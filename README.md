@@ -2,18 +2,14 @@
 
 **Der AI-Fashion-Agent, der dich wirklich kennt.**
 
-FinX-Moda (kurz: **Moda**) ist ein AI-natives Consumer-Frontend für Premium- und Luxus-Fashion-Commerce. Ein persönlicher Agent, der einen individualisierten Katalog on the fly generiert, Outfits komponiert, zu Größe und Passform berät und den Kauf wirklich abschließt — auf Live-Merchant-Infrastruktur.
+FinX-Moda (kurz: **Moda**) ist ein AI-natives Consumer-Frontend für Premium- und Luxus-Fashion-Commerce. Ein persönlicher Agent, der einen individualisierten Katalog on the fly generiert, Outfits komponiert, zu Größe und Passform berät und den Kauf wirklich abschließt — auf Live-Merchant-Infrastruktur (Genesys/Stockchain + Stripe).
 
-## Was Moda nicht ist
+Der Unterschied zu jedem GPT-Adapter: ein echter Lernkern (**finx-memory**) über L1-Graph, L2-Episoden, L3-Stilvektor — und L4-Adapter später. Lernen und vergessen sind Teil der Architektur.
 
-Kein GPT-Adapter über einem Shop. Der Unterschied ist ein echter Lernkern (**finx-memory**), der den Nutzer über vier Gedächtnisschichten hinweg wirklich lernt — und wirklich vergessen kann.
+## Architektur
 
-## Produktkern
+Kanonische Referenz: [Systemarchitektur v1.0](docs/systemarchitektur-v1.md) (Stand 30.08.2026).
 
-- Individualisierter Katalog, generiert zur Person
-- Outfit-Komposition
-- Größen- und Passformberatung
-- Kaufabschluss auf echter Merchant-Infrastruktur
-- `finx-memory`: vier Schichten, lernen und vergessen
+Invarianten: ein Schreibpfad ins Warehouse (`finx-ingest`), kein LLM im Feed-Pfad, Zonengrenzen als Code, jede Modellart versioniert.
 
-Dieses Repository ist die Home-Base für Moda (`xrey167/FinX-BB`).
+Dieses Repository ist die Home-Base (`xrey167/FinX-BB`).
