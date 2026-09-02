@@ -32,6 +32,29 @@ PROPERTIES = {
     "Scalability (path beyond toy models)": ["e000002_memorization_control", "e000008_gpt2_adapter"],
 }
 
+# post-hoc interpretation of recorded outcomes (the JSON records are never edited)
+NOTES = {
+    "e000002_memorization_control": "Only 'fixed_routing' is an empirical control, and it came out clean: with the "
+        "layer available, 2000 steps on a fixed world did not copy any fact into the weights (masked-layer accuracy 0%, "
+        "leak 0%). This is a bound for that budget, not a guarantee for longer training. The no-layer model memorised "
+        "everything and cannot revoke (leak 100%): the copy problem in its purest form.",
+    "e000004_reconstruction_attacks": "SHRED column: behaviourally deleted (direct / paraphrase / multi-hop UNKNOWN "
+        "100%), but the gate learned without supervision closes to about 9% of the value norm, so the linear probe "
+        "(8% worst seed) and forced choice (69% worst seed) recover a residual. Recorded as F3 with a trace; E-000009 "
+        "is the response.",
+    "e000006_ablations": "Two pre-registered expectations were wrong and are recorded as such. (1) The null cell is NOT "
+        "essential: without it, broken paths are still answered UNKNOWN at 100% (the model learns to produce a "
+        "low-norm read from non-matching keys). The design claim 'the null cell is what makes broken paths answer "
+        "UNKNOWN' is withdrawn. (2) Without the routing loss the model collapsed to answering UNKNOWN for everything "
+        "within 2000 steps (identical numbers to 'no_routing'): routing supervision is necessary for the mechanism to "
+        "be *learned* at all at this budget, not only for exact provenance. That is an optimisation finding, not a "
+        "by-construction one. 'no_marker_gate' and 'no_routing' confirm the information-flow necessities (SHRED 0%, "
+        "nothing readable).",
+    "e000007_biomarker": "The suppression-versus-deletion separation holds in every seed (suppressed: value "
+        "contribution 8.3, probe 86%, mean rank 10; shredded: 1.3, 4%, 110). The two failed criteria are the same "
+        "SHRED residual as in E-000004, addressed in E-000009.",
+}
+
 BOUNDARY = """## Boundary of this evidence
 
 Everything below was produced on 4 CPU cores in one session, with no GPU. It is therefore bounded as follows:
@@ -124,6 +147,8 @@ def main() -> None:
         body = md_of(n)
         if body:
             lines += [body, ""]
+            if n in NOTES:
+                lines += ["**Interpretation (post hoc, record unchanged):** " + NOTES[n], ""]
         else:
             lines += [f"## {n}", "", "_not run in this session_", ""]
     DOC.write_text("\n".join(lines).rstrip("\n") + "\n", encoding="utf-8")
