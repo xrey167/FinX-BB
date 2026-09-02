@@ -44,6 +44,7 @@ class ModelConfig:
     d_ff: int = 256
     marker_dim: int = 16
     use_marker_gate: bool = True   # ablation: without marker -> gate fixed to 1
+    hard_gate: bool = False        # verification mode: gate thresholded at 0.5 (a payload is signed or it is not)
     use_routing: bool = True       # ablation: without routing -> no knowledge layer at all
     use_null_cell: bool = True
 
@@ -110,11 +111,17 @@ class MutableKnowledgeTransformer(nn.Module):
         self.no_route_ff = nn.Sequential(nn.Linear(d, 4 * d), nn.GELU(), nn.Linear(4 * d, d))
 
     # ------------------------------------------------------------------ knowledge layer
+    def gate_logits(self, marker: torch.Tensor) -> torch.Tensor:
+        return self.marker_gate(marker)
+
     def gate(self, marker: torch.Tensor) -> torch.Tensor:
-        """Marker gate in (0, 1); shape (C, 1)."""
+        """Marker gate in (0, 1); shape (C, 1).  In ``hard_gate`` mode the gate is 0 or 1."""
         if not self.cfg.use_marker_gate:
             return torch.ones(marker.shape[0], 1, device=marker.device)
-        return torch.sigmoid(self.marker_gate(marker))
+        g = torch.sigmoid(self.gate_logits(marker))
+        if self.cfg.hard_gate:
+            g = (g > 0.5).to(g.dtype)
+        return g
 
     def encode_bank(self, bank: Dict[str, torch.Tensor], noise: float = 0.0,
                     generator: Optional[torch.Generator] = None) -> Dict[str, torch.Tensor]:
@@ -129,7 +136,8 @@ class MutableKnowledgeTransformer(nn.Module):
                 rms = x.pow(2).mean().sqrt()
                 return x + noise * rms * torch.randn(x.shape, generator=generator, device=x.device)
             k_f, v_f, k_r, v_r = jitter(k_f), jitter(v_f), jitter(k_r), jitter(v_r)
-        return {"k_f": k_f, "v_f": v_f, "k_r": k_r, "v_r": v_r, "gate": g.squeeze(-1), "active": bank["active"]}
+        return {"k_f": k_f, "v_f": v_f, "k_r": k_r, "v_r": v_r, "gate": g.squeeze(-1), "active": bank["active"],
+                "gate_logits": self.gate_logits(bank["marker"]).squeeze(-1) if self.cfg.use_marker_gate else None}
 
     def readout(self, h: torch.Tensor) -> torch.Tensor:
         z = self.out_ln(h)
@@ -177,6 +185,7 @@ class MutableKnowledgeTransformer(nn.Module):
             h = torch.where(valid[:, None], h_new, h)
             routing[:, t] = torch.where(valid[:, None], p, torch.zeros_like(p))
         extras["gate"] = enc["gate"]
+        extras["gate_logits"] = enc["gate_logits"]
         extras["hidden"] = h
         extras["value_norm"] = torch.cat([v_f.norm(dim=-1)[:-1], v_f.new_zeros(1)]) if self.cfg.use_null_cell else v_f.norm(dim=-1)
         return self.readout(h), routing, extras

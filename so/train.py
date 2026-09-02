@@ -41,6 +41,7 @@ class TrainConfig:
     p_stale: float = 0.05
     train_noise: float = 0.03
     route_weight: float = 0.5
+    gate_weight: float = 0.0         # E-000009: BCE(gate logits, marker validity) — signature verification loss
     mix: Dict[str, float] = field(default_factory=lambda: {"fwd1": 0.40, "fwd2": 0.25, "fwd3": 0.20, "rev1": 0.15})
     fixed_world: bool = False        # E-000002: train on ONE world so that facts can be memorised
     log_every: int = 250
@@ -106,12 +107,16 @@ def train(model_cfg: ModelConfig, cfg: TrainConfig, world_override: Optional[Wor
         batch = encode_queries(queries, bank, world, model_cfg.max_hops)
         for g in opt.param_groups:
             g["lr"] = lr_at(step, cfg)
-        logits, routing, _ = model(bank.tensors(), batch.mode, batch.start, batch.rels, batch.hop_valid,
-                                   noise=cfg.train_noise)
+        tensors = bank.tensors()
+        logits, routing, extras = model(tensors, batch.mode, batch.start, batch.rels, batch.hop_valid,
+                                        noise=cfg.train_noise)
         loss_ans = F.cross_entropy(logits, batch.target)
         loss = loss_ans
         if model_cfg.use_routing and cfg.route_weight > 0:
             loss = loss + cfg.route_weight * routing_loss(routing, batch.route, model_cfg.use_null_cell)
+        if model_cfg.use_routing and model_cfg.use_marker_gate and cfg.gate_weight > 0 and extras.get("gate_logits") is not None:
+            loss = loss + cfg.gate_weight * F.binary_cross_entropy_with_logits(
+                extras["gate_logits"], tensors["marker_valid"].float())
         opt.zero_grad(set_to_none=True)
         loss.backward()
         torch.nn.utils.clip_grad_norm_(model.parameters(), 1.0)

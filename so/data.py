@@ -53,6 +53,7 @@ class Bank:
     index_view: Dict[Tuple[int, int], int]
     kid_of_key: Dict[Tuple[int, int], int]   # key -> position in the bank (usable cells only)
     active_pos: Dict[Tuple[int, int], int]   # key -> position of a ROUTABLE cell (active; marker may be invalid)
+    marker_valid: Optional[np.ndarray] = None  # per cell: is the marker signed? (control-plane truth for gate supervision)
 
     @property
     def size(self) -> int:
@@ -65,6 +66,8 @@ class Bank:
             "obj": torch.as_tensor(self.obj, dtype=torch.long, device=device),
             "marker": torch.as_tensor(self.marker, dtype=torch.float32, device=device),
             "active": torch.as_tensor(self.active, dtype=torch.bool, device=device),
+            "marker_valid": torch.as_tensor(self.marker_valid if self.marker_valid is not None else np.ones(self.size, dtype=bool),
+                                            dtype=torch.bool, device=device),
         }
 
 
@@ -96,18 +99,19 @@ def bank_from_world(rng: np.random.Generator, world: World, centre: np.ndarray, 
     kid_of_key = {(int(s), int(r)): int(i) for i, (s, r, u) in enumerate(zip(subject, relation, usable)) if u}
     active_pos = {(int(s), int(r)): int(i) for i, (s, r, a) in enumerate(zip(subject, relation, active)) if a}
     return Bank(subject, relation, obj, marker.astype(np.float32), active, usable, np.arange(subject.shape[0]),
-                index_view, kid_of_key, active_pos)
+                index_view, kid_of_key, active_pos, marker_valid=~shred)
 
 
 def bank_from_store(store, respect_markers: bool = False) -> Bank:
     """Bank view of a real ``MVCCStore`` (used for evaluation and lifecycle operations)."""
     b = store.bank(respect_markers=False)
-    usable = np.array([store.marker_valid(m) for m in b["marker"]], dtype=bool) & b["active"]
+    valid = np.array([store.marker_valid(m) for m in b["marker"]], dtype=bool)
+    usable = valid & b["active"]
     index_view = {(int(s), int(r)): int(o) for s, r, o, u in zip(b["subject"], b["relation"], b["obj"], usable) if u}
     kid_of_key = {(int(s), int(r)): int(i) for i, (s, r, u) in enumerate(zip(b["subject"], b["relation"], usable)) if u}
     active_pos = {(int(s), int(r)): int(i) for i, (s, r, a) in enumerate(zip(b["subject"], b["relation"], b["active"])) if a}
     return Bank(b["subject"], b["relation"], b["obj"], b["marker"], b["active"], usable, b["kid"], index_view, kid_of_key,
-                active_pos)
+                active_pos, marker_valid=valid)
 
 
 def failing_hop_target(bank: Bank, q: Query, gt) -> int:
