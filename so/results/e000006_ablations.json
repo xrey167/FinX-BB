@@ -1,0 +1,1051 @@
+{
+  "aggregate": {
+    "full": {
+      "alternative_path": {
+        "max": 1.0,
+        "mean": 1.0,
+        "min": 1.0,
+        "n": 3
+      },
+      "direct": {
+        "max": 1.0,
+        "mean": 1.0,
+        "min": 1.0,
+        "n": 3
+      },
+      "hop2": {
+        "max": 1.0,
+        "mean": 1.0,
+        "min": 1.0,
+        "n": 3
+      },
+      "hop2_broken_unknown": {
+        "max": 1.0,
+        "mean": 1.0,
+        "min": 1.0,
+        "n": 3
+      },
+      "hop3": {
+        "max": 1.0,
+        "mean": 1.0,
+        "min": 1.0,
+        "n": 3
+      },
+      "locality": {
+        "max": 1.0,
+        "mean": 1.0,
+        "min": 1.0,
+        "n": 3
+      },
+      "provenance": {
+        "max": 1.0,
+        "mean": 1.0,
+        "min": 1.0,
+        "n": 3
+      },
+      "reverse": {
+        "max": 1.0,
+        "mean": 1.0,
+        "min": 1.0,
+        "n": 3
+      },
+      "revoke": {
+        "max": 1.0,
+        "mean": 1.0,
+        "min": 1.0,
+        "n": 3
+      },
+      "rollback": {
+        "max": 1.0,
+        "mean": 1.0,
+        "min": 1.0,
+        "n": 3
+      },
+      "shred": {
+        "max": 1.0,
+        "mean": 1.0,
+        "min": 1.0,
+        "n": 3
+      },
+      "update": {
+        "max": 1.0,
+        "mean": 1.0,
+        "min": 1.0,
+        "n": 3
+      }
+    },
+    "full_same_budget": {
+      "alternative_path": {
+        "max": 1.0,
+        "mean": 1.0,
+        "min": 1.0,
+        "n": 3
+      },
+      "direct": {
+        "max": 1.0,
+        "mean": 1.0,
+        "min": 1.0,
+        "n": 3
+      },
+      "hop2": {
+        "max": 1.0,
+        "mean": 1.0,
+        "min": 1.0,
+        "n": 3
+      },
+      "hop2_broken_unknown": {
+        "max": 1.0,
+        "mean": 1.0,
+        "min": 1.0,
+        "n": 3
+      },
+      "hop3": {
+        "max": 1.0,
+        "mean": 1.0,
+        "min": 1.0,
+        "n": 3
+      },
+      "locality": {
+        "max": 1.0,
+        "mean": 1.0,
+        "min": 1.0,
+        "n": 3
+      },
+      "provenance": {
+        "max": 1.0,
+        "mean": 1.0,
+        "min": 1.0,
+        "n": 3
+      },
+      "reverse": {
+        "max": 1.0,
+        "mean": 1.0,
+        "min": 1.0,
+        "n": 3
+      },
+      "revoke": {
+        "max": 1.0,
+        "mean": 1.0,
+        "min": 1.0,
+        "n": 3
+      },
+      "rollback": {
+        "max": 1.0,
+        "mean": 1.0,
+        "min": 1.0,
+        "n": 3
+      },
+      "shred": {
+        "max": 1.0,
+        "mean": 0.9933333333333333,
+        "min": 0.98,
+        "n": 3
+      },
+      "update": {
+        "max": 1.0,
+        "mean": 1.0,
+        "min": 1.0,
+        "n": 3
+      }
+    },
+    "no_marker_gate": {
+      "alternative_path": {
+        "max": 1.0,
+        "mean": 1.0,
+        "min": 1.0,
+        "n": 3
+      },
+      "direct": {
+        "max": 1.0,
+        "mean": 1.0,
+        "min": 1.0,
+        "n": 3
+      },
+      "hop2": {
+        "max": 1.0,
+        "mean": 1.0,
+        "min": 1.0,
+        "n": 3
+      },
+      "hop2_broken_unknown": {
+        "max": 1.0,
+        "mean": 1.0,
+        "min": 1.0,
+        "n": 3
+      },
+      "hop3": {
+        "max": 1.0,
+        "mean": 1.0,
+        "min": 1.0,
+        "n": 3
+      },
+      "locality": {
+        "max": 1.0,
+        "mean": 1.0,
+        "min": 1.0,
+        "n": 3
+      },
+      "provenance": {
+        "max": 1.0,
+        "mean": 1.0,
+        "min": 1.0,
+        "n": 3
+      },
+      "reverse": {
+        "max": 1.0,
+        "mean": 1.0,
+        "min": 1.0,
+        "n": 3
+      },
+      "revoke": {
+        "max": 1.0,
+        "mean": 1.0,
+        "min": 1.0,
+        "n": 3
+      },
+      "rollback": {
+        "max": 1.0,
+        "mean": 1.0,
+        "min": 1.0,
+        "n": 3
+      },
+      "shred": {
+        "max": 0.0,
+        "mean": 0.0,
+        "min": 0.0,
+        "n": 3
+      },
+      "update": {
+        "max": 1.0,
+        "mean": 1.0,
+        "min": 1.0,
+        "n": 3
+      }
+    },
+    "no_null_cell": {
+      "alternative_path": {
+        "max": 1.0,
+        "mean": 1.0,
+        "min": 1.0,
+        "n": 3
+      },
+      "direct": {
+        "max": 1.0,
+        "mean": 1.0,
+        "min": 1.0,
+        "n": 3
+      },
+      "hop2": {
+        "max": 1.0,
+        "mean": 1.0,
+        "min": 1.0,
+        "n": 3
+      },
+      "hop2_broken_unknown": {
+        "max": 1.0,
+        "mean": 1.0,
+        "min": 1.0,
+        "n": 3
+      },
+      "hop3": {
+        "max": 1.0,
+        "mean": 1.0,
+        "min": 1.0,
+        "n": 3
+      },
+      "locality": {
+        "max": 1.0,
+        "mean": 1.0,
+        "min": 1.0,
+        "n": 3
+      },
+      "provenance": {
+        "max": 1.0,
+        "mean": 1.0,
+        "min": 1.0,
+        "n": 3
+      },
+      "reverse": {
+        "max": 1.0,
+        "mean": 1.0,
+        "min": 1.0,
+        "n": 3
+      },
+      "revoke": {
+        "max": 1.0,
+        "mean": 1.0,
+        "min": 1.0,
+        "n": 3
+      },
+      "rollback": {
+        "max": 1.0,
+        "mean": 1.0,
+        "min": 1.0,
+        "n": 3
+      },
+      "shred": {
+        "max": 1.0,
+        "mean": 1.0,
+        "min": 1.0,
+        "n": 3
+      },
+      "update": {
+        "max": 1.0,
+        "mean": 1.0,
+        "min": 1.0,
+        "n": 3
+      }
+    },
+    "no_routing": {
+      "alternative_path": {
+        "max": 0.0,
+        "mean": 0.0,
+        "min": 0.0,
+        "n": 3
+      },
+      "direct": {
+        "max": 0.0,
+        "mean": 0.0,
+        "min": 0.0,
+        "n": 3
+      },
+      "hop2": {
+        "max": 0.0,
+        "mean": 0.0,
+        "min": 0.0,
+        "n": 3
+      },
+      "hop2_broken_unknown": {
+        "max": 1.0,
+        "mean": 1.0,
+        "min": 1.0,
+        "n": 3
+      },
+      "hop3": {
+        "max": 0.0,
+        "mean": 0.0,
+        "min": 0.0,
+        "n": 3
+      },
+      "locality": {
+        "max": 1.0,
+        "mean": 1.0,
+        "min": 1.0,
+        "n": 3
+      },
+      "provenance": {
+        "max": 0.0,
+        "mean": 0.0,
+        "min": 0.0,
+        "n": 3
+      },
+      "reverse": {
+        "max": 0.25,
+        "mean": 0.21,
+        "min": 0.16,
+        "n": 3
+      },
+      "revoke": {
+        "max": 1.0,
+        "mean": 1.0,
+        "min": 1.0,
+        "n": 3
+      },
+      "rollback": {
+        "max": 0.0,
+        "mean": 0.0,
+        "min": 0.0,
+        "n": 3
+      },
+      "shred": {
+        "max": 1.0,
+        "mean": 1.0,
+        "min": 1.0,
+        "n": 3
+      },
+      "update": {
+        "max": 0.0,
+        "mean": 0.0,
+        "min": 0.0,
+        "n": 3
+      }
+    },
+    "no_routing_loss": {
+      "alternative_path": {
+        "max": 0.0,
+        "mean": 0.0,
+        "min": 0.0,
+        "n": 3
+      },
+      "direct": {
+        "max": 0.0,
+        "mean": 0.0,
+        "min": 0.0,
+        "n": 3
+      },
+      "hop2": {
+        "max": 0.0,
+        "mean": 0.0,
+        "min": 0.0,
+        "n": 3
+      },
+      "hop2_broken_unknown": {
+        "max": 1.0,
+        "mean": 1.0,
+        "min": 1.0,
+        "n": 3
+      },
+      "hop3": {
+        "max": 0.0,
+        "mean": 0.0,
+        "min": 0.0,
+        "n": 3
+      },
+      "locality": {
+        "max": 1.0,
+        "mean": 1.0,
+        "min": 1.0,
+        "n": 3
+      },
+      "provenance": {
+        "max": 0.0,
+        "mean": 0.0,
+        "min": 0.0,
+        "n": 3
+      },
+      "reverse": {
+        "max": 0.25,
+        "mean": 0.21,
+        "min": 0.16,
+        "n": 3
+      },
+      "revoke": {
+        "max": 1.0,
+        "mean": 1.0,
+        "min": 1.0,
+        "n": 3
+      },
+      "rollback": {
+        "max": 0.0,
+        "mean": 0.0,
+        "min": 0.0,
+        "n": 3
+      },
+      "shred": {
+        "max": 1.0,
+        "mean": 1.0,
+        "min": 1.0,
+        "n": 3
+      },
+      "update": {
+        "max": 0.0,
+        "mean": 0.0,
+        "min": 0.0,
+        "n": 3
+      }
+    }
+  },
+  "by_construction_vs_learned": "'no_routing' and 'no_marker_gate' remove an information path, so their failures (nothing readable / SHRED ineffective) are information-flow necessities, reported to quantify them. 'no_null_cell' and 'no_routing_loss' keep the information paths and test learned behaviour: whether UNKNOWN detection and exact provenance emerge without the dedicated cell / loss. 'full_same_budget' is the fair baseline trained with the variants' step budget.",
+  "claim": "NOT SUPPORTED BY THE MEASUREMENTS (see criteria): Each architectural component has a measurable, specific effect: the marker gate is what makes SHRED work, the null cell is what makes broken paths answer UNKNOWN, routing is what makes any reading of re-sampled worlds possible, and the routing loss is what makes provenance exact.",
+  "claim_supported": false,
+  "config": {
+    "full_steps": 3000,
+    "seeds": [
+      0,
+      1,
+      2
+    ],
+    "variant_steps": 2000
+  },
+  "criteria": {
+    "full_same_budget/direct": {
+      "observed": 1.0,
+      "op": ">=",
+      "pass": true,
+      "threshold": 0.98
+    },
+    "full_same_budget/shred": {
+      "observed": 0.98,
+      "op": ">=",
+      "pass": true,
+      "threshold": 0.95
+    },
+    "no_marker_gate/direct": {
+      "observed": 1.0,
+      "op": ">=",
+      "pass": true,
+      "threshold": 0.98
+    },
+    "no_marker_gate/shred": {
+      "observed": 0.0,
+      "op": "<=",
+      "pass": true,
+      "threshold": 0.2
+    },
+    "no_null_cell/hop2_broken_unknown": {
+      "observed": 1.0,
+      "op": "<=",
+      "pass": false,
+      "threshold": 0.5
+    },
+    "no_routing/direct": {
+      "observed": 0.0,
+      "op": "<=",
+      "pass": true,
+      "threshold": 0.1
+    }
+  },
+  "deletion_level": null,
+  "environment": {
+    "device": "cpu",
+    "numpy": "2.2.6",
+    "platform": "Linux-6.18.44-fc-v24-x86_64-with-glibc2.39",
+    "python": "3.11.15",
+    "threads": "2",
+    "torch": "2.14.0+cpu"
+  },
+  "evidence_level": "E4",
+  "evidence_level_meaning": "Controlled neural-network evidence",
+  "experiment": "E-000006",
+  "no_versioning_rollback": "impossible (no version to return to)",
+  "not_claimed": "Optimality of the design; only necessity of components within this system.",
+  "per_variant": {
+    "full": [
+      {
+        "alternative_path": 1.0,
+        "direct": 1.0,
+        "direct_unknown_rate": 0.0,
+        "hop2": 1.0,
+        "hop2_broken_unknown": 1.0,
+        "hop3": 1.0,
+        "hop3_broken_unknown": 0.98,
+        "locality": 1.0,
+        "locality_targets_correct": 1.0,
+        "locality_undo_exact": 1.0,
+        "n_cells": 1000,
+        "noise": {
+          "0.00": 1.0
+        },
+        "provenance": 1.0,
+        "random_deletion_target_unchanged": 1.0,
+        "replay_deviation": 0,
+        "resign": 1.0,
+        "restore": 1.0,
+        "reverse": 1.0,
+        "revoke": 1.0,
+        "rollback": 1.0,
+        "seed": 600,
+        "shred": 1.0,
+        "update": 1.0,
+        "update_derived": 1.0,
+        "update_rollback": 1.0
+      },
+      {
+        "alternative_path": 1.0,
+        "direct": 1.0,
+        "direct_unknown_rate": 0.0,
+        "hop2": 1.0,
+        "hop2_broken_unknown": 1.0,
+        "hop3": 1.0,
+        "hop3_broken_unknown": 0.96,
+        "locality": 1.0,
+        "locality_targets_correct": 1.0,
+        "locality_undo_exact": 1.0,
+        "n_cells": 1000,
+        "noise": {
+          "0.00": 1.0
+        },
+        "provenance": 1.0,
+        "random_deletion_target_unchanged": 1.0,
+        "replay_deviation": 0,
+        "resign": 1.0,
+        "restore": 1.0,
+        "reverse": 1.0,
+        "revoke": 1.0,
+        "rollback": 1.0,
+        "seed": 601,
+        "shred": 1.0,
+        "update": 1.0,
+        "update_derived": 1.0,
+        "update_rollback": 1.0
+      },
+      {
+        "alternative_path": 1.0,
+        "direct": 1.0,
+        "direct_unknown_rate": 0.0,
+        "hop2": 1.0,
+        "hop2_broken_unknown": 1.0,
+        "hop3": 1.0,
+        "hop3_broken_unknown": 0.95,
+        "locality": 1.0,
+        "locality_targets_correct": 1.0,
+        "locality_undo_exact": 1.0,
+        "n_cells": 1000,
+        "noise": {
+          "0.00": 1.0
+        },
+        "provenance": 1.0,
+        "random_deletion_target_unchanged": 1.0,
+        "replay_deviation": 0,
+        "resign": 1.0,
+        "restore": 1.0,
+        "reverse": 1.0,
+        "revoke": 1.0,
+        "rollback": 1.0,
+        "seed": 602,
+        "shred": 1.0,
+        "update": 1.0,
+        "update_derived": 1.0,
+        "update_rollback": 1.0
+      }
+    ],
+    "full_same_budget": [
+      {
+        "alternative_path": 1.0,
+        "direct": 1.0,
+        "direct_unknown_rate": 0.0,
+        "hop2": 1.0,
+        "hop2_broken_unknown": 1.0,
+        "hop3": 1.0,
+        "hop3_broken_unknown": 0.92,
+        "locality": 1.0,
+        "locality_targets_correct": 1.0,
+        "locality_undo_exact": 1.0,
+        "n_cells": 1000,
+        "noise": {
+          "0.00": 1.0
+        },
+        "provenance": 1.0,
+        "replay_deviation": 0,
+        "resign": 1.0,
+        "restore": 1.0,
+        "reverse": 1.0,
+        "revoke": 1.0,
+        "rollback": 1.0,
+        "seed": 600,
+        "shred": 0.98,
+        "train_seconds": 95.31624674797058,
+        "update": 1.0,
+        "update_derived": 1.0,
+        "update_rollback": 0.9971428571428571
+      },
+      {
+        "alternative_path": 1.0,
+        "direct": 1.0,
+        "direct_unknown_rate": 0.0,
+        "hop2": 1.0,
+        "hop2_broken_unknown": 1.0,
+        "hop3": 1.0,
+        "hop3_broken_unknown": 0.93,
+        "locality": 1.0,
+        "locality_targets_correct": 1.0,
+        "locality_undo_exact": 1.0,
+        "n_cells": 1000,
+        "noise": {
+          "0.00": 1.0
+        },
+        "provenance": 1.0,
+        "replay_deviation": 0,
+        "resign": 1.0,
+        "restore": 1.0,
+        "reverse": 1.0,
+        "revoke": 1.0,
+        "rollback": 1.0,
+        "seed": 601,
+        "shred": 1.0,
+        "train_seconds": 96.57887411117554,
+        "update": 1.0,
+        "update_derived": 1.0,
+        "update_rollback": 1.0
+      },
+      {
+        "alternative_path": 1.0,
+        "direct": 1.0,
+        "direct_unknown_rate": 0.0,
+        "hop2": 1.0,
+        "hop2_broken_unknown": 1.0,
+        "hop3": 1.0,
+        "hop3_broken_unknown": 0.94,
+        "locality": 1.0,
+        "locality_targets_correct": 1.0,
+        "locality_undo_exact": 1.0,
+        "n_cells": 1000,
+        "noise": {
+          "0.00": 1.0
+        },
+        "provenance": 1.0,
+        "replay_deviation": 0,
+        "resign": 1.0,
+        "restore": 1.0,
+        "reverse": 1.0,
+        "revoke": 1.0,
+        "rollback": 1.0,
+        "seed": 602,
+        "shred": 1.0,
+        "train_seconds": 96.14609861373901,
+        "update": 1.0,
+        "update_derived": 1.0,
+        "update_rollback": 1.0
+      }
+    ],
+    "no_marker_gate": [
+      {
+        "alternative_path": 1.0,
+        "direct": 1.0,
+        "direct_unknown_rate": 0.0,
+        "hop2": 1.0,
+        "hop2_broken_unknown": 1.0,
+        "hop3": 1.0,
+        "hop3_broken_unknown": 0.96,
+        "locality": 1.0,
+        "locality_targets_correct": 1.0,
+        "locality_undo_exact": 1.0,
+        "n_cells": 1000,
+        "noise": {
+          "0.00": 1.0
+        },
+        "provenance": 1.0,
+        "replay_deviation": 0,
+        "resign": 1.0,
+        "restore": 1.0,
+        "reverse": 1.0,
+        "revoke": 1.0,
+        "rollback": 1.0,
+        "seed": 600,
+        "shred": 0.0,
+        "train_seconds": 91.88210391998291,
+        "update": 1.0,
+        "update_derived": 1.0,
+        "update_rollback": 0.8571428571428571
+      },
+      {
+        "alternative_path": 1.0,
+        "direct": 1.0,
+        "direct_unknown_rate": 0.0,
+        "hop2": 1.0,
+        "hop2_broken_unknown": 1.0,
+        "hop3": 1.0,
+        "hop3_broken_unknown": 0.96,
+        "locality": 1.0,
+        "locality_targets_correct": 1.0,
+        "locality_undo_exact": 1.0,
+        "n_cells": 1000,
+        "noise": {
+          "0.00": 1.0
+        },
+        "provenance": 1.0,
+        "replay_deviation": 0,
+        "resign": 1.0,
+        "restore": 1.0,
+        "reverse": 1.0,
+        "revoke": 1.0,
+        "rollback": 1.0,
+        "seed": 601,
+        "shred": 0.0,
+        "train_seconds": 98.15167593955994,
+        "update": 1.0,
+        "update_derived": 1.0,
+        "update_rollback": 0.8571428571428571
+      },
+      {
+        "alternative_path": 1.0,
+        "direct": 1.0,
+        "direct_unknown_rate": 0.0,
+        "hop2": 1.0,
+        "hop2_broken_unknown": 1.0,
+        "hop3": 1.0,
+        "hop3_broken_unknown": 0.97,
+        "locality": 1.0,
+        "locality_targets_correct": 1.0,
+        "locality_undo_exact": 1.0,
+        "n_cells": 1000,
+        "noise": {
+          "0.00": 1.0
+        },
+        "provenance": 1.0,
+        "replay_deviation": 0,
+        "resign": 1.0,
+        "restore": 1.0,
+        "reverse": 1.0,
+        "revoke": 1.0,
+        "rollback": 1.0,
+        "seed": 602,
+        "shred": 0.0,
+        "train_seconds": 94.81879925727844,
+        "update": 1.0,
+        "update_derived": 1.0,
+        "update_rollback": 0.8571428571428571
+      }
+    ],
+    "no_null_cell": [
+      {
+        "alternative_path": 1.0,
+        "direct": 1.0,
+        "direct_unknown_rate": 0.0,
+        "hop2": 1.0,
+        "hop2_broken_unknown": 1.0,
+        "hop3": 1.0,
+        "hop3_broken_unknown": 0.91,
+        "locality": 1.0,
+        "locality_targets_correct": 1.0,
+        "locality_undo_exact": 1.0,
+        "n_cells": 1000,
+        "noise": {
+          "0.00": 1.0
+        },
+        "provenance": 1.0,
+        "replay_deviation": 0,
+        "resign": 1.0,
+        "restore": 1.0,
+        "reverse": 1.0,
+        "revoke": 1.0,
+        "rollback": 1.0,
+        "seed": 600,
+        "shred": 1.0,
+        "train_seconds": 94.22467994689941,
+        "update": 1.0,
+        "update_derived": 1.0,
+        "update_rollback": 1.0
+      },
+      {
+        "alternative_path": 1.0,
+        "direct": 1.0,
+        "direct_unknown_rate": 0.0,
+        "hop2": 1.0,
+        "hop2_broken_unknown": 1.0,
+        "hop3": 1.0,
+        "hop3_broken_unknown": 0.93,
+        "locality": 1.0,
+        "locality_targets_correct": 1.0,
+        "locality_undo_exact": 1.0,
+        "n_cells": 1000,
+        "noise": {
+          "0.00": 1.0
+        },
+        "provenance": 1.0,
+        "replay_deviation": 0,
+        "resign": 1.0,
+        "restore": 1.0,
+        "reverse": 1.0,
+        "revoke": 1.0,
+        "rollback": 1.0,
+        "seed": 601,
+        "shred": 1.0,
+        "train_seconds": 95.05899620056152,
+        "update": 1.0,
+        "update_derived": 1.0,
+        "update_rollback": 1.0
+      },
+      {
+        "alternative_path": 1.0,
+        "direct": 1.0,
+        "direct_unknown_rate": 0.0,
+        "hop2": 1.0,
+        "hop2_broken_unknown": 1.0,
+        "hop3": 1.0,
+        "hop3_broken_unknown": 0.96,
+        "locality": 1.0,
+        "locality_targets_correct": 1.0,
+        "locality_undo_exact": 1.0,
+        "n_cells": 1000,
+        "noise": {
+          "0.00": 1.0
+        },
+        "provenance": 1.0,
+        "replay_deviation": 0,
+        "resign": 1.0,
+        "restore": 1.0,
+        "reverse": 1.0,
+        "revoke": 1.0,
+        "rollback": 1.0,
+        "seed": 602,
+        "shred": 1.0,
+        "train_seconds": 97.33423066139221,
+        "update": 1.0,
+        "update_derived": 1.0,
+        "update_rollback": 1.0
+      }
+    ],
+    "no_routing": [
+      {
+        "alternative_path": 0.0,
+        "direct": 0.0,
+        "direct_unknown_rate": 1.0,
+        "hop2": 0.0,
+        "hop2_broken_unknown": 1.0,
+        "hop3": 0.0,
+        "hop3_broken_unknown": 1.0,
+        "locality": 1.0,
+        "locality_targets_correct": 0.3333333333333333,
+        "locality_undo_exact": 1.0,
+        "n_cells": 1000,
+        "noise": {
+          "0.00": 0.0
+        },
+        "provenance": 0.0,
+        "replay_deviation": 0,
+        "resign": 0.0,
+        "restore": 0.0,
+        "reverse": 0.22,
+        "revoke": 1.0,
+        "rollback": 0.0,
+        "seed": 600,
+        "shred": 1.0,
+        "train_seconds": 52.94021821022034,
+        "update": 0.0,
+        "update_derived": 0.0,
+        "update_rollback": 0.2857142857142857
+      },
+      {
+        "alternative_path": 0.0,
+        "direct": 0.0,
+        "direct_unknown_rate": 1.0,
+        "hop2": 0.0,
+        "hop2_broken_unknown": 1.0,
+        "hop3": 0.0,
+        "hop3_broken_unknown": 1.0,
+        "locality": 1.0,
+        "locality_targets_correct": 0.3333333333333333,
+        "locality_undo_exact": 1.0,
+        "n_cells": 1000,
+        "noise": {
+          "0.00": 0.0
+        },
+        "provenance": 0.0,
+        "replay_deviation": 0,
+        "resign": 0.0,
+        "restore": 0.0,
+        "reverse": 0.25,
+        "revoke": 1.0,
+        "rollback": 0.0,
+        "seed": 601,
+        "shred": 1.0,
+        "train_seconds": 53.30168867111206,
+        "update": 0.0,
+        "update_derived": 0.0,
+        "update_rollback": 0.2857142857142857
+      },
+      {
+        "alternative_path": 0.0,
+        "direct": 0.0,
+        "direct_unknown_rate": 1.0,
+        "hop2": 0.0,
+        "hop2_broken_unknown": 1.0,
+        "hop3": 0.0,
+        "hop3_broken_unknown": 1.0,
+        "locality": 1.0,
+        "locality_targets_correct": 0.3333333333333333,
+        "locality_undo_exact": 1.0,
+        "n_cells": 1000,
+        "noise": {
+          "0.00": 0.0
+        },
+        "provenance": 0.0,
+        "replay_deviation": 0,
+        "resign": 0.0,
+        "restore": 0.0,
+        "reverse": 0.16,
+        "revoke": 1.0,
+        "rollback": 0.0,
+        "seed": 602,
+        "shred": 1.0,
+        "train_seconds": 52.60297417640686,
+        "update": 0.0,
+        "update_derived": 0.0,
+        "update_rollback": 0.2857142857142857
+      }
+    ],
+    "no_routing_loss": [
+      {
+        "alternative_path": 0.0,
+        "direct": 0.0,
+        "direct_unknown_rate": 1.0,
+        "hop2": 0.0,
+        "hop2_broken_unknown": 1.0,
+        "hop3": 0.0,
+        "hop3_broken_unknown": 1.0,
+        "locality": 1.0,
+        "locality_targets_correct": 0.3333333333333333,
+        "locality_undo_exact": 1.0,
+        "n_cells": 1000,
+        "noise": {
+          "0.00": 0.0
+        },
+        "provenance": 0.0,
+        "replay_deviation": 0,
+        "resign": 0.0,
+        "restore": 0.0,
+        "reverse": 0.22,
+        "revoke": 1.0,
+        "rollback": 0.0,
+        "seed": 600,
+        "shred": 1.0,
+        "train_seconds": 90.96464443206787,
+        "update": 0.0,
+        "update_derived": 0.0,
+        "update_rollback": 0.2857142857142857
+      },
+      {
+        "alternative_path": 0.0,
+        "direct": 0.0,
+        "direct_unknown_rate": 1.0,
+        "hop2": 0.0,
+        "hop2_broken_unknown": 1.0,
+        "hop3": 0.0,
+        "hop3_broken_unknown": 1.0,
+        "locality": 1.0,
+        "locality_targets_correct": 0.3333333333333333,
+        "locality_undo_exact": 1.0,
+        "n_cells": 1000,
+        "noise": {
+          "0.00": 0.0
+        },
+        "provenance": 0.0,
+        "replay_deviation": 0,
+        "resign": 0.0,
+        "restore": 0.0,
+        "reverse": 0.25,
+        "revoke": 1.0,
+        "rollback": 0.0,
+        "seed": 601,
+        "shred": 1.0,
+        "train_seconds": 91.76186156272888,
+        "update": 0.0,
+        "update_derived": 0.0,
+        "update_rollback": 0.2857142857142857
+      },
+      {
+        "alternative_path": 0.0,
+        "direct": 0.0,
+        "direct_unknown_rate": 1.0,
+        "hop2": 0.0,
+        "hop2_broken_unknown": 1.0,
+        "hop3": 0.0,
+        "hop3_broken_unknown": 1.0,
+        "locality": 1.0,
+        "locality_targets_correct": 0.3333333333333333,
+        "locality_undo_exact": 1.0,
+        "n_cells": 1000,
+        "noise": {
+          "0.00": 0.0
+        },
+        "provenance": 0.0,
+        "replay_deviation": 0,
+        "resign": 0.0,
+        "restore": 0.0,
+        "reverse": 0.16,
+        "revoke": 1.0,
+        "rollback": 0.0,
+        "seed": 602,
+        "shred": 1.0,
+        "train_seconds": 93.38716006278992,
+        "update": 0.0,
+        "update_derived": 0.0,
+        "update_rollback": 0.2857142857142857
+      }
+    ]
+  },
+  "random_deletion_target_unchanged": 1.0,
+  "recorded_at": "2026-09-02T23:25:10+00:00",
+  "title": "Ablations"
+}
