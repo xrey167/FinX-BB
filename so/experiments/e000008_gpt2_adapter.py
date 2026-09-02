@@ -146,21 +146,29 @@ class GPT2Knowledge:
                 "logits": np.concatenate(cand_logits)}
 
 
-def train_adapter(gk: GPT2Knowledge, seed: int, steps: int, batch_size: int = 32, route_weight: float = 0.5,
-                  lr: float = 1e-3, verbose: bool = True) -> Dict[str, Any]:
+def train_adapter(gk: GPT2Knowledge, seed: int, steps: int, batch_size: int = 32, route_weight: float = 1.0,
+                  lr: float = 2e-3, route_only_steps: int = 300, verbose: bool = True) -> Dict[str, Any]:
+    """Routing-first curriculum.
+
+    At initialisation routing is random, and the cheapest reduction of the answer loss is to
+    route everything to the null key (which emits ' unknown').  The first ``route_only_steps``
+    therefore train the routing loss alone on small banks (150–300 cells); afterwards the full
+    loss is used on full-size banks (700–1000 cells).
+    """
     torch.manual_seed(seed)
     rng = np.random.default_rng(seed)
     centre = make_centre(seed, gk.model.cfg.marker_dim)
     model = gk.model
     params = model.adapter_parameters()
     opt = torch.optim.AdamW(params, lr=lr, weight_decay=0.01)
-    tcfg = TrainConfig(seed=seed, n_steps=steps, lr=lr, warmup=100)
+    tcfg = TrainConfig(seed=seed, n_steps=steps, lr=lr, warmup=50)
     mix = {"fwd1": 0.7, "fwd2": 0.3}
     history = []
     t0 = time.time()
     for step in range(steps):
         model.train()
-        n_cells = int(rng.integers(700, 1001))
+        route_only = step < route_only_steps
+        n_cells = int(rng.integers(150, 301)) if route_only else int(rng.integers(700, 1001))
         world = World.sample(rng, gk.n_entities, 4, n_cells, gk.n_synonyms)
         bank = bank_from_world(rng, world, centre, 0.10, 0.05, 0.05)
         queries = sample_training_queries(rng, world, bank, batch_size, mix)
@@ -171,18 +179,22 @@ def train_adapter(gk: GPT2Knowledge, seed: int, steps: int, batch_size: int = 32
             g["lr"] = lr_at(step, tcfg)
         cand, _, routing, _ = model(bank.tensors(), ids, am, last)
         loss_ans = F.cross_entropy(cand, target)
-        loss = loss_ans + route_weight * routing_loss(routing, route)
+        loss_route = routing_loss(routing, route)
+        loss = loss_route if route_only else loss_ans + route_weight * loss_route
         opt.zero_grad(set_to_none=True)
         loss.backward()
         torch.nn.utils.clip_grad_norm_(params, 1.0)
         opt.step()
         if (step + 1) % 100 == 0 or step == 0:
             acc = (cand.argmax(-1) == target).float().mean().item()
-            rec = {"step": step + 1, "loss": float(loss.item()), "answer_loss": float(loss_ans.item()), "batch_acc": acc,
+            rmass = float(routing[:, -1].max(-1).values.mean().item())
+            rec = {"step": step + 1, "loss": float(loss.item()), "answer_loss": float(loss_ans.item()),
+                   "route_loss": float(loss_route.item()), "batch_acc": acc, "route_max_mass": rmass,
                    "elapsed_s": time.time() - t0}
             history.append(rec)
             if verbose:
-                print(f"  step {step + 1:5d}  loss {rec['loss']:.4f}  ans {rec['answer_loss']:.4f}  acc {acc:.3f}  {rec['elapsed_s']:.0f}s", flush=True)
+                print(f"  step {step + 1:5d}  loss {rec['loss']:.4f}  ans {rec['answer_loss']:.4f}  route {rec['route_loss']:.4f}  "
+                      f"acc {acc:.3f}  rmass {rmass:.2f}  {rec['elapsed_s']:.0f}s", flush=True)
     model.eval()
     return {"centre": centre, "history": history, "train_seconds": time.time() - t0}
 

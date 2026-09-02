@@ -67,11 +67,16 @@ class KnowledgeAdapterLM(nn.Module):
         self.marker_gate = nn.Sequential(nn.Linear(cfg.marker_dim, 64), nn.GELU(), nn.Linear(64, 1))
         self.q_ln = nn.ModuleDict({str(l): nn.LayerNorm(d) for l in cfg.read_layers})
         self.q_proj = nn.ModuleDict({str(l): nn.Linear(d, cfg.d_key) for l in cfg.read_layers})
-        self.o_proj = nn.ModuleDict({str(l): nn.Linear(d, d) for l in cfg.read_layers})
-        for l in cfg.read_layers:                   # zero-init: the frozen model is unchanged at step 0
-            nn.init.zeros_(self.o_proj[str(l)].weight); nn.init.zeros_(self.o_proj[str(l)].bias)
+        # output projection: identity, no bias (a bias could implement a constant "unknown" shortcut)
+        self.o_proj = nn.ModuleDict({str(l): nn.Linear(d, d, bias=False) for l in cfg.read_layers})
+        for l in cfg.read_layers:
+            nn.init.eye_(self.o_proj[str(l)].weight)
+        # the injected read is RMS-matched to the residual stream (whose norm is ~30x a token embedding's)
+        self.inject_gain = nn.Parameter(torch.full((len(cfg.read_layers),), 1.0))
         self.null_key = nn.Parameter(torch.randn(len(cfg.read_layers), cfg.d_key) * 0.02)
-        self.null_value = nn.Parameter(torch.zeros(len(cfg.read_layers), d))
+        with torch.no_grad():
+            unk = lm.transformer.wte.weight[unknown_token_id].detach().clone()
+        self.null_value = nn.Parameter(unk[None].repeat(len(cfg.read_layers), 1))   # "nothing found" -> ' unknown'
         self.scale = nn.Parameter(torch.tensor(1.0))
         self._ctx: Optional[Dict] = None
         self._hooks = [lm.transformer.h[l].register_forward_hook(self._make_hook(i, l)) for i, l in enumerate(cfg.read_layers)]
@@ -113,7 +118,10 @@ class KnowledgeAdapterLM(nn.Module):
             scores = (q @ keys.t()) * (self.scale / self.cfg.d_key ** 0.5)
             scores = scores.masked_fill(~allowed[None], float("-inf"))
             p = torch.softmax(scores, dim=-1)
-            read = self.o_proj[str(layer)](p @ values)
+            read = self.o_proj[str(layer)](p @ values)                        # (B, d)
+            rms_h = hl.detach().pow(2).mean(-1, keepdim=True).sqrt()
+            rms_r = read.pow(2).mean(-1, keepdim=True).sqrt() + 1e-6
+            read = read * (rms_h / rms_r) * self.inject_gain[read_index]        # RMS-matched injection
             delta = torch.zeros_like(h)
             delta[ar, ctx["last_idx"]] = read
             ctx["routing"].append(p)
