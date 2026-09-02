@@ -101,6 +101,66 @@ def pct(x: float) -> str:
     return f"{100.0 * x:.1f}%"
 
 
+def clopper_pearson(successes: int, n: int, alpha: float = 0.05) -> Dict[str, float]:
+    """Exact (Clopper–Pearson) two-sided binomial confidence interval for a rate.
+
+    For 0 failures in n trials the upper bound on the failure rate is 1 - lower.
+    Uses the beta-quantile identity; computed with a bisection on the regularised
+    incomplete beta so that no SciPy dependency is needed.
+    """
+    successes, n = int(successes), int(n)
+    if n <= 0:
+        return {"rate": float("nan"), "lower": float("nan"), "upper": float("nan"), "n": 0}
+
+    def beta_cdf(x: float, a: float, b: float) -> float:
+        # regularised incomplete beta via continued fraction (Numerical Recipes betacf)
+        if x <= 0:
+            return 0.0
+        if x >= 1:
+            return 1.0
+        import math
+        lbeta = math.lgamma(a + b) - math.lgamma(a) - math.lgamma(b) + a * math.log(x) + b * math.log(1 - x)
+
+        def betacf(x: float, a: float, b: float) -> float:
+            maxit, eps, fpmin = 300, 3e-14, 1e-300
+            qab, qap, qam = a + b, a + 1, a - 1
+            c, d = 1.0, 1 - qab * x / qap
+            d = 1 / (d if abs(d) > fpmin else fpmin)
+            h = d
+            for m in range(1, maxit + 1):
+                m2 = 2 * m
+                aa = m * (b - m) * x / ((qam + m2) * (a + m2))
+                d = 1 + aa * d; d = 1 / (d if abs(d) > fpmin else fpmin)
+                c = 1 + aa / c; c = c if abs(c) > fpmin else fpmin
+                h *= d * c
+                aa = -(a + m) * (qab + m) * x / ((a + m2) * (qap + m2))
+                d = 1 + aa * d; d = 1 / (d if abs(d) > fpmin else fpmin)
+                c = 1 + aa / c; c = c if abs(c) > fpmin else fpmin
+                de = d * c
+                h *= de
+                if abs(de - 1) < eps:
+                    break
+            return h
+
+        if x < (a + 1) / (a + b + 2):
+            return math.exp(lbeta) * betacf(x, a, b) / a
+        return 1 - math.exp(lbeta) * betacf(1 - x, b, a) / b
+
+    def beta_ppf(q: float, a: float, b: float) -> float:
+        lo, hi = 0.0, 1.0
+        for _ in range(200):
+            mid = (lo + hi) / 2
+            if beta_cdf(mid, a, b) < q:
+                lo = mid
+            else:
+                hi = mid
+        return (lo + hi) / 2
+
+    lower = 0.0 if successes == 0 else beta_ppf(alpha / 2, successes, n - successes + 1)
+    upper = 1.0 if successes == n else beta_ppf(1 - alpha / 2, successes + 1, n - successes)
+    return {"rate": successes / n, "lower": lower, "upper": upper, "n": n}
+
+
 def aggregate(per_seed: List[Dict[str, Any]], keys: Sequence[str]) -> Dict[str, Dict[str, float]]:
     out: Dict[str, Dict[str, float]] = {}
     for k in keys:
