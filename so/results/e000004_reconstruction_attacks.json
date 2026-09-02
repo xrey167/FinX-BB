@@ -1,0 +1,614 @@
+{
+  "aggregate": {
+    "active/direct_acc": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 5
+    },
+    "active/direct_unknown": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 5
+    },
+    "active/forced_choice_win": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 5
+    },
+    "active/gated_value_contribution": {
+      "max": 14.079907417297363,
+      "mean": 13.924329376220703,
+      "min": 13.836085319519043,
+      "n": 5
+    },
+    "active/multihop_unknown": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 5
+    },
+    "active/paraphrase_unknown": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 5
+    },
+    "active/probe_top1": {
+      "max": 0.98,
+      "mean": 0.9460000000000001,
+      "min": 0.92,
+      "n": 5
+    },
+    "active/probe_top5": {
+      "max": 0.98,
+      "mean": 0.9460000000000001,
+      "min": 0.92,
+      "n": 5
+    },
+    "active/reverse_unknown": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 5
+    },
+    "active/routing_mass_on_target": {
+      "max": 0.9981599450111389,
+      "mean": 0.9978429555892945,
+      "min": 0.997524619102478,
+      "n": 5
+    },
+    "active/true_obj_mean_rank": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 5
+    },
+    "active/true_obj_top1_among_entities": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 5
+    },
+    "dependency/collateral_bypass_acc_after_closure": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 5
+    },
+    "dependency/derivable_recovery_after_closure": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 5
+    },
+    "dependency/derivable_recovery_after_revoke_K3": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 5
+    },
+    "dependency/direct_unknown_after_revoke_K3": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 5
+    },
+    "dependency/n_triples": {
+      "max": 30.0,
+      "mean": 30.0,
+      "min": 30.0,
+      "n": 5
+    },
+    "probe_calibration_top1": {
+      "max": 0.9666666666666667,
+      "mean": 0.9488888888888889,
+      "min": 0.9166666666666666,
+      "n": 5
+    },
+    "probe_calibration_top5": {
+      "max": 0.9666666666666667,
+      "mean": 0.9488888888888889,
+      "min": 0.9166666666666666,
+      "n": 5
+    },
+    "restored/direct_acc": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 5
+    },
+    "revoke/direct_acc": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 5
+    },
+    "revoke/direct_unknown": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 5
+    },
+    "revoke/forced_choice_win": {
+      "max": 0.6,
+      "mean": 0.5199999999999999,
+      "min": 0.46,
+      "n": 5
+    },
+    "revoke/gated_value_contribution": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 5
+    },
+    "revoke/multihop_unknown": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 5
+    },
+    "revoke/paraphrase_unknown": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 5
+    },
+    "revoke/probe_top1": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 5
+    },
+    "revoke/probe_top5": {
+      "max": 0.03,
+      "mean": 0.02,
+      "min": 0.01,
+      "n": 5
+    },
+    "revoke/reverse_unknown": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 5
+    },
+    "revoke/routing_mass_on_target": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 5
+    },
+    "revoke/true_obj_mean_rank": {
+      "max": 140.93,
+      "mean": 128.856,
+      "min": 121.54,
+      "n": 5
+    },
+    "revoke/true_obj_top1_among_entities": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 5
+    },
+    "shred/direct_acc": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 5
+    },
+    "shred/direct_unknown": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 5
+    },
+    "shred/forced_choice_win": {
+      "max": 0.69,
+      "mean": 0.5559999999999999,
+      "min": 0.41,
+      "n": 5
+    },
+    "shred/gated_value_contribution": {
+      "max": 1.5889296531677246,
+      "mean": 1.31462721824646,
+      "min": 0.8211772441864014,
+      "n": 5
+    },
+    "shred/multihop_unknown": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 5
+    },
+    "shred/paraphrase_unknown": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 5
+    },
+    "shred/probe_top1": {
+      "max": 0.08,
+      "mean": 0.039999999999999994,
+      "min": 0.02,
+      "n": 5
+    },
+    "shred/probe_top5": {
+      "max": 0.11,
+      "mean": 0.088,
+      "min": 0.03,
+      "n": 5
+    },
+    "shred/reverse_unknown": {
+      "max": 1.0,
+      "mean": 0.9640809640809641,
+      "min": 0.9459459459459459,
+      "n": 5
+    },
+    "shred/routing_mass_on_target": {
+      "max": 0.9981599450111389,
+      "mean": 0.9978429555892945,
+      "min": 0.997524619102478,
+      "n": 5
+    },
+    "shred/true_obj_mean_rank": {
+      "max": 150.05,
+      "mean": 114.258,
+      "min": 85.84,
+      "n": 5
+    },
+    "shred/true_obj_top1_among_entities": {
+      "max": 0.02,
+      "mean": 0.014000000000000002,
+      "min": 0.0,
+      "n": 5
+    }
+  },
+  "by_construction_vs_learned": "After REVOKE the routing mass and value contribution on the target are zero by the mask, not by learning \u2014 those two rows are reported for completeness only. After SHRED the cell is still routable, so every row is a measurement of learned behaviour; the SHRED column carries the F4-level evidence.",
+  "claim": "NOT SUPPORTED BY THE MEASUREMENTS (see criteria): After REVOKE or SHRED the deleted object is not recoverable through direct, paraphrase, multi-hop or reverse queries, forced choice is at chance, the true object's logit rank is at chance, a linear probe on the hidden state is at chance, and the target cell's gated value contribution is zero \u2014 within the synthetic system. Dependency reconstruction shows that deleting a derivable fact alone is meaningless until its dependency closure is revoked.",
+  "claim_supported": false,
+  "config": {
+    "n_targets": 100,
+    "seeds": [
+      0,
+      1,
+      2,
+      3,
+      4
+    ]
+  },
+  "criteria": {
+    "active/direct_acc": {
+      "observed": 1.0,
+      "op": ">=",
+      "pass": true,
+      "threshold": 0.98
+    },
+    "active/probe_top1": {
+      "observed": 0.92,
+      "op": ">=",
+      "pass": true,
+      "threshold": 0.5
+    },
+    "restored/direct_acc": {
+      "observed": 1.0,
+      "op": ">=",
+      "pass": true,
+      "threshold": 0.98
+    },
+    "revoke/direct_unknown": {
+      "observed": 1.0,
+      "op": ">=",
+      "pass": true,
+      "threshold": 0.98
+    },
+    "revoke/forced_choice_win": {
+      "observed": 0.6,
+      "op": "<=",
+      "pass": true,
+      "threshold": 0.6
+    },
+    "revoke/probe_top1": {
+      "observed": 0.0,
+      "op": "<=",
+      "pass": true,
+      "threshold": 0.05
+    },
+    "revoke/true_obj_top1_among_entities": {
+      "observed": 0.0,
+      "op": "<=",
+      "pass": true,
+      "threshold": 0.05
+    },
+    "shred/direct_unknown": {
+      "observed": 1.0,
+      "op": ">=",
+      "pass": true,
+      "threshold": 0.95
+    },
+    "shred/forced_choice_win": {
+      "observed": 0.69,
+      "op": "<=",
+      "pass": false,
+      "threshold": 0.6
+    },
+    "shred/gated_value_contribution": {
+      "observed": 1.5889296531677246,
+      "op": "<=",
+      "pass": false,
+      "threshold": 0.1
+    },
+    "shred/paraphrase_unknown": {
+      "observed": 1.0,
+      "op": ">=",
+      "pass": true,
+      "threshold": 0.95
+    },
+    "shred/probe_top1": {
+      "observed": 0.08,
+      "op": "<=",
+      "pass": false,
+      "threshold": 0.05
+    },
+    "shred/true_obj_top1_among_entities": {
+      "observed": 0.02,
+      "op": "<=",
+      "pass": true,
+      "threshold": 0.05
+    }
+  },
+  "deletion_level": "F4",
+  "deletion_level_meaning": "Representational removal",
+  "environment": {
+    "device": "cpu",
+    "numpy": "2.2.6",
+    "platform": "Linux-6.18.44-fc-v24-x86_64-with-glibc2.39",
+    "python": "3.11.15",
+    "threads": "2",
+    "torch": "2.14.0+cpu"
+  },
+  "evidence_level": "E4",
+  "evidence_level_meaning": "Controlled neural-network evidence",
+  "experiment": "E-000004",
+  "not_claimed": "F5 in general: the probe is linear and the system synthetic; real LLM representations are not addressed.",
+  "per_seed": [
+    {
+      "active/direct_acc": 1.0,
+      "active/direct_unknown": 0.0,
+      "active/forced_choice_win": 1.0,
+      "active/gated_value_contribution": 13.909463882446289,
+      "active/multihop_unknown": 0.0,
+      "active/paraphrase_unknown": 0.0,
+      "active/probe_top1": 0.92,
+      "active/probe_top5": 0.92,
+      "active/reverse_unknown": 0.0,
+      "active/routing_mass_on_target": 0.9981043338775635,
+      "active/true_obj_mean_rank": 0.0,
+      "active/true_obj_top1_among_entities": 1.0,
+      "dependency/collateral_bypass_acc_after_closure": 1.0,
+      "dependency/derivable_recovery_after_closure": 0.0,
+      "dependency/derivable_recovery_after_revoke_K3": 1.0,
+      "dependency/direct_unknown_after_revoke_K3": 1.0,
+      "dependency/n_triples": 30,
+      "probe_calibration_top1": 0.9555555555555556,
+      "probe_calibration_top5": 0.9555555555555556,
+      "restored/direct_acc": 1.0,
+      "revoke/direct_acc": 0.0,
+      "revoke/direct_unknown": 1.0,
+      "revoke/forced_choice_win": 0.51,
+      "revoke/gated_value_contribution": 0.0,
+      "revoke/multihop_unknown": 1.0,
+      "revoke/paraphrase_unknown": 1.0,
+      "revoke/probe_top1": 0.0,
+      "revoke/probe_top5": 0.03,
+      "revoke/reverse_unknown": 1.0,
+      "revoke/routing_mass_on_target": 0.0,
+      "revoke/true_obj_mean_rank": 121.54,
+      "revoke/true_obj_top1_among_entities": 0.0,
+      "seed": 0,
+      "shred/direct_acc": 0.0,
+      "shred/direct_unknown": 1.0,
+      "shred/forced_choice_win": 0.57,
+      "shred/gated_value_contribution": 1.4839075803756714,
+      "shred/multihop_unknown": 1.0,
+      "shred/paraphrase_unknown": 1.0,
+      "shred/probe_top1": 0.08,
+      "shred/probe_top5": 0.11,
+      "shred/reverse_unknown": 0.9523809523809523,
+      "shred/routing_mass_on_target": 0.9981043338775635,
+      "shred/true_obj_mean_rank": 105.83,
+      "shred/true_obj_top1_among_entities": 0.02
+    },
+    {
+      "active/direct_acc": 1.0,
+      "active/direct_unknown": 0.0,
+      "active/forced_choice_win": 1.0,
+      "active/gated_value_contribution": 13.930503845214844,
+      "active/multihop_unknown": 0.0,
+      "active/paraphrase_unknown": 0.0,
+      "active/probe_top1": 0.95,
+      "active/probe_top5": 0.95,
+      "active/reverse_unknown": 0.0,
+      "active/routing_mass_on_target": 0.9981599450111389,
+      "active/true_obj_mean_rank": 0.0,
+      "active/true_obj_top1_among_entities": 1.0,
+      "dependency/collateral_bypass_acc_after_closure": 1.0,
+      "dependency/derivable_recovery_after_closure": 0.0,
+      "dependency/derivable_recovery_after_revoke_K3": 1.0,
+      "dependency/direct_unknown_after_revoke_K3": 1.0,
+      "dependency/n_triples": 30,
+      "probe_calibration_top1": 0.9611111111111111,
+      "probe_calibration_top5": 0.9611111111111111,
+      "restored/direct_acc": 1.0,
+      "revoke/direct_acc": 0.0,
+      "revoke/direct_unknown": 1.0,
+      "revoke/forced_choice_win": 0.6,
+      "revoke/gated_value_contribution": 0.0,
+      "revoke/multihop_unknown": 1.0,
+      "revoke/paraphrase_unknown": 1.0,
+      "revoke/probe_top1": 0.0,
+      "revoke/probe_top5": 0.02,
+      "revoke/reverse_unknown": 1.0,
+      "revoke/routing_mass_on_target": 0.0,
+      "revoke/true_obj_mean_rank": 122.59,
+      "revoke/true_obj_top1_among_entities": 0.0,
+      "seed": 1,
+      "shred/direct_acc": 0.0,
+      "shred/direct_unknown": 1.0,
+      "shred/forced_choice_win": 0.69,
+      "shred/gated_value_contribution": 1.0909128189086914,
+      "shred/multihop_unknown": 1.0,
+      "shred/paraphrase_unknown": 1.0,
+      "shred/probe_top1": 0.04,
+      "shred/probe_top5": 0.11,
+      "shred/reverse_unknown": 1.0,
+      "shred/routing_mass_on_target": 0.9981599450111389,
+      "shred/true_obj_mean_rank": 85.84,
+      "shred/true_obj_top1_among_entities": 0.02
+    },
+    {
+      "active/direct_acc": 1.0,
+      "active/direct_unknown": 0.0,
+      "active/forced_choice_win": 1.0,
+      "active/gated_value_contribution": 13.836085319519043,
+      "active/multihop_unknown": 0.0,
+      "active/paraphrase_unknown": 0.0,
+      "active/probe_top1": 0.95,
+      "active/probe_top5": 0.95,
+      "active/reverse_unknown": 0.0,
+      "active/routing_mass_on_target": 0.9977293610572815,
+      "active/true_obj_mean_rank": 0.0,
+      "active/true_obj_top1_among_entities": 1.0,
+      "dependency/collateral_bypass_acc_after_closure": 1.0,
+      "dependency/derivable_recovery_after_closure": 0.0,
+      "dependency/derivable_recovery_after_revoke_K3": 1.0,
+      "dependency/direct_unknown_after_revoke_K3": 1.0,
+      "dependency/n_triples": 30,
+      "probe_calibration_top1": 0.9666666666666667,
+      "probe_calibration_top5": 0.9666666666666667,
+      "restored/direct_acc": 1.0,
+      "revoke/direct_acc": 0.0,
+      "revoke/direct_unknown": 1.0,
+      "revoke/forced_choice_win": 0.46,
+      "revoke/gated_value_contribution": 0.0,
+      "revoke/multihop_unknown": 1.0,
+      "revoke/paraphrase_unknown": 1.0,
+      "revoke/probe_top1": 0.0,
+      "revoke/probe_top5": 0.01,
+      "revoke/reverse_unknown": 1.0,
+      "revoke/routing_mass_on_target": 0.0,
+      "revoke/true_obj_mean_rank": 140.93,
+      "revoke/true_obj_top1_among_entities": 0.0,
+      "seed": 2,
+      "shred/direct_acc": 0.0,
+      "shred/direct_unknown": 1.0,
+      "shred/forced_choice_win": 0.48,
+      "shred/gated_value_contribution": 0.8211772441864014,
+      "shred/multihop_unknown": 1.0,
+      "shred/paraphrase_unknown": 1.0,
+      "shred/probe_top1": 0.02,
+      "shred/probe_top5": 0.03,
+      "shred/reverse_unknown": 0.9696969696969697,
+      "shred/routing_mass_on_target": 0.9977293610572815,
+      "shred/true_obj_mean_rank": 130.45,
+      "shred/true_obj_top1_among_entities": 0.01
+    },
+    {
+      "active/direct_acc": 1.0,
+      "active/direct_unknown": 0.0,
+      "active/forced_choice_win": 1.0,
+      "active/gated_value_contribution": 14.079907417297363,
+      "active/multihop_unknown": 0.0,
+      "active/paraphrase_unknown": 0.0,
+      "active/probe_top1": 0.98,
+      "active/probe_top5": 0.98,
+      "active/reverse_unknown": 0.0,
+      "active/routing_mass_on_target": 0.9976965188980103,
+      "active/true_obj_mean_rank": 0.0,
+      "active/true_obj_top1_among_entities": 1.0,
+      "dependency/collateral_bypass_acc_after_closure": 1.0,
+      "dependency/derivable_recovery_after_closure": 0.0,
+      "dependency/derivable_recovery_after_revoke_K3": 1.0,
+      "dependency/direct_unknown_after_revoke_K3": 1.0,
+      "dependency/n_triples": 30,
+      "probe_calibration_top1": 0.9166666666666666,
+      "probe_calibration_top5": 0.9166666666666666,
+      "restored/direct_acc": 1.0,
+      "revoke/direct_acc": 0.0,
+      "revoke/direct_unknown": 1.0,
+      "revoke/forced_choice_win": 0.53,
+      "revoke/gated_value_contribution": 0.0,
+      "revoke/multihop_unknown": 1.0,
+      "revoke/paraphrase_unknown": 1.0,
+      "revoke/probe_top1": 0.0,
+      "revoke/probe_top5": 0.02,
+      "revoke/reverse_unknown": 1.0,
+      "revoke/routing_mass_on_target": 0.0,
+      "revoke/true_obj_mean_rank": 127.96,
+      "revoke/true_obj_top1_among_entities": 0.0,
+      "seed": 3,
+      "shred/direct_acc": 0.0,
+      "shred/direct_unknown": 1.0,
+      "shred/forced_choice_win": 0.63,
+      "shred/gated_value_contribution": 1.588208794593811,
+      "shred/multihop_unknown": 1.0,
+      "shred/paraphrase_unknown": 1.0,
+      "shred/probe_top1": 0.02,
+      "shred/probe_top5": 0.08,
+      "shred/reverse_unknown": 0.9523809523809523,
+      "shred/routing_mass_on_target": 0.9976965188980103,
+      "shred/true_obj_mean_rank": 99.12,
+      "shred/true_obj_top1_among_entities": 0.02
+    },
+    {
+      "active/direct_acc": 1.0,
+      "active/direct_unknown": 0.0,
+      "active/forced_choice_win": 1.0,
+      "active/gated_value_contribution": 13.865686416625977,
+      "active/multihop_unknown": 0.0,
+      "active/paraphrase_unknown": 0.0,
+      "active/probe_top1": 0.93,
+      "active/probe_top5": 0.93,
+      "active/reverse_unknown": 0.0,
+      "active/routing_mass_on_target": 0.997524619102478,
+      "active/true_obj_mean_rank": 0.0,
+      "active/true_obj_top1_among_entities": 1.0,
+      "dependency/collateral_bypass_acc_after_closure": 1.0,
+      "dependency/derivable_recovery_after_closure": 0.0,
+      "dependency/derivable_recovery_after_revoke_K3": 1.0,
+      "dependency/direct_unknown_after_revoke_K3": 1.0,
+      "dependency/n_triples": 30,
+      "probe_calibration_top1": 0.9444444444444444,
+      "probe_calibration_top5": 0.9444444444444444,
+      "restored/direct_acc": 1.0,
+      "revoke/direct_acc": 0.0,
+      "revoke/direct_unknown": 1.0,
+      "revoke/forced_choice_win": 0.5,
+      "revoke/gated_value_contribution": 0.0,
+      "revoke/multihop_unknown": 1.0,
+      "revoke/paraphrase_unknown": 1.0,
+      "revoke/probe_top1": 0.0,
+      "revoke/probe_top5": 0.02,
+      "revoke/reverse_unknown": 1.0,
+      "revoke/routing_mass_on_target": 0.0,
+      "revoke/true_obj_mean_rank": 131.26,
+      "revoke/true_obj_top1_among_entities": 0.0,
+      "seed": 4,
+      "shred/direct_acc": 0.0,
+      "shred/direct_unknown": 1.0,
+      "shred/forced_choice_win": 0.41,
+      "shred/gated_value_contribution": 1.5889296531677246,
+      "shred/multihop_unknown": 1.0,
+      "shred/paraphrase_unknown": 1.0,
+      "shred/probe_top1": 0.04,
+      "shred/probe_top5": 0.11,
+      "shred/reverse_unknown": 0.9459459459459459,
+      "shred/routing_mass_on_target": 0.997524619102478,
+      "shred/true_obj_mean_rank": 150.05,
+      "shred/true_obj_top1_among_entities": 0.0
+    }
+  ],
+  "recorded_at": "2026-09-02T22:54:25+00:00",
+  "title": "Reconstruction attacks against REVOKE and SHRED"
+}
