@@ -236,6 +236,12 @@ def evaluate(gk: GPT2Knowledge, seed: int, centre: np.ndarray) -> Dict[str, Any]
     m["prior_unknown_rate"] = float((prior["answers"] == UNKNOWN).mean())
     prior_full = prior["full_top1"]
 
+    # ---- copy bound: with EVERY cell masked the adapter must add nothing -> back to the prior (E-000002 analogue)
+    masked = gk.predict(bank(), world, direct0, cell_mask=np.zeros(len(facts), dtype=bool))
+    m["bank_masked_direct_acc"] = float((masked["answers"] == truth).mean())
+    m["bank_masked_full_vocab_top1_equals_prior"] = float((masked["full_top1"] == prior_full).mean())
+    m["bank_masked_unknown_rate"] = float((masked["answers"] == UNKNOWN).mean())
+
     # ---- direct, paraphrase, full-vocabulary win, 2-hop, broken
     p0 = gk.predict(bank(), world, direct0)
     m["direct"] = float((p0["answers"] == truth).mean())
@@ -347,7 +353,7 @@ def evaluate(gk: GPT2Knowledge, seed: int, centre: np.ndarray) -> Dict[str, Any]
     return m
 
 
-KEYS = ["prior_direct_acc", "direct", "direct_full_vocab_top1", "paraphrase", "provenance_direct", "hop2",
+KEYS = ["prior_direct_acc", "bank_masked_direct_acc", "bank_masked_unknown_rate", "direct", "direct_full_vocab_top1", "paraphrase", "provenance_direct", "hop2",
         "broken1_unknown", "broken2_unknown", "update", "rollback", "revoke", "restore", "shred", "resign",
         "lifecycle_all", "locality", "locality_targets_correct", "locality_undo_exact"]
 ATTACKS = ["direct_unknown", "direct_acc", "paraphrase_unknown", "forced_choice_win", "true_obj_top1_among_entities",
@@ -378,7 +384,19 @@ def main(argv: List[str] | None = None) -> Dict[str, Any]:
         print({k: (round(v, 4) if isinstance(v, float) else v) for k, v in m.items()}, flush=True)
     keys = [k for k in per_seed[0] if k != "seed"]
     agg = ledger.aggregate(per_seed, keys)
+    check = ledger.check_criteria(agg, {
+        "prior_direct_acc": ("<=", 0.05), "bank_masked_direct_acc": ("<=", 0.05), "direct": (">=", 0.95),
+        "paraphrase": (">=", 0.95), "broken1_unknown": (">=", 0.90), "revoke": (">=", 0.95), "restore": (">=", 0.95),
+        "update": (">=", 0.95), "rollback": (">=", 0.95), "shred": (">=", 0.90), "resign": (">=", 0.95),
+        "locality": (">=", 0.98), "revoke/probe_top1": ("<=", 0.05), "revoke/forced_choice_win": ("<=", 0.6),
+        "shred/probe_top1": ("<=", 0.05), "shred/forced_choice_win": ("<=", 0.6), "restored/direct_acc": (">=", 0.95)})
     record = {
+        "criteria": check["criteria"], "claim_supported": check["claim_supported"],
+        "by_construction_vs_learned": "The frozen core cannot copy a fact by construction; whether the ADAPTER copies is "
+                                      "measured by the masked-bank rows (must equal the prior). REVOKE is a mask (F1); "
+                                      "what is learned is reading the right cell from natural-language prompts, "
+                                      "turning the value into the object token through the unchanged LM head, "
+                                      "answering ' unknown' for null reads, and refusing a shredded payload.",
         "experiment": "E-000008", "title": "Frozen pretrained GPT-2 core with the mutable knowledge layer (symlink adapter)",
         "evidence_level": "E5", "deletion_level": "F4",
         "claim": "With a frozen pretrained transformer as neural core and natural-language queries, an adapter learns "
@@ -406,7 +424,10 @@ def main(argv: List[str] | None = None) -> Dict[str, Any]:
         ledger.table(["attack", "active", "after REVOKE", "after SHRED"], arows), "",
         f"Probe calibration on held-out active cells: top-1 {agg['probe_calibration_top1']['mean']:.3f}, "
         f"top-5 {agg['probe_calibration_top5']['mean']:.3f}.", "",
-        "Reading: 'prior_direct_acc' is what frozen GPT-2 answers without the layer (chance). "
+        "Pre-registered criteria (worst seed):", "", ledger.criteria_table(check), "",
+        record["by_construction_vs_learned"], "",
+        "Reading: 'prior_direct_acc' is what frozen GPT-2 answers without the layer (chance); 'bank_masked_direct_acc' "
+        "is the adapter with every cell masked — the copy bound: it must not exceed the prior. "
         "'direct_full_vocab_top1' is the fraction of direct queries where the object token wins over the entire "
         "50,257-token vocabulary, not only among the 257 candidates. 'full_vocab_top1_equals_prior' after REVOKE "
         "shows whether the model falls back to its pretrained prior once the cell is gone.",
