@@ -1005,3 +1005,46 @@ At the present project checkpoint:
 The inability to use the local GPUs temporarily shifted work toward everything that could still be proven without them.
 
 This is an important boundary in the evidence.
+
+---
+
+## 31. Session record 2026-09-02 — recorded experiments
+
+*Appended on 2026-09-02. Sections 1–30 above are the ledger as supplied; this section records what the code in [`so/`](../so/README.md) actually measured in one CPU-only session. All numbers come from `so/results/*.json`; the complete tables are in the [session results](so-results-2026-09-02.md), the path forward in the [roadmap](so-roadmap-2026-09-02.md).*
+
+### 31.1 What was built
+
+A minimal system in which the neural core is trained on worlds that are re-sampled every step, so facts cannot enter its weights; knowledge lives in addressable cells (key = subject + relation, value = object, marker, version, status) that the core reads through routing attention with a null cell for "nothing found" and a learned marker gate on the value. Lifecycle operations (WRITE / UPDATE / REVOKE / RESTORE / ROLLBACK / SHRED / RESIGN, plus SWAP / REPLACE as interventions) act on the cells only. Every experiment compares the trained core with a mechanical reference over the same store, has pre-registered pass criteria evaluated on the worst seed, and records sample sizes with exact binomial intervals.
+
+### 31.2 Evidence recorded
+
+| Experiment | Question | Outcome | Level |
+|---|---|---|---|
+| E-000001-A | Are the intended semantics coherent in a mechanical reference? | 5 seeds × 1,000 cells: every family 100%, replay deviation 0 | E3 / F1 |
+| E-000001-B | Does a trained core reproduce them? | 5 seeds: direct, 2-hop, provenance, reverse, update, rollback, revoke, restore, locality, alternative path 100% in every seed; 3-hop 99.8%; SHRED 97.0% worst seed; all criteria met | E4 / F3 (SHRED learned) |
+| E-000002 | Does the core copy facts into its weights? | Re-sampled: layer masked → 0% answered, leak after REVOKE 0%. Fixed world with layer: also 0% / 0% (2000-step bound). No layer: 100% memorised, 100% leak | E4 (the copy-problem control) |
+| E-000003 | Selectivity, retention, generalisation | Target high → low on every paraphrase, multi-hop and reverse route; controls, unrelated, bypass paths 100%; UPDATE / ROLLBACK exact; all criteria met | E4 / F3 |
+| E-000004 | Reconstruction attacks | REVOKE: everything at chance (mask). SHRED: behaviourally deleted (direct / paraphrase / multi-hop UNKNOWN 100%) but linear probe 8% and forced choice 69% (worst seed) recover a residual → **F4 criteria not met** | E4 / F3 with a trace |
+| E-000005 | Causal interventions | disable / swap / restore / replace / random-other / localisation / routed-cell causality: 100% in every seed | E4 |
+| E-000006 | Ablations | Marker gate necessary for SHRED (0% without); routing necessary (nothing readable); **routing loss necessary for learning** (without it the model collapses to UNKNOWN); **null cell not essential** (pre-registered expectation wrong, claim withdrawn) | E4 |
+| E-000007 | Biomarker: suppression vs deletion | Suppressed model answers UNKNOWN yet keeps value contribution 8.3 and probe 86%; SHRED keeps routing mass (key unchanged) but drops contribution to 1.3 and probe to 4%; REVOKE zero by mask. Separation holds in every seed; SHRED residual as in E-000004 | E4 |
+| E-000009 | Verification loss on the gate | Separation improved (signed 0.89 → 0.998, unsigned mean 0.087 → 0.065) but an unsigned tail (max 0.84) lets 3–5% of shredded payloads through under hard gating → **F4 criteria still not met** | E4 |
+| E-000010 | Class-balanced verification loss | _pending at the time of writing; see the session results_ | — |
+| E-000008 | Frozen pretrained GPT-2 core with the layer as adapter, natural-language prompts | _pending at the time of writing; see the session results_ | E5 target |
+
+### 31.3 What this changes in sections 19, 22 and 30
+
+- **Section 19 (versioned cell lifecycle):** "Synthetic implementation / repeated synthetic behaviour / version lifecycle: PASS" now has a recorded basis (E-000001-A/B, E-000003), with the copy-problem control (E-000002) that the whole deletion argument rests on.
+- **Section 22 (biomarker status):** "Synthetic signals: research evidence exists" is now a recorded, causal result in the synthetic system (E-000005 + E-000007): the gated value contribution separates output suppression from representational removal; routing mass alone does not (a shredded cell is still routed to). "Robust causal marker" remains not established beyond this system.
+- **Section 30 (C55–C57):** still outstanding. E-000008 is the CPU-feasible analogue on a 124M-parameter frozen core, not the GPU chain.
+
+### 31.4 Negative and corrected findings (recorded, not tuned away)
+
+1. The marker gate learned without supervision leaves a residual (≈9% of the value) that representation-level attacks exploit; SHRED is F3, not F4, until the gate verifies signatures reliably (E-000004, E-000007, E-000009).
+2. The null cell is not an essential component (E-000006).
+3. Routing supervision is necessary for the mechanism to be learned at all at this budget (E-000006); provenance exactness is therefore a trained property.
+4. The first GPT-2 adapter design did not learn (collapse to " unknown"); an untrained injection test showed the read-out path works at gain ≥ 1, and a routing-first curriculum was required (E-000008 engineering record).
+
+### 31.5 Boundary
+
+CPU only, no GPU, no LLM above 124M parameters, synthetic worlds, single-token entities, two surface forms per relation, one session. Nothing here shows unlearning of facts already encoded in pretrained weights. Evidence levels claimed: E3–E4 for the synthetic system, E5 at most for the frozen-GPT-2 experiment.
