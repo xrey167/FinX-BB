@@ -20,13 +20,15 @@ Code behind the SO documents in `docs/`:
 | `so/attacks.py` | Reconstruction attacks: forced choice, logit rank, linear representation probe, routing-mass activation probe |
 | `so/interventions.py` | Causal interventions: disable mask, routed-cell identification |
 | `so/ledger.py` | Result recording (JSON + Markdown) with evidence levels E0–E7 and deletion levels F0–F5 |
-| `so/experiments/` | E-000001-A, E-000001-B, E-000002 … E-000007, `run_all.py` |
+| `so/llm_adapter.py` | The knowledge layer attached to a frozen pretrained GPT-2 as a symlink adapter (E-000008) |
+| `so/report.py` | Assembles `docs/so-results-2026-09-02.md` from the recorded results |
+| `so/experiments/` | E-000001-A, E-000001-B, E-000002 … E-000008, `run_all.py` |
 | `so/tests/` | Unit tests |
 
 ## Running
 
 ```bash
-pip install -r so/requirements.txt     # numpy, torch (CPU is enough), pytest
+pip install -r so/requirements.txt     # numpy, torch (CPU is enough), pytest, transformers (E-000008)
 python -m pytest so/tests -q
 python -m so.experiments.e000001a_reference
 python -m so.experiments.e000001b_mini_transformer      # trains 5 models (~4 min each on 4 CPU cores)
@@ -36,6 +38,8 @@ python -m so.experiments.e000004_reconstruction_attacks
 python -m so.experiments.e000005_causal_interventions
 python -m so.experiments.e000006_ablations
 python -m so.experiments.e000007_biomarker
+python -m so.experiments.e000008_gpt2_adapter             # frozen GPT-2 small + adapter (needs transformers; ~30 min per seed on CPU)
+python -m so.report                                      # regenerate docs/so-results-2026-09-02.md
 python -m so.experiments.run_all --quick                 # reduced smoke run of the whole chain
 ```
 
@@ -43,4 +47,4 @@ Every experiment writes `so/results/<name>.json` (complete record: config, per-s
 
 ## Design in one paragraph
 
-The neural core never stores facts. Every training step samples a fresh world, so the only stable signal is *how to read* the knowledge layer: build a query from the tokens, attend over cell keys (subject + relation), take the gated value (object), and feed it into the next hop. Knowledge therefore lives in cells that have an identity (`kid`), versions, a status and a marker, and the control plane can WRITE / UPDATE / REVOKE / RESTORE / ROLLBACK / SHRED them without touching the weights. The experiments then test whether the *learned* computation respects those lifecycle semantics (E-000001-B), whether the guarantee survives when facts *can* be copied into weights (E-000002), whether deletion generalises and retention holds (E-000003), whether the deleted object can be reconstructed (E-000004), whether the routing signature is causal (E-000005), which components are necessary (E-000006), and whether internal signals separate suppression from deletion (E-000007).
+The neural core never stores facts. Every training step samples a fresh world, so the only stable signal is *how to read* the knowledge layer: build a query from the tokens, attend over cell keys (subject + relation), take the gated value (object), and feed it into the next hop. Knowledge therefore lives in cells that have an identity (`kid`), versions, a status and a marker, and the control plane can WRITE / UPDATE / REVOKE / RESTORE / ROLLBACK / SHRED them without touching the weights. The experiments then test whether the *learned* computation respects those lifecycle semantics (E-000001-B), whether the guarantee survives when facts *can* be copied into weights (E-000002), whether deletion generalises and retention holds (E-000003), whether the deleted object can be reconstructed (E-000004), whether the routing signature is causal (E-000005), which components are necessary (E-000006), and whether internal signals separate suppression from deletion (E-000007), and whether the same layer works as an adapter on a frozen pretrained GPT-2 with natural-language queries (E-000008).
