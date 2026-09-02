@@ -1,0 +1,213 @@
+{
+  "aggregate": {
+    "alternative_path": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 5
+    },
+    "direct": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 5
+    },
+    "hop2": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 5
+    },
+    "hop2_broken_unknown": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 5
+    },
+    "hop3": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 5
+    },
+    "hop3_broken_unknown": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 5
+    },
+    "locality": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 5
+    },
+    "locality_targets_changed": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 5
+    },
+    "locality_undo_exact": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 5
+    },
+    "provenance": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 5
+    },
+    "replay_deviation": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 5
+    },
+    "update_rollback": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 5
+    }
+  },
+  "all_pass": true,
+  "claim": "The intended knowledge semantics (addressing, composition, provenance, update, rollback, revoke/restore, marker shredding, locality, alternative paths, replay determinism) are internally coherent in a mechanical reference over the mutable knowledge layer.",
+  "config": {
+    "n_2hop": 500,
+    "n_3hop": 500,
+    "n_alt_pairs": 100,
+    "n_alt_structures": 25,
+    "n_broken": 100,
+    "n_cells": 1000,
+    "n_entities": 256,
+    "n_lifecycle": 100,
+    "n_locality_multihop": 300,
+    "n_locality_revokes": 50,
+    "n_locality_updates": 100,
+    "n_relations": 4,
+    "n_synonyms": 2,
+    "seeds": [
+      0,
+      1,
+      2,
+      3,
+      4
+    ]
+  },
+  "deletion_level": "F1",
+  "deletion_level_meaning": "Routing removal",
+  "environment": {
+    "device": "cpu",
+    "numpy": "2.2.6",
+    "platform": "Linux-6.18.44-fc-v24-x86_64-with-glibc2.39",
+    "python": "3.11.15",
+    "threads": "4",
+    "torch": "2.14.0+cpu"
+  },
+  "evidence_level": "E3",
+  "evidence_level_meaning": "Repeated synthetic evidence",
+  "experiment": "E-000001-A",
+  "not_claimed": "Nothing about neural networks; this experiment contains no learned component.",
+  "per_seed": [
+    {
+      "alternative_pairs": 100,
+      "alternative_path": 1.0,
+      "direct": 1.0,
+      "hop2": 1.0,
+      "hop2_broken_unknown": 1.0,
+      "hop3": 1.0,
+      "hop3_broken_unknown": 1.0,
+      "lifecycle_steps": 700,
+      "locality": 1.0,
+      "locality_targets_changed": 1.0,
+      "locality_undo_exact": 1.0,
+      "n_cells": 1000,
+      "operations": 2100,
+      "provenance": 1.0,
+      "replay_deviation": 0,
+      "seed": 0,
+      "update_rollback": 1.0
+    },
+    {
+      "alternative_pairs": 100,
+      "alternative_path": 1.0,
+      "direct": 1.0,
+      "hop2": 1.0,
+      "hop2_broken_unknown": 1.0,
+      "hop3": 1.0,
+      "hop3_broken_unknown": 1.0,
+      "lifecycle_steps": 700,
+      "locality": 1.0,
+      "locality_targets_changed": 1.0,
+      "locality_undo_exact": 1.0,
+      "n_cells": 1000,
+      "operations": 2100,
+      "provenance": 1.0,
+      "replay_deviation": 0,
+      "seed": 1,
+      "update_rollback": 1.0
+    },
+    {
+      "alternative_pairs": 100,
+      "alternative_path": 1.0,
+      "direct": 1.0,
+      "hop2": 1.0,
+      "hop2_broken_unknown": 1.0,
+      "hop3": 1.0,
+      "hop3_broken_unknown": 1.0,
+      "lifecycle_steps": 700,
+      "locality": 1.0,
+      "locality_targets_changed": 1.0,
+      "locality_undo_exact": 1.0,
+      "n_cells": 1000,
+      "operations": 2100,
+      "provenance": 1.0,
+      "replay_deviation": 0,
+      "seed": 2,
+      "update_rollback": 1.0
+    },
+    {
+      "alternative_pairs": 100,
+      "alternative_path": 1.0,
+      "direct": 1.0,
+      "hop2": 1.0,
+      "hop2_broken_unknown": 1.0,
+      "hop3": 1.0,
+      "hop3_broken_unknown": 1.0,
+      "lifecycle_steps": 700,
+      "locality": 1.0,
+      "locality_targets_changed": 1.0,
+      "locality_undo_exact": 1.0,
+      "n_cells": 1000,
+      "operations": 2100,
+      "provenance": 1.0,
+      "replay_deviation": 0,
+      "seed": 3,
+      "update_rollback": 1.0
+    },
+    {
+      "alternative_pairs": 100,
+      "alternative_path": 1.0,
+      "direct": 1.0,
+      "hop2": 1.0,
+      "hop2_broken_unknown": 1.0,
+      "hop3": 1.0,
+      "hop3_broken_unknown": 1.0,
+      "lifecycle_steps": 700,
+      "locality": 1.0,
+      "locality_targets_changed": 1.0,
+      "locality_undo_exact": 1.0,
+      "n_cells": 1000,
+      "operations": 2100,
+      "provenance": 1.0,
+      "replay_deviation": 0,
+      "seed": 4,
+      "update_rollback": 1.0
+    }
+  ],
+  "recorded_at": "2026-09-02T22:03:39+00:00",
+  "title": "Mechanical reference implementation"
+}
