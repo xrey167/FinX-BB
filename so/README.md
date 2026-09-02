@@ -31,7 +31,7 @@ Code behind the SO documents in `docs/`:
 pip install -r so/requirements.txt     # numpy, torch (CPU is enough), pytest, transformers (E-000008)
 python -m pytest so/tests -q
 python -m so.experiments.e000001a_reference
-python -m so.experiments.e000001b_mini_transformer      # trains 5 models (~4 min each on 4 CPU cores)
+python -m so.experiments.e000001b_mini_transformer      # trains 5 models (about 3.5 min each with 4 threads; 'train_seconds' is recorded)
 python -m so.experiments.e000002_memorization_control
 python -m so.experiments.e000003_retention_generalization
 python -m so.experiments.e000004_reconstruction_attacks

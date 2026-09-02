@@ -35,6 +35,15 @@ def checkpoint_path(name: str, seed: int) -> Path:
     return CHECKPOINTS / f"{name}_seed{seed}.pt"
 
 
+def _sha256(path: Path) -> str:
+    import hashlib
+    h = hashlib.sha256()
+    with open(path, "rb") as f:
+        for chunk in iter(lambda: f.read(1 << 20), b""):
+            h.update(chunk)
+    return h.hexdigest()
+
+
 def train_or_load(name: str, seed: int, model_cfg: ModelConfig, train_cfg: TrainConfig, force: bool = False):
     path = checkpoint_path(name, seed)
     if path.exists() and not force:
@@ -43,13 +52,16 @@ def train_or_load(name: str, seed: int, model_cfg: ModelConfig, train_cfg: Train
         model.load_state_dict(ck["state_dict"])
         model.eval()
         return {"model": model, "centre": ck["centre"], "history": ck["history"], "train_config": ck["train_config"],
-                "model_config": ck["model_config"], "train_seconds": ck["train_seconds"], "loaded": True}
+                "model_config": ck["model_config"], "train_seconds": ck["train_seconds"], "loaded": True,
+                "checkpoint": str(path), "checkpoint_sha256": _sha256(path)}
     out = train(model_cfg, train_cfg)
     CHECKPOINTS.mkdir(parents=True, exist_ok=True)
     torch.save({"state_dict": out["model"].state_dict(), "centre": out["centre"], "history": out["history"],
                 "train_config": out["train_config"], "model_config": out["model_config"],
                 "train_seconds": out["train_seconds"]}, path)
     out["loaded"] = False
+    out["checkpoint"] = str(path)
+    out["checkpoint_sha256"] = _sha256(path)
     return out
 
 
@@ -65,8 +77,9 @@ def main(argv: List[str] | None = None) -> Dict[str, Any]:
         print(f"=== seed {seed}: training ===", flush=True)
         out = train_or_load("e000001b", seed, model_cfg, TrainConfig(seed=seed, n_steps=args.steps), force=args.force)
         print(f"=== seed {seed}: evaluating ===", flush=True)
-        m = run_suite(out["model"], 100 + seed, EVAL_CONFIG, out["centre"])
+        m = run_suite(out["model"], 100 + seed, EVAL_CONFIG, out["centre"], train_seed=seed)
         m["train_seconds"] = out["train_seconds"]
+        m["checkpoint_sha256"] = out["checkpoint_sha256"]
         m["final_train_loss"] = out["history"][-1]["loss"] if out["history"] else None
         m["train_config_used"] = out["train_config"]
         m["checkpoint_loaded"] = out["loaded"]

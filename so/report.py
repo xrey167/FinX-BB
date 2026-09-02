@@ -44,9 +44,9 @@ NOTES = {
         "(8% worst seed) and forced choice (69% worst seed) recover a residual. Recorded as F3 with a trace; E-000009 "
         "is the response.",
     "e000006_ablations": "Two pre-registered expectations were wrong and are recorded as such. (1) The null cell is NOT "
-        "essential: without it, broken paths are still answered UNKNOWN at 100% (the model learns to produce a "
-        "low-norm read from non-matching keys). The design claim 'the null cell is what makes broken paths answer "
-        "UNKNOWN' is withdrawn. (2) Without the routing loss the model collapsed to answering UNKNOWN for everything "
+        "essential: without it, broken paths are still answered UNKNOWN at 100% (how the model does this was not "
+        "measured; a plausible mechanism is a diffuse, low-norm read over non-matching keys). The design claim 'the null "
+        "cell is what makes broken paths answer UNKNOWN' is withdrawn. (2) Without the routing loss the model collapsed to answering UNKNOWN for everything "
         "within 2000 steps (identical numbers to 'no_routing'): routing supervision is necessary for the mechanism to "
         "be *learned* at all at this budget, not only for exact provenance. That is an optimisation finding, not a "
         "by-construction one. 'no_marker_gate' and 'no_routing' confirm the information-flow necessities (SHRED 0%, "
@@ -68,7 +68,7 @@ NOTES = {
 
 BOUNDARY = """## Boundary of this evidence
 
-Everything below was produced on 4 CPU cores in one session, with no GPU. It is therefore bounded as follows:
+Everything below was produced on one 4-core CPU box in one session, with no GPU (experiments ran with 2 or 4 torch threads; each record stores the thread count under `environment`). It is therefore bounded as follows:
 
 - **No LLM-scale evidence.** The largest neural core used is frozen GPT-2 small (124M parameters, E-000008). Nothing here shows editable knowledge inside a large pretrained model, and nothing here shows unlearning of facts that a pretrained model already encodes in its weights.
 - **Synthetic worlds.** Facts are `(subject, relation) → object` triples over 256 entities and 4 relations; queries are symbolic (E-000001 … E-000007) or short natural-language templates (E-000008). Real-world knowledge, multi-token entities and free-text questions are not covered.
@@ -135,8 +135,13 @@ def main() -> None:
                 max((recs[e].get("evidence_level", "E0") for e in exps if recs.get(e)), default="-"))
                for prop, exps in PROPERTIES.items()]),
         "",
-        "Scalability is the property this session can least address: E-000008 shows the mechanism attaches to a "
-        "frozen pretrained transformer on CPU; the path to LLM scale is a roadmap item, not a result.",
+        ("Scalability is the property this session can least address: E-000008 tests whether the same layer works as an "
+         "adapter on a frozen pretrained GPT-2 (" + ("recorded below" if recs.get("e000008_gpt2_adapter") else "not yet recorded") +
+         "); the path to LLM scale is a roadmap item, not a result."),
+        "",
+        "The 'status' column is the status of the whole record's pre-registered criteria; a property can be supported by "
+        "an experiment whose record fails on a different criterion (E-000004 and E-000007 fail only their F4 rows while "
+        "their behavioural rows pass — see the split claims inside those records).",
         "",
         BOUNDARY,
         "",

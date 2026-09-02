@@ -86,11 +86,14 @@ def agree(pred: Predictions, ref: ReferenceResolver, queries: Sequence[Query]) -
 
 
 def run_suite(model, seed: int, cfg: Dict[str, Any], marker_centre: np.ndarray,
-              noise_levels: Sequence[float] = (0.0, 0.05, 0.1, 0.16, 0.2, 0.24, 0.3, 0.4, 0.5, 0.7, 1.0, 1.5)) -> Dict[str, Any]:
+              noise_levels: Sequence[float] = (0.0, 0.05, 0.1, 0.16, 0.2, 0.24, 0.3, 0.4, 0.5, 0.7, 1.0, 1.5),
+              train_seed: Optional[int] = None) -> Dict[str, Any]:
+    """``seed`` selects the fresh evaluation world; ``train_seed`` (recorded as ``seed``) names the model."""
     rng, world, store, kids = build_eval_world(seed, cfg["n_entities"], cfg["n_relations"], cfg["n_synonyms"],
                                                cfg["n_cells"], cfg["n_alt_structures"], marker_centre)
     ref = ReferenceResolver(store)
-    m: Dict[str, Any] = {"seed": seed, "n_cells": len(world.facts)}
+    m: Dict[str, Any] = {"seed": seed if train_seed is None else train_seed, "eval_world_seed": seed,
+                         "n_cells": len(world.facts)}
 
     def q1(f) -> Query:
         return world.make_query(rng, "fwd", f.subject, [f.relation])

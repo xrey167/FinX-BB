@@ -100,7 +100,7 @@ def run_seed(seed: int) -> Dict[str, Any]:
         m[f"{tag}/true_obj_mean_rank"] = rk["mean_rank"]
         m[f"{tag}/forced_choice_win"] = forced_choice(lg, truth_t, np.random.default_rng(seed), n_ent)
 
-    m: Dict[str, Any] = {"seed": seed}
+    m: Dict[str, Any] = {"seed": seed, "base_checkpoint_sha256": base["checkpoint_sha256"]}
     measure(model, "active", m)
     for f in targets: store.revoke(kids[f.key])
     measure(model, "revoked", m)
@@ -123,7 +123,7 @@ def main(argv: List[str] | None = None) -> Dict[str, Any]:
     args = ap.parse_args(argv)
     per_seed = [run_seed(s) for s in args.seeds]
     for s in per_seed: print(s, flush=True)
-    keys = [k for k in per_seed[0] if k != "seed"]
+    keys = [k for k in per_seed[0] if k not in ("seed", "base_checkpoint_sha256")]
     agg = ledger.aggregate(per_seed, keys)
     conds = ["active", "revoked", "shredded", "suppressed"]
     check = ledger.check_criteria(agg, {
@@ -133,9 +133,22 @@ def main(argv: List[str] | None = None) -> Dict[str, Any]:
         "shredded/probe_top1": ("<=", 0.05), "revoked/probe_top1": ("<=", 0.05)})
     signals = ["target_unknown", "target_acc", "control_acc", "routing_mass_on_target", "gated_value_contribution",
                "probe_top1", "probe_top5", "true_obj_top1_among_entities", "true_obj_mean_rank", "forced_choice_win"]
+    sep_keys = ["suppressed/target_unknown", "suppressed/control_acc", "suppressed/gated_value_contribution",
+                "suppressed/probe_top1", "revoked/probe_top1"]
+    f4_keys = ["shredded/target_unknown", "shredded/gated_value_contribution", "shredded/probe_top1"]
+    sep_met = all(check["criteria"][k]["pass"] for k in sep_keys)
+    f4_met = all(check["criteria"][k]["pass"] for k in f4_keys)
     record = {
         "experiment": "E-000007", "title": "Biomarker: output suppression versus representational change",
-        "evidence_level": "E4", "deletion_level": "F4",
+        "evidence_level": "E4", "deletion_level": "F4" if f4_met else "F3", "deletion_level_targeted": "F4",
+        "claim_parts": [
+            {"claim": "Output suppression (fine-tuned refusal) is behaviourally identical to deletion on the targets "
+                      "but keeps the target cell's value contribution and a probe leak; REVOKE removes both (mask). "
+                      "The gated value contribution separates suppression from representational removal.",
+             "criteria": sep_keys, "supported": sep_met},
+            {"claim": "SHRED (unsupervised gate) removes the value contribution and the probe leak to the F4 thresholds.",
+             "criteria": f4_keys, "supported": f4_met},
+        ],
         "claim": "Suppression (fine-tuned refusal) and deletion (REVOKE / SHRED) are behaviourally identical on the "
                  "targets, but the internal signals separate them: under suppression the target cell still receives "
                  "value contribution and a linear probe still decodes the object from the hidden state; under SHRED "
@@ -151,7 +164,9 @@ def main(argv: List[str] | None = None) -> Dict[str, Any]:
     rows = [(s, *(f"{agg[f'{c}/{s}']['mean']:.4f}" for c in conds)) for s in signals]
     md = "\n".join([
         "# E-000007 — Biomarker: suppression versus representational change", "",
-        f"Evidence level: **E4** ({ledger.EVIDENCE_LEVELS['E4']}); deletion level **F4** within the synthetic system. "
+        f"Evidence level: **E4** ({ledger.EVIDENCE_LEVELS['E4']}); deletion level targeted **F4**, recorded "
+        f"**{record['deletion_level']}** (suppression/deletion separation {'supported' if sep_met else 'NOT supported'}, "
+        f"SHRED at F4 thresholds {'supported' if f4_met else 'NOT supported'}). "
         f"Seeds: {args.seeds}. Chance levels: probe top-1 0.0039, top-5 0.0195, mean rank 127.5, forced choice 0.5.", "",
         ledger.table(["signal (mean over seeds)"] + conds, rows), "",
         "Reading: 'suppressed' keeps the biomarker (value contribution) and the probe leak while answering UNKNOWN — "

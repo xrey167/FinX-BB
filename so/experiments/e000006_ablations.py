@@ -81,14 +81,15 @@ def main(argv: List[str] | None = None) -> Dict[str, Any]:
     results: Dict[str, List[Dict[str, Any]]] = {"full": []}
     for seed in args.seeds:
         base = load_base_model(seed)
-        m = run_suite(base["model"], 600 + seed, SMALL_EVAL, base["centre"], noise_levels=(0.0,))
+        m = run_suite(base["model"], 600 + seed, SMALL_EVAL, base["centre"], noise_levels=(0.0,), train_seed=seed)
+        m["base_checkpoint_sha256"] = base["checkpoint_sha256"]
         m["random_deletion_target_unchanged"] = random_deletion(base["model"], base["centre"], seed)
         results["full"].append(m); print("full", seed, {k: m[k] for k in KEYS}, flush=True)
     for name in VARIANTS:
         results[name] = []
         for seed in args.seeds:
             model, centre, secs = train_variant(name, seed, args.steps, args.force)
-            m = run_suite(model, 600 + seed, SMALL_EVAL, centre, noise_levels=(0.0,))
+            m = run_suite(model, 600 + seed, SMALL_EVAL, centre, noise_levels=(0.0,), train_seed=seed)
             m["train_seconds"] = secs
             results[name].append(m); print(name, seed, {k: m[k] for k in KEYS}, flush=True)
     agg = {name: ledger.aggregate(rs, KEYS) for name, rs in results.items()}
@@ -132,6 +133,8 @@ def main(argv: List[str] | None = None) -> Dict[str, Any]:
         record["by_construction_vs_learned"], "",
         "Pre-registered criteria (worst seed):", "", ledger.criteria_table(check), "",
         f"Random deletion (revoke another cell, target must stay): {ledger.pct(record['random_deletion_target_unchanged'])}", "",
+        "Reading the table: for a variant that answers UNKNOWN to everything (no_routing, no_routing_loss) the rows "
+        "hop2_broken_unknown, revoke, shred and locality are satisfied trivially and carry no information.", "",
         f"Without versioning (UPDATE as in-place replace): rollback {no_versioning_rollback} — structural property of "
         "the layer, not a learned one.",
     ])

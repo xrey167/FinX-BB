@@ -16,12 +16,12 @@ The numbers are in the [session results](so-results-2026-09-02.md); this section
 
 | Property (ledger §3) | What is shown | Kind | Level |
 |---|---|---|---|
-| Selectivity | The targeted cell's answer disappears for direct, paraphrased, multi-hop and reverse access; controls unchanged | REVOKE: routing removal by mask (**by construction**, F1). SHRED: payload stays routable, the *learned* marker gate refuses it (**learned**, F3) | E4 synthetic; E5 on frozen GPT-2 (E-000008) |
+| Selectivity | The targeted cell's answer disappears for direct, paraphrased, multi-hop and reverse access; controls unchanged | REVOKE: routing removal by mask (**by construction**, F1). SHRED: payload stays routable, the *learned* marker gate refuses it (**learned**, F3; F4 with the verified gate of E-000010) | E4 synthetic |
 | Retention | Controls, unrelated cells, bypass paths unchanged after mutation; targets restored exactly by RESTORE / ROLLBACK | learned (the model must not draw the answer from another cell) | E4 |
 | Generalisation | Deletion holds across all surface paraphrases and access directions | partly by construction (one canonical cell per fact) — the learned part is that no other route produces the answer; only 2 surface forms per relation in the synthetic system, 2 natural-language templates in E-000008 | E4 / E5, **weakest property** |
 | Causal isolation | disable / swap / replace / restore on a cell change the answer exactly as predicted; the routed cell is the ground-truth cell | localisation is a *trained* objective (routing loss); in this architecture the cell read is the only channel, so this is a consistency check rather than a discovery | E4 |
 | Reconstruction resistance | With the unsupervised gate, SHRED leaves a residual that a probe and forced choice exploit (E-000004); with the class-balanced verified gate (E-000010) probe, forced choice and logit rank are at chance and the value contribution is zero while the payload is still present and routed to; dependency closure is required for derivable facts | learned (SHRED column); after REVOKE the activation rows are the mask | E4, F4 within the synthetic system (E-000010) |
-| Scalability | The same layer attaches as an adapter to a frozen pretrained GPT-2 with natural-language prompts | first step only; 124M parameters, CPU, single-token entities | E5, partial E6 |
+| Scalability | E-000008 tests whether the same layer attaches as an adapter to a frozen pretrained GPT-2 with natural-language prompts (see the session results for its recorded outcome) | first step only; 124M parameters, CPU, single-token entities | E5 at most, if E-000008 meets its criteria |
 
 What is **not** established: anything about knowledge already encoded in pretrained weights (the design avoids that regime by construction rather than solving it), free-text paraphrases, multi-token entities, models above 124M parameters, GPU-scale runs, external reproduction.
 

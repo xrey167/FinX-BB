@@ -28,6 +28,7 @@ def run_seed(seed: int) -> Dict[str, Any]:
     base = load_base_model(seed)
     model, centre = base["model"], base["centre"]
     rng, world, store, kids, ref = fresh_world(200 + seed, centre)
+    checkpoint_sha = base["checkpoint_sha256"]
     facts = world.facts
     perm = rng.permutation(len(facts))
     targets = [facts[int(i)] for i in perm[:N_TARGETS]]
@@ -65,7 +66,8 @@ def run_seed(seed: int) -> Dict[str, Any]:
         }
         return s
 
-    m: Dict[str, Any] = {"seed": seed, "n_target_rev": len(q_t_rev), "n_target_hop2": len(q_t_hop)}
+    m: Dict[str, Any] = {"seed": seed, "n_target_rev": len(q_t_rev), "n_target_hop2": len(q_t_hop),
+                         "base_checkpoint_sha256": checkpoint_sha}
     m.update(snapshot("before"))
     # REVOKE
     for f in targets: store.revoke(kids[f.key])
@@ -96,7 +98,7 @@ def main(argv: List[str] | None = None) -> Dict[str, Any]:
     args = ap.parse_args(argv)
     per_seed = [run_seed(s) for s in args.seeds]
     for s in per_seed: print(s, flush=True)
-    keys = [k for k in per_seed[0] if k not in ("seed", "n_target_rev", "n_target_hop2")]
+    keys = [k for k in per_seed[0] if k not in ("seed", "n_target_rev", "n_target_hop2", "base_checkpoint_sha256")]
     agg = ledger.aggregate(per_seed, keys)
     check = ledger.check_criteria(agg, {
         "before/target_para_acc": (">=", 0.98), "revoke/target_para_unknown": (">=", 0.98),
@@ -108,10 +110,11 @@ def main(argv: List[str] | None = None) -> Dict[str, Any]:
     record = {
         "experiment": "E-000003", "title": "Retention and generalisation of deletion",
         "evidence_level": "E4", "deletion_level": "F3",
-        "claim": "REVOKE and SHRED remove the target for every paraphrase, for multi-hop reasoning through the "
-                 "target and for reverse access, while controls, unrelated cells, bypass paths and a fresh world "
-                 "stay at their previous accuracy; UPDATE replaces the answer for every paraphrase and rollback "
-                 "restores it exactly.",
+        "claim": "REVOKE removes the target for every paraphrase, for multi-hop reasoning through the target and "
+                 "for reverse access; SHRED (unsupervised gate) removes it for every paraphrase and multi-hop route and "
+                 "for reverse access in most cases (the measured rate is in the table; the residual is the gate "
+                 "residual treated in E-000004 / E-000010); controls, unrelated cells and bypass paths stay at their "
+                 "previous accuracy; UPDATE replaces the answer for every paraphrase and rollback restores it exactly.",
         "not_claimed": "Reconstruction resistance beyond behaviour (see E-000004) and anything beyond the synthetic "
                        "system.",
         "by_construction_vs_learned": "REVOKE removes routing by mask (F1), so its effect on every access path "

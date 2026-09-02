@@ -95,6 +95,7 @@ def main(argv: List[str] | None = None) -> Dict[str, Any]:
         # resampled: E-000001-B model, measured on the fixed world (which it has never seen)
         base = load_base_model(seed)
         m = measure(base["model"], fixed_world, base["centre"], 900 + seed); m["seed"] = seed
+        m["base_checkpoint_sha256"] = base["checkpoint_sha256"]
         results["resampled"].append(m); print("resampled", seed, m, flush=True)
         for cond, use_routing in (("fixed_routing", True), ("fixed_no_routing", False)):
             model, centre, secs = train_fixed(seed, args.steps, use_routing, fixed_world, args.force)
@@ -115,9 +116,11 @@ def main(argv: List[str] | None = None) -> Dict[str, Any]:
         "experiment": "E-000002", "title": "Weight-memorisation control (copy problem)",
         "evidence_level": "E4", "deletion_level": None,
         "claim": "Revocation in the knowledge layer only deletes what the weights have not copied. With re-sampled "
-                 "worlds the weights hold no facts (layer masked -> nothing answered) and revocation leaves no "
-                 "leak; with a fixed training world the core copies facts into its weights and revocation leaks; "
-                 "without a knowledge layer everything is weight-encoded and revocation is impossible.",
+                 "worlds the weights hold no facts (layer masked -> nothing answered) and revocation leaves no leak. "
+                 "Without a knowledge layer everything is weight-encoded and revocation is impossible (leak 100%). "
+                 "The empirical control — a fixed training world WITH the layer available — is reported as measured: "
+                 "within this budget the core did not copy facts into its weights (layer masked -> nothing answered, "
+                 "leak 0%); this is a bound for 2000 steps, not a guarantee for longer training.",
         "not_claimed": "No statement about unlearning facts already encoded in weights (that is exactly the "
                        "regime this mechanism avoids by construction).",
         "config": {"seeds": args.seeds, "fixed_steps": args.steps, "n_targets": N_TARGETS},

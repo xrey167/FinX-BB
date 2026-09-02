@@ -57,10 +57,10 @@ def main(argv: List[str] | None = None) -> Dict[str, Any]:
                             force=args.force)
         model, centre = out["model"], out["centre"]
         model.cfg.hard_gate = False
-        core["verified_soft"].append(run_suite(model, 950 + seed, SMALL_EVAL, centre, noise_levels=(0.0,)))
+        core["verified_soft"].append(run_suite(model, 950 + seed, SMALL_EVAL, centre, noise_levels=(0.0,), train_seed=seed))
         conds["verified_soft"].append(attack_battery(model, centre, seed, 900 + seed))
         model.cfg.hard_gate = True
-        core["verified_hard"].append(run_suite(model, 950 + seed, SMALL_EVAL, centre, noise_levels=(0.0,)))
+        core["verified_hard"].append(run_suite(model, 950 + seed, SMALL_EVAL, centre, noise_levels=(0.0,), train_seed=seed))
         conds["verified_hard"].append(attack_battery(model, centre, seed, 900 + seed))
         model.cfg.hard_gate = False
         for c in conds:
@@ -79,7 +79,7 @@ def main(argv: List[str] | None = None) -> Dict[str, Any]:
     record = {
         "experiment": args.experiment, "title": "Signature-verification gate: closing the SHRED residual"
                  + (" (class-balanced loss)" if args.balanced else ""),
-        "evidence_level": "E4", "deletion_level": "F4",
+        "evidence_level": "E4", "deletion_level": "F4" if check["claim_supported"] else "F3", "deletion_level_targeted": "F4",
         "claim": "With an explicit verification loss the marker gate closes far more tightly on unsigned payloads, and "
                  "with hard verification at read time the SHRED residual measured in E-000004 / E-000007 disappears: "
                  "probe, forced choice and logit rank return to chance and the gated value contribution to zero, "
@@ -98,8 +98,8 @@ def main(argv: List[str] | None = None) -> Dict[str, Any]:
     crow = [(k, *(ledger.pct(core_agg[c][k]["mean"]) + " / " + ledger.pct(core_agg[c][k]["min"]) for c in core)) for k in CORE_KEYS]
     md = "\n".join([
         f"# {args.experiment} — Signature-verification gate: closing the SHRED residual" + (" (class-balanced loss)" if args.balanced else ""), "",
-        f"Evidence level: **E4** ({ledger.EVIDENCE_LEVELS['E4']}); deletion level claimed for SHRED with hard verification: "
-        f"**F4** within the synthetic system. Seeds: {args.seeds}; {args.steps} steps; gate loss weight {args.gate_weight}"
+        f"Evidence level: **E4** ({ledger.EVIDENCE_LEVELS['E4']}); deletion level targeted for SHRED with hard verification: "
+        f"F4, recorded **{record['deletion_level']}** within the synthetic system. Seeds: {args.seeds}; {args.steps} steps; gate loss weight {args.gate_weight}"
         + (", class-balanced" if args.balanced else "") + ". "
         "Baseline = the E-000001-B models (no gate loss).", "",
         "Attack battery after SHRED (mean / worst seed):", "",

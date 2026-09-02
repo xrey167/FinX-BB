@@ -67,6 +67,7 @@ def run_seed(seed: int) -> Dict[str, Any]:
         store.replace(kid, f.obj)
     m = {k: v / N_TARGETS for k, v in c.items()}
     m["seed"] = seed
+    m["base_checkpoint_sha256"] = base["checkpoint_sha256"]
     return m
 
 
@@ -76,7 +77,7 @@ def main(argv: List[str] | None = None) -> Dict[str, Any]:
     args = ap.parse_args(argv)
     per_seed = [run_seed(s) for s in args.seeds]
     for s in per_seed: print(s, flush=True)
-    keys = [k for k in per_seed[0] if k != "seed"]
+    keys = [k for k in per_seed[0] if k not in ("seed", "base_checkpoint_sha256")]
     agg = ledger.aggregate(per_seed, keys)
     check = ledger.check_criteria(agg, {k: (">=", 0.98) for k in keys})
     record = {
@@ -92,7 +93,10 @@ def main(argv: List[str] | None = None) -> Dict[str, Any]:
         "evidence_level": "E4", "deletion_level": None,
         "claim": "The cell the model routes to for a query is the ground-truth cell, and intervening on it "
                  "(disable / swap / restore / replace) changes the answer exactly as predicted while intervening "
-                 "on another cell changes nothing: the routing signature is causal, not merely correlated.",
+                 "on another cell changes nothing. In this architecture the cell read is the only knowledge channel, "
+                 "so this establishes that the trained core uses that channel as intended (no answer from elsewhere, "
+                 "exact localisation); it is a consistency result, not a discovery of localisation in a model with "
+                 "competing channels.",
         "not_claimed": "Causal localisation inside a pretrained LLM.",
         "config": {"seeds": args.seeds, "n_targets": N_TARGETS}, "per_seed": per_seed, "aggregate": agg,
     }
