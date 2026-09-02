@@ -1,0 +1,1007 @@
+# Modular Neural OS / Mutable Knowledge Architecture
+
+**Complete Experiment & Evidence Ledger**
+
+**Project:** Editable / erasable in-model knowledge for neural networks  
+**Research direction:** Modular Neural OS / Mutable Knowledge / Neural-MVCC / Symlink Architecture  
+**Status date:** 2026-09-02  
+**Document type:** Experiment ledger / evidence report  
+**Status:** Active research
+
+---
+
+## 1. Purpose of this document
+
+This document is the experimental counterpart to the main project architecture document.
+
+Its purpose is to record:
+
+* hypotheses,
+* experiments,
+* implementations,
+* tests,
+* controls,
+* seeds,
+* observations,
+* positive results,
+* negative results,
+* falsification attempts,
+* unresolved questions,
+* evidence strength,
+* and the current breakthrough status.
+
+The central rule is:
+
+> A promising mechanism is not a breakthrough until the relevant experiment actually demonstrates it.
+
+The project therefore separates:
+
+1. conceptual plausibility,
+2. synthetic demonstration,
+3. controlled neural-network evidence,
+4. transformer evidence,
+5. real-LLM evidence,
+6. scalable system evidence.
+
+---
+
+## 2. Central research question
+
+The project investigates whether knowledge inside a neural model can become a first-class mutable object.
+
+Instead of treating a trained model as one inseparable parameter blob, the intended architecture should allow knowledge to have properties such as:
+
+```text
+knowledge
+├── identity
+├── source
+├── owner
+├── version
+├── dependencies
+├── validity
+├── provenance
+├── confidence
+├── lifecycle
+└── deletion state
+```
+
+The ultimate question is:
+
+> Can a neural model learn knowledge in a form that remains usable like normal learned knowledge while also remaining identifiable, versionable, replaceable and selectively deletable?
+
+---
+
+## 3. Experimental breakthrough definition
+
+A true breakthrough requires substantially more than deleting a database entry or disabling an adapter.
+
+The target chain is:
+
+```text
+WRITE
+  ↓
+INTEGRATE
+  ↓
+USE
+  ↓
+IDENTIFY
+  ↓
+UPDATE / VERSION
+  ↓
+DELETE
+  ↓
+VERIFY ABSENCE
+  ↓
+PRESERVE UNRELATED KNOWLEDGE
+  ↓
+RESIST RECONSTRUCTION
+```
+
+A candidate mechanism therefore needs to demonstrate at least:
+
+### Selectivity
+
+Target knowledge disappears.
+
+### Retention
+
+Non-target knowledge remains intact.
+
+### Generalization
+
+Deletion affects paraphrases and alternative queries, not merely one memorized prompt.
+
+### Causal isolation
+
+The effect follows from manipulating the intended knowledge structure.
+
+### Reconstruction resistance
+
+The supposedly deleted information cannot simply be recovered through another obvious route.
+
+### Scalability
+
+The mechanism should have a plausible path beyond toy models.
+
+---
+
+## 4. Evidence scale
+
+The project uses the following conceptual evidence hierarchy.
+
+| Level | Meaning |
+|---|---|
+| E0 | Idea only |
+| E1 | Analytical / conceptual support |
+| E2 | Toy implementation |
+| E3 | Repeated synthetic evidence |
+| E4 | Controlled neural-network evidence |
+| E5 | Transformer evidence |
+| E6 | Real pretrained LLM evidence |
+| E7 | Scalable / externally reproduced evidence |
+
+A result at E2–E3 is valuable, but it must not be presented as E6.
+
+---
+
+## 5. Historical experimental branch
+
+Before the project was narrowed to its present evidence-first core, several mechanisms were explored.
+
+These included:
+
+* Symlink Adapter,
+* Source Marker,
+* Aiko Marker,
+* Crypto-Shredding,
+* Immune Response,
+* dependency structures,
+* knowledge Pods,
+* mutable knowledge cells,
+* F0–F5 unlearning levels.
+
+These ideas established much of the conceptual vocabulary of the current project.
+
+They are not all independently validated mechanisms.
+
+---
+
+## 6. F0–F5 deletion model
+
+One important early result was recognizing that “deletion” is not a binary concept.
+
+The project therefore distinguishes several increasingly strong deletion levels.
+
+### F0 — Access suppression
+
+Knowledge still exists but normal access is blocked.
+
+Example:
+
+```text
+query
+  ↓
+filter
+  ↓
+blocked answer
+```
+
+This is not neural deletion.
+
+### F1 — Routing removal
+
+A route to knowledge is removed.
+
+Example:
+
+```text
+knowledge router
+     ├── A
+     ├── B  ← disabled
+     └── C
+```
+
+The underlying information may still exist.
+
+### F2 — Component removal
+
+A dedicated module or adapter containing knowledge is removed.
+
+This is stronger than F1 but still does not establish that the base model has forgotten the information.
+
+### F3 — Functional forgetting
+
+Behavioral tests indicate that the target information can no longer be retrieved.
+
+However, internal traces may remain.
+
+### F4 — Representational removal
+
+Evidence indicates that the relevant representation itself has been removed or neutralized.
+
+This requires stronger internal tests than behavioral evaluation alone.
+
+### F5 — Reconstruction-resistant deletion
+
+The strongest target.
+
+The information:
+
+* cannot normally be retrieved,
+* cannot easily be recovered through paraphrases,
+* cannot be reconstructed through known dependencies,
+* does not reappear through obvious latent routes,
+* while unrelated capabilities remain preserved.
+
+F5 remains a research target rather than a completed claim.
+
+---
+
+## 7. Symlink hypothesis
+
+The Symlink concept originated from a software analogy.
+
+Instead of duplicating knowledge throughout a network:
+
+```text
+A → knowledge
+B → knowledge
+C → knowledge
+```
+
+the model would ideally learn something closer to:
+
+```text
+A ─┐
+B ─┼──► K17
+C ─┘
+```
+
+where K17 is a mutable neural knowledge object.
+
+Deleting or replacing K17 could therefore modify multiple semantic access paths simultaneously.
+
+### Experimental motivation
+
+This would potentially address a major problem with ordinary model editing:
+
+> The same fact can be represented redundantly across parameters and contexts.
+
+A Symlink-like representation attempts to separate:
+
+```text
+semantic access
+```
+
+from:
+
+```text
+knowledge payload
+```
+
+### Current evidence
+
+Status: promising architectural hypothesis.
+
+What has been established so far is the usefulness and internal consistency of the abstraction.
+
+What has not yet been established is that a large pretrained transformer naturally or controllably organizes arbitrary knowledge into clean Symlink objects.
+
+Therefore:
+
+| Claim | Status |
+|---|---|
+| Symlink concept | → supported |
+| Symlink toy behavior | → investigated |
+| LLM-scale Symlink | → unproven |
+
+---
+
+## 8. Source Marker / Aiko Marker
+
+The Marker branch investigated whether learned information could carry a persistent provenance identity.
+
+Conceptually:
+
+```text
+knowledge payload
+      +
+source identity
+      +
+lifecycle identity
+```
+
+rather than:
+
+```text
+anonymous gradient update
+```
+
+The Marker is intended to provide a handle for later:
+
+* attribution,
+* mutation,
+* invalidation,
+* deletion,
+* auditing.
+
+---
+
+## 9. Crypto-Shredding experiment family
+
+A further branch combined Marker identity with cryptographic destruction.
+
+Conceptually:
+
+```text
+Knowledge K
+   ↓
+encoded / gated by key κ
+   ↓
+model can use K
+DELETE:
+destroy κ
+   ↓
+K becomes inaccessible
+```
+
+This creates an appealing analogy with cryptographic erasure.
+
+### Important experimental conclusion
+
+> Crypto-shredding alone does not prove neural unlearning.
+
+Why?
+
+Because the neural system could potentially have:
+
+* copied the information,
+* compressed it elsewhere,
+* inferred it from correlated facts,
+* stored alternative representations.
+
+Therefore:
+
+```text
+key destruction
+≠
+proof of knowledge destruction
+```
+
+This was an important conceptual falsification.
+
+Crypto-shredding remains potentially useful as a lifecycle/security mechanism, but cannot by itself satisfy the strongest unlearning claim.
+
+---
+
+## 10. Immune Response experiments
+
+The Immune Response branch investigated whether the system could recognize invalidated knowledge and actively suppress or replace dependent representations.
+
+Conceptually:
+
+```text
+invalidated K17
+      ↓
+dependency detection
+      ↓
+affected structures
+      ↓
+repair / quarantine / relearning
+```
+
+The idea remains relevant to future autonomous maintenance.
+
+However, it was intentionally removed from the immediate core experiment because it introduces additional complexity before the fundamental mutable-knowledge mechanism has been demonstrated.
+
+Current status:
+
+> Architectural research branch — not core breakthrough evidence.
+
+---
+
+## 11. Reduction to the core experiment
+
+A major methodological improvement was deliberately freezing much of the larger Neural OS vision.
+
+The project moved from:
+
+```text
+Pods
++ Symlinks
++ Crypto
++ Immune System
++ Graphs
++ autonomous maintenance
++ provenance
++ distributed architecture
+```
+
+to one experimentally answerable question:
+
+> Can we create a minimal neural system in which learned knowledge has an independently controllable lifecycle?
+
+This produced the Mini-Transformer / Synthetic World research line.
+
+---
+
+## 12. Synthetic World
+
+A synthetic environment was chosen because ground truth is completely controllable.
+
+Example:
+
+```text
+Entity A → Property X
+Entity B → Property Y
+Entity C → Property Z
+```
+
+Advantages:
+
+* exact knowledge provenance,
+* exact dependency structure,
+* controlled mutations,
+* controlled contradictions,
+* unlimited generated data,
+* no contamination from pretrained knowledge,
+* precise retention testing.
+
+This is crucial for falsification.
+
+With a pretrained LLM it can be difficult to determine whether a fact originates from:
+
+```text
+experiment training
+```
+
+or:
+
+```text
+pretraining
+```
+
+The Synthetic World removes this ambiguity.
+
+---
+
+## 13. Mini-Transformer experiment
+
+The Mini-Transformer serves as the smallest meaningful neural substrate.
+
+The goal is not to build a useful language model.
+
+The goal is to test the architecture under controlled neural learning.
+
+Experimental pipeline:
+
+```text
+Synthetic World
+      ↓
+training examples
+      ↓
+Mini Transformer
+      ↓
+Mutable Knowledge mechanism
+      ↓
+write / query / update / delete
+      ↓
+evaluation
+```
+
+---
+
+## 14. Core experiment E-000001
+
+The first formal experiment was defined around mutable knowledge.
+
+### Hypothesis
+
+A model can maintain knowledge whose lifecycle can be manipulated independently while preserving unrelated learned information.
+
+### Required conditions
+
+The experiment must distinguish:
+
+```text
+TARGET knowledge
+CONTROL knowledge
+UNRELATED knowledge
+```
+
+and measure all three before and after mutation.
+
+### Required sequence
+
+```text
+baseline
+   ↓
+write
+   ↓
+verify learning
+   ↓
+update
+   ↓
+verify replacement
+   ↓
+delete
+   ↓
+verify forgetting
+   ↓
+retention test
+```
+
+This structure became the basis for subsequent test families.
+
+---
+
+## 15. Multi-seed testing
+
+Single-run success was explicitly rejected as sufficient evidence.
+
+Tests were therefore expanded across multiple random seeds.
+
+Purpose:
+
+* detect lucky initialization,
+* detect unstable training,
+* distinguish architecture effects from stochastic effects,
+* estimate repeatability.
+
+The seed work strengthened confidence in the synthetic mechanism.
+
+However:
+
+> Multi-seed synthetic evidence still does not equal real-LLM validation.
+
+---
+
+## 16. Negative-control testing
+
+Controls were introduced to detect trivial explanations.
+
+Examples include comparisons between:
+
+```text
+target mutation
+```
+
+and:
+
+```text
+untouched knowledge
+```
+
+as well as tests intended to establish that observed forgetting was not merely caused by general model degradation.
+
+The desired pattern is:
+
+```text
+Target:
+high → low
+Control:
+high → high
+```
+
+rather than:
+
+```text
+Target:
+high → low
+Control:
+high → low
+```
+
+The latter would indicate destructive global forgetting rather than selective editing.
+
+---
+
+## 17. Update / replacement testing
+
+Deletion is not the only required operation.
+
+A mutable architecture should support:
+
+```text
+K(version 1)
+     ↓
+UPDATE
+     ↓
+K(version 2)
+```
+
+without retraining the complete system.
+
+This motivated explicit version semantics.
+
+---
+
+## 18. Neural-MVCC
+
+The project subsequently developed the concept into Neural MVCC.
+
+MVCC is inspired by Multi-Version Concurrency Control in databases.
+
+Instead of treating knowledge as one timeless parameter state:
+
+```text
+K
+```
+
+the architecture treats it as:
+
+```text
+K@v1
+K@v2
+K@v3
+```
+
+with lifecycle information.
+
+Example:
+
+```text
+K17
+├── v1 — historical
+├── v2 — historical
+└── v3 — active
+```
+
+A query resolves against an active knowledge state.
+
+This enables conceptual operations analogous to:
+
+```text
+CREATE
+READ
+UPDATE
+INVALIDATE
+ROLLBACK
+DELETE
+```
+
+for neural knowledge.
+
+---
+
+## 19. Versioned cell lifecycle tests
+
+The strongest synthetic evidence obtained so far concerns the versioned neural-cell lifecycle / Neural-MVCC mechanism.
+
+The tests demonstrate, at synthetic level, that the architecture can maintain distinct lifecycle states and manipulate them without simply destroying the entire learned system.
+
+Current assessment:
+
+| Aspect | Status |
+|---|---|
+| Conceptual consistency | PASS |
+| Synthetic implementation | PASS |
+| Repeated synthetic behavior | PASS |
+| Version lifecycle | PASS |
+| Selective mutation | supported |
+| Real pretrained LLM | NOT YET PROVEN |
+
+This is currently one of the strongest pieces of evidence in the project.
+
+---
+
+## 20. Biomarker research branch
+
+A newer research direction asks whether mutable knowledge can leave measurable internal signatures.
+
+These signatures are referred to as neural biomarkers.
+
+The hypothesis is:
+
+> If a knowledge object has a distinct lifecycle, changes to that object may produce measurable activation or representation signatures.
+
+Potential signals include:
+
+```text
+activation patterns
+representation distance
+routing patterns
+attention behavior
+gradient response
+cell utilization
+dependency activation
+```
+
+The long-term goal would be:
+
+```text
+Knowledge ID
+     ↓
+Neural Biomarker
+     ↓
+observable lifecycle
+```
+
+This could provide something extremely important:
+
+> an internal verification mechanism for knowledge deletion rather than relying solely on output behavior.
+
+---
+
+## 21. Why biomarkers matter
+
+Suppose a model stops answering:
+
+```text
+“What is fact K?”
+```
+
+That alone does not establish deletion.
+
+The model could simply have learned:
+
+```text
+do not output K
+```
+
+while still internally representing K.
+
+A biomarker could potentially distinguish:
+
+```text
+OUTPUT SUPPRESSION
+```
+
+from:
+
+```text
+REPRESENTATIONAL CHANGE
+```
+
+This is one of the highest-value research directions currently under investigation.
+
+---
+
+## 22. Biomarker status
+
+Current status:
+
+| Aspect | Status |
+|---|---|
+| Concept | promising |
+| Synthetic signals | research evidence exists |
+| Robust causal marker | not yet established |
+| Real-LLM marker | not yet established |
+| Deletion certificate | not established |
+
+Therefore no claim of a neural deletion biomarker should yet be presented as proven.
+
+---
+
+## 23. Dependency / reconstruction testing
+
+A fundamental difficulty discovered throughout the project is that facts rarely exist independently.
+
+For example:
+
+```text
+K1: Alice lives in Berlin
+K2: Berlin is in Germany
+K3: Alice lives in Germany
+```
+
+Deleting K3 may be meaningless if the model can reconstruct it from K1 + K2.
+
+Therefore future deletion evaluation must distinguish:
+
+```text
+memorized knowledge
+```
+
+from:
+
+```text
+derivable knowledge
+```
+
+This substantially strengthens the definition of F5 deletion.
+
+---
+
+## 24. Reconstruction attacks
+
+A deletion test must eventually include adversarial recovery attempts.
+
+Candidate classes:
+
+```text
+direct query
+paraphrase
+multi-hop query
+reverse query
+context completion
+forced-choice query
+representation probe
+activation probe
+dependency reconstruction
+```
+
+A knowledge deletion claim becomes stronger as it survives more of these attacks.
+
+---
+
+## 25. Causal tests
+
+Correlation is insufficient.
+
+Suppose cell C17 activates whenever knowledge K17 is queried.
+
+That gives:
+
+```text
+C17 ↔ K17
+```
+
+but does not establish:
+
+```text
+C17 → K17
+```
+
+Therefore the architecture requires interventions such as:
+
+```text
+disable C17
+swap C17
+restore C17
+replace C17
+```
+
+and observing whether the corresponding knowledge changes predictably.
+
+This is central to distinguishing biomarkers from merely correlated activations.
+
+---
+
+## 26. Ablation testing
+
+Ablation tests are intended to determine whether architectural components are actually necessary.
+
+Example:
+
+```text
+Full architecture
+vs
+without versioning
+vs
+without marker
+vs
+without routing
+vs
+random deletion
+```
+
+If removing a component has no measurable effect, the architecture should not claim that component is essential.
+
+This principle remains part of the research methodology.
+
+---
+
+## 27. Retention testing
+
+Every forgetting experiment must simultaneously test preservation.
+
+A successful result therefore has two sides:
+
+```text
+FORGET TARGET
++
+KEEP CONTROL
+```
+
+The desired metric structure is:
+
+```text
+target retention       ↓↓↓
+control retention      ≈ constant
+general capability     ≈ constant
+```
+
+Selective forgetting is more important than raw forgetting.
+
+---
+
+## 28. False-positive breakthrough criteria
+
+The following outcomes explicitly do not count as breakthroughs:
+
+### Output refusal
+
+“I cannot answer that.”
+
+Knowledge may still exist.
+
+### Prompt filtering
+
+Query never reaches the model.
+
+### Database deletion
+
+External memory disappears while model memory remains.
+
+### Adapter disablement alone
+
+Shows modular access control, not necessarily neural forgetting.
+
+### Global degradation
+
+Target disappears because everything became worse.
+
+### One successful seed
+
+Could be stochastic.
+
+### One exact prompt forgotten
+
+Could be surface overfitting.
+
+### Crypto key destruction alone
+
+Does not establish that the neural network lacks another copy.
+
+### Correlated activation
+
+Does not establish causal knowledge localization.
+
+These distinctions substantially increased the rigor of the project.
+
+---
+
+## 29. C-series validation campaign
+
+The project subsequently evolved into an extended validation campaign.
+
+The C-series tests progressively attack alternative explanations and increase the strength of evidence.
+
+Rather than interpreting every successful test as a new architecture, the series should be understood as:
+
+```text
+candidate mechanism
+       ↓
+attack
+       ↓
+survives?
+       ↓
+stronger attack
+       ↓
+survives?
+       ↓
+cross-model validation
+```
+
+The campaign has progressed into the C50+ range.
+
+---
+
+## 30. C55 → C57
+
+The current critical validation chain is:
+
+```text
+C55
+ ↓
+C56
+ ↓
+C57
+```
+
+These tests represent the transition from the strongly controlled synthetic evidence toward the real-model / GPU evidence required for a substantially stronger claim.
+
+### Current state
+
+At the present project checkpoint:
+
+| Evidence | State |
+|---|---|
+| Synthetic Neural-MVCC evidence | STRONG |
+| C55–C57 real-model chain | OUTSTANDING |
+| GPU execution | OUTSTANDING |
+
+The inability to use the local GPUs temporarily shifted work toward everything that could still be proven without them.
+
+This is an important boundary in the evidence.

@@ -12,8 +12,11 @@ Kanonische Referenz: [Systemarchitektur v1.0](docs/systemarchitektur-v1.md) (Sta
 
 Invarianten: ein Schreibpfad ins Warehouse (`finx-ingest`), kein LLM im Feed-Pfad, Zonengrenzen als Code, jede Modellart versioniert.
 
+Dieses Repository ist die Home-Base (`xrey167/FinX-BB`).
+
 ## Forschung: SO
 
-Begleitende Forschungsrichtung zum Lernkern: [SO — Modular Neural Operating System](docs/so-modular-neural-os.md) (Stand 02.09.2026). Projektstand, Vision und Architektur für adressierbares, veränderbares, versionierbares und widerrufbares neuronales Wissen, das direkt an der neuronalen Berechnung teilnimmt — inklusive der Ergebnisse der Experimente E-000001-A und E-000001-B.
+Forschungsprojekt **SO — Modular Neural Operating System**: adressierbares, veränderbares, versionierbares und widerrufbares neuronales Wissen, das direkt an der neuronalen Berechnung teilnimmt statt nur als externer Kontext.
 
-Dieses Repository ist die Home-Base (`xrey167/FinX-BB`).
+- [Projektstand, Vision und Architektur](docs/so-modular-neural-os.md) (Stand 02.09.2026) — Forschungsfrage, Löschung vs. Unterdrückung, Provenienz, Abhängigkeitsgraph, Symlink- und Marker-Konzepte, aktuelle Architektur sowie die Ergebnisse der Experimente E-000001-A und E-000001-B.
+- [Experiment- und Evidenz-Ledger](docs/so-experiment-ledger.md) (Stand 02.09.2026) — Durchbruchskriterien, Evidenzskala E0–E7, Löschmodell F0–F5, Neural-MVCC, Biomarker, Rekonstruktionsangriffe, Kausal- und Ablationstests, Stand der C-Serie.

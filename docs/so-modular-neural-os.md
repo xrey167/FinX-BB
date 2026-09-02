@@ -846,9 +846,7 @@ Determine whether learned neural computation could interact with the controlled 
 
 ### Seeds
 
-```text
-5 / 5 seeds
-```
+**5 / 5 seeds**
 
 successfully completed the principal test set.
 
