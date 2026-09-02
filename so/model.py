@@ -157,6 +157,7 @@ class MutableKnowledgeTransformer(nn.Module):
             for t in range(H):
                 h_new = h + self.no_route_ff(x[:, 2 + t] + h)
                 h = torch.where(hop_valid[:, t, None], h_new, h)
+            extras["hidden"] = h
             return self.readout(h), routing, extras
         enc = self.encode_bank(bank, noise=noise, generator=generator)
         k_f, v_f, k_r, v_r = enc["k_f"], enc["v_f"], enc["k_r"], enc["v_r"]
@@ -176,6 +177,8 @@ class MutableKnowledgeTransformer(nn.Module):
             h = torch.where(valid[:, None], h_new, h)
             routing[:, t] = torch.where(valid[:, None], p, torch.zeros_like(p))
         extras["gate"] = enc["gate"]
+        extras["hidden"] = h
+        extras["value_norm"] = torch.cat([v_f.norm(dim=-1)[:-1], v_f.new_zeros(1)]) if self.cfg.use_null_cell else v_f.norm(dim=-1)
         return self.readout(h), routing, extras
 
     def n_params(self) -> int:
