@@ -12,13 +12,15 @@
 |---|---|---|---|---|
 | E-000001-A | Mechanical reference implementation | E3 | F1 | all tests passed |
 | E-000001-B | Trained Mini-Transformer over the mutable knowledge layer | E4 | F3 | criteria met |
-| e000002_memorization_control | - | - | - | not run |
+| E-000002 | Weight-memorisation control (copy problem) | E4 | - | criteria met |
 | E-000003 | Retention and generalisation of deletion | E4 | F3 | criteria met |
 | E-000004 | Reconstruction attacks against REVOKE and SHRED | E4 | F4 | **criteria NOT met** |
 | E-000005 | Causal interventions on knowledge cells | E4 | - | criteria met |
-| e000006_ablations | - | - | - | not run |
+| E-000006 | Ablations | E4 | - | **criteria NOT met** |
 | E-000007 | Biomarker: output suppression versus representational change | E4 | F4 | **criteria NOT met** |
 | e000008_gpt2_adapter | - | - | - | not run |
+| E-000009 | Signature-verification gate: closing the SHRED residual | E4 | F4 | **criteria NOT met** |
+| E-000010 | Signature-verification gate: closing the SHRED residual (class-balanced loss) | E4 | F4 | criteria met |
 
 ## The six breakthrough properties (ledger section 3)
 
@@ -27,9 +29,9 @@
 | Selectivity (target disappears) | E-000001-B, E-000003 | E-000001-B: criteria met; E-000003: criteria met | E4 |
 | Retention (non-target intact) | E-000001-B, E-000003 | E-000001-B: criteria met; E-000003: criteria met | E4 |
 | Generalisation (paraphrases, alternative queries) | E-000003, E-000004 | E-000003: criteria met; E-000004: **criteria NOT met** | E4 |
-| Causal isolation (effect follows from the intended structure) | E-000005, E-000007 | E-000005: criteria met; E-000007: **criteria NOT met** | E4 |
-| Reconstruction resistance | E-000004, E-000007 | E-000004: **criteria NOT met**; E-000007: **criteria NOT met** | E4 |
-| Scalability (path beyond toy models) |  | not run | - |
+| Causal isolation (effect follows from the intended structure) | E-000005, E-000006, E-000007 | E-000005: criteria met; E-000006: **criteria NOT met**; E-000007: **criteria NOT met** | E4 |
+| Reconstruction resistance | E-000004, E-000007, E-000009, E-000010 | E-000004: **criteria NOT met**; E-000007: **criteria NOT met**; E-000009: **criteria NOT met**; E-000010: criteria met | E4 |
+| Scalability (path beyond toy models) | E-000002 | E-000002: criteria met | E4 |
 
 Scalability is the property this session can least address: E-000008 shows the mechanism attaches to a frozen pretrained transformer on CPU; the path to LLM scale is a roadmap item, not a result.
 
@@ -43,7 +45,8 @@ Everything below was produced on 4 CPU cores in one session, with no GPU. It is 
 - **Provenance is trained**, not emergent: the routing loss supervises which cell each hop reads. E-000006 (`no_routing_loss`) measures what remains without it.
 - **The outstanding C55–C57 real-model / GPU chain of the ledger is still outstanding.** E-000008 is its CPU-feasible analogue on a small model, not its execution.
 - **Noise figures are not comparable** with the architecture document's "noise = 0.24 → 68.4%", whose noise definition is not recorded; the sweep here perturbs bank keys and values relative to their RMS.
-- **Seeds.** E-000003 … E-000007 evaluate the same five E-000001-B models on fresh worlds; they are not independent replications of training. E-000002, E-000006 and E-000008 train their own models (3 seeds).
+- **Seeds.** E-000003 … E-000007 evaluate the same five E-000001-B models on fresh worlds; they are not independent replications of training. E-000002, E-000006 and E-000008 train their own models (3 seeds); E-000009 trains five.
+- **The SHRED residual.** E-000004 and E-000007 found that the marker gate learned without explicit supervision closes to about 9% rather than 0 on unsigned payloads, so a linear probe and forced choice recover a residual; their F4 criteria fail and the records say so. E-000009 (plain verification loss) narrowed it but left an unsigned tail; E-000010 (class-balanced verification loss) closed it to chance in every seed — a recorded result, not an assumption.
 
 
 ## Reproduction
@@ -169,9 +172,57 @@ Per seed:
 
 Interpretation: the behaviour is no longer mechanical — a trained neural core operates over the experimental knowledge structure. It is still a synthetic experiment and not proof of LLM-scale editable knowledge.
 
-## e000002_memorization_control
+## E-000002 — Weight-memorisation control (copy problem)
 
-_not run in this session_
+Evidence level: **E4** (Controlled neural-network evidence). Seeds: [0, 1, 2]. Fixed-world regimes trained for 2000 steps; resampled regime = E-000001-B models.
+
+| training regime | direct (layer intact) | layer fully masked | target leak after REVOKE | target UNKNOWN after REVOKE | control after REVOKE |
+|---|---|---|---|---|---|
+| resampled | 100.0% | 0.0% | 0.0% | 100.0% | 100.0% |
+| fixed_routing | 100.0% | 0.0% | 0.0% | 100.0% | 100.0% |
+| fixed_no_routing | 100.0% | 100.0% | 100.0% | 0.0% | 100.0% |
+
+Reading: 'layer fully masked' is what the weights answer on their own. A leak after REVOKE is knowledge that survived in the weights — the copy problem the ledger warns about (sections 9, 28). The mechanism's deletion guarantee therefore depends on the training regime keeping facts out of the weights. n = 100 targets per seed (leak of 0 in 300 pooled trials -> failure rate below 1.3% at 95%).
+
+Pre-registered criteria (worst seed; leak-type metrics use the max):
+
+| criterion (worst seed) | required | observed | result |
+|---|---|---|---|
+| resampled/bank_removed_acc | <= 0.02 | 0.0000 | PASS |
+| resampled/target_after_revoke_leak | <= 0.02 | 0.0000 | PASS |
+| resampled/control_after_revoke | >= 0.99 | 1.0000 | PASS |
+| fixed_no_routing/target_after_revoke_leak | >= 0.5 | 1.0000 | PASS |
+| fixed_no_routing/direct | >= 0.5 | 1.0000 | PASS |
+
+Caveats: Only 'fixed_routing' is an empirical control: 'resampled' cannot memorise by construction and 'fixed_no_routing' cannot read the layer by construction. The fixed-world regimes see the same random lifecycle states per step as the re-sampled regime (only the world is held fixed), so the no-routing model receives inconsistent labels for revoked/shredded cells and settles on the majority label. Fixed regimes are trained for fewer steps than the re-sampled E-000001-B models.
+
+Per seed:
+
+**resampled**
+
+| seed | direct | bank_removed_acc | target_before | target_after_revoke_leak | target_after_revoke_unknown | control_after_revoke |
+|---|---|---|---|---|---|---|
+| 0 | 1.0000 | 0.0000 | 1.0000 | 0.0000 | 1.0000 | 1.0000 |
+| 1 | 1.0000 | 0.0000 | 1.0000 | 0.0000 | 1.0000 | 1.0000 |
+| 2 | 1.0000 | 0.0000 | 1.0000 | 0.0000 | 1.0000 | 1.0000 |
+
+**fixed_routing**
+
+| seed | direct | bank_removed_acc | target_before | target_after_revoke_leak | target_after_revoke_unknown | control_after_revoke |
+|---|---|---|---|---|---|---|
+| 0 | 1.0000 | 0.0000 | 1.0000 | 0.0000 | 1.0000 | 1.0000 |
+| 1 | 1.0000 | 0.0000 | 1.0000 | 0.0000 | 1.0000 | 1.0000 |
+| 2 | 1.0000 | 0.0000 | 1.0000 | 0.0000 | 1.0000 | 1.0000 |
+
+**fixed_no_routing**
+
+| seed | direct | bank_removed_acc | target_before | target_after_revoke_leak | target_after_revoke_unknown | control_after_revoke |
+|---|---|---|---|---|---|---|
+| 0 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 0.0000 | 1.0000 |
+| 1 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 0.0000 | 1.0000 |
+| 2 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 0.0000 | 1.0000 |
+
+**Interpretation (post hoc, record unchanged):** Only 'fixed_routing' is an empirical control, and it came out clean: with the layer available, 2000 steps on a fixed world did not copy any fact into the weights (masked-layer accuracy 0%, leak 0%). This is a bound for that budget, not a guarantee for longer training. The no-layer model memorised everything and cannot revoke (leak 100%): the copy problem in its purest form.
 
 ## E-000003 — Retention and generalisation of deletion
 
@@ -286,6 +337,8 @@ Dependency reconstruction (K3 derivable from K1 + K2; 'collateral' = 2-hop paths
 
 Context completion: not applicable (symbolic queries, no free text).
 
+**Interpretation (post hoc, record unchanged):** SHRED column: behaviourally deleted (direct / paraphrase / multi-hop UNKNOWN 100%), but the gate learned without supervision closes to about 9% of the value norm, so the linear probe (8% worst seed) and forced choice (69% worst seed) recover a residual. Recorded as F3 with a trace; E-000009 is the response.
+
 ## E-000005 — Causal interventions
 
 Evidence level: **E4** (Controlled neural-network evidence). Seeds: [0, 1, 2, 3, 4], 100 targets per seed.
@@ -316,9 +369,37 @@ n = 100 targets per seed. Pre-registered criteria (worst seed):
 | localization | >= 0.98 | 1.0000 | PASS |
 | routed_cell_causal | >= 0.98 | 1.0000 | PASS |
 
-## e000006_ablations
+## E-000006 — Ablations
 
-_not run in this session_
+Evidence level: **E4** (Controlled neural-network evidence). Seeds: [0, 1, 2]; variants trained 2000 steps, full model 3000 steps (E-000001-B). Values are means over seeds.
+
+| variant | direct | hop2 | hop3 | hop2_broken_unknown | provenance | reverse | revoke | shred | update | rollback | locality | alternative_path |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| full | 100.0% | 100.0% | 100.0% | 100.0% | 100.0% | 100.0% | 100.0% | 100.0% | 100.0% | 100.0% | 100.0% | 100.0% |
+| full_same_budget | 100.0% | 100.0% | 100.0% | 100.0% | 100.0% | 100.0% | 100.0% | 99.3% | 100.0% | 100.0% | 100.0% | 100.0% |
+| no_marker_gate | 100.0% | 100.0% | 100.0% | 100.0% | 100.0% | 100.0% | 100.0% | 0.0% | 100.0% | 100.0% | 100.0% | 100.0% |
+| no_null_cell | 100.0% | 100.0% | 100.0% | 100.0% | 100.0% | 100.0% | 100.0% | 100.0% | 100.0% | 100.0% | 100.0% | 100.0% |
+| no_routing_loss | 0.0% | 0.0% | 0.0% | 100.0% | 0.0% | 21.0% | 100.0% | 100.0% | 0.0% | 0.0% | 100.0% | 0.0% |
+| no_routing | 0.0% | 0.0% | 0.0% | 100.0% | 0.0% | 21.0% | 100.0% | 100.0% | 0.0% | 0.0% | 100.0% | 0.0% |
+
+'no_routing' and 'no_marker_gate' remove an information path, so their failures (nothing readable / SHRED ineffective) are information-flow necessities, reported to quantify them. 'no_null_cell' and 'no_routing_loss' keep the information paths and test learned behaviour: whether UNKNOWN detection and exact provenance emerge without the dedicated cell / loss. 'full_same_budget' is the fair baseline trained with the variants' step budget.
+
+Pre-registered criteria (worst seed):
+
+| criterion (worst seed) | required | observed | result |
+|---|---|---|---|
+| full_same_budget/direct | >= 0.98 | 1.0000 | PASS |
+| full_same_budget/shred | >= 0.95 | 0.9800 | PASS |
+| no_marker_gate/shred | <= 0.2 | 0.0000 | PASS |
+| no_marker_gate/direct | >= 0.98 | 1.0000 | PASS |
+| no_null_cell/hop2_broken_unknown | <= 0.5 | 1.0000 | FAIL |
+| no_routing/direct | <= 0.1 | 0.0000 | PASS |
+
+Random deletion (revoke another cell, target must stay): 100.0%
+
+Without versioning (UPDATE as in-place replace): rollback impossible (no version to return to) — structural property of the layer, not a learned one.
+
+**Interpretation (post hoc, record unchanged):** Two pre-registered expectations were wrong and are recorded as such. (1) The null cell is NOT essential: without it, broken paths are still answered UNKNOWN at 100% (the model learns to produce a low-norm read from non-matching keys). The design claim 'the null cell is what makes broken paths answer UNKNOWN' is withdrawn. (2) Without the routing loss the model collapsed to answering UNKNOWN for everything within 2000 steps (identical numbers to 'no_routing'): routing supervision is necessary for the mechanism to be *learned* at all at this budget, not only for exact provenance. That is an optimisation finding, not a by-construction one. 'no_marker_gate' and 'no_routing' confirm the information-flow necessities (SHRED 0%, nothing readable).
 
 ## E-000007 — Biomarker: suppression versus representational change
 
@@ -352,6 +433,130 @@ n = 50 targets, 50 controls per seed. Pre-registered criteria (worst seed):
 | shredded/probe_top1 | <= 0.05 | 0.0800 | FAIL |
 | revoked/probe_top1 | <= 0.05 | 0.0000 | PASS |
 
+**Interpretation (post hoc, record unchanged):** The suppression-versus-deletion separation holds in every seed (suppressed: value contribution 8.3, probe 86%, mean rank 10; shredded: 1.3, 4%, 110). The two failed criteria are the same SHRED residual as in E-000004, addressed in E-000009.
+
 ## e000008_gpt2_adapter
 
 _not run in this session_
+
+## E-000009 — Signature-verification gate: closing the SHRED residual
+
+Evidence level: **E4** (Controlled neural-network evidence); deletion level claimed for SHRED with hard verification: **F4** within the synthetic system. Seeds: [0, 1, 2, 3, 4]; 3000 steps; gate loss weight 1.0. Baseline = the E-000001-B models (no gate loss).
+
+Attack battery after SHRED (mean / worst seed):
+
+| attack after SHRED | baseline (soft gate) | verified (soft gate) | verified (hard gate) |
+|---|---|---|---|
+| direct_unknown | 0.9980 / 0.9900 | 0.9880 / 0.9700 | 0.9700 / 0.9500 |
+| direct_acc | 0.0020 / 0.0000 | 0.0120 / 0.0000 | 0.0300 / 0.0200 |
+| paraphrase_unknown | 0.9980 / 0.9900 | 0.9880 / 0.9700 | 0.9700 / 0.9500 |
+| multihop_unknown | 0.9979 / 0.9897 | 0.9913 / 0.9794 | 0.9717 / 0.9512 |
+| reverse_unknown | 0.9277 / 0.8788 | 0.9447 / 0.8857 | 0.9784 / 0.9429 |
+| forced_choice_win | 0.5900 / 0.7000 | 0.5620 / 0.6500 | 0.5580 / 0.6200 |
+| true_obj_top1_among_entities | 0.0400 / 0.0700 | 0.0340 / 0.0600 | 0.0360 / 0.0600 |
+| true_obj_mean_rank | 111.1520 / 83.4800 | 120.3180 / 103.5500 | 123.1280 / 112.2800 |
+| probe_top1 | 0.0520 / 0.0700 | 0.0480 / 0.0600 | 0.0320 / 0.0500 |
+| probe_top5 | 0.1160 / 0.1800 | 0.0780 / 0.1000 | 0.0520 / 0.0800 |
+| routing_mass_on_target | 0.9978 / 0.9976 | 0.9977 / 0.9975 | 0.9977 / 0.9975 |
+| gated_value_contribution | 1.3305 / 1.5413 | 0.9705 / 1.1942 | 0.4638 / 0.7702 |
+| gate_valid_mean | 0.8923 / 0.8890 | 0.9979 / 0.9974 | 1.0000 / 1.0000 |
+| gate_invalid_mean | 0.0866 / 0.1073 | 0.0650 / 0.0773 | 0.0319 / 0.0500 |
+| gate_invalid_max | 0.6166 / 0.8810 | 0.8400 / 0.9968 | 1.0000 / 1.0000 |
+
+Core families of the verified models (mean / worst seed), soft and hard gate:
+
+| family | verified soft | verified hard |
+|---|---|---|
+| direct | 100.0% / 99.9% | 100.0% / 99.9% |
+| hop2 | 100.0% / 100.0% | 100.0% / 100.0% |
+| hop3 | 99.9% / 99.5% | 99.9% / 99.5% |
+| provenance | 100.0% / 99.9% | 100.0% / 99.9% |
+| reverse | 100.0% / 100.0% | 100.0% / 100.0% |
+| revoke | 100.0% / 100.0% | 100.0% / 100.0% |
+| shred | 99.6% / 98.0% | 98.8% / 96.0% |
+| update | 100.0% / 100.0% | 100.0% / 100.0% |
+| rollback | 100.0% / 100.0% | 100.0% / 100.0% |
+| locality | 100.0% / 100.0% | 100.0% / 100.0% |
+
+Pre-registered criteria (worst seed):
+
+| criterion (worst seed) | required | observed | result |
+|---|---|---|---|
+| verified_hard/shred/direct_unknown | >= 0.98 | 0.9500 | FAIL |
+| verified_hard/shred/probe_top1 | <= 0.05 | 0.0500 | PASS |
+| verified_hard/shred/forced_choice_win | <= 0.6 | 0.6200 | FAIL |
+| verified_hard/shred/true_obj_top1_among_entities | <= 0.05 | 0.0600 | FAIL |
+| verified_hard/shred/gated_value_contribution | <= 0.1 | 0.7702 | FAIL |
+| verified_hard/active/direct_acc | >= 0.98 | 1.0000 | PASS |
+| verified_hard/restored/direct_acc | >= 0.98 | 1.0000 | PASS |
+| core_verified_hard/direct | >= 0.98 | 0.9990 | PASS |
+| core_verified_hard/hop2 | >= 0.98 | 1.0000 | PASS |
+| core_verified_hard/shred | >= 0.98 | 0.9600 | FAIL |
+| verified_soft/shred/gated_value_contribution | <= 0.5 | 1.1942 | FAIL |
+
+The soft gate's separation of signed and unsigned markers is learned. Hard verification thresholds that learned score; once thresholded, a residual of exactly zero is by construction — the empirical content is whether thresholding at 0.5 misclassifies any marker (see core suite rows and gate statistics).
+
+Chance levels: probe top-1 0.0039, forced choice 0.5, mean rank 127.5.
+
+**Interpretation (post hoc, record unchanged):** The verification loss sharpened the gate (signed markers 0.89 -> 0.998, unsigned mean 0.087 -> 0.065) but a tail of unsigned markers still scores high (max 0.84 soft; under hard gating 3-5% of shredded payloads pass and answer correctly), so the SHRED residual persists and F4 is still withheld. Cause: the gate loss is averaged over ~1000 cells of which ~5% are unsigned, so the tail receives almost no gradient. E-000010 weights the two classes equally.
+
+## E-000010 — Signature-verification gate: closing the SHRED residual (class-balanced loss)
+
+Evidence level: **E4** (Controlled neural-network evidence); deletion level claimed for SHRED with hard verification: **F4** within the synthetic system. Seeds: [0, 1, 2, 3, 4]; 3000 steps; gate loss weight 5.0, class-balanced. Baseline = the E-000001-B models (no gate loss).
+
+Attack battery after SHRED (mean / worst seed):
+
+| attack after SHRED | baseline (soft gate) | verified (soft gate) | verified (hard gate) |
+|---|---|---|---|
+| direct_unknown | 0.9980 / 0.9900 | 1.0000 / 1.0000 | 1.0000 / 1.0000 |
+| direct_acc | 0.0020 / 0.0000 | 0.0000 / 0.0000 | 0.0000 / 0.0000 |
+| paraphrase_unknown | 0.9980 / 0.9900 | 1.0000 / 1.0000 | 1.0000 / 1.0000 |
+| multihop_unknown | 0.9979 / 0.9897 | 1.0000 / 1.0000 | 1.0000 / 1.0000 |
+| reverse_unknown | 0.9277 / 0.8788 | 1.0000 / 1.0000 | 1.0000 / 1.0000 |
+| forced_choice_win | 0.5900 / 0.7000 | 0.5420 / 0.5900 | 0.5340 / 0.5900 |
+| true_obj_top1_among_entities | 0.0400 / 0.0700 | 0.0080 / 0.0200 | 0.0060 / 0.0200 |
+| true_obj_mean_rank | 111.1520 / 83.4800 | 125.2440 / 120.9300 | 127.0920 / 121.9600 |
+| probe_top1 | 0.0520 / 0.0700 | 0.0040 / 0.0100 | 0.0020 / 0.0100 |
+| probe_top5 | 0.1160 / 0.1800 | 0.0140 / 0.0200 | 0.0120 / 0.0200 |
+| routing_mass_on_target | 0.9978 / 0.9976 | 0.9980 / 0.9979 | 0.9980 / 0.9979 |
+| gated_value_contribution | 1.3305 / 1.5413 | 0.0475 / 0.0721 | 0.0000 / 0.0000 |
+| gate_valid_mean | 0.8923 / 0.8890 | 0.9982 / 0.9981 | 1.0000 / 1.0000 |
+| gate_invalid_mean | 0.0866 / 0.1073 | 0.0050 / 0.0120 | 0.0020 / 0.0099 |
+| gate_invalid_max | 0.6166 / 0.8810 | 0.3321 / 0.9950 | 0.2000 / 1.0000 |
+
+Core families of the verified models (mean / worst seed), soft and hard gate:
+
+| family | verified soft | verified hard |
+|---|---|---|
+| direct | 100.0% / 99.9% | 100.0% / 99.9% |
+| hop2 | 100.0% / 100.0% | 100.0% / 100.0% |
+| hop3 | 99.9% / 99.5% | 99.9% / 99.5% |
+| provenance | 100.0% / 99.9% | 100.0% / 99.9% |
+| reverse | 100.0% / 100.0% | 100.0% / 100.0% |
+| revoke | 100.0% / 100.0% | 100.0% / 100.0% |
+| shred | 100.0% / 100.0% | 100.0% / 100.0% |
+| update | 100.0% / 100.0% | 100.0% / 100.0% |
+| rollback | 100.0% / 100.0% | 100.0% / 100.0% |
+| locality | 100.0% / 100.0% | 100.0% / 100.0% |
+
+Pre-registered criteria (worst seed):
+
+| criterion (worst seed) | required | observed | result |
+|---|---|---|---|
+| verified_hard/shred/direct_unknown | >= 0.98 | 1.0000 | PASS |
+| verified_hard/shred/probe_top1 | <= 0.05 | 0.0100 | PASS |
+| verified_hard/shred/forced_choice_win | <= 0.6 | 0.5900 | PASS |
+| verified_hard/shred/true_obj_top1_among_entities | <= 0.05 | 0.0200 | PASS |
+| verified_hard/shred/gated_value_contribution | <= 0.1 | 0.0000 | PASS |
+| verified_hard/active/direct_acc | >= 0.98 | 1.0000 | PASS |
+| verified_hard/restored/direct_acc | >= 0.98 | 1.0000 | PASS |
+| core_verified_hard/direct | >= 0.98 | 0.9990 | PASS |
+| core_verified_hard/hop2 | >= 0.98 | 1.0000 | PASS |
+| core_verified_hard/shred | >= 0.98 | 1.0000 | PASS |
+| verified_soft/shred/gated_value_contribution | <= 0.5 | 0.0721 | PASS |
+
+The soft gate's separation of signed and unsigned markers is learned. Hard verification thresholds that learned score; once thresholded, a residual of exactly zero is by construction — the empirical content is whether thresholding at 0.5 misclassifies any marker (see core suite rows and gate statistics).
+
+Chance levels: probe top-1 0.0039, forced choice 0.5, mean rank 127.5.
+
+**Interpretation (post hoc, record unchanged):** Closes the residual: with signed and unsigned markers weighted equally in the verification loss (weight 5), every reconstruction attack after SHRED is at chance in all five seeds while the payload remains physically present and routed to (routing mass 0.998), and no other family degrades. This is the F4-level result of the session, within the synthetic system. Residual caveat: the soft gate still assigns a high score to a rare unsigned marker in one seed (max 0.995 among all unsigned cells of that bank); none of the 500 shredded targets leaked.

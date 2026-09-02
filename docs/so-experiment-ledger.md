@@ -1029,18 +1029,19 @@ A minimal system in which the neural core is trained on worlds that are re-sampl
 | E-000006 | Ablations | Marker gate necessary for SHRED (0% without); routing necessary (nothing readable); **routing loss necessary for learning** (without it the model collapses to UNKNOWN); **null cell not essential** (pre-registered expectation wrong, claim withdrawn) | E4 |
 | E-000007 | Biomarker: suppression vs deletion | Suppressed model answers UNKNOWN yet keeps value contribution 8.3 and probe 86%; SHRED keeps routing mass (key unchanged) but drops contribution to 1.3 and probe to 4%; REVOKE zero by mask. Separation holds in every seed; SHRED residual as in E-000004 | E4 |
 | E-000009 | Verification loss on the gate | Separation improved (signed 0.89 → 0.998, unsigned mean 0.087 → 0.065) but an unsigned tail (max 0.84) lets 3–5% of shredded payloads through under hard gating → **F4 criteria still not met** | E4 |
-| E-000010 | Class-balanced verification loss | _pending at the time of writing; see the session results_ | — |
+| E-000010 | Class-balanced verification loss (weight 5) | 5 seeds: after SHRED the payload is still present and routed to, yet linear probe 0.2–0.4% (chance 0.39%), forced choice 53–54% (chance 50%), logit rank 125–127 (chance 127.5), gated value contribution 0.047 soft / 0.000 hard; SHRED 100% in the core suite, no other family degraded; **all F4 criteria met**. One seed still shows a single unsigned marker with a high soft score (max 0.995) — none of the 500 shredded targets leaked | E4 / **F4** (synthetic system) |
 | E-000008 | Frozen pretrained GPT-2 core with the layer as adapter, natural-language prompts | _pending at the time of writing; see the session results_ | E5 target |
 
 ### 31.3 What this changes in sections 19, 22 and 30
 
 - **Section 19 (versioned cell lifecycle):** "Synthetic implementation / repeated synthetic behaviour / version lifecycle: PASS" now has a recorded basis (E-000001-A/B, E-000003), with the copy-problem control (E-000002) that the whole deletion argument rests on.
-- **Section 22 (biomarker status):** "Synthetic signals: research evidence exists" is now a recorded, causal result in the synthetic system (E-000005 + E-000007): the gated value contribution separates output suppression from representational removal; routing mass alone does not (a shredded cell is still routed to). "Robust causal marker" remains not established beyond this system.
+- **Section 6 (F0–F5):** REVOKE = F1 by construction plus learned UNKNOWN behaviour; SHRED = F3 with the unsupervised gate (E-000004), F4 with the class-balanced verified gate (E-000010). F5 remains a research target: it requires attacks and reproducers from outside the system (roadmap stages 3 and 6).
+- **Section 22 (biomarker status):** "Synthetic signals: research evidence exists" is now a recorded, causal result in the synthetic system (E-000005 + E-000007): the gated value contribution separates output suppression from representational removal; routing mass alone does not (a shredded cell is still routed to). With the verified gate (E-000010) the same signal reads exactly zero after SHRED while every reconstruction attack is at chance — a deletion certificate *within this system*. "Robust causal marker" remains not established beyond it.
 - **Section 30 (C55–C57):** still outstanding. E-000008 is the CPU-feasible analogue on a 124M-parameter frozen core, not the GPU chain.
 
 ### 31.4 Negative and corrected findings (recorded, not tuned away)
 
-1. The marker gate learned without supervision leaves a residual (≈9% of the value) that representation-level attacks exploit; SHRED is F3, not F4, until the gate verifies signatures reliably (E-000004, E-000007, E-000009).
+1. The marker gate learned without supervision leaves a residual (≈9% of the value) that representation-level attacks exploit; SHRED is F3, not F4, until the gate verifies signatures reliably (E-000004, E-000007). A plain verification loss is not enough because unsigned markers are 5% of the cells (E-000009); a class-balanced verification loss closes the residual to chance in every seed (E-000010).
 2. The null cell is not an essential component (E-000006).
 3. Routing supervision is necessary for the mechanism to be learned at all at this budget (E-000006); provenance exactness is therefore a trained property.
 4. The first GPT-2 adapter design did not learn (collapse to " unknown"); an untrained injection test showed the read-out path works at gain ≥ 1, and a routing-first curriculum was required (E-000008 engineering record).

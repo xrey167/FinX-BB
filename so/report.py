@@ -56,6 +56,11 @@ NOTES = {
         "shredded payloads pass and answer correctly), so the SHRED residual persists and F4 is still withheld. Cause: "
         "the gate loss is averaged over ~1000 cells of which ~5% are unsigned, so the tail receives almost no gradient. "
         "E-000010 weights the two classes equally.",
+    "e000010_balanced_gate": "Closes the residual: with signed and unsigned markers weighted equally in the verification "
+        "loss (weight 5), every reconstruction attack after SHRED is at chance in all five seeds while the payload remains "
+        "physically present and routed to (routing mass 0.998), and no other family degrades. This is the F4-level result "
+        "of the session, within the synthetic system. Residual caveat: the soft gate still assigns a high score to a rare "
+        "unsigned marker in one seed (max 0.995 among all unsigned cells of that bank); none of the 500 shredded targets leaked.",
     "e000007_biomarker": "The suppression-versus-deletion separation holds in every seed (suppressed: value "
         "contribution 8.3, probe 86%, mean rank 10; shredded: 1.3, 4%, 110). The two failed criteria are the same "
         "SHRED residual as in E-000004, addressed in E-000009.",
@@ -72,7 +77,7 @@ Everything below was produced on 4 CPU cores in one session, with no GPU. It is 
 - **The outstanding C55–C57 real-model / GPU chain of the ledger is still outstanding.** E-000008 is its CPU-feasible analogue on a small model, not its execution.
 - **Noise figures are not comparable** with the architecture document's "noise = 0.24 → 68.4%", whose noise definition is not recorded; the sweep here perturbs bank keys and values relative to their RMS.
 - **Seeds.** E-000003 … E-000007 evaluate the same five E-000001-B models on fresh worlds; they are not independent replications of training. E-000002, E-000006 and E-000008 train their own models (3 seeds); E-000009 trains five.
-- **The SHRED residual.** E-000004 and E-000007 found that the marker gate learned without explicit supervision closes to about 9% rather than 0 on unsigned payloads, so a linear probe and forced choice recover a residual; their F4 criteria fail and the records say so. E-000009 is the response: a verification loss and a hard verification gate. Whether that closes the residual is a recorded result, not an assumption.
+- **The SHRED residual.** E-000004 and E-000007 found that the marker gate learned without explicit supervision closes to about 9% rather than 0 on unsigned payloads, so a linear probe and forced choice recover a residual; their F4 criteria fail and the records say so. E-000009 (plain verification loss) narrowed it but left an unsigned tail; E-000010 (class-balanced verification loss) closed it to chance in every seed — a recorded result, not an assumption.
 """
 
 
