@@ -20,7 +20,7 @@ DOC = Path(__file__).resolve().parent.parent / "docs" / "so-results-2026-09-02.m
 
 ORDER = ["e000001a_reference", "e000001b_mini_transformer", "e000002_memorization_control",
          "e000003_retention_generalization", "e000004_reconstruction_attacks", "e000005_causal_interventions",
-         "e000006_ablations", "e000007_biomarker", "e000008_gpt2_adapter"]
+         "e000006_ablations", "e000007_biomarker", "e000008_gpt2_adapter", "e000009_verification_gate"]
 
 # ledger §3 properties -> the experiments that bear on them
 PROPERTIES = {
@@ -28,7 +28,7 @@ PROPERTIES = {
     "Retention (non-target intact)": ["e000001b_mini_transformer", "e000003_retention_generalization", "e000008_gpt2_adapter"],
     "Generalisation (paraphrases, alternative queries)": ["e000003_retention_generalization", "e000004_reconstruction_attacks", "e000008_gpt2_adapter"],
     "Causal isolation (effect follows from the intended structure)": ["e000005_causal_interventions", "e000006_ablations", "e000007_biomarker"],
-    "Reconstruction resistance": ["e000004_reconstruction_attacks", "e000007_biomarker", "e000008_gpt2_adapter"],
+    "Reconstruction resistance": ["e000004_reconstruction_attacks", "e000007_biomarker", "e000009_verification_gate", "e000008_gpt2_adapter"],
     "Scalability (path beyond toy models)": ["e000002_memorization_control", "e000008_gpt2_adapter"],
 }
 
@@ -42,7 +42,8 @@ Everything below was produced on 4 CPU cores in one session, with no GPU. It is 
 - **Provenance is trained**, not emergent: the routing loss supervises which cell each hop reads. E-000006 (`no_routing_loss`) measures what remains without it.
 - **The outstanding C55–C57 real-model / GPU chain of the ledger is still outstanding.** E-000008 is its CPU-feasible analogue on a small model, not its execution.
 - **Noise figures are not comparable** with the architecture document's "noise = 0.24 → 68.4%", whose noise definition is not recorded; the sweep here perturbs bank keys and values relative to their RMS.
-- **Seeds.** E-000003 … E-000007 evaluate the same five E-000001-B models on fresh worlds; they are not independent replications of training. E-000002, E-000006 and E-000008 train their own models (3 seeds).
+- **Seeds.** E-000003 … E-000007 evaluate the same five E-000001-B models on fresh worlds; they are not independent replications of training. E-000002, E-000006 and E-000008 train their own models (3 seeds); E-000009 trains five.
+- **The SHRED residual.** E-000004 and E-000007 found that the marker gate learned without explicit supervision closes to about 9% rather than 0 on unsigned payloads, so a linear probe and forced choice recover a residual; their F4 criteria fail and the records say so. E-000009 is the response: a verification loss and a hard verification gate. Whether that closes the residual is a recorded result, not an assumption.
 """
 
 
