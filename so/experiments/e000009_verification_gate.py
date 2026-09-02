@@ -41,14 +41,19 @@ def main(argv: List[str] | None = None) -> Dict[str, Any]:
     ap.add_argument("--seeds", type=int, nargs="*", default=[0, 1, 2, 3, 4])
     ap.add_argument("--steps", type=int, default=3000)
     ap.add_argument("--gate-weight", type=float, default=1.0)
+    ap.add_argument("--balanced", action="store_true", help="class-balanced gate loss (E-000010)")
+    ap.add_argument("--name", default="e000009_verification_gate", help="result / checkpoint name")
+    ap.add_argument("--experiment", default="E-000009")
     ap.add_argument("--force", action="store_true")
     args = ap.parse_args(argv)
+    ck_name = args.name.split("_")[0]
     conds = {"baseline_soft": [], "verified_soft": [], "verified_hard": []}
     core: Dict[str, List[Dict[str, Any]]] = {"verified_soft": [], "verified_hard": []}
     for seed in args.seeds:
         base = load_base_model(seed)
         conds["baseline_soft"].append(attack_battery(base["model"], base["centre"], seed, 900 + seed))
-        out = train_or_load("e000009", seed, ModelConfig(), TrainConfig(seed=seed, n_steps=args.steps, gate_weight=args.gate_weight),
+        out = train_or_load(ck_name, seed, ModelConfig(),
+                            TrainConfig(seed=seed, n_steps=args.steps, gate_weight=args.gate_weight, gate_balanced=args.balanced),
                             force=args.force)
         model, centre = out["model"], out["centre"]
         model.cfg.hard_gate = False
@@ -72,7 +77,8 @@ def main(argv: List[str] | None = None) -> Dict[str, Any]:
          "core_verified_hard/hop2": (">=", 0.98), "core_verified_hard/shred": (">=", 0.98),
          "verified_soft/shred/gated_value_contribution": ("<=", 0.5)})
     record = {
-        "experiment": "E-000009", "title": "Signature-verification gate: closing the SHRED residual",
+        "experiment": args.experiment, "title": "Signature-verification gate: closing the SHRED residual"
+                 + (" (class-balanced loss)" if args.balanced else ""),
         "evidence_level": "E4", "deletion_level": "F4",
         "claim": "With an explicit verification loss the marker gate closes far more tightly on unsigned payloads, and "
                  "with hard verification at read time the SHRED residual measured in E-000004 / E-000007 disappears: "
@@ -84,16 +90,17 @@ def main(argv: List[str] | None = None) -> Dict[str, Any]:
                                       "verification thresholds that learned score; once thresholded, a residual of exactly "
                                       "zero is by construction — the empirical content is whether thresholding at 0.5 "
                                       "misclassifies any marker (see core suite rows and gate statistics).",
-        "config": {"seeds": args.seeds, "steps": args.steps, "gate_weight": args.gate_weight},
+        "config": {"seeds": args.seeds, "steps": args.steps, "gate_weight": args.gate_weight, "gate_balanced": args.balanced},
         "criteria": check["criteria"], "claim_supported": check["claim_supported"],
         "per_condition": conds, "core_per_condition": core, "aggregate": agg, "core_aggregate": core_agg,
     }
     rows = [(a, *(f"{agg[c][f'shred/{a}']['mean']:.4f} / {agg[c][f'shred/{a}']['max' if a in ('probe_top1','probe_top5','forced_choice_win','true_obj_top1_among_entities','gated_value_contribution','gate_invalid_mean','gate_invalid_max') else 'min']:.4f}" for c in conds)) for a in ATTACK_ROWS]
     crow = [(k, *(ledger.pct(core_agg[c][k]["mean"]) + " / " + ledger.pct(core_agg[c][k]["min"]) for c in core)) for k in CORE_KEYS]
     md = "\n".join([
-        "# E-000009 — Signature-verification gate: closing the SHRED residual", "",
+        f"# {args.experiment} — Signature-verification gate: closing the SHRED residual" + (" (class-balanced loss)" if args.balanced else ""), "",
         f"Evidence level: **E4** ({ledger.EVIDENCE_LEVELS['E4']}); deletion level claimed for SHRED with hard verification: "
-        f"**F4** within the synthetic system. Seeds: {args.seeds}; {args.steps} steps; gate loss weight {args.gate_weight}. "
+        f"**F4** within the synthetic system. Seeds: {args.seeds}; {args.steps} steps; gate loss weight {args.gate_weight}"
+        + (", class-balanced" if args.balanced else "") + ". "
         "Baseline = the E-000001-B models (no gate loss).", "",
         "Attack battery after SHRED (mean / worst seed):", "",
         ledger.table(["attack after SHRED", "baseline (soft gate)", "verified (soft gate)", "verified (hard gate)"], rows), "",
@@ -103,7 +110,7 @@ def main(argv: List[str] | None = None) -> Dict[str, Any]:
         record["by_construction_vs_learned"], "",
         "Chance levels: probe top-1 0.0039, forced choice 0.5, mean rank 127.5.",
     ])
-    path = ledger.save("e000009_verification_gate", record, md)
+    path = ledger.save(args.name, record, md)
     print(md); print(f"\nsaved {path}")
     return record
 

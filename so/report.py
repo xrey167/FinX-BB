@@ -20,7 +20,8 @@ DOC = Path(__file__).resolve().parent.parent / "docs" / "so-results-2026-09-02.m
 
 ORDER = ["e000001a_reference", "e000001b_mini_transformer", "e000002_memorization_control",
          "e000003_retention_generalization", "e000004_reconstruction_attacks", "e000005_causal_interventions",
-         "e000006_ablations", "e000007_biomarker", "e000008_gpt2_adapter", "e000009_verification_gate"]
+         "e000006_ablations", "e000007_biomarker", "e000008_gpt2_adapter", "e000009_verification_gate",
+         "e000010_balanced_gate"]
 
 # ledger §3 properties -> the experiments that bear on them
 PROPERTIES = {
@@ -28,7 +29,7 @@ PROPERTIES = {
     "Retention (non-target intact)": ["e000001b_mini_transformer", "e000003_retention_generalization", "e000008_gpt2_adapter"],
     "Generalisation (paraphrases, alternative queries)": ["e000003_retention_generalization", "e000004_reconstruction_attacks", "e000008_gpt2_adapter"],
     "Causal isolation (effect follows from the intended structure)": ["e000005_causal_interventions", "e000006_ablations", "e000007_biomarker"],
-    "Reconstruction resistance": ["e000004_reconstruction_attacks", "e000007_biomarker", "e000009_verification_gate", "e000008_gpt2_adapter"],
+    "Reconstruction resistance": ["e000004_reconstruction_attacks", "e000007_biomarker", "e000009_verification_gate", "e000010_balanced_gate", "e000008_gpt2_adapter"],
     "Scalability (path beyond toy models)": ["e000002_memorization_control", "e000008_gpt2_adapter"],
 }
 
@@ -50,6 +51,11 @@ NOTES = {
         "be *learned* at all at this budget, not only for exact provenance. That is an optimisation finding, not a "
         "by-construction one. 'no_marker_gate' and 'no_routing' confirm the information-flow necessities (SHRED 0%, "
         "nothing readable).",
+    "e000009_verification_gate": "The verification loss sharpened the gate (signed markers 0.89 -> 0.998, unsigned "
+        "mean 0.087 -> 0.065) but a tail of unsigned markers still scores high (max 0.84 soft; under hard gating 3-5% of "
+        "shredded payloads pass and answer correctly), so the SHRED residual persists and F4 is still withheld. Cause: "
+        "the gate loss is averaged over ~1000 cells of which ~5% are unsigned, so the tail receives almost no gradient. "
+        "E-000010 weights the two classes equally.",
     "e000007_biomarker": "The suppression-versus-deletion separation holds in every seed (suppressed: value "
         "contribution 8.3, probe 86%, mean rank 10; shredded: 1.3, 4%, 110). The two failed criteria are the same "
         "SHRED residual as in E-000004, addressed in E-000009.",

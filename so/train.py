@@ -42,6 +42,7 @@ class TrainConfig:
     train_noise: float = 0.03
     route_weight: float = 0.5
     gate_weight: float = 0.0         # E-000009: BCE(gate logits, marker validity) — signature verification loss
+    gate_balanced: bool = False      # E-000010: weight signed and unsigned markers equally (unsigned are ~5% of cells)
     mix: Dict[str, float] = field(default_factory=lambda: {"fwd1": 0.40, "fwd2": 0.25, "fwd3": 0.20, "rev1": 0.15})
     fixed_world: bool = False        # E-000002: train on ONE world so that facts can be memorised
     log_every: int = 250
@@ -115,8 +116,14 @@ def train(model_cfg: ModelConfig, cfg: TrainConfig, world_override: Optional[Wor
         if model_cfg.use_routing and cfg.route_weight > 0:
             loss = loss + cfg.route_weight * routing_loss(routing, batch.route, model_cfg.use_null_cell)
         if model_cfg.use_routing and model_cfg.use_marker_gate and cfg.gate_weight > 0 and extras.get("gate_logits") is not None:
-            loss = loss + cfg.gate_weight * F.binary_cross_entropy_with_logits(
-                extras["gate_logits"], tensors["marker_valid"].float())
+            valid = tensors["marker_valid"].float()
+            per_cell = F.binary_cross_entropy_with_logits(extras["gate_logits"], valid, reduction="none")
+            if cfg.gate_balanced:
+                n_pos, n_neg = valid.sum().clamp_min(1), (1 - valid).sum().clamp_min(1)
+                gate_loss = 0.5 * (per_cell * valid).sum() / n_pos + 0.5 * (per_cell * (1 - valid)).sum() / n_neg
+            else:
+                gate_loss = per_cell.mean()
+            loss = loss + cfg.gate_weight * gate_loss
         opt.zero_grad(set_to_none=True)
         loss.backward()
         torch.nn.utils.clip_grad_norm_(model.parameters(), 1.0)
