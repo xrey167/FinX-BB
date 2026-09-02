@@ -94,8 +94,13 @@ def run_seed(seed: int) -> Dict[str, Any]:
         for d, _, _ in triples: store.revoke(kids[d])
         m["dependency/direct_unknown_after_revoke_K3"] = unknown_rate(answers(model, store, world, q_direct))
         m["dependency/derivable_recovery_after_revoke_K3"] = accuracy(answers(model, store, world, q_derive), obj)
+        closure = {e2 for _, _, e2 in triples} | {d for d, _, _ in triples}
+        bypass = [q for q in world.sample_queries(rng, 600, 2, "fwd", require_answer=True)
+                  if not (set(world.answer(q).edges) & closure)][:200]
+        bypass_truth = [world.answer(q).answer for q in bypass]
         for _, _, e2 in triples: store.revoke(kids[e2])
         m["dependency/derivable_recovery_after_closure"] = accuracy(answers(model, store, world, q_derive), obj)
+        m["dependency/collateral_bypass_acc_after_closure"] = accuracy(answers(model, store, world, bypass), bypass_truth)
         for d, _, e2 in triples: store.restore(kids[d]); store.restore(kids[e2])
     return m
 
@@ -116,9 +121,21 @@ def main(argv: List[str] | None = None) -> Dict[str, Any]:
     for s in per_seed: print(s, flush=True)
     keys = [k for k in per_seed[0] if k != "seed"]
     agg = ledger.aggregate(per_seed, keys)
+    check = ledger.check_criteria(agg, {
+        "active/direct_acc": (">=", 0.98), "active/probe_top1": (">=", 0.5),
+        "revoke/direct_unknown": (">=", 0.98), "revoke/probe_top1": ("<=", 0.05), "revoke/forced_choice_win": ("<=", 0.6),
+        "revoke/true_obj_top1_among_entities": ("<=", 0.05),
+        "shred/direct_unknown": (">=", 0.95), "shred/paraphrase_unknown": (">=", 0.95), "shred/probe_top1": ("<=", 0.05),
+        "shred/forced_choice_win": ("<=", 0.6), "shred/true_obj_top1_among_entities": ("<=", 0.05),
+        "shred/gated_value_contribution": ("<=", 0.1), "restored/direct_acc": (">=", 0.98)})
     record = {
         "experiment": "E-000004", "title": "Reconstruction attacks against REVOKE and SHRED",
         "evidence_level": "E4", "deletion_level": "F4",
+        "criteria": check["criteria"], "claim_supported": check["claim_supported"],
+        "by_construction_vs_learned": "After REVOKE the routing mass and value contribution on the target are zero "
+                                      "by the mask, not by learning — those two rows are reported for completeness "
+                                      "only. After SHRED the cell is still routable, so every row is a measurement "
+                                      "of learned behaviour; the SHRED column carries the F4-level evidence.",
         "claim": "After REVOKE or SHRED the deleted object is not recoverable through direct, paraphrase, multi-hop "
                  "or reverse queries, forced choice is at chance, the true object's logit rank is at chance, a "
                  "linear probe on the hidden state is at chance, and the target cell's gated value contribution is "
@@ -141,8 +158,12 @@ def main(argv: List[str] | None = None) -> Dict[str, Any]:
         f". Probe calibration on held-out active cells: top-1 {agg['probe_calibration_top1']['mean']:.3f}, "
         f"top-5 {agg['probe_calibration_top5']['mean']:.3f}. Chance: forced choice 0.5, top-1 among entities "
         f"1/256 = 0.0039, mean rank 127.5, probe top-1 0.0039, top-5 0.0195.", "",
-        ledger.table(["attack (mean over seeds)", "active", "after REVOKE", "after SHRED"], rows), "",
-        "Dependency reconstruction (K3 derivable from K1 + K2):", "",
+        ledger.table(["attack (mean over seeds)", "active", "after REVOKE (mask)", "after SHRED (learned)"], rows), "",
+        record["by_construction_vs_learned"], "",
+        "Pre-registered criteria (worst seed):", "", ledger.criteria_table(check), "",
+        f"Sample sizes per seed: {N_TARGETS} targets (probe / forced choice / rank / direct); multi-hop and reverse "
+        "subsets are smaller (only targets with an outgoing edge or a unique reverse subject).", "",
+        "Dependency reconstruction (K3 derivable from K1 + K2; 'collateral' = 2-hop paths not touching the closure):", "",
         ledger.table(["measure", "mean"], dep), "",
         "Context completion: not applicable (symbolic queries, no free text).",
     ])

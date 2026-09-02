@@ -13,7 +13,7 @@ import datetime as _dt
 import json
 import platform
 from pathlib import Path
-from typing import Any, Dict, Iterable, List, Sequence
+from typing import Any, Dict, Iterable, List, Sequence, Tuple
 
 import numpy as np
 
@@ -70,12 +70,18 @@ def environment() -> Dict[str, str]:
 
 
 def save(name: str, record: Dict[str, Any], markdown: str) -> Path:
+    """Write ``<name>.json`` and ``<name>.md``; ``SO_RESULT_SUFFIX`` (e.g. "-quick") keeps reduced runs apart."""
+    import os
+
+    name = name + os.environ.get("SO_RESULT_SUFFIX", "")
     RESULTS_DIR.mkdir(parents=True, exist_ok=True)
     record = dict(record)
     record.setdefault("recorded_at", _dt.datetime.now(_dt.timezone.utc).isoformat(timespec="seconds"))
     record.setdefault("environment", environment())
     if "evidence_level" in record:
         record["evidence_level_meaning"] = EVIDENCE_LEVELS[record["evidence_level"]]
+    if "claim_supported" in record and not record["claim_supported"]:
+        record["claim"] = "NOT SUPPORTED BY THE MEASUREMENTS (see criteria): " + record.get("claim", "")
     if record.get("deletion_level"):
         record["deletion_level_meaning"] = DELETION_LEVELS[record["deletion_level"]]
     json_path = RESULTS_DIR / f"{name}.json"
@@ -159,6 +165,57 @@ def clopper_pearson(successes: int, n: int, alpha: float = 0.05) -> Dict[str, fl
     lower = 0.0 if successes == 0 else beta_ppf(alpha / 2, successes, n - successes + 1)
     upper = 1.0 if successes == n else beta_ppf(1 - alpha / 2, successes + 1, n - successes)
     return {"rate": successes / n, "lower": lower, "upper": upper, "n": n}
+
+
+def ci_rows(per_seed: List[Dict[str, Any]], keys: Sequence[str], sizes: Dict[str, int],
+            lower_is_better: Sequence[str] = ()) -> List[List[Any]]:
+    """Rows: metric, mean, worst seed, pooled n, 95% CI lower, 95% CI upper.
+
+    Rates are pooled over seeds with the per-seed sample size ``sizes[metric]`` (exact
+    binomial interval, Clopper–Pearson).  "Worst" is the max for lower-is-better metrics
+    (leaks, unknown-rates that should be 0) and the min otherwise.
+    """
+    rows: List[List[Any]] = []
+    lib = set(lower_is_better)
+    for k in keys:
+        vals = [float(s[k]) for s in per_seed if k in s and s[k] == s[k]]
+        if not vals:
+            continue
+        n = sizes.get(k)
+        worst = max(vals) if k in lib else min(vals)
+        if n:
+            successes = int(round(sum(v * n for v in vals)))
+            ci = clopper_pearson(successes, n * len(vals))
+            rows.append([k, f"{np.mean(vals):.4f}", f"{worst:.4f}", n * len(vals), f"{ci['lower']:.4f}", f"{ci['upper']:.4f}"])
+        else:
+            rows.append([k, f"{np.mean(vals):.4f}", f"{worst:.4f}", "-", "-", "-"])
+    return rows
+
+
+CI_HEADERS = ["measure", "mean over seeds", "worst seed", "pooled n", "95% CI lower", "95% CI upper"]
+
+
+def check_criteria(agg: Dict[str, Dict[str, float]], criteria: Dict[str, Tuple[str, float]]) -> Dict[str, Any]:
+    """Evaluate pass criteria on the aggregate: ``{"metric": (">=", 0.99)}`` tests the worst seed
+    (min for ">=", max for "<=").  Returns per-criterion detail and an overall ``claim_supported``."""
+    detail: Dict[str, Dict[str, Any]] = {}
+    ok_all = True
+    for metric, (op, threshold) in criteria.items():
+        if metric not in agg:
+            detail[metric] = {"op": op, "threshold": threshold, "observed": None, "pass": False}
+            ok_all = False
+            continue
+        observed = agg[metric]["min"] if op == ">=" else agg[metric]["max"]
+        passed = observed >= threshold if op == ">=" else observed <= threshold
+        detail[metric] = {"op": op, "threshold": threshold, "observed": observed, "pass": bool(passed)}
+        ok_all = ok_all and bool(passed)
+    return {"criteria": detail, "claim_supported": ok_all}
+
+
+def criteria_table(check: Dict[str, Any]) -> str:
+    rows = [(m, f"{d['op']} {d['threshold']}", "-" if d["observed"] is None else f"{d['observed']:.4f}",
+             "PASS" if d["pass"] else "FAIL") for m, d in check["criteria"].items()]
+    return table(["criterion (worst seed)", "required", "observed", "result"], rows)
 
 
 def aggregate(per_seed: List[Dict[str, Any]], keys: Sequence[str]) -> Dict[str, Dict[str, float]]:

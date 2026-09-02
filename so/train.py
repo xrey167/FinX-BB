@@ -62,10 +62,15 @@ def lr_at(step: int, cfg: TrainConfig) -> float:
     return cfg.lr * 0.5 * (1 + math.cos(math.pi * progress))
 
 
-def routing_loss(routing: torch.Tensor, route: torch.Tensor) -> torch.Tensor:
-    """Cross-entropy of the routing distribution against the cell (or null) it should read."""
+def routing_loss(routing: torch.Tensor, route: torch.Tensor, has_null_cell: bool = True) -> torch.Tensor:
+    """Cross-entropy of the routing distribution against the cell (or null) it should read.
+
+    Without a null cell there is no column to route "nothing found" to, so those hops are ignored.
+    """
     B, H, C1 = routing.shape
     target = route.clone()
+    if not has_null_cell:
+        target[target == -1] = -2
     ignore = target == -2
     target[target == -1] = C1 - 1           # null cell is the last column
     target[ignore] = 0
@@ -85,16 +90,14 @@ def train(model_cfg: ModelConfig, cfg: TrainConfig, world_override: Optional[Wor
     fixed = world_override
     if cfg.fixed_world and fixed is None:
         fixed = World.sample(rng, cfg.n_entities, cfg.n_relations, cfg.n_cells_max, cfg.n_synonyms)
-    fixed_bank: Optional[Bank] = None
     history: List[Dict] = []
     t0 = time.time()
     model.train()
     for step in range(cfg.n_steps):
         if fixed is not None:
+            # same lifecycle-state sampling as the re-sampled regime: only the WORLD is held fixed
             world = fixed
-            if fixed_bank is None:
-                fixed_bank = bank_from_world(rng, world, centre, p_revoked=0.0, p_shred=0.0, p_stale=0.0)
-            bank = fixed_bank
+            bank = bank_from_world(rng, world, centre, cfg.p_revoked, cfg.p_shred, cfg.p_stale)
         else:
             n_cells = int(rng.integers(cfg.n_cells_min, cfg.n_cells_max + 1))
             world = World.sample(rng, cfg.n_entities, cfg.n_relations, n_cells, cfg.n_synonyms)
@@ -108,7 +111,7 @@ def train(model_cfg: ModelConfig, cfg: TrainConfig, world_override: Optional[Wor
         loss_ans = F.cross_entropy(logits, batch.target)
         loss = loss_ans
         if model_cfg.use_routing and cfg.route_weight > 0:
-            loss = loss + cfg.route_weight * routing_loss(routing, batch.route)
+            loss = loss + cfg.route_weight * routing_loss(routing, batch.route, model_cfg.use_null_cell)
         opt.zero_grad(set_to_none=True)
         loss.backward()
         torch.nn.utils.clip_grad_norm_(model.parameters(), 1.0)

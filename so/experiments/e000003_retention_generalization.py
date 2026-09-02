@@ -98,6 +98,13 @@ def main(argv: List[str] | None = None) -> Dict[str, Any]:
     for s in per_seed: print(s, flush=True)
     keys = [k for k in per_seed[0] if k not in ("seed", "n_target_rev", "n_target_hop2")]
     agg = ledger.aggregate(per_seed, keys)
+    check = ledger.check_criteria(agg, {
+        "before/target_para_acc": (">=", 0.98), "revoke/target_para_unknown": (">=", 0.98),
+        "revoke/target_hop2_unknown": (">=", 0.98), "revoke/control_para_acc": (">=", 0.98),
+        "revoke/unrelated_para_acc": (">=", 0.98), "revoke/bypass_hop2_acc": (">=", 0.98),
+        "shred/target_para_unknown": (">=", 0.95), "shred/control_para_acc": (">=", 0.98),
+        "update/target_para_new_obj_acc": (">=", 0.98), "update/target_para_old_obj_rate": ("<=", 0.02),
+        "rollback/target_para_acc": (">=", 0.98)})
     record = {
         "experiment": "E-000003", "title": "Retention and generalisation of deletion",
         "evidence_level": "E4", "deletion_level": "F3",
@@ -107,6 +114,13 @@ def main(argv: List[str] | None = None) -> Dict[str, Any]:
                  "restores it exactly.",
         "not_claimed": "Reconstruction resistance beyond behaviour (see E-000004) and anything beyond the synthetic "
                        "system.",
+        "by_construction_vs_learned": "REVOKE removes routing by mask (F1), so its effect on every access path "
+                                      "(paraphrase, multi-hop, reverse) follows from canonical addressing of one "
+                                      "cell; what is learned is that the model answers UNKNOWN instead of using "
+                                      "another cell. SHRED leaves the cell routable: refusing it on every path is "
+                                      "learned (F3). 'general_fresh_world_acc' uses a separate store and cannot change "
+                                      "— it is a sanity row, not evidence of retention.",
+        "criteria": check["criteria"], "claim_supported": check["claim_supported"],
         "config": {"seeds": args.seeds, "n_targets": N_TARGETS, "n_controls": N_CONTROLS, "n_general": N_GENERAL},
         "per_seed": per_seed, "aggregate": agg,
     }
@@ -117,8 +131,12 @@ def main(argv: List[str] | None = None) -> Dict[str, Any]:
         "generalising over paraphrases, multi-hop and reverse access). Seeds: " + str(args.seeds), "",
         ledger.table(["measure", "mean", "min", "max"], rows), "",
         "Pattern required by the ledger (section 16): target high → low, control high → high. "
-        "'target_para_unknown' after revoke/shred is the deletion; 'control_para_acc', 'unrelated_para_acc', "
-        "'bypass_hop2_acc' and 'general_fresh_world_acc' are the retention side.",
+        "'target_para_unknown' after revoke/shred is the deletion; 'control_para_acc', 'unrelated_para_acc' and "
+        "'bypass_hop2_acc' are the retention side ('general_fresh_world_acc' is a by-construction sanity row). "
+        f"Sample sizes per seed: targets {N_TARGETS} x {2} paraphrases, controls {N_CONTROLS} x 2, unrelated up to "
+        f"{N_CONTROLS} x 2, bypass 300, reverse only where the subject is unique (see n_target_rev).", "",
+        "Pre-registered criteria (worst seed):", "", ledger.criteria_table(check), "",
+        record["by_construction_vs_learned"],
     ])
     path = ledger.save("e000003_retention_generalization", record, md)
     print(md); print(f"\nsaved {path}")

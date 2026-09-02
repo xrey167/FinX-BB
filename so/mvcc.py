@@ -74,7 +74,8 @@ class MVCCStore:
         self.marker_dim = marker_dim
         self.seed = seed
         self.rng = np.random.default_rng(seed)
-        centre = self.rng.normal(size=marker_dim) if marker_centre is None else np.asarray(marker_centre, dtype=float)
+        drawn = self.rng.normal(size=marker_dim)          # always drawn: replay must reproduce the RNG sequence
+        centre = drawn if marker_centre is None else np.asarray(marker_centre, dtype=float)
         self.marker_centre = centre / np.linalg.norm(centre)
         self.valid_radius = valid_radius
         self.cells: Dict[int, Cell] = {}

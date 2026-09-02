@@ -38,15 +38,19 @@ N_TARGETS, N_CONTROLS = 50, 50
 
 
 def suppress(model, store, world, target_queries: List[Query], rng: np.random.Generator, steps: int = 200,
-             lr: float = 3e-4):
-    """Fine-tune a copy of the model to refuse the target queries while keeping everything else."""
+             lr: float = 3e-4, target_keys=frozenset()):
+    """Fine-tune a copy of the model to refuse the target queries while keeping everything else.
+
+    Batches mix the targets (label UNKNOWN) with other queries whose paths do not touch any
+    target key, so the supervision is never contradictory."""
     m = copy.deepcopy(model)
     m.train()
     opt = torch.optim.AdamW(m.parameters(), lr=lr, weight_decay=0.0)
     bank = bank_from_store(store)
     tensors = bank.tensors()
     for _ in range(steps):
-        others = world.sample_queries(rng, 96, 1, "fwd") + world.sample_queries(rng, 32, 2, "fwd")
+        others = [q for q in world.sample_queries(rng, 140, 1, "fwd") + world.sample_queries(rng, 48, 2, "fwd")
+                  if not (set(world.answer(q).edges) & target_keys)][:128]
         b = encode_queries(target_queries + others, bank, world, m.cfg.max_hops)
         target = b.target.clone()
         target[: len(target_queries)] = world.n_entities        # UNKNOWN for the targets
@@ -78,7 +82,7 @@ def run_seed(seed: int) -> Dict[str, Any]:
     probe = LinearProbe(h_o.shape[1], n_ent, seed=seed)
     probe.fit(h_o, np.array([f.obj for f in others]))
 
-    def measure(mdl, tag: str, m: Dict[str, Any]) -> None:
+    def measure(mdl, tag: str, m: Dict[str, Any], probe=probe) -> None:
         h, r, lg = hidden_states(mdl, store, world, q_t)
         a = answers(mdl, store, world, q_t)
         m[f"{tag}/target_unknown"] = unknown_rate(a)
@@ -104,8 +108,12 @@ def run_seed(seed: int) -> Dict[str, Any]:
     for f in targets: store.shred(kids[f.key])
     measure(model, "shredded", m)
     for f in targets: store.resign(kids[f.key])
-    sup = suppress(model, store, world, q_t_all, rng)
-    measure(sup, "suppressed", m)
+    sup = suppress(model, store, world, q_t_all, rng, target_keys=frozenset(f.key for f in targets))
+    # the attacker recalibrates the probe on the model actually attacked (active non-target cells)
+    h_s, _, _ = hidden_states(sup, store, world, q_o)
+    probe_s = LinearProbe(h_s.shape[1], n_ent, seed=seed)
+    probe_s.fit(h_s, np.array([f.obj for f in others]))
+    measure(sup, "suppressed", m, probe=probe_s)
     return m
 
 
@@ -118,6 +126,11 @@ def main(argv: List[str] | None = None) -> Dict[str, Any]:
     keys = [k for k in per_seed[0] if k != "seed"]
     agg = ledger.aggregate(per_seed, keys)
     conds = ["active", "revoked", "shredded", "suppressed"]
+    check = ledger.check_criteria(agg, {
+        "suppressed/target_unknown": (">=", 0.95), "suppressed/control_acc": (">=", 0.95),
+        "suppressed/gated_value_contribution": (">=", 0.3), "suppressed/probe_top1": (">=", 0.5),
+        "shredded/target_unknown": (">=", 0.95), "shredded/gated_value_contribution": ("<=", 0.1),
+        "shredded/probe_top1": ("<=", 0.05), "revoked/probe_top1": ("<=", 0.05)})
     signals = ["target_unknown", "target_acc", "control_acc", "routing_mass_on_target", "gated_value_contribution",
                "probe_top1", "probe_top5", "true_obj_top1_among_entities", "true_obj_mean_rank", "forced_choice_win"]
     record = {
@@ -125,9 +138,12 @@ def main(argv: List[str] | None = None) -> Dict[str, Any]:
         "evidence_level": "E4", "deletion_level": "F4",
         "claim": "Suppression (fine-tuned refusal) and deletion (REVOKE / SHRED) are behaviourally identical on the "
                  "targets, but the internal signals separate them: under suppression the target cell still receives "
-                 "routing mass and value contribution and a linear probe still decodes the object from the hidden "
-                 "state; under REVOKE / SHRED those signals vanish. The gated value contribution is a causal "
-                 "biomarker of usable knowledge in this system (its causality is established in E-000005).",
+                 "value contribution and a linear probe still decodes the object from the hidden state; under SHRED "
+                 "the cell is still routed to (routing mass stays, by construction of the key) but its gated value "
+                 "contribution and the probe reading vanish; under REVOKE both are zero by the mask. The gated value "
+                 "contribution is the separating signal; its causal role (payload -> answer) is what E-000005 "
+                 "intervenes on.",
+        "criteria": check["criteria"], "claim_supported": check["claim_supported"],
         "not_claimed": "A deletion certificate for real LLMs; robustness of the marker beyond this synthetic system.",
         "config": {"seeds": args.seeds, "n_targets": N_TARGETS, "n_controls": N_CONTROLS},
         "per_seed": per_seed, "aggregate": agg,
@@ -138,9 +154,12 @@ def main(argv: List[str] | None = None) -> Dict[str, Any]:
         f"Evidence level: **E4** ({ledger.EVIDENCE_LEVELS['E4']}); deletion level **F4** within the synthetic system. "
         f"Seeds: {args.seeds}. Chance levels: probe top-1 0.0039, top-5 0.0195, mean rank 127.5, forced choice 0.5.", "",
         ledger.table(["signal (mean over seeds)"] + conds, rows), "",
-        "Reading: 'suppressed' keeps the biomarker (routing mass, value contribution) and the probe leak while "
-        "answering UNKNOWN — output suppression, ledger F0. 'revoked' and 'shredded' remove them — representational "
-        "removal, F4.",
+        "Reading: 'suppressed' keeps the biomarker (value contribution) and the probe leak while answering UNKNOWN — "
+        "output suppression, ledger F0. 'shredded' keeps routing mass (the key is unchanged, by construction) but "
+        "loses value contribution and probe leak — representational removal, F4, learned. 'revoked' loses both by "
+        "the mask (F1). The probe used on 'suppressed' is refitted on that model's own active cells.", "",
+        f"n = {N_TARGETS} targets, {N_CONTROLS} controls per seed. Pre-registered criteria (worst seed):", "",
+        ledger.criteria_table(check),
     ])
     path = ledger.save("e000007_biomarker", record, md)
     print(md); print(f"\nsaved {path}")

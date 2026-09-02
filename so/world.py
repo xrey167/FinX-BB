@@ -234,20 +234,35 @@ class World:
     def derivable_shortcuts(self, rng: np.random.Generator, n: int) -> List[Tuple[Tuple[int, int], Tuple[int, int], Tuple[int, int]]]:
         """Triples ``(direct_edge, edge_1, edge_2)`` where the object of ``direct_edge`` equals
         the 2-hop result through ``edge_1`` then ``edge_2`` from the same subject.  This is the
-        ledger's K3 = K1 + K2 dependency situation (section 23)."""
+        ledger's K3 = K1 + K2 dependency situation (section 23).  Degenerate triples (the
+        intermediate entity equal to the subject, or an edge reused inside the triple) are
+        excluded, and the returned triples share no edge with each other."""
         found = []
         for (s, r), o in self.index.items():
             for r1 in range(self.n_relations):
                 if r1 == r or (s, r1) not in self.index:
                     continue
                 mid = self.index[(s, r1)]
+                if mid == s:
+                    continue
                 for r2 in range(self.n_relations):
-                    if (mid, r2) in self.index and self.index[(mid, r2)] == o:
-                        found.append(((s, r), (s, r1), (mid, r2)))
+                    e2 = (mid, r2)
+                    if e2 in self.index and self.index[e2] == o and e2 != (s, r) and e2 != (s, r1):
+                        found.append(((s, r), (s, r1), e2))
         if not found:
             return []
-        pick = rng.choice(len(found), size=min(n, len(found)), replace=False)
-        return [found[int(k)] for k in pick]
+        order = rng.permutation(len(found))
+        used: set = set()
+        out = []
+        for k in order:
+            t = found[int(k)]
+            if any(e in used for e in t):
+                continue
+            used.update(t)
+            out.append(t)
+            if len(out) >= n:
+                break
+        return out
 
 
 def free_keys(world: World) -> List[Tuple[int, int]]:

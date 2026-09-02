@@ -33,6 +33,7 @@ from so.model import ModelConfig, MutableKnowledgeTransformer
 from so.train import TrainConfig, train
 
 VARIANTS: Dict[str, Dict[str, Any]] = {
+    "full_same_budget": {"model": {}, "train": {}},          # the fair comparison: default model, variant step budget
     "no_marker_gate": {"model": {"use_marker_gate": False}, "train": {}},
     "no_null_cell": {"model": {"use_null_cell": False}, "train": {}},
     "no_routing_loss": {"model": {}, "train": {"route_weight": 0.0}},
@@ -98,9 +99,21 @@ def main(argv: List[str] | None = None) -> Dict[str, Any]:
         s.rollback(k, 2); no_versioning_rollback = "possible"
     except ValueError:
         no_versioning_rollback = "impossible (no version to return to)"
+    check = ledger.check_criteria(
+        {f"{v}/{k}": x for v in results for k, x in agg[v].items()},
+        {"full_same_budget/direct": (">=", 0.98), "full_same_budget/shred": (">=", 0.95),
+         "no_marker_gate/shred": ("<=", 0.2), "no_marker_gate/direct": (">=", 0.98),
+         "no_null_cell/hop2_broken_unknown": ("<=", 0.5), "no_routing/direct": ("<=", 0.1)})
     record = {
         "experiment": "E-000006", "title": "Ablations",
         "evidence_level": "E4", "deletion_level": None,
+        "criteria": check["criteria"], "claim_supported": check["claim_supported"],
+        "by_construction_vs_learned": "'no_routing' and 'no_marker_gate' remove an information path, so their "
+                                      "failures (nothing readable / SHRED ineffective) are information-flow "
+                                      "necessities, reported to quantify them. 'no_null_cell' and 'no_routing_loss' "
+                                      "keep the information paths and test learned behaviour: whether UNKNOWN "
+                                      "detection and exact provenance emerge without the dedicated cell / loss. "
+                                      "'full_same_budget' is the fair baseline trained with the variants' step budget.",
         "claim": "Each architectural component has a measurable, specific effect: the marker gate is what makes "
                  "SHRED work, the null cell is what makes broken paths answer UNKNOWN, routing is what makes any "
                  "reading of re-sampled worlds possible, and the routing loss is what makes provenance exact.",
@@ -116,6 +129,8 @@ def main(argv: List[str] | None = None) -> Dict[str, Any]:
         f"Evidence level: **E4** ({ledger.EVIDENCE_LEVELS['E4']}). Seeds: {args.seeds}; variants trained "
         f"{args.steps} steps, full model 3000 steps (E-000001-B). Values are means over seeds.", "",
         ledger.table(["variant"] + KEYS, rows), "",
+        record["by_construction_vs_learned"], "",
+        "Pre-registered criteria (worst seed):", "", ledger.criteria_table(check), "",
         f"Random deletion (revoke another cell, target must stay): {ledger.pct(record['random_deletion_target_unchanged'])}", "",
         f"Without versioning (UPDATE as in-place replace): rollback {no_versioning_rollback} — structural property of "
         "the layer, not a learned one.",

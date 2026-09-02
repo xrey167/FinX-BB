@@ -78,7 +78,16 @@ def main(argv: List[str] | None = None) -> Dict[str, Any]:
     for s in per_seed: print(s, flush=True)
     keys = [k for k in per_seed[0] if k != "seed"]
     agg = ledger.aggregate(per_seed, keys)
+    check = ledger.check_criteria(agg, {k: (">=", 0.98) for k in keys})
     record = {
+        "criteria": check["criteria"], "claim_supported": check["claim_supported"],
+        "by_construction_vs_learned": "That the read equation uses the cell's payload is by construction; what is "
+                                      "tested is that the trained core actually routes each query to its own cell "
+                                      "(localisation), does not draw the answer from anywhere else (disable -> "
+                                      "UNKNOWN, random-other -> unchanged) and turns a swapped or replaced payload "
+                                      "into exactly the predicted answer. Localisation is a trained objective "
+                                      "(routing loss); E-000006 'no_routing_loss' reports how much of it emerges "
+                                      "without that supervision.",
         "experiment": "E-000005", "title": "Causal interventions on knowledge cells",
         "evidence_level": "E4", "deletion_level": None,
         "claim": "The cell the model routes to for a query is the ground-truth cell, and intervening on it "
@@ -94,7 +103,9 @@ def main(argv: List[str] | None = None) -> Dict[str, Any]:
     md = "\n".join([
         "# E-000005 — Causal interventions", "",
         f"Evidence level: **E4** ({ledger.EVIDENCE_LEVELS['E4']}). Seeds: {args.seeds}, {N_TARGETS} targets per seed.", "",
-        ledger.table(["intervention", "predicted outcome", "observed (mean)", "worst seed"], rows),
+        ledger.table(["intervention", "predicted outcome", "observed (mean)", "worst seed"], rows), "",
+        record["by_construction_vs_learned"], "",
+        f"n = {N_TARGETS} targets per seed. Pre-registered criteria (worst seed):", "", ledger.criteria_table(check),
     ])
     path = ledger.save("e000005_causal_interventions", record, md)
     print(md); print(f"\nsaved {path}")

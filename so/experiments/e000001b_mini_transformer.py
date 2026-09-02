@@ -68,6 +68,8 @@ def main(argv: List[str] | None = None) -> Dict[str, Any]:
         m = run_suite(out["model"], 100 + seed, EVAL_CONFIG, out["centre"])
         m["train_seconds"] = out["train_seconds"]
         m["final_train_loss"] = out["history"][-1]["loss"] if out["history"] else None
+        m["train_config_used"] = out["train_config"]
+        m["checkpoint_loaded"] = out["loaded"]
         per_seed.append(m)
         print({k: (round(v, 4) if isinstance(v, float) else v) for k, v in m.items() if k != "noise"}, flush=True)
         print("noise:", m["noise"], flush=True)
@@ -77,28 +79,58 @@ def main(argv: List[str] | None = None) -> Dict[str, Any]:
     core = ["direct", "hop2", "hop3", "provenance", "revoke", "update", "rollback", "shred", "locality",
             "alternative_path"]
     all_pass = all(agg[k]["min"] == 1.0 for k in core) and agg["replay_deviation"]["max"] == 0
+    criteria = {"direct": (">=", 0.99), "hop2": (">=", 0.98), "hop3": (">=", 0.95), "provenance": (">=", 0.98),
+                "hop2_broken_unknown": (">=", 0.95), "reverse": (">=", 0.95), "update": (">=", 0.98),
+                "rollback": (">=", 0.98), "revoke": (">=", 0.98), "restore": (">=", 0.98), "shred": (">=", 0.95),
+                "resign": (">=", 0.98), "locality": (">=", 0.99), "alternative_path": (">=", 0.95),
+                "replay_deviation": ("<=", 0)}
+    check = ledger.check_criteria(agg, criteria)
     record = {
         "experiment": "E-000001-B", "title": "Trained Mini-Transformer over the mutable knowledge layer",
         "evidence_level": "E4", "deletion_level": "F3",
         "claim": "A small transformer trained on re-sampled synthetic worlds reads, composes (multi-hop) and "
                  "traces knowledge held in the mutable layer, and reproduces the reference semantics of update, "
                  "rollback, revoke, restore and marker shredding on a fresh world, across seeds.",
+        "by_construction_vs_learned": {
+            "by_construction": "REVOKE removes routing by a hard mask (ledger F1); replay determinism and locality-undo "
+                               "are consistency checks of a deterministic forward pass; provenance is trained with a "
+                               "routing loss (route_weight), not emergent.",
+            "learned": "reading the right cell (direct, reverse, paraphrases), composing hops, answering UNKNOWN "
+                       "instead of hallucinating when the path is broken or the cell is revoked, refusing a routable "
+                       "payload whose marker is invalid (SHRED — the learned functional-forgetting result, F3), and "
+                       "updating the answer when the active version changes.",
+        },
         "not_claimed": "Nothing about pretrained LLMs or natural language; the facts never enter the weights by "
-                       "construction (re-sampled worlds), so this does not show unlearning of weight-encoded facts.",
-        "model_config": model_cfg.to_dict(), "train_config": TrainConfig(n_steps=args.steps).to_dict(),
+                       "construction (re-sampled worlds), so this does not show unlearning of weight-encoded facts. "
+                       "The noise sweep perturbs bank keys/values and is NOT comparable to the architecture "
+                       "document's 'noise = 0.24 -> 68.4%' figure, whose noise definition is not recorded.",
+        "criteria": check["criteria"], "claim_supported": check["claim_supported"],
+        "model_config": model_cfg.to_dict(), "train_config_requested": TrainConfig(n_steps=args.steps).to_dict(),
+        "train_config_used_per_seed": [s["train_config_used"] for s in per_seed],
         "eval_config": EVAL_CONFIG, "per_seed": per_seed, "aggregate": agg, "noise_aggregate": noise_agg,
         "all_pass": all_pass, "n_params": MutableKnowledgeTransformer(model_cfg).n_params(),
     }
-    rows = [(k, ledger.pct(agg[k]["mean"]) if k != "replay_deviation" else f"{agg[k]['max']:.0f}",
-             ledger.pct(agg[k]["min"]) if k != "replay_deviation" else "-") for k in SUITE_KEYS]
+    sizes = {"direct": EVAL_CONFIG["n_cells"], "hop2": EVAL_CONFIG["n_2hop"], "hop3": EVAL_CONFIG["n_3hop"],
+             "hop2_broken_unknown": EVAL_CONFIG["n_broken"], "hop3_broken_unknown": EVAL_CONFIG["n_broken"],
+             "provenance": EVAL_CONFIG["n_cells"] + EVAL_CONFIG["n_2hop"] + EVAL_CONFIG["n_3hop"],
+             "reverse": EVAL_CONFIG["n_rev"], "update": EVAL_CONFIG["n_lifecycle"], "rollback": EVAL_CONFIG["n_lifecycle"],
+             "revoke": EVAL_CONFIG["n_lifecycle"], "restore": EVAL_CONFIG["n_lifecycle"], "shred": EVAL_CONFIG["n_lifecycle"],
+             "resign": EVAL_CONFIG["n_lifecycle"], "locality": EVAL_CONFIG["n_cells"] - 150 + EVAL_CONFIG["n_locality_multihop"],
+             "locality_targets_correct": 150, "alternative_path": EVAL_CONFIG["n_alt_pairs"]}
+    record["sample_sizes_per_seed"] = sizes
     md = "\n".join([
         "# E-000001-B — Trained Mini-Transformer over the mutable knowledge layer", "",
-        f"Evidence level: **E4** ({ledger.EVIDENCE_LEVELS['E4']}). Deletion level demonstrated: **F3** "
-        "(functional forgetting on the targeted path, verified against the mechanical reference).", "",
+        f"Evidence level: **E4** ({ledger.EVIDENCE_LEVELS['E4']}). Deletion levels: REVOKE is routing removal "
+        "(**F1**, by construction) on which the model has learned to answer UNKNOWN; SHRED is the learned "
+        "functional-forgetting result (**F3**): the payload stays routable and the model refuses it because its "
+        "marker is invalid.", "",
         f"Seeds: {args.seeds} · training steps: {args.steps} · parameters: {record['n_params']:,} · "
-        f"core tests all at 100% in every seed: **{all_pass}**", "",
-        ledger.table(["Measure", "Mean over seeds", "Worst seed"], rows), "",
-        "Noise sweep (bank-level Gaussian perturbation, direct queries, mean over seeds):", "",
+        f"core tests all at 100% in every seed: **{all_pass}** · pre-registered criteria met: **{check['claim_supported']}**", "",
+        ledger.table(ledger.CI_HEADERS, ledger.ci_rows(per_seed, SUITE_KEYS, sizes)), "",
+        "Pre-registered pass criteria (evaluated on the worst seed):", "",
+        ledger.criteria_table(check), "",
+        "Noise sweep (bank-level Gaussian perturbation of keys and values relative to their RMS, direct queries, "
+        "mean over seeds; NOT comparable to the architecture document's 0.24 -> 68.4% figure):", "",
         ledger.table(["noise", "direct accuracy"], [(lvl, ledger.pct(v)) for lvl, v in noise_agg.items()]), "",
         "Per seed:", "",
         ledger.table(["seed"] + SUITE_KEYS + ["train_seconds"],

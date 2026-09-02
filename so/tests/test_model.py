@@ -61,7 +61,14 @@ def test_routing_targets_are_consistent_with_ground_truth():
                 p = int(b.route[i, t])
                 assert (int(bank.subject[p]), int(bank.relation[p])) == e and bank.usable[p]
             if gt.answer == UNKNOWN and len(gt.edges) < q.hops:
-                assert int(b.route[i, len(gt.edges)]) == -1
+                tgt = int(b.route[i, len(gt.edges)])
+                if tgt == -1:
+                    cur = q.start
+                    for e in gt.edges:
+                        cur = bank.index_view[e]
+                    assert (cur, q.path[len(gt.edges)]) not in bank.active_pos
+                else:
+                    assert bank.active[tgt] and not bank.usable[tgt]   # a routable but shredded cell
         if gt.answer == UNKNOWN:
             assert int(b.target[i]) == world.n_entities
 

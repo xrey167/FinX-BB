@@ -52,6 +52,7 @@ class Bank:
     kid: np.ndarray
     index_view: Dict[Tuple[int, int], int]
     kid_of_key: Dict[Tuple[int, int], int]   # key -> position in the bank (usable cells only)
+    active_pos: Dict[Tuple[int, int], int]   # key -> position of a ROUTABLE cell (active; marker may be invalid)
 
     @property
     def size(self) -> int:
@@ -93,8 +94,9 @@ def bank_from_world(rng: np.random.Generator, world: World, centre: np.ndarray, 
     usable = active & ~shred
     index_view = {(int(s), int(r)): int(o) for s, r, o, u in zip(subject, relation, obj, usable) if u}
     kid_of_key = {(int(s), int(r)): int(i) for i, (s, r, u) in enumerate(zip(subject, relation, usable)) if u}
+    active_pos = {(int(s), int(r)): int(i) for i, (s, r, a) in enumerate(zip(subject, relation, active)) if a}
     return Bank(subject, relation, obj, marker.astype(np.float32), active, usable, np.arange(subject.shape[0]),
-                index_view, kid_of_key)
+                index_view, kid_of_key, active_pos)
 
 
 def bank_from_store(store, respect_markers: bool = False) -> Bank:
@@ -103,7 +105,32 @@ def bank_from_store(store, respect_markers: bool = False) -> Bank:
     usable = np.array([store.marker_valid(m) for m in b["marker"]], dtype=bool) & b["active"]
     index_view = {(int(s), int(r)): int(o) for s, r, o, u in zip(b["subject"], b["relation"], b["obj"], usable) if u}
     kid_of_key = {(int(s), int(r)): int(i) for i, (s, r, u) in enumerate(zip(b["subject"], b["relation"], usable)) if u}
-    return Bank(b["subject"], b["relation"], b["obj"], b["marker"], b["active"], usable, b["kid"], index_view, kid_of_key)
+    active_pos = {(int(s), int(r)): int(i) for i, (s, r, a) in enumerate(zip(b["subject"], b["relation"], b["active"])) if a}
+    return Bank(b["subject"], b["relation"], b["obj"], b["marker"], b["active"], usable, b["kid"], index_view, kid_of_key,
+                active_pos)
+
+
+def failing_hop_target(bank: Bank, q: Query, gt) -> int:
+    """Routing target for the hop at which a forward path fails.
+
+    If a *routable* cell holds that key (a shredded cell: active, marker invalid), the model
+    must attend to it and discover the closed gate, so the target is that cell; otherwise
+    (key absent or cell revoked) the target is the null cell (-1).
+    """
+    cur = q.start
+    for e in gt.edges:
+        cur = bank.index_view[e]
+    key = (cur, q.path[len(gt.edges)])
+    return bank.active_pos.get(key, -1)
+
+
+def reverse_target(bank: Bank, q: Query, gt) -> int:
+    """Routing target for a reverse query: the usable cell, else a single routable (shredded) cell, else null."""
+    if gt.edges:
+        return bank.kid_of_key[gt.edges[0]]
+    r, o = q.path[0], q.start
+    hits = [i for i, (rr, oo, a) in enumerate(zip(bank.relation, bank.obj, bank.active)) if a and rr == r and oo == o]
+    return hits[0] if len(hits) == 1 else -1
 
 
 @dataclass
@@ -137,9 +164,9 @@ def encode_queries(queries: List[Query], bank: Bank, world: World, max_hops: int
             for t, e in enumerate(gt.edges):
                 route[i, t] = bank.kid_of_key[e]
             if gt.answer == UNKNOWN and len(gt.edges) < q.hops:
-                route[i, len(gt.edges)] = -1   # the failing hop must read the null cell
+                route[i, len(gt.edges)] = failing_hop_target(bank, q, gt)
         else:
-            route[i, 0] = bank.kid_of_key[gt.edges[0]] if gt.edges else -1
+            route[i, 0] = reverse_target(bank, q, gt)
     t = lambda a, dt: torch.as_tensor(a, dtype=dt, device=device)
     return Batch(t(mode, torch.long), t(start, torch.long), t(rels, torch.long), t(hop_valid, torch.bool),
                  t(target, torch.long), t(route, torch.long), queries)

@@ -29,6 +29,9 @@ def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--quick", action="store_true")
     args = ap.parse_args()
+    if args.quick:
+        import os
+        os.environ["SO_RESULT_SUFFIX"] = "-quick"
     t0 = time.time()
     for module, full_args, quick_args in CHAIN:
         print(f"\n################ {module} ################", flush=True)

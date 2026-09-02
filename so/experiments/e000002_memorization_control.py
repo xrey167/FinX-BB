@@ -106,6 +106,11 @@ def main(argv: List[str] | None = None) -> Dict[str, Any]:
     keys = ["direct", "bank_removed_acc", "target_before", "target_after_revoke_leak", "target_after_revoke_unknown",
             "control_after_revoke"]
     agg = {c: ledger.aggregate(results[c], keys) for c in conditions}
+    check = ledger.check_criteria(
+        {f"{c}/{k}": v for c in conditions for k, v in agg[c].items()},
+        {"resampled/bank_removed_acc": ("<=", 0.02), "resampled/target_after_revoke_leak": ("<=", 0.02),
+         "resampled/control_after_revoke": (">=", 0.99), "fixed_no_routing/target_after_revoke_leak": (">=", 0.5),
+         "fixed_no_routing/direct": (">=", 0.5)})
     record = {
         "experiment": "E-000002", "title": "Weight-memorisation control (copy problem)",
         "evidence_level": "E4", "deletion_level": None,
@@ -116,6 +121,12 @@ def main(argv: List[str] | None = None) -> Dict[str, Any]:
         "not_claimed": "No statement about unlearning facts already encoded in weights (that is exactly the "
                        "regime this mechanism avoids by construction).",
         "config": {"seeds": args.seeds, "fixed_steps": args.steps, "n_targets": N_TARGETS},
+        "caveats": "Only 'fixed_routing' is an empirical control: 'resampled' cannot memorise by construction and "
+                   "'fixed_no_routing' cannot read the layer by construction. The fixed-world regimes see the same "
+                   "random lifecycle states per step as the re-sampled regime (only the world is held fixed), so the "
+                   "no-routing model receives inconsistent labels for revoked/shredded cells and settles on the "
+                   "majority label. Fixed regimes are trained for fewer steps than the re-sampled E-000001-B models.",
+        "criteria": check["criteria"], "claim_supported": check["claim_supported"],
         "per_condition": results, "aggregate": agg,
     }
     rows = [(c, ledger.pct(agg[c]["direct"]["mean"]), ledger.pct(agg[c]["bank_removed_acc"]["mean"]),
@@ -129,7 +140,10 @@ def main(argv: List[str] | None = None) -> Dict[str, Any]:
                       "target UNKNOWN after REVOKE", "control after REVOKE"], rows), "",
         "Reading: 'layer fully masked' is what the weights answer on their own. A leak after REVOKE is knowledge "
         "that survived in the weights — the copy problem the ledger warns about (sections 9, 28). The mechanism's "
-        "deletion guarantee therefore depends on the training regime keeping facts out of the weights.", "",
+        "deletion guarantee therefore depends on the training regime keeping facts out of the weights. "
+        f"n = {N_TARGETS} targets per seed (leak of 0 in 300 pooled trials -> failure rate below 1.3% at 95%).", "",
+        "Pre-registered criteria (worst seed; leak-type metrics use the max):", "", ledger.criteria_table(check), "",
+        f"Caveats: {record['caveats']}", "",
         "Per seed:", "",
         "\n\n".join(f"**{c}**\n\n" + ledger.table(["seed"] + keys, [[s["seed"]] + [s[k] for k in keys] for s in results[c]])
                     for c in conditions),
