@@ -102,6 +102,11 @@ class KnowledgeAdapterLM(nn.Module):
             self.q_deref = nn.ModuleDict({str(l): nn.Linear(d, cfg.d_key) for l in cfg.read_layers})
             self.deref_ln = nn.ModuleDict({str(l): nn.LayerNorm(d) for l in cfg.read_layers})
             self.deref_scale = nn.Parameter(torch.ones(len(cfg.read_layers)))
+            # Initialised so the dereference slot starts as a near-perfect PASSTHROUGH. Without it the slot
+            # begins with a random query, spreads its mass over every cell and injects the average of all
+            # values into the frozen model, which poisons training from the first step: the first attempt at
+            # E-000020 collapsed to answering ' unknown' everywhere, direct reading included.
+            self.deref_pass_bias = nn.Parameter(torch.full((len(cfg.read_layers),), 5.0))
         self.null_key = nn.Parameter(torch.randn(len(cfg.read_layers), cfg.d_key) * 0.02)
         with torch.no_grad():
             unk = lm.transformer.wte.weight[unknown_token_id].detach().clone()
@@ -181,6 +186,7 @@ class KnowledgeAdapterLM(nn.Module):
                     qd = self.q_deref[str(layer)](self.deref_ln[str(layer)](val))
                     sd = (qd @ keys.t()) * (self.deref_scale[read_index] / self.cfg.d_key ** 0.5)
                     sd = sd.masked_fill(~allowed[None], float("-inf"))
+                    sd = torch.cat([sd[:, :-1], sd[:, -1:] + self.deref_pass_bias[read_index]], dim=-1)
                     pd = torch.softmax(sd, dim=-1)
                     # the null column carries the incoming value: "what I read was not a pointer"
                     val = pd[:, :-1] @ values[:-1] + pd[:, -1:] * val
