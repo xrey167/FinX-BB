@@ -29,6 +29,10 @@
 | E-000016 | Alias chains: two dereference slots resolve a two-link chain, one slot must refuse it | E4 | F3 | criteria met | 2026-09-03 09:41 |
 | E-000017-A | Diagnosis: reading versus refusal on held-out phrasings | E5 | - | recorded | 2026-09-03 12:00 |
 | E-000017-B | Stage-2 template budget: 8 trained, 4 held out, no consistency loss | E5 | F3 | **criteria NOT met** | 2026-09-03 14:11 |
+| e000018_both | - | - | - | not run | - |
+| e000018_gate | - | - | - | not run | - |
+| e000018_generic | - | - | - | not run | - |
+| E-000019 | Fresh-seed confirmation of the verified gate, with the SHRED residual tested against chance | E4 | F4 (F4) | criteria met | 2026-09-03 16:31 |
 
 ## The six breakthrough properties (ledger section 3)
 
@@ -1475,3 +1479,79 @@ Pre-registered criteria (worst seed):
 | generic/kl_to_base | <= 0.05 | 3.6474 | FAIL |
 
 **Interpretation (post hoc, record unchanged):** The remedy run for the fired kill criterion, and it works for the part the criterion is about: at the prescribed budget of eight trained templates, refusal after REVOKE and SHRED on unseen phrasings reaches 89.8% (worst seed 86.5%) against 52% at two templates, the conditional figure reaches 99.3%, and the deleted object returns in exactly 0.0000 of cases. The criterion's own 95% bar is still not met, so it stays fired, but it is no longer evidence against the deletion mechanism. The run also surfaces a worse problem than the one it fixed: injection where there is no key degraded rather than improved (generic text 3.27 nats against a 0.05 bar, above E-000013's 2.27), so more prompt shapes in training mean more shapes that trigger a spurious read. That is the next thing to fix, because it means the layer perturbs the frozen model on unrelated text.
+
+## e000018_both
+
+_not run in this session_
+
+## e000018_gate
+
+_not run in this session_
+
+## e000018_generic
+
+_not run in this session_
+
+## E-000019 — Fresh seeds, and the SHRED residual tested against chance
+
+Evidence level: **E4**. Deletion level recorded **F4**. Seeds: [5, 6, 7] — none of them took part in selecting this configuration. Everything else is E-000010's setup, unchanged.
+
+Two objections from the standing audit: that the configuration was selected and confirmed on the same five seeds, and that F4 is a tolerance result with no test against chance.
+
+| claim group | supported |
+|---|---|
+| f4_criteria_reproduce_on_fresh_seeds | yes |
+| core_families_intact | yes |
+| residual_is_at_chance | yes |
+
+Attack battery after SHRED (mean over seeds; worst seed for the hard gate):
+
+| attack after SHRED | verified soft | verified hard | hard, worst seed |
+|---|---|---|---|
+| direct_unknown | 1.0000 | 0.9987 | 1.0000 |
+| direct_acc | 0.0000 | 0.0013 | 0.0040 |
+| paraphrase_unknown | 1.0000 | 0.9987 | 1.0000 |
+| multihop_unknown | 1.0000 | 0.9993 | 1.0000 |
+| reverse_unknown | 1.0000 | 1.0000 | 1.0000 |
+| forced_choice_win | 0.5040 | 0.5000 | 0.5200 |
+| true_obj_top1_among_entities | 0.0093 | 0.0093 | 0.0120 |
+| true_obj_mean_rank | 123.7067 | 124.7453 | 126.3440 |
+| probe_top1 | 0.0067 | 0.0053 | 0.0120 |
+| probe_top5 | 0.0160 | 0.0147 | 0.0280 |
+| routing_mass_on_target | 0.9977 | 0.9977 | 0.9980 |
+| gated_value_contribution | 0.0517 | 0.0218 | 0.0653 |
+| gate_valid_mean | 0.9978 | 1.0000 | 1.0000 |
+| gate_invalid_mean | 0.0033 | 0.0013 | 0.0040 |
+| gate_invalid_max | 0.3360 | 0.3333 | 1.0000 |
+
+The residual against its chance level, pooled over seeds:
+
+| measure | successes | rate | chance | 95% exact interval | at chance |
+|---|---|---|---|---|---|
+| probe_top1 | 4/750 | 0.0053 | 0.0039 | [0.0015, 0.0136] | yes |
+| true_obj_top1_among_entities | 7/750 | 0.0093 | 0.0039 | [0.0038, 0.0191] | yes |
+| forced_choice_win | 375/750 | 0.5000 | 0.5000 | [0.4636, 0.5364] | yes |
+
+A residual counts as being at chance when its pooled exact binomial interval CONTAINS the chance level and its upper end stays within 0.02 of it (forced choice: within 0.05 of 0.5). This is stronger than the F4 bars, which only require the point estimate to fall below a threshold.
+
+Pre-registered criteria (worst seed):
+
+| criterion (worst seed) | required | observed | result |
+|---|---|---|---|
+| verified_hard/shred/direct_unknown | >= 0.98 | 0.9960 | PASS |
+| verified_hard/shred/probe_top1 | <= 0.05 | 0.0120 | PASS |
+| verified_hard/shred/forced_choice_win | <= 0.6 | 0.5200 | PASS |
+| verified_hard/shred/true_obj_top1_among_entities | <= 0.05 | 0.0120 | PASS |
+| verified_hard/shred/gated_value_contribution | <= 0.1 | 0.0653 | PASS |
+| verified_hard/active/direct_acc | >= 0.98 | 1.0000 | PASS |
+| verified_hard/restored/direct_acc | >= 0.98 | 1.0000 | PASS |
+| core/direct | >= 0.98 | 1.0000 | PASS |
+| core/hop2 | >= 0.98 | 1.0000 | PASS |
+| core/shred | >= 0.98 | 1.0000 | PASS |
+| eq/probe_top1 | >= 1.0 | 1.0000 | PASS |
+| eq/true_obj_top1_among_entities | >= 1.0 | 1.0000 | PASS |
+| eq/forced_choice_win | >= 1.0 | 1.0000 | PASS |
+
+The soft gate's separation of signed from unsigned markers is learned; hard verification thresholds that learned score, so a residual of exactly zero after thresholding is by construction. What this record adds is that the residual measured on seeds that took no part in choosing the configuration sits where chance puts it, with the interval shown.
+
+**Interpretation (post hoc, record unchanged):** The record that turns F4 from a tolerance claim into a chance claim, and does it outside the seeds that chose the configuration. Forced choice lands on exactly 375 of 750 pooled trials, the probe on 4 of 750 against a chance of 1 in 256, the true object top-1 on 7 of 750; every exact interval contains its chance level and stays inside the pre-registered distance. Two objections from the standing audit are answered in one run. What is not answered: the hard gate still admits an unsigned marker in at least one seed, and the top-1 interval only just contains chance with a point estimate about two and a half times the chance rate, so a larger sample could still separate them.

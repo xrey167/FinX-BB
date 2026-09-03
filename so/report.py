@@ -83,6 +83,13 @@ NOTES = {
         "control: with the slot disabled, alias reading is 0% and fact reading is 100%. Two results are withheld and "
         "recorded as failures: shredding the alias rather than the payload reaches only 93% on the worst seed, and the "
         "two-slot control does not resolve two-link chains because chains never occur in the training distribution.",
+    "e000019_fresh_seed_chance": "The record that turns F4 from a tolerance claim into a chance claim, and does it "
+        "outside the seeds that chose the configuration. Forced choice lands on exactly 375 of 750 pooled trials, the "
+        "probe on 4 of 750 against a chance of 1 in 256, the true object top-1 on 7 of 750; every exact interval "
+        "contains its chance level and stays inside the pre-registered distance. Two objections from the standing "
+        "audit are answered in one run. What is not answered: the hard gate still admits an unsigned marker in at "
+        "least one seed, and the top-1 interval only just contains chance with a point estimate about two and a half "
+        "times the chance rate, so a larger sample could still separate them.",
     "e000017b_templates8": "The remedy run for the fired kill criterion, and it works for the part the criterion is "
         "about: at the prescribed budget of eight trained templates, refusal after REVOKE and SHRED on unseen phrasings "
         "reaches 89.8% (worst seed 86.5%) against 52% at two templates, the conditional figure reaches 99.3%, and the "
