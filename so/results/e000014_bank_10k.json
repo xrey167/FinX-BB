@@ -1,0 +1,1376 @@
+{
+  "aggregate": {
+    "alternative_path": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "direct": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "hop2": {
+      "max": 1.0,
+      "mean": 0.9993333333333334,
+      "min": 0.998,
+      "n": 3
+    },
+    "hop2_broken_unknown": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "hop3": {
+      "max": 1.0,
+      "mean": 0.9946666666666667,
+      "min": 0.99,
+      "n": 3
+    },
+    "hop3_broken_unknown": {
+      "max": 0.97,
+      "mean": 0.9566666666666667,
+      "min": 0.95,
+      "n": 3
+    },
+    "locality": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "locality_targets_correct": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "locality_undo_exact": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "provenance": {
+      "max": 1.0,
+      "mean": 0.9999393939393939,
+      "min": 0.9998181818181818,
+      "n": 3
+    },
+    "replay_deviation": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 3
+    },
+    "resign": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "restore": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "reverse": {
+      "max": 1.0,
+      "mean": 0.9977777777777778,
+      "min": 0.9966666666666667,
+      "n": 3
+    },
+    "revoke": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "rollback": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "shred": {
+      "max": 1.0,
+      "mean": 0.9966666666666667,
+      "min": 0.99,
+      "n": 3
+    },
+    "update": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "update_derived": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "update_rollback": {
+      "max": 1.0,
+      "mean": 0.9995238095238096,
+      "min": 0.9985714285714286,
+      "n": 3
+    }
+  },
+  "aggregate_attacks_hard": {
+    "active/direct_acc": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "active/direct_unknown": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 3
+    },
+    "active/forced_choice_win": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "active/gate_invalid_max": {
+      "max": NaN,
+      "mean": NaN,
+      "min": NaN,
+      "n": 3
+    },
+    "active/gate_invalid_mean": {
+      "max": NaN,
+      "mean": NaN,
+      "min": NaN,
+      "n": 3
+    },
+    "active/gate_valid_mean": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "active/gated_value_contribution": {
+      "max": 14.23320198059082,
+      "mean": 13.975616455078125,
+      "min": 13.717873573303223,
+      "n": 3
+    },
+    "active/multihop_unknown": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 3
+    },
+    "active/paraphrase_unknown": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 3
+    },
+    "active/probe_top1": {
+      "max": 0.97,
+      "mean": 0.9533333333333335,
+      "min": 0.93,
+      "n": 3
+    },
+    "active/probe_top5": {
+      "max": 0.97,
+      "mean": 0.9533333333333335,
+      "min": 0.93,
+      "n": 3
+    },
+    "active/reverse_unknown": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 3
+    },
+    "active/routing_mass_on_target": {
+      "max": 0.9962201714515686,
+      "mean": 0.9953218698501587,
+      "min": 0.9945181012153625,
+      "n": 3
+    },
+    "active/true_obj_mean_rank": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 3
+    },
+    "active/true_obj_top1_among_entities": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "dependency/collateral_bypass_acc_after_closure": {
+      "max": 1.0,
+      "mean": 0.9966666666666667,
+      "min": 0.99,
+      "n": 3
+    },
+    "dependency/derivable_recovery_after_closure": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 3
+    },
+    "dependency/derivable_recovery_after_revoke_K3": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "dependency/direct_unknown_after_revoke_K3": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "dependency/n_triples": {
+      "max": 30.0,
+      "mean": 30.0,
+      "min": 30.0,
+      "n": 3
+    },
+    "probe_calibration_top1": {
+      "max": 0.9666666666666667,
+      "mean": 0.962121212121212,
+      "min": 0.9570707070707071,
+      "n": 3
+    },
+    "probe_calibration_top5": {
+      "max": 0.9666666666666667,
+      "mean": 0.962121212121212,
+      "min": 0.9570707070707071,
+      "n": 3
+    },
+    "restored/direct_acc": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "revoke/direct_acc": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 3
+    },
+    "revoke/direct_unknown": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "revoke/forced_choice_win": {
+      "max": 0.59,
+      "mean": 0.5366666666666666,
+      "min": 0.45,
+      "n": 3
+    },
+    "revoke/gate_invalid_max": {
+      "max": NaN,
+      "mean": NaN,
+      "min": NaN,
+      "n": 3
+    },
+    "revoke/gate_invalid_mean": {
+      "max": NaN,
+      "mean": NaN,
+      "min": NaN,
+      "n": 3
+    },
+    "revoke/gate_valid_mean": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "revoke/gated_value_contribution": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 3
+    },
+    "revoke/multihop_unknown": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "revoke/paraphrase_unknown": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "revoke/probe_top1": {
+      "max": 0.01,
+      "mean": 0.006666666666666667,
+      "min": 0.0,
+      "n": 3
+    },
+    "revoke/probe_top5": {
+      "max": 0.01,
+      "mean": 0.006666666666666667,
+      "min": 0.0,
+      "n": 3
+    },
+    "revoke/reverse_unknown": {
+      "max": 1.0,
+      "mean": 0.9907407407407408,
+      "min": 0.9722222222222222,
+      "n": 3
+    },
+    "revoke/routing_mass_on_target": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 3
+    },
+    "revoke/true_obj_mean_rank": {
+      "max": 1331.1,
+      "mean": 1267.8133333333333,
+      "min": 1208.02,
+      "n": 3
+    },
+    "revoke/true_obj_top1_among_entities": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 3
+    },
+    "shred/direct_acc": {
+      "max": 0.01,
+      "mean": 0.0033333333333333335,
+      "min": 0.0,
+      "n": 3
+    },
+    "shred/direct_unknown": {
+      "max": 1.0,
+      "mean": 0.9966666666666667,
+      "min": 0.99,
+      "n": 3
+    },
+    "shred/forced_choice_win": {
+      "max": 0.58,
+      "mean": 0.5333333333333333,
+      "min": 0.45,
+      "n": 3
+    },
+    "shred/gate_invalid_max": {
+      "max": 1.0,
+      "mean": 0.3333333333333333,
+      "min": 0.0,
+      "n": 3
+    },
+    "shred/gate_invalid_mean": {
+      "max": 0.019801979884505272,
+      "mean": 0.006600659961501758,
+      "min": 0.0,
+      "n": 3
+    },
+    "shred/gate_valid_mean": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "shred/gated_value_contribution": {
+      "max": 0.1459561288356781,
+      "mean": 0.048652042945226036,
+      "min": 0.0,
+      "n": 3
+    },
+    "shred/multihop_unknown": {
+      "max": 1.0,
+      "mean": 0.9974358974358974,
+      "min": 0.9923076923076923,
+      "n": 3
+    },
+    "shred/paraphrase_unknown": {
+      "max": 1.0,
+      "mean": 0.9966666666666667,
+      "min": 0.99,
+      "n": 3
+    },
+    "shred/probe_top1": {
+      "max": 0.02,
+      "mean": 0.01,
+      "min": 0.0,
+      "n": 3
+    },
+    "shred/probe_top5": {
+      "max": 0.02,
+      "mean": 0.01,
+      "min": 0.0,
+      "n": 3
+    },
+    "shred/reverse_unknown": {
+      "max": 1.0,
+      "mean": 0.9907407407407408,
+      "min": 0.9722222222222222,
+      "n": 3
+    },
+    "shred/routing_mass_on_target": {
+      "max": 0.9962201714515686,
+      "mean": 0.9953218698501587,
+      "min": 0.9945181012153625,
+      "n": 3
+    },
+    "shred/true_obj_mean_rank": {
+      "max": 1272.55,
+      "mean": 1225.4166666666667,
+      "min": 1152.01,
+      "n": 3
+    },
+    "shred/true_obj_top1_among_entities": {
+      "max": 0.01,
+      "mean": 0.0033333333333333335,
+      "min": 0.0,
+      "n": 3
+    }
+  },
+  "aggregate_attacks_soft": {
+    "active/direct_acc": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "active/direct_unknown": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 3
+    },
+    "active/forced_choice_win": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "active/gate_invalid_max": {
+      "max": NaN,
+      "mean": NaN,
+      "min": NaN,
+      "n": 3
+    },
+    "active/gate_invalid_mean": {
+      "max": NaN,
+      "mean": NaN,
+      "min": NaN,
+      "n": 3
+    },
+    "active/gate_valid_mean": {
+      "max": 0.9976515173912048,
+      "mean": 0.9974550207455953,
+      "min": 0.9970923662185669,
+      "n": 3
+    },
+    "active/gated_value_contribution": {
+      "max": 14.199584007263184,
+      "mean": 13.940038998921713,
+      "min": 13.686201095581055,
+      "n": 3
+    },
+    "active/multihop_unknown": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 3
+    },
+    "active/paraphrase_unknown": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 3
+    },
+    "active/probe_top1": {
+      "max": 0.97,
+      "mean": 0.9533333333333335,
+      "min": 0.93,
+      "n": 3
+    },
+    "active/probe_top5": {
+      "max": 0.97,
+      "mean": 0.9533333333333335,
+      "min": 0.93,
+      "n": 3
+    },
+    "active/reverse_unknown": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 3
+    },
+    "active/routing_mass_on_target": {
+      "max": 0.9962201714515686,
+      "mean": 0.9953218698501587,
+      "min": 0.9945181012153625,
+      "n": 3
+    },
+    "active/true_obj_mean_rank": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 3
+    },
+    "active/true_obj_top1_among_entities": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "dependency/collateral_bypass_acc_after_closure": {
+      "max": 1.0,
+      "mean": 0.9966666666666667,
+      "min": 0.99,
+      "n": 3
+    },
+    "dependency/derivable_recovery_after_closure": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 3
+    },
+    "dependency/derivable_recovery_after_revoke_K3": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "dependency/direct_unknown_after_revoke_K3": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "dependency/n_triples": {
+      "max": 30.0,
+      "mean": 30.0,
+      "min": 30.0,
+      "n": 3
+    },
+    "probe_calibration_top1": {
+      "max": 0.9666666666666667,
+      "mean": 0.962121212121212,
+      "min": 0.9570707070707071,
+      "n": 3
+    },
+    "probe_calibration_top5": {
+      "max": 0.9666666666666667,
+      "mean": 0.962121212121212,
+      "min": 0.9570707070707071,
+      "n": 3
+    },
+    "restored/direct_acc": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "revoke/direct_acc": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 3
+    },
+    "revoke/direct_unknown": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "revoke/forced_choice_win": {
+      "max": 0.59,
+      "mean": 0.5366666666666666,
+      "min": 0.45,
+      "n": 3
+    },
+    "revoke/gate_invalid_max": {
+      "max": NaN,
+      "mean": NaN,
+      "min": NaN,
+      "n": 3
+    },
+    "revoke/gate_invalid_mean": {
+      "max": NaN,
+      "mean": NaN,
+      "min": NaN,
+      "n": 3
+    },
+    "revoke/gate_valid_mean": {
+      "max": 0.9976515173912048,
+      "mean": 0.9974550207455953,
+      "min": 0.9970923662185669,
+      "n": 3
+    },
+    "revoke/gated_value_contribution": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 3
+    },
+    "revoke/multihop_unknown": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "revoke/paraphrase_unknown": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "revoke/probe_top1": {
+      "max": 0.01,
+      "mean": 0.006666666666666667,
+      "min": 0.0,
+      "n": 3
+    },
+    "revoke/probe_top5": {
+      "max": 0.01,
+      "mean": 0.006666666666666667,
+      "min": 0.0,
+      "n": 3
+    },
+    "revoke/reverse_unknown": {
+      "max": 1.0,
+      "mean": 0.9907407407407408,
+      "min": 0.9722222222222222,
+      "n": 3
+    },
+    "revoke/routing_mass_on_target": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 3
+    },
+    "revoke/true_obj_mean_rank": {
+      "max": 1331.04,
+      "mean": 1267.7933333333333,
+      "min": 1208.02,
+      "n": 3
+    },
+    "revoke/true_obj_top1_among_entities": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 3
+    },
+    "shred/direct_acc": {
+      "max": 0.01,
+      "mean": 0.0033333333333333335,
+      "min": 0.0,
+      "n": 3
+    },
+    "shred/direct_unknown": {
+      "max": 1.0,
+      "mean": 0.9966666666666667,
+      "min": 0.99,
+      "n": 3
+    },
+    "shred/forced_choice_win": {
+      "max": 0.58,
+      "mean": 0.5299999999999999,
+      "min": 0.44,
+      "n": 3
+    },
+    "shred/gate_invalid_max": {
+      "max": 0.9932973980903625,
+      "mean": 0.4405553837617238,
+      "min": 0.06095358729362488,
+      "n": 3
+    },
+    "shred/gate_invalid_mean": {
+      "max": 0.018893713131546974,
+      "mean": 0.00821433363792797,
+      "min": 0.0018755593337118626,
+      "n": 3
+    },
+    "shred/gate_valid_mean": {
+      "max": 0.9976511001586914,
+      "mean": 0.9974550207455953,
+      "min": 0.9970929026603699,
+      "n": 3
+    },
+    "shred/gated_value_contribution": {
+      "max": 0.13153335452079773,
+      "mean": 0.07136726006865501,
+      "min": 0.02598251774907112,
+      "n": 3
+    },
+    "shred/multihop_unknown": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "shred/paraphrase_unknown": {
+      "max": 1.0,
+      "mean": 0.9966666666666667,
+      "min": 0.99,
+      "n": 3
+    },
+    "shred/probe_top1": {
+      "max": 0.02,
+      "mean": 0.01,
+      "min": 0.0,
+      "n": 3
+    },
+    "shred/probe_top5": {
+      "max": 0.02,
+      "mean": 0.01,
+      "min": 0.0,
+      "n": 3
+    },
+    "shred/reverse_unknown": {
+      "max": 1.0,
+      "mean": 0.9907407407407408,
+      "min": 0.9722222222222222,
+      "n": 3
+    },
+    "shred/routing_mass_on_target": {
+      "max": 0.9962201714515686,
+      "mean": 0.9953218698501587,
+      "min": 0.9945181012153625,
+      "n": 3
+    },
+    "shred/true_obj_mean_rank": {
+      "max": 1289.1,
+      "mean": 1242.2066666666667,
+      "min": 1168.67,
+      "n": 3
+    },
+    "shred/true_obj_top1_among_entities": {
+      "max": 0.01,
+      "mean": 0.0033333333333333335,
+      "min": 0.0,
+      "n": 3
+    }
+  },
+  "attacks_hard": [
+    {
+      "active/direct_acc": 1.0,
+      "active/direct_unknown": 0.0,
+      "active/forced_choice_win": 1.0,
+      "active/gate_invalid_max": NaN,
+      "active/gate_invalid_mean": NaN,
+      "active/gate_valid_mean": 1.0,
+      "active/gated_value_contribution": 14.23320198059082,
+      "active/multihop_unknown": 0.0,
+      "active/paraphrase_unknown": 0.0,
+      "active/probe_top1": 0.96,
+      "active/probe_top5": 0.96,
+      "active/reverse_unknown": 0.0,
+      "active/routing_mass_on_target": 0.9945181012153625,
+      "active/true_obj_mean_rank": 0.0,
+      "active/true_obj_top1_among_entities": 1.0,
+      "dependency/collateral_bypass_acc_after_closure": 1.0,
+      "dependency/derivable_recovery_after_closure": 0.0,
+      "dependency/derivable_recovery_after_revoke_K3": 1.0,
+      "dependency/direct_unknown_after_revoke_K3": 1.0,
+      "dependency/n_triples": 30,
+      "probe_calibration_top1": 0.9626262626262626,
+      "probe_calibration_top5": 0.9626262626262626,
+      "restored/direct_acc": 1.0,
+      "revoke/direct_acc": 0.0,
+      "revoke/direct_unknown": 1.0,
+      "revoke/forced_choice_win": 0.45,
+      "revoke/gate_invalid_max": NaN,
+      "revoke/gate_invalid_mean": NaN,
+      "revoke/gate_valid_mean": 1.0,
+      "revoke/gated_value_contribution": 0.0,
+      "revoke/multihop_unknown": 1.0,
+      "revoke/paraphrase_unknown": 1.0,
+      "revoke/probe_top1": 0.0,
+      "revoke/probe_top5": 0.0,
+      "revoke/reverse_unknown": 1.0,
+      "revoke/routing_mass_on_target": 0.0,
+      "revoke/true_obj_mean_rank": 1264.32,
+      "revoke/true_obj_top1_among_entities": 0.0,
+      "seed": 0,
+      "shred/direct_acc": 0.0,
+      "shred/direct_unknown": 1.0,
+      "shred/forced_choice_win": 0.45,
+      "shred/gate_invalid_max": 0.0,
+      "shred/gate_invalid_mean": 0.0,
+      "shred/gate_valid_mean": 1.0,
+      "shred/gated_value_contribution": 0.0,
+      "shred/multihop_unknown": 1.0,
+      "shred/paraphrase_unknown": 1.0,
+      "shred/probe_top1": 0.0,
+      "shred/probe_top5": 0.0,
+      "shred/reverse_unknown": 1.0,
+      "shred/routing_mass_on_target": 0.9945181012153625,
+      "shred/true_obj_mean_rank": 1251.69,
+      "shred/true_obj_top1_among_entities": 0.0
+    },
+    {
+      "active/direct_acc": 1.0,
+      "active/direct_unknown": 0.0,
+      "active/forced_choice_win": 1.0,
+      "active/gate_invalid_max": 1.0,
+      "active/gate_invalid_mean": 1.0,
+      "active/gate_valid_mean": 1.0,
+      "active/gated_value_contribution": 13.717873573303223,
+      "active/multihop_unknown": 0.0,
+      "active/paraphrase_unknown": 0.0,
+      "active/probe_top1": 0.93,
+      "active/probe_top5": 0.93,
+      "active/reverse_unknown": 0.0,
+      "active/routing_mass_on_target": 0.9952273368835449,
+      "active/true_obj_mean_rank": 0.0,
+      "active/true_obj_top1_among_entities": 1.0,
+      "dependency/collateral_bypass_acc_after_closure": 0.99,
+      "dependency/derivable_recovery_after_closure": 0.0,
+      "dependency/derivable_recovery_after_revoke_K3": 1.0,
+      "dependency/direct_unknown_after_revoke_K3": 1.0,
+      "dependency/n_triples": 30,
+      "probe_calibration_top1": 0.9570707070707071,
+      "probe_calibration_top5": 0.9570707070707071,
+      "restored/direct_acc": 1.0,
+      "revoke/direct_acc": 0.0,
+      "revoke/direct_unknown": 1.0,
+      "revoke/forced_choice_win": 0.59,
+      "revoke/gate_invalid_max": 1.0,
+      "revoke/gate_invalid_mean": 1.0,
+      "revoke/gate_valid_mean": 1.0,
+      "revoke/gated_value_contribution": 0.0,
+      "revoke/multihop_unknown": 1.0,
+      "revoke/paraphrase_unknown": 1.0,
+      "revoke/probe_top1": 0.01,
+      "revoke/probe_top5": 0.01,
+      "revoke/reverse_unknown": 0.9722222222222222,
+      "revoke/routing_mass_on_target": 0.0,
+      "revoke/true_obj_mean_rank": 1208.02,
+      "revoke/true_obj_top1_among_entities": 0.0,
+      "seed": 1,
+      "shred/direct_acc": 0.01,
+      "shred/direct_unknown": 0.99,
+      "shred/forced_choice_win": 0.58,
+      "shred/gate_invalid_max": 1.0,
+      "shred/gate_invalid_mean": 0.019801979884505272,
+      "shred/gate_valid_mean": 1.0,
+      "shred/gated_value_contribution": 0.1459561288356781,
+      "shred/multihop_unknown": 0.9923076923076923,
+      "shred/paraphrase_unknown": 0.99,
+      "shred/probe_top1": 0.02,
+      "shred/probe_top5": 0.02,
+      "shred/reverse_unknown": 0.9722222222222222,
+      "shred/routing_mass_on_target": 0.9952273368835449,
+      "shred/true_obj_mean_rank": 1152.01,
+      "shred/true_obj_top1_among_entities": 0.01
+    },
+    {
+      "active/direct_acc": 1.0,
+      "active/direct_unknown": 0.0,
+      "active/forced_choice_win": 1.0,
+      "active/gate_invalid_max": NaN,
+      "active/gate_invalid_mean": NaN,
+      "active/gate_valid_mean": 1.0,
+      "active/gated_value_contribution": 13.975773811340332,
+      "active/multihop_unknown": 0.0,
+      "active/paraphrase_unknown": 0.0,
+      "active/probe_top1": 0.97,
+      "active/probe_top5": 0.97,
+      "active/reverse_unknown": 0.0,
+      "active/routing_mass_on_target": 0.9962201714515686,
+      "active/true_obj_mean_rank": 0.0,
+      "active/true_obj_top1_among_entities": 1.0,
+      "dependency/collateral_bypass_acc_after_closure": 1.0,
+      "dependency/derivable_recovery_after_closure": 0.0,
+      "dependency/derivable_recovery_after_revoke_K3": 1.0,
+      "dependency/direct_unknown_after_revoke_K3": 1.0,
+      "dependency/n_triples": 30,
+      "probe_calibration_top1": 0.9666666666666667,
+      "probe_calibration_top5": 0.9666666666666667,
+      "restored/direct_acc": 1.0,
+      "revoke/direct_acc": 0.0,
+      "revoke/direct_unknown": 1.0,
+      "revoke/forced_choice_win": 0.57,
+      "revoke/gate_invalid_max": NaN,
+      "revoke/gate_invalid_mean": NaN,
+      "revoke/gate_valid_mean": 1.0,
+      "revoke/gated_value_contribution": 0.0,
+      "revoke/multihop_unknown": 1.0,
+      "revoke/paraphrase_unknown": 1.0,
+      "revoke/probe_top1": 0.01,
+      "revoke/probe_top5": 0.01,
+      "revoke/reverse_unknown": 1.0,
+      "revoke/routing_mass_on_target": 0.0,
+      "revoke/true_obj_mean_rank": 1331.1,
+      "revoke/true_obj_top1_among_entities": 0.0,
+      "seed": 2,
+      "shred/direct_acc": 0.0,
+      "shred/direct_unknown": 1.0,
+      "shred/forced_choice_win": 0.57,
+      "shred/gate_invalid_max": 0.0,
+      "shred/gate_invalid_mean": 0.0,
+      "shred/gate_valid_mean": 1.0,
+      "shred/gated_value_contribution": 0.0,
+      "shred/multihop_unknown": 1.0,
+      "shred/paraphrase_unknown": 1.0,
+      "shred/probe_top1": 0.01,
+      "shred/probe_top5": 0.01,
+      "shred/reverse_unknown": 1.0,
+      "shred/routing_mass_on_target": 0.9962201714515686,
+      "shred/true_obj_mean_rank": 1272.55,
+      "shred/true_obj_top1_among_entities": 0.0
+    }
+  ],
+  "attacks_soft": [
+    {
+      "active/direct_acc": 1.0,
+      "active/direct_unknown": 0.0,
+      "active/forced_choice_win": 1.0,
+      "active/gate_invalid_max": NaN,
+      "active/gate_invalid_mean": NaN,
+      "active/gate_valid_mean": 0.9976211786270142,
+      "active/gated_value_contribution": 14.199584007263184,
+      "active/multihop_unknown": 0.0,
+      "active/paraphrase_unknown": 0.0,
+      "active/probe_top1": 0.96,
+      "active/probe_top5": 0.96,
+      "active/reverse_unknown": 0.0,
+      "active/routing_mass_on_target": 0.9945181012153625,
+      "active/true_obj_mean_rank": 0.0,
+      "active/true_obj_top1_among_entities": 1.0,
+      "dependency/collateral_bypass_acc_after_closure": 1.0,
+      "dependency/derivable_recovery_after_closure": 0.0,
+      "dependency/derivable_recovery_after_revoke_K3": 1.0,
+      "dependency/direct_unknown_after_revoke_K3": 1.0,
+      "dependency/n_triples": 30,
+      "probe_calibration_top1": 0.9626262626262626,
+      "probe_calibration_top5": 0.9626262626262626,
+      "restored/direct_acc": 1.0,
+      "revoke/direct_acc": 0.0,
+      "revoke/direct_unknown": 1.0,
+      "revoke/forced_choice_win": 0.45,
+      "revoke/gate_invalid_max": NaN,
+      "revoke/gate_invalid_mean": NaN,
+      "revoke/gate_valid_mean": 0.9976211786270142,
+      "revoke/gated_value_contribution": 0.0,
+      "revoke/multihop_unknown": 1.0,
+      "revoke/paraphrase_unknown": 1.0,
+      "revoke/probe_top1": 0.0,
+      "revoke/probe_top5": 0.0,
+      "revoke/reverse_unknown": 1.0,
+      "revoke/routing_mass_on_target": 0.0,
+      "revoke/true_obj_mean_rank": 1264.32,
+      "revoke/true_obj_top1_among_entities": 0.0,
+      "seed": 0,
+      "shred/direct_acc": 0.0,
+      "shred/direct_unknown": 1.0,
+      "shred/forced_choice_win": 0.44,
+      "shred/gate_invalid_max": 0.2674151659011841,
+      "shred/gate_invalid_mean": 0.003873728448525071,
+      "shred/gate_valid_mean": 0.9976210594177246,
+      "shred/gated_value_contribution": 0.05658590793609619,
+      "shred/multihop_unknown": 1.0,
+      "shred/paraphrase_unknown": 1.0,
+      "shred/probe_top1": 0.0,
+      "shred/probe_top5": 0.0,
+      "shred/reverse_unknown": 1.0,
+      "shred/routing_mass_on_target": 0.9945181012153625,
+      "shred/true_obj_mean_rank": 1268.85,
+      "shred/true_obj_top1_among_entities": 0.0
+    },
+    {
+      "active/direct_acc": 1.0,
+      "active/direct_unknown": 0.0,
+      "active/forced_choice_win": 1.0,
+      "active/gate_invalid_max": 0.9932973980903625,
+      "active/gate_invalid_mean": 0.9932973980903625,
+      "active/gate_valid_mean": 0.9976515173912048,
+      "active/gated_value_contribution": 13.686201095581055,
+      "active/multihop_unknown": 0.0,
+      "active/paraphrase_unknown": 0.0,
+      "active/probe_top1": 0.93,
+      "active/probe_top5": 0.93,
+      "active/reverse_unknown": 0.0,
+      "active/routing_mass_on_target": 0.9952273368835449,
+      "active/true_obj_mean_rank": 0.0,
+      "active/true_obj_top1_among_entities": 1.0,
+      "dependency/collateral_bypass_acc_after_closure": 0.99,
+      "dependency/derivable_recovery_after_closure": 0.0,
+      "dependency/derivable_recovery_after_revoke_K3": 1.0,
+      "dependency/direct_unknown_after_revoke_K3": 1.0,
+      "dependency/n_triples": 30,
+      "probe_calibration_top1": 0.9570707070707071,
+      "probe_calibration_top5": 0.9570707070707071,
+      "restored/direct_acc": 1.0,
+      "revoke/direct_acc": 0.0,
+      "revoke/direct_unknown": 1.0,
+      "revoke/forced_choice_win": 0.59,
+      "revoke/gate_invalid_max": 0.9932973980903625,
+      "revoke/gate_invalid_mean": 0.9932973980903625,
+      "revoke/gate_valid_mean": 0.9976515173912048,
+      "revoke/gated_value_contribution": 0.0,
+      "revoke/multihop_unknown": 1.0,
+      "revoke/paraphrase_unknown": 1.0,
+      "revoke/probe_top1": 0.01,
+      "revoke/probe_top5": 0.01,
+      "revoke/reverse_unknown": 0.9722222222222222,
+      "revoke/routing_mass_on_target": 0.0,
+      "revoke/true_obj_mean_rank": 1208.02,
+      "revoke/true_obj_top1_among_entities": 0.0,
+      "seed": 1,
+      "shred/direct_acc": 0.01,
+      "shred/direct_unknown": 0.99,
+      "shred/forced_choice_win": 0.58,
+      "shred/gate_invalid_max": 0.9932973980903625,
+      "shred/gate_invalid_mean": 0.018893713131546974,
+      "shred/gate_valid_mean": 0.9976511001586914,
+      "shred/gated_value_contribution": 0.13153335452079773,
+      "shred/multihop_unknown": 1.0,
+      "shred/paraphrase_unknown": 0.99,
+      "shred/probe_top1": 0.02,
+      "shred/probe_top5": 0.02,
+      "shred/reverse_unknown": 0.9722222222222222,
+      "shred/routing_mass_on_target": 0.9952273368835449,
+      "shred/true_obj_mean_rank": 1168.67,
+      "shred/true_obj_top1_among_entities": 0.01
+    },
+    {
+      "active/direct_acc": 1.0,
+      "active/direct_unknown": 0.0,
+      "active/forced_choice_win": 1.0,
+      "active/gate_invalid_max": NaN,
+      "active/gate_invalid_mean": NaN,
+      "active/gate_valid_mean": 0.9970923662185669,
+      "active/gated_value_contribution": 13.934331893920898,
+      "active/multihop_unknown": 0.0,
+      "active/paraphrase_unknown": 0.0,
+      "active/probe_top1": 0.97,
+      "active/probe_top5": 0.97,
+      "active/reverse_unknown": 0.0,
+      "active/routing_mass_on_target": 0.9962201714515686,
+      "active/true_obj_mean_rank": 0.0,
+      "active/true_obj_top1_among_entities": 1.0,
+      "dependency/collateral_bypass_acc_after_closure": 1.0,
+      "dependency/derivable_recovery_after_closure": 0.0,
+      "dependency/derivable_recovery_after_revoke_K3": 1.0,
+      "dependency/direct_unknown_after_revoke_K3": 1.0,
+      "dependency/n_triples": 30,
+      "probe_calibration_top1": 0.9666666666666667,
+      "probe_calibration_top5": 0.9666666666666667,
+      "restored/direct_acc": 1.0,
+      "revoke/direct_acc": 0.0,
+      "revoke/direct_unknown": 1.0,
+      "revoke/forced_choice_win": 0.57,
+      "revoke/gate_invalid_max": NaN,
+      "revoke/gate_invalid_mean": NaN,
+      "revoke/gate_valid_mean": 0.9970923662185669,
+      "revoke/gated_value_contribution": 0.0,
+      "revoke/multihop_unknown": 1.0,
+      "revoke/paraphrase_unknown": 1.0,
+      "revoke/probe_top1": 0.01,
+      "revoke/probe_top5": 0.01,
+      "revoke/reverse_unknown": 1.0,
+      "revoke/routing_mass_on_target": 0.0,
+      "revoke/true_obj_mean_rank": 1331.04,
+      "revoke/true_obj_top1_among_entities": 0.0,
+      "seed": 2,
+      "shred/direct_acc": 0.0,
+      "shred/direct_unknown": 1.0,
+      "shred/forced_choice_win": 0.57,
+      "shred/gate_invalid_max": 0.06095358729362488,
+      "shred/gate_invalid_mean": 0.0018755593337118626,
+      "shred/gate_valid_mean": 0.9970929026603699,
+      "shred/gated_value_contribution": 0.02598251774907112,
+      "shred/multihop_unknown": 1.0,
+      "shred/paraphrase_unknown": 1.0,
+      "shred/probe_top1": 0.01,
+      "shred/probe_top5": 0.01,
+      "shred/reverse_unknown": 1.0,
+      "shred/routing_mass_on_target": 0.9962201714515686,
+      "shred/true_obj_mean_rank": 1289.1,
+      "shred/true_obj_top1_among_entities": 0.0
+    }
+  ],
+  "chance_levels": {
+    "forced_choice": 0.5,
+    "mean_rank": 1279.5,
+    "probe_top1": 0.000390625
+  },
+  "claim": "NOT SUPPORTED BY THE MEASUREMENTS (see criteria): At ten times the bank size the core still reads, composes and traces the right cell, reproduces every lifecycle operation, and after SHRED with hard verification every reconstruction attack is at chance.",
+  "claim_supported": false,
+  "config": {
+    "eval": {
+      "n_2hop": 500,
+      "n_3hop": 500,
+      "n_alt_pairs": 100,
+      "n_alt_structures": 25,
+      "n_broken": 100,
+      "n_cells": 10000,
+      "n_entities": 2560,
+      "n_lifecycle": 100,
+      "n_locality_multihop": 300,
+      "n_locality_revokes": 50,
+      "n_locality_updates": 100,
+      "n_relations": 4,
+      "n_rev": 300,
+      "n_synonyms": 2
+    },
+    "model": {
+      "d_ff": 256,
+      "d_model": 128,
+      "hard_gate": false,
+      "marker_dim": 16,
+      "max_hops": 3,
+      "n_core_layers": 2,
+      "n_entities": 2560,
+      "n_heads": 4,
+      "n_relations": 4,
+      "n_surface": 8,
+      "use_marker_gate": true,
+      "use_null_cell": true,
+      "use_routing": true
+    },
+    "seeds": [
+      0,
+      1,
+      2
+    ],
+    "steps": 3000,
+    "train": {
+      "gate_balanced": true,
+      "gate_weight": 5.0,
+      "n_cells_max": 10000,
+      "n_cells_min": 7000,
+      "n_entities": 2560
+    }
+  },
+  "criteria": {
+    "alternative_path": {
+      "observed": 1.0,
+      "op": ">=",
+      "pass": true,
+      "threshold": 0.95
+    },
+    "direct": {
+      "observed": 1.0,
+      "op": ">=",
+      "pass": true,
+      "threshold": 0.98
+    },
+    "hard/active/direct_acc": {
+      "observed": 1.0,
+      "op": ">=",
+      "pass": true,
+      "threshold": 0.98
+    },
+    "hard/shred/direct_unknown": {
+      "observed": 0.99,
+      "op": ">=",
+      "pass": true,
+      "threshold": 0.98
+    },
+    "hard/shred/forced_choice_win": {
+      "observed": 0.58,
+      "op": "<=",
+      "pass": true,
+      "threshold": 0.6
+    },
+    "hard/shred/gated_value_contribution": {
+      "observed": 0.1459561288356781,
+      "op": "<=",
+      "pass": false,
+      "threshold": 0.1
+    },
+    "hard/shred/probe_top1": {
+      "observed": 0.02,
+      "op": "<=",
+      "pass": true,
+      "threshold": 0.02
+    },
+    "hop2": {
+      "observed": 0.998,
+      "op": ">=",
+      "pass": true,
+      "threshold": 0.95
+    },
+    "hop3": {
+      "observed": 0.99,
+      "op": ">=",
+      "pass": true,
+      "threshold": 0.9
+    },
+    "locality": {
+      "observed": 1.0,
+      "op": ">=",
+      "pass": true,
+      "threshold": 0.99
+    },
+    "provenance": {
+      "observed": 0.9998181818181818,
+      "op": ">=",
+      "pass": true,
+      "threshold": 0.95
+    },
+    "replay_deviation": {
+      "observed": 0.0,
+      "op": "<=",
+      "pass": true,
+      "threshold": 0
+    },
+    "reverse": {
+      "observed": 0.9966666666666667,
+      "op": ">=",
+      "pass": true,
+      "threshold": 0.95
+    },
+    "revoke": {
+      "observed": 1.0,
+      "op": ">=",
+      "pass": true,
+      "threshold": 0.98
+    },
+    "rollback": {
+      "observed": 1.0,
+      "op": ">=",
+      "pass": true,
+      "threshold": 0.98
+    },
+    "shred": {
+      "observed": 0.99,
+      "op": ">=",
+      "pass": true,
+      "threshold": 0.95
+    },
+    "update": {
+      "observed": 1.0,
+      "op": ">=",
+      "pass": true,
+      "threshold": 0.98
+    }
+  },
+  "deletion_level": "F3",
+  "deletion_level_meaning": "Functional forgetting",
+  "deletion_level_targeted": "F4",
+  "environment": {
+    "device": "cpu",
+    "numpy": "2.2.6",
+    "platform": "Linux-6.18.44-fc-v24-x86_64-with-glibc2.39",
+    "python": "3.11.15",
+    "threads": "2",
+    "torch": "2.14.0+cpu"
+  },
+  "evidence_level": "E4",
+  "evidence_level_meaning": "Controlled neural-network evidence",
+  "experiment": "E-000014",
+  "not_claimed": "Anything about approximate retrieval or banks beyond 10,000 cells; the synthetic boundary applies.",
+  "per_seed": [
+    {
+      "alternative_path": 1.0,
+      "checkpoint_sha256": "aa4f74732fbef59283102ce8b4c4c103aac85f76753e18a504f66a2ec70afdbe",
+      "direct": 1.0,
+      "direct_unknown_rate": 0.0,
+      "eval_world_seed": 1400,
+      "hop2": 1.0,
+      "hop2_broken_unknown": 1.0,
+      "hop3": 1.0,
+      "hop3_broken_unknown": 0.95,
+      "locality": 1.0,
+      "locality_targets_correct": 1.0,
+      "locality_undo_exact": 1.0,
+      "n_cells": 10000,
+      "noise": {
+        "0.00": 1.0,
+        "0.24": 0.9984
+      },
+      "provenance": 1.0,
+      "replay_deviation": 0,
+      "resign": 1.0,
+      "restore": 1.0,
+      "reverse": 0.9966666666666667,
+      "revoke": 1.0,
+      "rollback": 1.0,
+      "seed": 0,
+      "shred": 1.0,
+      "train_seconds": 1205.0660688877106,
+      "update": 1.0,
+      "update_derived": 1.0,
+      "update_rollback": 1.0
+    },
+    {
+      "alternative_path": 1.0,
+      "checkpoint_sha256": "bdbc4a47b7b74d39cb765827f8772592d10bb12b352c6266d34e2b5d811e0632",
+      "direct": 1.0,
+      "direct_unknown_rate": 0.0,
+      "eval_world_seed": 1401,
+      "hop2": 1.0,
+      "hop2_broken_unknown": 1.0,
+      "hop3": 0.994,
+      "hop3_broken_unknown": 0.97,
+      "locality": 1.0,
+      "locality_targets_correct": 1.0,
+      "locality_undo_exact": 1.0,
+      "n_cells": 10000,
+      "noise": {
+        "0.00": 1.0,
+        "0.24": 0.9983
+      },
+      "provenance": 1.0,
+      "replay_deviation": 0,
+      "resign": 1.0,
+      "restore": 1.0,
+      "reverse": 0.9966666666666667,
+      "revoke": 1.0,
+      "rollback": 1.0,
+      "seed": 1,
+      "shred": 0.99,
+      "train_seconds": 1179.327154636383,
+      "update": 1.0,
+      "update_derived": 1.0,
+      "update_rollback": 0.9985714285714286
+    },
+    {
+      "alternative_path": 1.0,
+      "checkpoint_sha256": "e9b81b88e3222f9df875349cc701f8d9c86ec014cb4935e7e189bf432af9062e",
+      "direct": 1.0,
+      "direct_unknown_rate": 0.0,
+      "eval_world_seed": 1402,
+      "hop2": 0.998,
+      "hop2_broken_unknown": 1.0,
+      "hop3": 0.99,
+      "hop3_broken_unknown": 0.95,
+      "locality": 1.0,
+      "locality_targets_correct": 1.0,
+      "locality_undo_exact": 1.0,
+      "n_cells": 10000,
+      "noise": {
+        "0.00": 1.0,
+        "0.24": 0.9985
+      },
+      "provenance": 0.9998181818181818,
+      "replay_deviation": 0,
+      "resign": 1.0,
+      "restore": 1.0,
+      "reverse": 1.0,
+      "revoke": 1.0,
+      "rollback": 1.0,
+      "seed": 2,
+      "shred": 1.0,
+      "train_seconds": 1170.0259447097778,
+      "update": 1.0,
+      "update_derived": 1.0,
+      "update_rollback": 1.0
+    }
+  ],
+  "recorded_at": "2026-09-03T05:41:27+00:00",
+  "title": "Addressing at 10,000 cells (2,560 entities), verified gate"
+}
