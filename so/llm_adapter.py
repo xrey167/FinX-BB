@@ -45,6 +45,7 @@ class AdapterConfig:
     marker_dim: int = 16
     use_marker_gate: bool = True
     hard_gate: bool = False        # verification mode: gate thresholded at 0.5
+    status_gated: bool = False     # E-000012: revoked cells stay routable; the status flag is folded into the gate
 
     def to_dict(self) -> Dict:
         return asdict(self)
@@ -112,8 +113,11 @@ class KnowledgeAdapterLM(nn.Module):
         unk = self.v_proj(self.wte[self.candidate_ids[-1]][None])          # the ' unknown' direction
         # the gate selects between the payload and "unknown": an unsigned payload READS AS unknown.
         # (a mere attenuation would be undone by the RMS-matched injection downstream)
+        if self.cfg.status_gated:
+            g = g * bank["active"].float()[:, None]          # an inactive (revoked) cell reads as unknown
         values = payload * g + unk * (1 - g)
-        return {"keys": keys, "values": values, "values_payload": payload, "gate": g.squeeze(-1), "active": bank["active"]}
+        allowed = bank["routable"] if (self.cfg.status_gated and "routable" in bank) else bank["active"]
+        return {"keys": keys, "values": values, "values_payload": payload, "gate": g.squeeze(-1), "active": allowed}
 
     def _make_hook(self, read_index: int, layer: int):
         def hook(module, inputs, output):

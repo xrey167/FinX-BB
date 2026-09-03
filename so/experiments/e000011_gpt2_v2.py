@@ -373,27 +373,8 @@ INT = ["localisation_hop1", "localisation_hop2", "disable_hop1_changes", "disabl
        "disable_hop2_unknown", "disable_random_unchanged", "swap_hop2", "replace_hop2"]
 
 
-def main(argv: List[str] | None = None) -> Dict[str, Any]:
-    ap = argparse.ArgumentParser()
-    ap.add_argument("--seeds", type=int, nargs="*", default=[0, 1, 2])
-    ap.add_argument("--steps", type=int, default=3000)
-    ap.add_argument("--threads", type=int, default=int(os.environ.get("SO_THREADS", "0")))
-    ap.add_argument("--force", action="store_true")
-    args = ap.parse_args(argv)
-    if args.threads:
-        torch.set_num_threads(args.threads)
-    per_seed: List[Dict[str, Any]] = []
-    for seed in args.seeds:
-        gk = E8.GPT2Knowledge(AdapterConfig())
-        print(f"=== seed {seed}: adapter training v2 ===", flush=True)
-        out = train_or_load(gk, seed, args.steps, args.force)
-        print(f"=== seed {seed}: evaluating ===", flush=True)
-        m = evaluate(gk, 1100 + seed, out["centre"])
-        m["train_seconds"] = out["train_seconds"]; m["checkpoint_sha256"] = out["checkpoint_sha256"]
-        per_seed.append(m)
-        print({k: (round(v, 4) if isinstance(v, float) else v) for k, v in m.items()}, flush=True)
-    keys = [k for k in per_seed[0] if k not in ("seed", "checkpoint_sha256")]
-    agg = ledger.aggregate(per_seed, keys)
+def criteria_groups():
+    """Pre-registered criteria, grouped per claim (shared with E-000012, which changes the design, not the bar)."""
     # STRICT thresholds = the ones pre-registered for E-000008 (kept unchanged so that nothing is relaxed after seeing E-000008)
     groups = {
         "reading": {"prior_direct_acc": ("<=", 0.05), "bank_masked_direct_acc": ("<=", 0.05), "direct": (">=", 0.95),
@@ -416,6 +397,31 @@ def main(argv: List[str] | None = None) -> Dict[str, Any]:
     }
     lenient = {"direct": (">=", 0.90), "template1_train/direct": (">=", 0.90), "revoke": (">=", 0.90), "shred": (">=", 0.85),
                "broken1_unknown": (">=", 0.85)}
+    return groups, lenient
+
+
+def main(argv: List[str] | None = None) -> Dict[str, Any]:
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--seeds", type=int, nargs="*", default=[0, 1, 2])
+    ap.add_argument("--steps", type=int, default=3000)
+    ap.add_argument("--threads", type=int, default=int(os.environ.get("SO_THREADS", "0")))
+    ap.add_argument("--force", action="store_true")
+    args = ap.parse_args(argv)
+    if args.threads:
+        torch.set_num_threads(args.threads)
+    per_seed: List[Dict[str, Any]] = []
+    for seed in args.seeds:
+        gk = E8.GPT2Knowledge(AdapterConfig())
+        print(f"=== seed {seed}: adapter training v2 ===", flush=True)
+        out = train_or_load(gk, seed, args.steps, args.force)
+        print(f"=== seed {seed}: evaluating ===", flush=True)
+        m = evaluate(gk, 1100 + seed, out["centre"])
+        m["train_seconds"] = out["train_seconds"]; m["checkpoint_sha256"] = out["checkpoint_sha256"]
+        per_seed.append(m)
+        print({k: (round(v, 4) if isinstance(v, float) else v) for k, v in m.items()}, flush=True)
+    keys = [k for k in per_seed[0] if k not in ("seed", "checkpoint_sha256")]
+    agg = ledger.aggregate(per_seed, keys)
+    groups, lenient = criteria_groups()
     check_lenient = ledger.check_criteria(agg, lenient)
     all_criteria = {k: v for g in groups.values() for k, v in g.items()}
     check = ledger.check_criteria(agg, all_criteria)

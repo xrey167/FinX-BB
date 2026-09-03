@@ -54,6 +54,8 @@ class Bank:
     kid_of_key: Dict[Tuple[int, int], int]   # key -> position in the bank (usable cells only)
     active_pos: Dict[Tuple[int, int], int]   # key -> position of a ROUTABLE cell (active; marker may be invalid)
     marker_valid: Optional[np.ndarray] = None  # per cell: is the marker signed? (control-plane truth for gate supervision)
+    routable: Optional[np.ndarray] = None      # status-gated designs: ACTIVE or REVOKED cells are routable, stale/deleted are not
+    routable_pos: Optional[Dict[Tuple[int, int], int]] = None
 
     @property
     def size(self) -> int:
@@ -68,6 +70,7 @@ class Bank:
             "active": torch.as_tensor(self.active, dtype=torch.bool, device=device),
             "marker_valid": torch.as_tensor(self.marker_valid if self.marker_valid is not None else np.ones(self.size, dtype=bool),
                                             dtype=torch.bool, device=device),
+            "routable": torch.as_tensor(self.routable if self.routable is not None else self.active, dtype=torch.bool, device=device),
         }
 
 
@@ -98,8 +101,10 @@ def bank_from_world(rng: np.random.Generator, world: World, centre: np.ndarray, 
     index_view = {(int(s), int(r)): int(o) for s, r, o, u in zip(subject, relation, obj, usable) if u}
     kid_of_key = {(int(s), int(r)): int(i) for i, (s, r, u) in enumerate(zip(subject, relation, usable)) if u}
     active_pos = {(int(s), int(r)): int(i) for i, (s, r, a) in enumerate(zip(subject, relation, active)) if a}
+    routable = np.concatenate([np.ones(n, dtype=bool), np.zeros(subject.shape[0] - n, dtype=bool)])   # stale rows are not
+    routable_pos = {(int(s), int(r)): int(i) for i, (s, r, rt) in enumerate(zip(subject, relation, routable)) if rt}
     return Bank(subject, relation, obj, marker.astype(np.float32), active, usable, np.arange(subject.shape[0]),
-                index_view, kid_of_key, active_pos, marker_valid=~shred)
+                index_view, kid_of_key, active_pos, marker_valid=~shred, routable=routable, routable_pos=routable_pos)
 
 
 def bank_from_store(store, respect_markers: bool = False) -> Bank:
@@ -111,21 +116,27 @@ def bank_from_store(store, respect_markers: bool = False) -> Bank:
     index_view = {(int(s), int(r)): int(o) for s, r, o, u in zip(b["subject"], b["relation"], b["obj"], usable) if u}
     kid_of_key = {(int(s), int(r)): int(i) for i, (s, r, u) in enumerate(zip(b["subject"], b["relation"], usable)) if u}
     active_pos = {(int(s), int(r)): int(i) for i, (s, r, a) in enumerate(zip(b["subject"], b["relation"], b["active"])) if a}
+    routable = np.ones(b["kid"].shape[0], dtype=bool)   # store.bank() returns ACTIVE and REVOKED cells (deleted excluded)
+    routable_pos = {(int(s), int(r)): int(i) for i, (s, r) in enumerate(zip(b["subject"], b["relation"]))}
     return Bank(b["subject"], b["relation"], b["obj"], b["marker"], b["active"], usable, b["kid"], index_view, kid_of_key,
-                active_pos, marker_valid=valid)
+                active_pos, marker_valid=valid, routable=routable, routable_pos=routable_pos)
 
 
-def failing_hop_target(bank: Bank, q: Query, gt) -> int:
+def failing_hop_target(bank: Bank, q: Query, gt, status_gated: bool = False) -> int:
     """Routing target for the hop at which a forward path fails.
 
     If a *routable* cell holds that key (a shredded cell: active, marker invalid), the model
     must attend to it and discover the closed gate, so the target is that cell; otherwise
-    (key absent or cell revoked) the target is the null cell (-1).
+    (key absent or cell revoked) the target is the null cell (-1).  In a status-gated design
+    (``status_gated``) revoked cells stay routable and read as unknown through the gate, so
+    they are targets too.
     """
     cur = q.start
     for e in gt.edges:
         cur = bank.index_view[e]
     key = (cur, q.path[len(gt.edges)])
+    if status_gated and bank.routable_pos is not None:
+        return bank.routable_pos.get(key, -1)
     return bank.active_pos.get(key, -1)
 
 
