@@ -22,7 +22,12 @@ CHAIN = [
     ("so.experiments.e000005_causal_interventions", [], ["--seeds", "0", "1"]),
     ("so.experiments.e000006_ablations", [], ["--seeds", "0", "--steps", "800"]),
     ("so.experiments.e000007_biomarker", [], ["--seeds", "0", "1"]),
+    ("so.experiments.e000009_verification_gate", [], ["--seeds", "0", "1", "--steps", "800"]),
+    ("so.experiments.e000009_verification_gate",
+     ["--gate-weight", "5.0", "--balanced", "--name", "e000010_balanced_gate", "--experiment", "E-000010"],
+     ["--seeds", "0", "1", "--steps", "800", "--gate-weight", "5.0", "--balanced", "--name", "e000010_balanced_gate", "--experiment", "E-000010"]),
 ]
+# E-000008 (frozen GPT-2 + adapter) is not part of the chain: it needs 'transformers' and ~20 min per seed on CPU.
 
 
 def main() -> None:

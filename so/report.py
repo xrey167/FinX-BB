@@ -123,9 +123,11 @@ def main() -> None:
         "",
         "## Summary",
         "",
-        table(["experiment", "title", "evidence level claimed", "deletion level", "status"],
-              [(r["experiment"], r["title"], r.get("evidence_level", "-"), r.get("deletion_level") or "-", status_of(r))
-               if r else (n, "-", "-", "-", "not run") for n, r in recs.items()]),
+        table(["experiment", "title", "evidence level recorded", "deletion level recorded (targeted)", "status", "recorded at (UTC)"],
+              [(r["experiment"], r["title"], r.get("evidence_level", "-"),
+                (r.get("deletion_level") or "-") + (f" ({r['deletion_level_targeted']})" if r.get("deletion_level_targeted") else ""),
+                status_of(r), r.get("recorded_at", "-")[:16].replace("T", " "))
+               if r else (n, "-", "-", "-", "not run", "-") for n, r in recs.items()]),
         "",
         "## The six breakthrough properties (ledger section 3)",
         "",

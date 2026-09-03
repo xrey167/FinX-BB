@@ -31,16 +31,19 @@ Code behind the SO documents in `docs/`:
 pip install -r so/requirements.txt     # numpy, torch (CPU is enough), pytest, transformers (E-000008)
 python -m pytest so/tests -q
 python -m so.experiments.e000001a_reference
-python -m so.experiments.e000001b_mini_transformer      # trains 5 models (about 3.5 min each with 4 threads; 'train_seconds' is recorded)
+python -m so.experiments.e000001b_mini_transformer      # trains 5 models (2-3.5 min each on this 4-core box; 'train_seconds' is in the record)
 python -m so.experiments.e000002_memorization_control
 python -m so.experiments.e000003_retention_generalization
 python -m so.experiments.e000004_reconstruction_attacks
 python -m so.experiments.e000005_causal_interventions
 python -m so.experiments.e000006_ablations
 python -m so.experiments.e000007_biomarker
-python -m so.experiments.e000008_gpt2_adapter             # frozen GPT-2 small + adapter (needs transformers; ~30 min per seed on CPU)
+python -m so.experiments.e000009_verification_gate                                           # E-000009: verification loss
+python -m so.experiments.e000009_verification_gate --gate-weight 5 --balanced \
+    --name e000010_balanced_gate --experiment E-000010                                       # E-000010: class-balanced
+python -m so.experiments.e000008_gpt2_adapter             # frozen GPT-2 small + adapter (needs transformers; ~20 min per seed on CPU)
 python -m so.report                                      # regenerate docs/so-results-2026-09-02.md
-python -m so.experiments.run_all --quick                 # reduced smoke run of the whole chain
+python -m so.experiments.run_all --quick                 # reduced smoke run of the synthetic chain (E-000001 … E-000007, E-000009, E-000010; results get a -quick suffix)
 ```
 
 Every experiment writes `so/results/<name>.json` (complete record: config, per-seed numbers, aggregate, claim, what is *not* claimed, evidence level) and `so/results/<name>.md` (summary tables). Trained models are cached under `so/results/checkpoints/` and are not committed; delete a checkpoint (or pass `--force`) to retrain.

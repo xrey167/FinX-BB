@@ -41,8 +41,8 @@ VARIANTS: Dict[str, Dict[str, Any]] = {
 }
 SMALL_EVAL = dict(EVAL_CONFIG, n_2hop=200, n_3hop=200, n_broken=100, n_rev=100, n_lifecycle=50,
                   n_locality_updates=50, n_locality_revokes=25, n_locality_multihop=100, n_alt_pairs=50)
-KEYS = ["direct", "hop2", "hop3", "hop2_broken_unknown", "provenance", "reverse", "revoke", "shred", "update",
-        "rollback", "locality", "alternative_path"]
+KEYS = ["direct", "direct_unknown_rate", "hop2", "hop3", "hop2_broken_unknown", "provenance", "reverse", "revoke", "shred",
+        "update", "rollback", "locality", "alternative_path"]
 
 
 def train_variant(name: str, seed: int, steps: int, force: bool = False):
