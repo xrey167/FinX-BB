@@ -48,7 +48,7 @@ Compute column: what runs on 4 CPU cores now versus what needs a GPU.
 
 ### Stage 0 — Close the ledger gap on the synthetic core (this session)
 
-Run E-000001-B … E-000007 on the corrected objective, record every number with pre-registered criteria, per-seed worst case and exact binomial intervals, and generate the results document from the JSON records only. Load-bearing control: E-000002 (masked-layer accuracy at chance; leak after REVOKE ≈ 0 for re-sampled training, > 0 for fixed-world training). **Kill:** masked-layer accuracy above chance or REVOKE leak above 2% in any seed — the "no copy" foundation is false and every F3/F4 claim collapses to F1. *Compute: CPU, ~2 hours.*
+Run E-000001-B … E-000007 on the corrected objective, record every number with pre-registered criteria, per-seed worst case and exact binomial intervals, and generate the results document from the JSON records only. Load-bearing control: E-000002 (masked-layer accuracy at chance; leak after REVOKE ≈ 0). The separating variable is the LAYER, not the training regime: with the layer present both the re-sampled and the fixed-world model answer 0% masked and leak 0% in every seed, and only the model without routing memorises (100%) and leaks (100%). An earlier version of this line attributed the leak to fixed-world training, which the record does not show. **Kill:** masked-layer accuracy above chance or REVOKE leak above 2% in any seed — the "no copy" foundation is false and every F3/F4 claim collapses to F1. *Compute: CPU, ~2 hours.*
 
 ### Stage 1 — E-000008: frozen pretrained core, single-token prior-free facts (this session — recorded)
 
@@ -88,7 +88,7 @@ Publish code, seeds, world generators, template sets, pre-registered criteria an
 2. Masked-bank accuracy above the prior by more than 5 points in GPT-2 (Stage 1): the adapter copies.
 3. Leak after REVOKE above 5 points for prior-free facts (Stages 1–3).
 4. 2-hop through a cell not above the single-fact in-context baseline (Stage 2): the mechanism is RAG with a vector interface.
-5. Held-out-template deletion below 95% with train-template deletion ≈ 100% (Stage 2): surface overfitting.
+5. Held-out-template deletion below 95% with train-template deletion ≈ 100% (Stage 2): surface overfitting. **This criterion has FIRED.** E-000012 answers ' unknown' after REVOKE at 98% on the trained template and 52% on the weakest held-out one (E-000011: 70% / 16%). Two qualifications belong with it, and neither rescues it: the budget was 2 trained templates against the 8 this stage prescribes, and the failure is one of REFUSAL, not of recovery — after REVOKE the deleted object is never the top-1 answer on any held-out template (0.0 in all three seeds); the model names some other entity. Reading on those same templates is already unreliable while the cell is ACTIVE (56% correct, 7% unknown on template 4), so reading and refusal have to be separated before the criterion can be adjudicated.
 6. Override of moderate priors only with perplexity damage above 5% (Stages 2, 5).
 7. Any reconstruction attack above prior + 5 points, or a probe above chance above the read block (Stage 3).
 8. Suppressed and revoked not separable by any internal signal (Stage 3): the biomarker programme stops.

@@ -57,7 +57,9 @@ NOTES = {
         "the gate loss is averaged over ~1000 cells of which ~5% are unsigned, so the tail receives almost no gradient. "
         "E-000010 weights the two classes equally.",
     "e000010_balanced_gate": "Closes the residual: with signed and unsigned markers weighted equally in the verification "
-        "loss (weight 5), every reconstruction attack after SHRED is at chance in all five seeds while the payload remains "
+        "loss (weight 5), every reconstruction attack after SHRED is at or below its pre-registered chance-level "
+        "threshold in all five seeds (probe 0.2-0.4% against a chance of 0.39%, forced choice 53-54% against 50%); "
+        "this is a tolerance result, not a test of the null that the residual IS chance while the payload remains "
         "physically present and routed to (routing mass 0.998), and no other family degrades. This is the F4-level result "
         "of the session, within the synthetic system. Residual caveat: the soft gate still assigns a high score to a rare "
         "unsigned marker in one seed (max 0.995 among all unsigned cells of that bank); none of the 500 shredded targets leaked.",
@@ -87,7 +89,7 @@ NOTES = {
         "naming another entity, and shredding the pointer rather than the payload rises from 93% to 97% on the worst "
         "seed. The refusal arm is the load-bearing part: it shows the depth the mechanism reaches is set by the number "
         "of slots, and that the model reports the limit instead of hiding it.",
-    "e000007_biomarker": "The suppression-versus-deletion separation holds in every seed (suppressed: value "
+    "e000007_biomarker": "CORRECTION to the prose inside that record: its \"Reading:\" paragraph calls the shredded arm \"F4, learned\" eleven lines below the record's own F3 line. The criteria are evaluated on the worst seed and both F4 criteria fail there (value contribution 1.57 against a bar of 0.10, probe 8% against 5%), so the record is F3. The separation itself holds in every seed (suppressed: value "
         "contribution 8.3, probe 86%, mean rank 10; shredded: 1.3, 4%, 110). The two failed criteria are the same "
         "SHRED residual as in E-000004, addressed in E-000009.",
 }

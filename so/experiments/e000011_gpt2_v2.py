@@ -373,6 +373,21 @@ INT = ["localisation_hop1", "localisation_hop2", "disable_hop1_changes", "disabl
        "disable_hop2_unknown", "disable_random_unchanged", "swap_hop2", "replace_hop2"]
 
 
+def deletion_level(met: Dict[str, bool], gk_status_gated: bool) -> str:
+    """Level from the met claim groups.
+
+    The fallback must not claim more than the design does. F1 in ledger section 6 means routing
+    removal; a status-gated design keeps the cell addressed and closes the gate instead, so when no
+    deletion group is met its honest floor is F0 (the payload is still there and still routed to,
+    the read is suppressed) rather than F1.
+    """
+    if met["deletion_behaviour"] and met["attacks_after_shred_hard"]:
+        return "F4"
+    if met["deletion_behaviour"]:
+        return "F3"
+    return "F0" if gk_status_gated else "F1"
+
+
 def criteria_groups():
     """Pre-registered criteria, grouped per claim (shared with E-000012, which changes the design, not the bar)."""
     # STRICT thresholds = the ones pre-registered for E-000008 (kept unchanged so that nothing is relaxed after seeing E-000008)
@@ -426,7 +441,7 @@ def main(argv: List[str] | None = None) -> Dict[str, Any]:
     all_criteria = {k: v for g in groups.values() for k, v in g.items()}
     check = ledger.check_criteria(agg, all_criteria)
     met = {g: all(check["criteria"][k]["pass"] for k in ks) for g, ks in groups.items()}
-    level = "F4" if met["deletion_behaviour"] and met["attacks_after_shred_hard"] else ("F3" if met["deletion_behaviour"] else "F1")
+    level = deletion_level(met, gk_status_gated=False)
     record = {
         "experiment": "E-000011", "title": "Frozen GPT-2 core v2: verified gate, deletion behaviour, held-out paraphrases, interventions",
         "evidence_level": "E5", "deletion_level": level, "deletion_level_targeted": "F4",

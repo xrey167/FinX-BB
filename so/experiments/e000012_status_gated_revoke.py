@@ -99,10 +99,13 @@ def _report(per_seed: List[Dict[str, Any]], args) -> Dict[str, Any]:
     all_criteria = {k: v for g in groups.values() for k, v in g.items()}
     check = ledger.check_criteria(agg, all_criteria)
     met = {g: all(check["criteria"][k]["pass"] for k in ks) for g, ks in groups.items()}
-    level = "F4" if met["deletion_behaviour"] and met["attacks_after_shred_hard"] else ("F3" if met["deletion_behaviour"] else "F1")
+    level = E11.deletion_level(met, gk_status_gated=True)
     record = {
         "experiment": "E-000012", "title": "Frozen GPT-2 core: status-gated REVOKE (revoked cells stay routable and read as unknown)",
         "evidence_level": "E5", "deletion_level": level, "deletion_level_targeted": "F4",
+        "deletion_level_note": "In this design REVOKE does NOT remove routing: the revoked cell stays addressed and its "
+                               "status closes the gate. When the deletion groups are unmet the floor is therefore F0 "
+                               "(the payload is present and routed to, the read is suppressed), not F1.",
         "evidence_level_note": "E5 names the substrate (a pretrained transformer as frozen core); support is stated per claim group.",
         "claim_groups_met": met,
         "claim_parts": [{"claim": f"{g}", "criteria": list(ks), "supported": met[g]} for g, ks in groups.items()],

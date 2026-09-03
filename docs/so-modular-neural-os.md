@@ -897,3 +897,16 @@ However:
 The experiments provide evidence for a narrower claim:
 
 > A trained small neural model can be constructed such that structured mutable knowledge participates in learned computation while retaining controlled update/revoke/provenance behavior in a synthetic environment.
+
+---
+
+## Errata (added 2026-09-03, not part of the source text)
+
+The document above is preserved as written. Two numbers in it are contradicted by the measurements recorded later in `docs/so-experiment-ledger.md` section 31 and in `so/results/`, and the roadmap's own process rule (kill criterion 11) requires the contradiction to be stated before further results are reported:
+
+| Statement in the document | What the record shows | Source |
+|---|---|---|
+| 3-hop accuracy 100% | 99.88% mean over 5 seeds, 99.80% on the worst seed | `so/results/e000001b_mini_transformer.json` |
+| Noise 0.24 degrades accuracy to 68.4% | 100.0% at noise 0.24 in the recorded sweep | `so/results/e000001b_mini_transformer.json` |
+
+Neither correction changes any argument of the document. They are recorded here because a claim that is contradicted by the programme's own measurements must not stand unmarked.
