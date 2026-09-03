@@ -229,21 +229,21 @@
       "n": 3
     },
     "interventions/disable_hop1_unknown": {
-      "max": 0.7714285714285715,
-      "mean": 0.701213190102079,
-      "min": 0.6049382716049383,
+      "max": 0.75,
+      "mean": 0.6966666666666667,
+      "min": 0.62,
       "n": 3
     },
     "interventions/disable_hop2_changes": {
       "max": 1.0,
-      "mean": 0.9952380952380953,
-      "min": 0.9857142857142858,
+      "mean": 0.9966666666666667,
+      "min": 0.99,
       "n": 3
     },
     "interventions/disable_hop2_unknown": {
-      "max": 0.7727272727272727,
-      "mean": 0.7220084442306666,
-      "min": 0.6790123456790124,
+      "max": 0.75,
+      "mean": 0.7133333333333333,
+      "min": 0.69,
       "n": 3
     },
     "interventions/disable_random_unchanged": {
@@ -265,27 +265,39 @@
       "n": 3
     },
     "interventions/n_correct_hop2": {
-      "max": 88.0,
-      "mean": 79.66666666666667,
-      "min": 70.0,
+      "max": 100.0,
+      "mean": 100.0,
+      "min": 100.0,
       "n": 3
     },
     "interventions/n_swap": {
-      "max": 87.0,
-      "mean": 78.66666666666667,
-      "min": 68.0,
+      "max": 99.0,
+      "mean": 98.33333333333333,
+      "min": 98.0,
+      "n": 3
+    },
+    "interventions/pool_correct_rate": {
+      "max": 0.84,
+      "mean": 0.82,
+      "min": 0.79,
+      "n": 3
+    },
+    "interventions/pool_size": {
+      "max": 400.0,
+      "mean": 400.0,
+      "min": 400.0,
       "n": 3
     },
     "interventions/replace_hop2": {
-      "max": 0.9886363636363636,
-      "mean": 0.9784578590134146,
-      "min": 0.9714285714285714,
+      "max": 0.98,
+      "mean": 0.9733333333333333,
+      "min": 0.96,
       "n": 3
     },
     "interventions/swap_hop2": {
-      "max": 0.9885057471264368,
-      "mean": 0.983036168916268,
-      "min": 0.9753086419753086,
+      "max": 0.9797979797979798,
+      "mean": 0.9796605510891224,
+      "min": 0.9795918367346939,
       "n": 3
     },
     "locality": {
@@ -330,7 +342,49 @@
       "min": 0.86,
       "n": 3
     },
+    "resign/template0": {
+      "max": 0.91,
+      "mean": 0.8866666666666667,
+      "min": 0.86,
+      "n": 3
+    },
+    "resign/template1": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "resign/template2": {
+      "max": 0.5,
+      "mean": 0.41,
+      "min": 0.34,
+      "n": 3
+    },
+    "resign/template3": {
+      "max": 0.79,
+      "mean": 0.7300000000000001,
+      "min": 0.66,
+      "n": 3
+    },
+    "resign/template4": {
+      "max": 0.73,
+      "mean": 0.6433333333333332,
+      "min": 0.59,
+      "n": 3
+    },
+    "resign/template5": {
+      "max": 0.96,
+      "mean": 0.9366666666666666,
+      "min": 0.92,
+      "n": 3
+    },
     "resign_heldout": {
+      "max": 0.6975,
+      "mean": 0.68,
+      "min": 0.6675,
+      "n": 3
+    },
+    "resign_heldout_min": {
       "max": 0.5,
       "mean": 0.41,
       "min": 0.34,
@@ -480,6 +534,42 @@
       "min": 0.0,
       "n": 3
     },
+    "revoke/template0": {
+      "max": 0.76,
+      "mean": 0.7266666666666666,
+      "min": 0.7,
+      "n": 3
+    },
+    "revoke/template1": {
+      "max": 0.9,
+      "mean": 0.8833333333333333,
+      "min": 0.86,
+      "n": 3
+    },
+    "revoke/template2": {
+      "max": 0.79,
+      "mean": 0.7266666666666667,
+      "min": 0.67,
+      "n": 3
+    },
+    "revoke/template3": {
+      "max": 0.84,
+      "mean": 0.8133333333333334,
+      "min": 0.79,
+      "n": 3
+    },
+    "revoke/template4": {
+      "max": 0.19,
+      "mean": 0.17333333333333334,
+      "min": 0.16,
+      "n": 3
+    },
+    "revoke/template5": {
+      "max": 0.37,
+      "mean": 0.32666666666666666,
+      "min": 0.28,
+      "n": 3
+    },
     "revoke/true_obj_mean_rank": {
       "max": 139.34,
       "mean": 124.31666666666668,
@@ -493,9 +583,15 @@
       "n": 3
     },
     "revoke_heldout": {
-      "max": 0.79,
-      "mean": 0.7266666666666667,
-      "min": 0.67,
+      "max": 0.525,
+      "mean": 0.5099999999999999,
+      "min": 0.4875,
+      "n": 3
+    },
+    "revoke_heldout_min": {
+      "max": 0.19,
+      "mean": 0.17333333333333334,
+      "min": 0.16,
       "n": 3
     },
     "rollback": {
@@ -504,7 +600,49 @@
       "min": 0.86,
       "n": 3
     },
+    "rollback/template0": {
+      "max": 0.9,
+      "mean": 0.8833333333333333,
+      "min": 0.86,
+      "n": 3
+    },
+    "rollback/template1": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "rollback/template2": {
+      "max": 0.5,
+      "mean": 0.41,
+      "min": 0.34,
+      "n": 3
+    },
+    "rollback/template3": {
+      "max": 0.78,
+      "mean": 0.7266666666666666,
+      "min": 0.66,
+      "n": 3
+    },
+    "rollback/template4": {
+      "max": 0.73,
+      "mean": 0.6433333333333332,
+      "min": 0.59,
+      "n": 3
+    },
+    "rollback/template5": {
+      "max": 0.96,
+      "mean": 0.9366666666666666,
+      "min": 0.92,
+      "n": 3
+    },
     "rollback_heldout": {
+      "max": 0.6950000000000001,
+      "mean": 0.6791666666666667,
+      "min": 0.6675,
+      "n": 3
+    },
+    "rollback_heldout_min": {
       "max": 0.5,
       "mean": 0.41,
       "min": 0.34,
@@ -514,6 +652,42 @@
       "max": 1.0,
       "mean": 0.9966666666666667,
       "min": 0.99,
+      "n": 3
+    },
+    "shred/template0": {
+      "max": 1.0,
+      "mean": 0.9966666666666667,
+      "min": 0.99,
+      "n": 3
+    },
+    "shred/template1": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "shred/template2": {
+      "max": 0.93,
+      "mean": 0.9033333333333333,
+      "min": 0.86,
+      "n": 3
+    },
+    "shred/template3": {
+      "max": 0.96,
+      "mean": 0.96,
+      "min": 0.96,
+      "n": 3
+    },
+    "shred/template4": {
+      "max": 0.82,
+      "mean": 0.75,
+      "min": 0.7,
+      "n": 3
+    },
+    "shred/template5": {
+      "max": 1.0,
+      "mean": 0.9833333333333334,
+      "min": 0.97,
       "n": 3
     },
     "shred_hard/candidate_other_entity": {
@@ -661,9 +835,15 @@
       "n": 3
     },
     "shred_heldout": {
-      "max": 0.93,
-      "mean": 0.9033333333333333,
-      "min": 0.86,
+      "max": 0.905,
+      "mean": 0.8991666666666666,
+      "min": 0.8875,
+      "n": 3
+    },
+    "shred_heldout_min": {
+      "max": 0.82,
+      "mean": 0.75,
+      "min": 0.7,
       "n": 3
     },
     "shred_soft/candidate_other_entity": {
@@ -894,7 +1074,49 @@
       "min": 0.85,
       "n": 3
     },
+    "update/template0": {
+      "max": 0.89,
+      "mean": 0.8766666666666666,
+      "min": 0.85,
+      "n": 3
+    },
+    "update/template1": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "update/template2": {
+      "max": 0.5,
+      "mean": 0.41333333333333333,
+      "min": 0.36,
+      "n": 3
+    },
+    "update/template3": {
+      "max": 0.77,
+      "mean": 0.71,
+      "min": 0.67,
+      "n": 3
+    },
+    "update/template4": {
+      "max": 0.79,
+      "mean": 0.6633333333333334,
+      "min": 0.6,
+      "n": 3
+    },
+    "update/template5": {
+      "max": 0.96,
+      "mean": 0.94,
+      "min": 0.92,
+      "n": 3
+    },
     "update_heldout": {
+      "max": 0.715,
+      "mean": 0.6816666666666666,
+      "min": 0.6575,
+      "n": 3
+    },
+    "update_heldout_min": {
       "max": 0.5,
       "mean": 0.41333333333333333,
       "min": 0.36,
@@ -949,8 +1171,8 @@
         "revoke",
         "shred",
         "broken1_unknown",
-        "revoke_heldout",
-        "shred_heldout",
+        "revoke_heldout_min",
+        "shred_heldout_min",
         "locality",
         "restored/direct_acc"
       ],
@@ -1088,7 +1310,7 @@
       "threshold": 0.95
     },
     "interventions/disable_hop2_changes": {
-      "observed": 0.9857142857142858,
+      "observed": 0.99,
       "op": ">=",
       "pass": true,
       "threshold": 0.95
@@ -1112,13 +1334,13 @@
       "threshold": 0.9
     },
     "interventions/replace_hop2": {
-      "observed": 0.9714285714285714,
+      "observed": 0.96,
       "op": ">=",
       "pass": true,
       "threshold": 0.9
     },
     "interventions/swap_hop2": {
-      "observed": 0.9753086419753086,
+      "observed": 0.9795918367346939,
       "op": ">=",
       "pass": true,
       "threshold": 0.9
@@ -1165,8 +1387,8 @@
       "pass": true,
       "threshold": 0.05
     },
-    "revoke_heldout": {
-      "observed": 0.67,
+    "revoke_heldout_min": {
+      "observed": 0.16,
       "op": ">=",
       "pass": false,
       "threshold": 0.85
@@ -1213,10 +1435,10 @@
       "pass": true,
       "threshold": 0.05
     },
-    "shred_heldout": {
-      "observed": 0.86,
+    "shred_heldout_min": {
+      "observed": 0.7,
       "op": ">=",
-      "pass": true,
+      "pass": false,
       "threshold": 0.85
     },
     "template1_train/direct": {
@@ -1346,16 +1568,18 @@
       "direct_heldout_mean": 0.6982499999999999,
       "hop2": 0.8266666666666667,
       "interventions/disable_hop1_changes": 1.0,
-      "interventions/disable_hop1_unknown": 0.7714285714285715,
-      "interventions/disable_hop2_changes": 0.9857142857142858,
-      "interventions/disable_hop2_unknown": 0.7142857142857143,
+      "interventions/disable_hop1_unknown": 0.75,
+      "interventions/disable_hop2_changes": 0.99,
+      "interventions/disable_hop2_unknown": 0.7,
       "interventions/disable_random_unchanged": 1.0,
       "interventions/localisation_hop1": 1.0,
       "interventions/localisation_hop2": 1.0,
-      "interventions/n_correct_hop2": 70,
-      "interventions/n_swap": 68,
-      "interventions/replace_hop2": 0.9714285714285714,
-      "interventions/swap_hop2": 0.9852941176470589,
+      "interventions/n_correct_hop2": 100,
+      "interventions/n_swap": 98,
+      "interventions/pool_correct_rate": 0.79,
+      "interventions/pool_size": 400,
+      "interventions/replace_hop2": 0.96,
+      "interventions/swap_hop2": 0.9795918367346939,
       "locality": 0.991764705882353,
       "locality_targets_correct": 0.8266666666666667,
       "locality_undo_exact": 1.0,
@@ -1363,7 +1587,14 @@
       "probe_calibration_top1": 0.8277777777777777,
       "provenance_direct": 0.853,
       "resign": 0.89,
-      "resign_heldout": 0.5,
+      "resign/template0": 0.89,
+      "resign/template1": 1.0,
+      "resign/template2": 0.5,
+      "resign/template3": 0.66,
+      "resign/template4": 0.59,
+      "resign/template5": 0.92,
+      "resign_heldout": 0.6675,
+      "resign_heldout_min": 0.5,
       "restored/direct_acc": 0.87,
       "revoke": 0.76,
       "revoke/candidate_other_entity": 0.29,
@@ -1388,13 +1619,33 @@
       "revoke/payload_share": 0.0,
       "revoke/probe_top1": 0.01,
       "revoke/routing_mass_on_target": 0.0,
+      "revoke/template0": 0.76,
+      "revoke/template1": 0.9,
+      "revoke/template2": 0.72,
+      "revoke/template3": 0.84,
+      "revoke/template4": 0.17,
+      "revoke/template5": 0.37,
       "revoke/true_obj_mean_rank": 120.11,
       "revoke/true_obj_top1_among_entities": 0.01,
-      "revoke_heldout": 0.72,
+      "revoke_heldout": 0.525,
+      "revoke_heldout_min": 0.17,
       "rollback": 0.89,
-      "rollback_heldout": 0.5,
+      "rollback/template0": 0.89,
+      "rollback/template1": 1.0,
+      "rollback/template2": 0.5,
+      "rollback/template3": 0.66,
+      "rollback/template4": 0.59,
+      "rollback/template5": 0.92,
+      "rollback_heldout": 0.6675,
+      "rollback_heldout_min": 0.5,
       "seed": 1100,
       "shred": 1.0,
+      "shred/template0": 1.0,
+      "shred/template1": 1.0,
+      "shred/template2": 0.92,
+      "shred/template3": 0.96,
+      "shred/template4": 0.7,
+      "shred/template5": 0.97,
       "shred_hard/candidate_other_entity": 0.0,
       "shred_hard/direct_acc": 0.0,
       "shred_hard/direct_unknown": 1.0,
@@ -1419,7 +1670,8 @@
       "shred_hard/routing_mass_on_target": 0.7908283472061157,
       "shred_hard/true_obj_mean_rank": 120.91,
       "shred_hard/true_obj_top1_among_entities": 0.0,
-      "shred_heldout": 0.92,
+      "shred_heldout": 0.8875,
+      "shred_heldout_min": 0.7,
       "shred_soft/candidate_other_entity": 0.0,
       "shred_soft/direct_acc": 0.0,
       "shred_soft/direct_unknown": 1.0,
@@ -1458,7 +1710,14 @@
       "template5_heldout/full_vocab_top1": 0.939,
       "train_seconds": 2707.1008162498474,
       "update": 0.89,
-      "update_heldout": 0.5
+      "update/template0": 0.89,
+      "update/template1": 1.0,
+      "update/template2": 0.5,
+      "update/template3": 0.67,
+      "update/template4": 0.6,
+      "update/template5": 0.92,
+      "update_heldout": 0.6725,
+      "update_heldout_min": 0.5
     },
     {
       "active/candidate_other_entity": 0.01,
@@ -1500,16 +1759,18 @@
       "direct_heldout_mean": 0.7242500000000001,
       "hop2": 0.83,
       "interventions/disable_hop1_changes": 1.0,
-      "interventions/disable_hop1_unknown": 0.6049382716049383,
+      "interventions/disable_hop1_unknown": 0.62,
       "interventions/disable_hop2_changes": 1.0,
-      "interventions/disable_hop2_unknown": 0.6790123456790124,
+      "interventions/disable_hop2_unknown": 0.69,
       "interventions/disable_random_unchanged": 1.0,
       "interventions/localisation_hop1": 1.0,
       "interventions/localisation_hop2": 1.0,
-      "interventions/n_correct_hop2": 81,
-      "interventions/n_swap": 81,
-      "interventions/replace_hop2": 0.9753086419753086,
-      "interventions/swap_hop2": 0.9753086419753086,
+      "interventions/n_correct_hop2": 100,
+      "interventions/n_swap": 99,
+      "interventions/pool_correct_rate": 0.83,
+      "interventions/pool_size": 400,
+      "interventions/replace_hop2": 0.98,
+      "interventions/swap_hop2": 0.9797979797979798,
       "locality": 0.9847058823529412,
       "locality_targets_correct": 0.8333333333333334,
       "locality_undo_exact": 1.0,
@@ -1517,7 +1778,14 @@
       "probe_calibration_top1": 0.7666666666666667,
       "provenance_direct": 0.813,
       "resign": 0.91,
-      "resign_heldout": 0.34,
+      "resign/template0": 0.91,
+      "resign/template1": 1.0,
+      "resign/template2": 0.34,
+      "resign/template3": 0.79,
+      "resign/template4": 0.73,
+      "resign/template5": 0.93,
+      "resign_heldout": 0.6975,
+      "resign_heldout_min": 0.34,
       "restored/direct_acc": 0.82,
       "revoke": 0.72,
       "revoke/candidate_other_entity": 0.24,
@@ -1542,13 +1810,33 @@
       "revoke/payload_share": 0.0,
       "revoke/probe_top1": 0.01,
       "revoke/routing_mass_on_target": 0.0,
+      "revoke/template0": 0.72,
+      "revoke/template1": 0.86,
+      "revoke/template2": 0.67,
+      "revoke/template3": 0.81,
+      "revoke/template4": 0.19,
+      "revoke/template5": 0.28,
       "revoke/true_obj_mean_rank": 113.5,
       "revoke/true_obj_top1_among_entities": 0.01,
-      "revoke_heldout": 0.67,
+      "revoke_heldout": 0.4875,
+      "revoke_heldout_min": 0.19,
       "rollback": 0.9,
-      "rollback_heldout": 0.34,
+      "rollback/template0": 0.9,
+      "rollback/template1": 1.0,
+      "rollback/template2": 0.34,
+      "rollback/template3": 0.78,
+      "rollback/template4": 0.73,
+      "rollback/template5": 0.93,
+      "rollback_heldout": 0.6950000000000001,
+      "rollback_heldout_min": 0.34,
       "seed": 1101,
       "shred": 0.99,
+      "shred/template0": 0.99,
+      "shred/template1": 1.0,
+      "shred/template2": 0.86,
+      "shred/template3": 0.96,
+      "shred/template4": 0.82,
+      "shred/template5": 0.98,
       "shred_hard/candidate_other_entity": 0.01,
       "shred_hard/direct_acc": 0.0,
       "shred_hard/direct_unknown": 0.99,
@@ -1573,7 +1861,8 @@
       "shred_hard/routing_mass_on_target": 0.711362361907959,
       "shred_hard/true_obj_mean_rank": 123.2,
       "shred_hard/true_obj_top1_among_entities": 0.0,
-      "shred_heldout": 0.86,
+      "shred_heldout": 0.9049999999999999,
+      "shred_heldout_min": 0.82,
       "shred_soft/candidate_other_entity": 0.01,
       "shred_soft/direct_acc": 0.0,
       "shred_soft/direct_unknown": 0.99,
@@ -1612,7 +1901,14 @@
       "template5_heldout/full_vocab_top1": 0.932,
       "train_seconds": 2797.7851741313934,
       "update": 0.89,
-      "update_heldout": 0.36
+      "update/template0": 0.89,
+      "update/template1": 1.0,
+      "update/template2": 0.36,
+      "update/template3": 0.77,
+      "update/template4": 0.79,
+      "update/template5": 0.94,
+      "update_heldout": 0.715,
+      "update_heldout_min": 0.36
     },
     {
       "active/candidate_other_entity": 0.0,
@@ -1654,16 +1950,18 @@
       "direct_heldout_mean": 0.65325,
       "hop2": 0.8433333333333334,
       "interventions/disable_hop1_changes": 1.0,
-      "interventions/disable_hop1_unknown": 0.7272727272727273,
+      "interventions/disable_hop1_unknown": 0.72,
       "interventions/disable_hop2_changes": 1.0,
-      "interventions/disable_hop2_unknown": 0.7727272727272727,
+      "interventions/disable_hop2_unknown": 0.75,
       "interventions/disable_random_unchanged": 1.0,
       "interventions/localisation_hop1": 1.0,
       "interventions/localisation_hop2": 1.0,
-      "interventions/n_correct_hop2": 88,
-      "interventions/n_swap": 87,
-      "interventions/replace_hop2": 0.9886363636363636,
-      "interventions/swap_hop2": 0.9885057471264368,
+      "interventions/n_correct_hop2": 100,
+      "interventions/n_swap": 98,
+      "interventions/pool_correct_rate": 0.84,
+      "interventions/pool_size": 400,
+      "interventions/replace_hop2": 0.98,
+      "interventions/swap_hop2": 0.9795918367346939,
       "locality": 0.991764705882353,
       "locality_targets_correct": 0.84,
       "locality_undo_exact": 1.0,
@@ -1671,7 +1969,14 @@
       "probe_calibration_top1": 0.8166666666666667,
       "provenance_direct": 0.826,
       "resign": 0.86,
-      "resign_heldout": 0.39,
+      "resign/template0": 0.86,
+      "resign/template1": 1.0,
+      "resign/template2": 0.39,
+      "resign/template3": 0.74,
+      "resign/template4": 0.61,
+      "resign/template5": 0.96,
+      "resign_heldout": 0.6749999999999999,
+      "resign_heldout_min": 0.39,
       "restored/direct_acc": 0.95,
       "revoke": 0.7,
       "revoke/candidate_other_entity": 0.34,
@@ -1696,13 +2001,33 @@
       "revoke/payload_share": 0.0,
       "revoke/probe_top1": 0.0,
       "revoke/routing_mass_on_target": 0.0,
+      "revoke/template0": 0.7,
+      "revoke/template1": 0.89,
+      "revoke/template2": 0.79,
+      "revoke/template3": 0.79,
+      "revoke/template4": 0.16,
+      "revoke/template5": 0.33,
       "revoke/true_obj_mean_rank": 139.34,
       "revoke/true_obj_top1_among_entities": 0.0,
-      "revoke_heldout": 0.79,
+      "revoke_heldout": 0.5175,
+      "revoke_heldout_min": 0.16,
       "rollback": 0.86,
-      "rollback_heldout": 0.39,
+      "rollback/template0": 0.86,
+      "rollback/template1": 1.0,
+      "rollback/template2": 0.39,
+      "rollback/template3": 0.74,
+      "rollback/template4": 0.61,
+      "rollback/template5": 0.96,
+      "rollback_heldout": 0.6749999999999999,
+      "rollback_heldout_min": 0.39,
       "seed": 1102,
       "shred": 1.0,
+      "shred/template0": 1.0,
+      "shred/template1": 1.0,
+      "shred/template2": 0.93,
+      "shred/template3": 0.96,
+      "shred/template4": 0.73,
+      "shred/template5": 1.0,
       "shred_hard/candidate_other_entity": 0.0,
       "shred_hard/direct_acc": 0.0,
       "shred_hard/direct_unknown": 1.0,
@@ -1727,7 +2052,8 @@
       "shred_hard/routing_mass_on_target": 0.7911483645439148,
       "shred_hard/true_obj_mean_rank": 133.76,
       "shred_hard/true_obj_top1_among_entities": 0.01,
-      "shred_heldout": 0.93,
+      "shred_heldout": 0.905,
+      "shred_heldout_min": 0.73,
       "shred_soft/candidate_other_entity": 0.0,
       "shred_soft/direct_acc": 0.0,
       "shred_soft/direct_unknown": 1.0,
@@ -1766,10 +2092,17 @@
       "template5_heldout/full_vocab_top1": 0.93,
       "train_seconds": 2930.3509719371796,
       "update": 0.85,
-      "update_heldout": 0.38
+      "update/template0": 0.85,
+      "update/template1": 1.0,
+      "update/template2": 0.38,
+      "update/template3": 0.69,
+      "update/template4": 0.6,
+      "update/template5": 0.96,
+      "update_heldout": 0.6575,
+      "update_heldout_min": 0.38
     }
   ],
-  "recorded_at": "2026-09-03T07:33:04+00:00",
+  "recorded_at": "2026-09-03T07:50:04+00:00",
   "sample_sizes": {
     "alt_routes": 50,
     "attacks": 100,
@@ -1777,7 +2110,7 @@
     "comparators": 300,
     "direct/templates": 1000,
     "hop2": 300,
-    "interventions": "correct 2-hop subset (n recorded)",
+    "interventions": "first 100 correctly answered 2-hop questions from a pool of 400 (pool correct rate recorded)",
     "lifecycle": 100
   },
   "title": "Frozen GPT-2 core v2: verified gate, deletion behaviour, held-out paraphrases, interventions"
