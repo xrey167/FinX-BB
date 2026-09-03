@@ -46,6 +46,8 @@ class AdapterConfig:
     use_marker_gate: bool = True
     hard_gate: bool = False        # verification mode: gate thresholded at 0.5
     status_gated: bool = False     # E-000012: revoked cells stay routable; the status flag is folded into the gate
+    use_links: bool = False        # E-000020: the bank may contain alias rows whose payload is the TARGET'S KEY
+    n_deref: int = 0               # E-000020: dereference reads after each read layer (1 resolves an alias)
     match_gate: bool = False       # E-000018: scale the injection by how well the query matches ANY real cell key.
                                    # The routing softmax always sums to one, so some cell always wins and the layer
                                    # injects into text it has no key for; an absolute match score can say "nothing".
@@ -85,6 +87,12 @@ class KnowledgeAdapterLM(nn.Module):
         if cfg.match_gate:
             self.match_tau = nn.Parameter(torch.full((len(cfg.read_layers),), 0.3))
             self.match_temp = nn.Parameter(torch.full((len(cfg.read_layers),), 10.0))
+        if cfg.use_links:
+            self.v_link = nn.Linear(cfg.d_key, d, bias=False)      # an alias's value: its TARGET'S KEY, in value space
+        if cfg.n_deref > 0:
+            self.q_deref = nn.ModuleDict({str(l): nn.Linear(d, cfg.d_key) for l in cfg.read_layers})
+            self.deref_ln = nn.ModuleDict({str(l): nn.LayerNorm(d) for l in cfg.read_layers})
+            self.deref_scale = nn.Parameter(torch.ones(len(cfg.read_layers)))
         self.null_key = nn.Parameter(torch.randn(len(cfg.read_layers), cfg.d_key) * 0.02)
         with torch.no_grad():
             unk = lm.transformer.wte.weight[unknown_token_id].detach().clone()
@@ -121,6 +129,12 @@ class KnowledgeAdapterLM(nn.Module):
         keys = self.k_proj(self.ln_key(subj + self.rel_emb(bank["relation"])))
         g = self.gate(bank["marker"])
         payload = self.v_proj(obj)
+        if self.cfg.use_links and "is_link" in bank:
+            # Control-plane materialisation, exactly like the marker: an alias row carries its TARGET'S KEY
+            # instead of an object. The model is never told that a value it has read is a pointer.
+            tgt = self.k_proj(self.ln_key(self.wte[self.entity_token_ids[bank["link_subject"]]]
+                                          + self.rel_emb(bank["link_relation"])))
+            payload = torch.where(bank["is_link"][:, None], self.v_link(tgt), payload)
         if self.cfg.status_gated:
             g = g * bank["active"].float()[:, None]          # an inactive (revoked) cell reads as unknown / as nothing
         if self.cfg.fallback == "prior":
@@ -152,7 +166,17 @@ class KnowledgeAdapterLM(nn.Module):
             scores = (q @ keys.t()) * (self.scale / self.cfg.d_key ** 0.5)
             scores = scores.masked_fill(~allowed[None], float("-inf"))
             p = torch.softmax(scores, dim=-1)
-            read = self.o_proj[str(layer)](p @ values)                        # (B, d)
+            val = p @ values                                                  # (B, d)
+            if self.cfg.n_deref > 0:
+                for _ in range(self.cfg.n_deref):
+                    qd = self.q_deref[str(layer)](self.deref_ln[str(layer)](val))
+                    sd = (qd @ keys.t()) * (self.deref_scale[read_index] / self.cfg.d_key ** 0.5)
+                    sd = sd.masked_fill(~allowed[None], float("-inf"))
+                    pd = torch.softmax(sd, dim=-1)
+                    # the null column carries the incoming value: "what I read was not a pointer"
+                    val = pd[:, :-1] @ values[:-1] + pd[:, -1:] * val
+                    ctx["routing"].append(pd)
+            read = self.o_proj[str(layer)](val)                               # (B, d)
             if self.cfg.match_gate:
                 # absolute agreement with the best REAL cell key; the null key is excluded on purpose, because
                 # the question is whether any cell matches at all, not which one wins the competition
