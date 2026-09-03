@@ -53,6 +53,7 @@ class ModelConfig:
     n_deref: int = 0               # dereference slots per hop (1 resolves an alias, 2 a chain of two)
     deref_query_from_state: bool = False   # ablation: let the deref query see the question, not only the pointer
     use_deref_passthrough: bool = True     # the deref slot may keep the value it was given ("this was no pointer")
+    disable_deref: bool = False    # inference-time ablation: every deref slot passes through (no pointer is followed)
 
     def to_dict(self) -> Dict:
         return asdict(self)
@@ -248,7 +249,11 @@ class MutableKnowledgeTransformer(nn.Module):
             read, p = self.hop.read(h, rel_t, self.hop_emb.weight[t][None], k_f, v_f, k_r, v_r, is_fwd, allowed)
             routing[:, t * (1 + D)] = torch.where(valid[:, None], p, torch.zeros_like(p))
             for dd in range(D):
-                read, p = self.deref[dd](read, h, k_f, v_f, allowed)
+                if self.cfg.disable_deref:
+                    p = torch.zeros(B, k_f.shape[0], device=rels.device)
+                    p[:, -1] = 1.0                                    # ablation: keep the value, follow nothing
+                else:
+                    read, p = self.deref[dd](read, h, k_f, v_f, allowed)
                 routing[:, t * (1 + D) + 1 + dd] = torch.where(valid[:, None], p, torch.zeros_like(p))
             h_new = self.hop.apply_read(h, read)
             h = torch.where(valid[:, None], h_new, h)

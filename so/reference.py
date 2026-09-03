@@ -28,9 +28,14 @@ class ReferenceResolver:
         self._cache_revision = -1
         self._cache_view: Dict[Tuple[int, int], Tuple[int, int]] = {}
 
-    def view(self) -> Dict[Tuple[int, int], Tuple[int, int]]:
+    def view(self) -> Dict[Tuple[int, int], Tuple[int, Tuple[int, ...]]]:
+        """``key -> (object, trace of cells read)``; alias chains are followed (E-000015).
+
+        In a store without link cells every trace has exactly one element, so this is the same
+        view as before and every earlier record stays reproducible.
+        """
         if self._cache_revision != self.store.revision:
-            self._cache_view = self.store.active_view(respect_markers=True)
+            self._cache_view = self.store.resolved_view(respect_markers=True)
             self._cache_revision = self.store.revision
         return self._cache_view
 
@@ -43,12 +48,14 @@ class ReferenceResolver:
                 hit = v.get((cur, r))
                 if hit is None:
                     return Resolution(UNKNOWN, tuple(trace))
-                cur, kid = hit
-                trace.append(kid)
+                cur, tr = hit
+                trace.extend(int(x) for x in tr)
             return Resolution(cur, tuple(trace))
         if q.mode == "rev":
             r, o = q.path[0], q.start
-            hits = [(s, kid) for (s, rr), (oo, kid) in v.items() if rr == r and oo == o]
+            # reverse addressing goes to the cell that HOLDS the object; an alias holds a pointer,
+            # so only directly resolving keys (trace length 1) take part
+            hits = [(s, tr[0]) for (s, rr), (oo, tr) in v.items() if rr == r and oo == o and len(tr) == 1]
             if len(hits) != 1:
                 return Resolution(UNKNOWN, tuple())
             return Resolution(hits[0][0], (hits[0][1],))
