@@ -1,0 +1,1784 @@
+{
+  "aggregate": {
+    "active/candidate_other_entity": {
+      "max": 0.01,
+      "mean": 0.0033333333333333335,
+      "min": 0.0,
+      "n": 3
+    },
+    "active/direct_acc": {
+      "max": 0.95,
+      "mean": 0.8799999999999999,
+      "min": 0.82,
+      "n": 3
+    },
+    "active/direct_unknown": {
+      "max": 0.17,
+      "mean": 0.11666666666666668,
+      "min": 0.05,
+      "n": 3
+    },
+    "active/forced_choice_win": {
+      "max": 1.0,
+      "mean": 0.9966666666666667,
+      "min": 0.99,
+      "n": 3
+    },
+    "active/full_vocab_equals_prior": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 3
+    },
+    "active/full_vocab_is_non_entity_token": {
+      "max": 0.04,
+      "mean": 0.03,
+      "min": 0.02,
+      "n": 3
+    },
+    "active/full_vocab_is_other_entity": {
+      "max": 0.01,
+      "mean": 0.0033333333333333335,
+      "min": 0.0,
+      "n": 3
+    },
+    "active/full_vocab_is_true_object": {
+      "max": 0.92,
+      "mean": 0.8566666666666666,
+      "min": 0.79,
+      "n": 3
+    },
+    "active/full_vocab_is_unknown_word": {
+      "max": 0.17,
+      "mean": 0.11,
+      "min": 0.04,
+      "n": 3
+    },
+    "active/gate_on_target": {
+      "max": 0.998647928237915,
+      "mean": 0.9984944264094034,
+      "min": 0.9983938336372375,
+      "n": 3
+    },
+    "active/gated_value_contribution": {
+      "max": 0.7899114489555359,
+      "mean": 0.7632932265599569,
+      "min": 0.7102160453796387,
+      "n": 3
+    },
+    "active/heldout2_acc": {
+      "max": 0.45,
+      "mean": 0.3933333333333333,
+      "min": 0.35,
+      "n": 3
+    },
+    "active/heldout2_unknown": {
+      "max": 0.56,
+      "mean": 0.49666666666666665,
+      "min": 0.45,
+      "n": 3
+    },
+    "active/heldout3_acc": {
+      "max": 0.83,
+      "mean": 0.7633333333333333,
+      "min": 0.72,
+      "n": 3
+    },
+    "active/heldout3_unknown": {
+      "max": 0.25,
+      "mean": 0.22,
+      "min": 0.17,
+      "n": 3
+    },
+    "active/heldout4_acc": {
+      "max": 0.79,
+      "mean": 0.6900000000000001,
+      "min": 0.53,
+      "n": 3
+    },
+    "active/heldout4_unknown": {
+      "max": 0.18,
+      "mean": 0.12666666666666668,
+      "min": 0.09,
+      "n": 3
+    },
+    "active/heldout5_acc": {
+      "max": 0.98,
+      "mean": 0.9500000000000001,
+      "min": 0.91,
+      "n": 3
+    },
+    "active/heldout5_unknown": {
+      "max": 0.08,
+      "mean": 0.043333333333333335,
+      "min": 0.01,
+      "n": 3
+    },
+    "active/payload_share": {
+      "max": 0.7899114489555359,
+      "mean": 0.7632932265599569,
+      "min": 0.7102160453796387,
+      "n": 3
+    },
+    "active/probe_top1": {
+      "max": 0.89,
+      "mean": 0.8166666666666668,
+      "min": 0.77,
+      "n": 3
+    },
+    "active/routing_mass_on_target": {
+      "max": 0.79114830493927,
+      "mean": 0.7644461790720621,
+      "min": 0.711362898349762,
+      "n": 3
+    },
+    "active/true_obj_mean_rank": {
+      "max": 0.5,
+      "mean": 0.39666666666666667,
+      "min": 0.26,
+      "n": 3
+    },
+    "active/true_obj_top1_among_entities": {
+      "max": 0.98,
+      "mean": 0.9500000000000001,
+      "min": 0.91,
+      "n": 3
+    },
+    "alt_route/broken_route_changes": {
+      "max": 1.0,
+      "mean": 0.9933333333333333,
+      "min": 0.98,
+      "n": 3
+    },
+    "alt_route/n_pairs": {
+      "max": 50.0,
+      "mean": 50.0,
+      "min": 50.0,
+      "n": 3
+    },
+    "alt_route/other_route_survives": {
+      "max": 0.86,
+      "mean": 0.7799999999999999,
+      "min": 0.7,
+      "n": 3
+    },
+    "bank_masked_direct_acc": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 3
+    },
+    "bank_masked_unknown_rate": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "broken1_unknown": {
+      "max": 0.86,
+      "mean": 0.77,
+      "min": 0.69,
+      "n": 3
+    },
+    "broken2_unknown": {
+      "max": 0.76,
+      "mean": 0.7233333333333333,
+      "min": 0.68,
+      "n": 3
+    },
+    "comparator/adapter_no_context_hop2_acc": {
+      "max": 0.86,
+      "mean": 0.8222222222222221,
+      "min": 0.7866666666666666,
+      "n": 3
+    },
+    "comparator/in_context_both_facts_hop2_acc": {
+      "max": 0.44,
+      "mean": 0.4166666666666667,
+      "min": 0.4,
+      "n": 3
+    },
+    "comparator/in_context_first_fact_only_hop2_acc": {
+      "max": 0.01,
+      "mean": 0.005555555555555556,
+      "min": 0.0033333333333333335,
+      "n": 3
+    },
+    "direct": {
+      "max": 0.876,
+      "mean": 0.8656666666666667,
+      "min": 0.85,
+      "n": 3
+    },
+    "direct_heldout_mean": {
+      "max": 0.7242500000000001,
+      "mean": 0.6919166666666666,
+      "min": 0.65325,
+      "n": 3
+    },
+    "hop2": {
+      "max": 0.8433333333333334,
+      "mean": 0.8333333333333334,
+      "min": 0.8266666666666667,
+      "n": 3
+    },
+    "interventions/disable_hop1_changes": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "interventions/disable_hop1_unknown": {
+      "max": 0.7714285714285715,
+      "mean": 0.701213190102079,
+      "min": 0.6049382716049383,
+      "n": 3
+    },
+    "interventions/disable_hop2_changes": {
+      "max": 1.0,
+      "mean": 0.9952380952380953,
+      "min": 0.9857142857142858,
+      "n": 3
+    },
+    "interventions/disable_hop2_unknown": {
+      "max": 0.7727272727272727,
+      "mean": 0.7220084442306666,
+      "min": 0.6790123456790124,
+      "n": 3
+    },
+    "interventions/disable_random_unchanged": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "interventions/localisation_hop1": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "interventions/localisation_hop2": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "interventions/n_correct_hop2": {
+      "max": 88.0,
+      "mean": 79.66666666666667,
+      "min": 70.0,
+      "n": 3
+    },
+    "interventions/n_swap": {
+      "max": 87.0,
+      "mean": 78.66666666666667,
+      "min": 68.0,
+      "n": 3
+    },
+    "interventions/replace_hop2": {
+      "max": 0.9886363636363636,
+      "mean": 0.9784578590134146,
+      "min": 0.9714285714285714,
+      "n": 3
+    },
+    "interventions/swap_hop2": {
+      "max": 0.9885057471264368,
+      "mean": 0.983036168916268,
+      "min": 0.9753086419753086,
+      "n": 3
+    },
+    "locality": {
+      "max": 0.991764705882353,
+      "mean": 0.9894117647058823,
+      "min": 0.9847058823529412,
+      "n": 3
+    },
+    "locality_targets_correct": {
+      "max": 0.84,
+      "mean": 0.8333333333333334,
+      "min": 0.8266666666666667,
+      "n": 3
+    },
+    "locality_undo_exact": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "prior_direct_acc": {
+      "max": 0.005,
+      "mean": 0.0036666666666666666,
+      "min": 0.003,
+      "n": 3
+    },
+    "probe_calibration_top1": {
+      "max": 0.8277777777777777,
+      "mean": 0.8037037037037038,
+      "min": 0.7666666666666667,
+      "n": 3
+    },
+    "provenance_direct": {
+      "max": 0.853,
+      "mean": 0.8306666666666667,
+      "min": 0.813,
+      "n": 3
+    },
+    "resign": {
+      "max": 0.91,
+      "mean": 0.8866666666666667,
+      "min": 0.86,
+      "n": 3
+    },
+    "resign_heldout": {
+      "max": 0.5,
+      "mean": 0.41,
+      "min": 0.34,
+      "n": 3
+    },
+    "restored/direct_acc": {
+      "max": 0.95,
+      "mean": 0.8799999999999999,
+      "min": 0.82,
+      "n": 3
+    },
+    "revoke": {
+      "max": 0.76,
+      "mean": 0.7266666666666666,
+      "min": 0.7,
+      "n": 3
+    },
+    "revoke/candidate_other_entity": {
+      "max": 0.34,
+      "mean": 0.29000000000000004,
+      "min": 0.24,
+      "n": 3
+    },
+    "revoke/direct_acc": {
+      "max": 0.01,
+      "mean": 0.006666666666666667,
+      "min": 0.0,
+      "n": 3
+    },
+    "revoke/direct_unknown": {
+      "max": 0.75,
+      "mean": 0.7033333333333333,
+      "min": 0.66,
+      "n": 3
+    },
+    "revoke/forced_choice_win": {
+      "max": 0.57,
+      "mean": 0.5366666666666666,
+      "min": 0.47,
+      "n": 3
+    },
+    "revoke/full_vocab_equals_prior": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 3
+    },
+    "revoke/full_vocab_is_non_entity_token": {
+      "max": 0.13,
+      "mean": 0.08666666666666667,
+      "min": 0.04,
+      "n": 3
+    },
+    "revoke/full_vocab_is_other_entity": {
+      "max": 0.32,
+      "mean": 0.27666666666666667,
+      "min": 0.22,
+      "n": 3
+    },
+    "revoke/full_vocab_is_true_object": {
+      "max": 0.01,
+      "mean": 0.006666666666666667,
+      "min": 0.0,
+      "n": 3
+    },
+    "revoke/full_vocab_is_unknown_word": {
+      "max": 0.68,
+      "mean": 0.63,
+      "min": 0.55,
+      "n": 3
+    },
+    "revoke/gate_on_target": {
+      "max": 0.998647928237915,
+      "mean": 0.9984944264094034,
+      "min": 0.9983938336372375,
+      "n": 3
+    },
+    "revoke/gated_value_contribution": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 3
+    },
+    "revoke/heldout2_acc": {
+      "max": 0.01,
+      "mean": 0.0033333333333333335,
+      "min": 0.0,
+      "n": 3
+    },
+    "revoke/heldout2_unknown": {
+      "max": 0.69,
+      "mean": 0.65,
+      "min": 0.58,
+      "n": 3
+    },
+    "revoke/heldout3_acc": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 3
+    },
+    "revoke/heldout3_unknown": {
+      "max": 0.86,
+      "mean": 0.84,
+      "min": 0.8,
+      "n": 3
+    },
+    "revoke/heldout4_acc": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 3
+    },
+    "revoke/heldout4_unknown": {
+      "max": 0.25,
+      "mean": 0.16666666666666666,
+      "min": 0.12,
+      "n": 3
+    },
+    "revoke/heldout5_acc": {
+      "max": 0.01,
+      "mean": 0.0033333333333333335,
+      "min": 0.0,
+      "n": 3
+    },
+    "revoke/heldout5_unknown": {
+      "max": 0.42,
+      "mean": 0.38000000000000006,
+      "min": 0.35,
+      "n": 3
+    },
+    "revoke/payload_share": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 3
+    },
+    "revoke/probe_top1": {
+      "max": 0.01,
+      "mean": 0.006666666666666667,
+      "min": 0.0,
+      "n": 3
+    },
+    "revoke/routing_mass_on_target": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 3
+    },
+    "revoke/true_obj_mean_rank": {
+      "max": 139.34,
+      "mean": 124.31666666666668,
+      "min": 113.5,
+      "n": 3
+    },
+    "revoke/true_obj_top1_among_entities": {
+      "max": 0.01,
+      "mean": 0.006666666666666667,
+      "min": 0.0,
+      "n": 3
+    },
+    "revoke_heldout": {
+      "max": 0.79,
+      "mean": 0.7266666666666667,
+      "min": 0.67,
+      "n": 3
+    },
+    "rollback": {
+      "max": 0.9,
+      "mean": 0.8833333333333333,
+      "min": 0.86,
+      "n": 3
+    },
+    "rollback_heldout": {
+      "max": 0.5,
+      "mean": 0.41,
+      "min": 0.34,
+      "n": 3
+    },
+    "shred": {
+      "max": 1.0,
+      "mean": 0.9966666666666667,
+      "min": 0.99,
+      "n": 3
+    },
+    "shred_hard/candidate_other_entity": {
+      "max": 0.01,
+      "mean": 0.0033333333333333335,
+      "min": 0.0,
+      "n": 3
+    },
+    "shred_hard/direct_acc": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 3
+    },
+    "shred_hard/direct_unknown": {
+      "max": 1.0,
+      "mean": 0.9966666666666667,
+      "min": 0.99,
+      "n": 3
+    },
+    "shred_hard/forced_choice_win": {
+      "max": 0.52,
+      "mean": 0.49,
+      "min": 0.43,
+      "n": 3
+    },
+    "shred_hard/full_vocab_equals_prior": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 3
+    },
+    "shred_hard/full_vocab_is_non_entity_token": {
+      "max": 0.02,
+      "mean": 0.01,
+      "min": 0.0,
+      "n": 3
+    },
+    "shred_hard/full_vocab_is_other_entity": {
+      "max": 0.01,
+      "mean": 0.0033333333333333335,
+      "min": 0.0,
+      "n": 3
+    },
+    "shred_hard/full_vocab_is_true_object": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 3
+    },
+    "shred_hard/full_vocab_is_unknown_word": {
+      "max": 1.0,
+      "mean": 0.9866666666666667,
+      "min": 0.97,
+      "n": 3
+    },
+    "shred_hard/gate_on_target": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 3
+    },
+    "shred_hard/gated_value_contribution": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 3
+    },
+    "shred_hard/heldout2_acc": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 3
+    },
+    "shred_hard/heldout2_unknown": {
+      "max": 0.88,
+      "mean": 0.8533333333333334,
+      "min": 0.81,
+      "n": 3
+    },
+    "shred_hard/heldout3_acc": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 3
+    },
+    "shred_hard/heldout3_unknown": {
+      "max": 0.99,
+      "mean": 0.9766666666666666,
+      "min": 0.96,
+      "n": 3
+    },
+    "shred_hard/heldout4_acc": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 3
+    },
+    "shred_hard/heldout4_unknown": {
+      "max": 0.83,
+      "mean": 0.75,
+      "min": 0.61,
+      "n": 3
+    },
+    "shred_hard/heldout5_acc": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 3
+    },
+    "shred_hard/heldout5_unknown": {
+      "max": 0.99,
+      "mean": 0.9833333333333334,
+      "min": 0.97,
+      "n": 3
+    },
+    "shred_hard/payload_share": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 3
+    },
+    "shred_hard/probe_top1": {
+      "max": 0.03,
+      "mean": 0.01,
+      "min": 0.0,
+      "n": 3
+    },
+    "shred_hard/routing_mass_on_target": {
+      "max": 0.7911483645439148,
+      "mean": 0.7644463578859965,
+      "min": 0.711362361907959,
+      "n": 3
+    },
+    "shred_hard/true_obj_mean_rank": {
+      "max": 133.76,
+      "mean": 125.95666666666666,
+      "min": 120.91,
+      "n": 3
+    },
+    "shred_hard/true_obj_top1_among_entities": {
+      "max": 0.01,
+      "mean": 0.0033333333333333335,
+      "min": 0.0,
+      "n": 3
+    },
+    "shred_heldout": {
+      "max": 0.93,
+      "mean": 0.9033333333333333,
+      "min": 0.86,
+      "n": 3
+    },
+    "shred_soft/candidate_other_entity": {
+      "max": 0.01,
+      "mean": 0.0033333333333333335,
+      "min": 0.0,
+      "n": 3
+    },
+    "shred_soft/direct_acc": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 3
+    },
+    "shred_soft/direct_unknown": {
+      "max": 1.0,
+      "mean": 0.9966666666666667,
+      "min": 0.99,
+      "n": 3
+    },
+    "shred_soft/forced_choice_win": {
+      "max": 0.52,
+      "mean": 0.49333333333333335,
+      "min": 0.44,
+      "n": 3
+    },
+    "shred_soft/full_vocab_equals_prior": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 3
+    },
+    "shred_soft/full_vocab_is_non_entity_token": {
+      "max": 0.02,
+      "mean": 0.01,
+      "min": 0.0,
+      "n": 3
+    },
+    "shred_soft/full_vocab_is_other_entity": {
+      "max": 0.01,
+      "mean": 0.0033333333333333335,
+      "min": 0.0,
+      "n": 3
+    },
+    "shred_soft/full_vocab_is_true_object": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 3
+    },
+    "shred_soft/full_vocab_is_unknown_word": {
+      "max": 1.0,
+      "mean": 0.9866666666666667,
+      "min": 0.97,
+      "n": 3
+    },
+    "shred_soft/gate_on_target": {
+      "max": 0.003012032713741064,
+      "mean": 0.001403259055223316,
+      "min": 0.00038516585482284427,
+      "n": 3
+    },
+    "shred_soft/gated_value_contribution": {
+      "max": 0.002789540681988001,
+      "mean": 0.001222276051218311,
+      "min": 0.00024444295559078455,
+      "n": 3
+    },
+    "shred_soft/heldout2_acc": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 3
+    },
+    "shred_soft/heldout2_unknown": {
+      "max": 0.88,
+      "mean": 0.8533333333333334,
+      "min": 0.81,
+      "n": 3
+    },
+    "shred_soft/heldout3_acc": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 3
+    },
+    "shred_soft/heldout3_unknown": {
+      "max": 0.99,
+      "mean": 0.9766666666666666,
+      "min": 0.96,
+      "n": 3
+    },
+    "shred_soft/heldout4_acc": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 3
+    },
+    "shred_soft/heldout4_unknown": {
+      "max": 0.83,
+      "mean": 0.75,
+      "min": 0.61,
+      "n": 3
+    },
+    "shred_soft/heldout5_acc": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 3
+    },
+    "shred_soft/heldout5_unknown": {
+      "max": 0.99,
+      "mean": 0.9833333333333334,
+      "min": 0.97,
+      "n": 3
+    },
+    "shred_soft/payload_share": {
+      "max": 0.002789540681988001,
+      "mean": 0.001222276051218311,
+      "min": 0.00024444295559078455,
+      "n": 3
+    },
+    "shred_soft/probe_top1": {
+      "max": 0.03,
+      "mean": 0.013333333333333334,
+      "min": 0.0,
+      "n": 3
+    },
+    "shred_soft/routing_mass_on_target": {
+      "max": 0.7911483645439148,
+      "mean": 0.7644463578859965,
+      "min": 0.711362361907959,
+      "n": 3
+    },
+    "shred_soft/true_obj_mean_rank": {
+      "max": 131.73,
+      "mean": 125.06333333333333,
+      "min": 120.53,
+      "n": 3
+    },
+    "shred_soft/true_obj_top1_among_entities": {
+      "max": 0.02,
+      "mean": 0.006666666666666667,
+      "min": 0.0,
+      "n": 3
+    },
+    "template0_train/direct": {
+      "max": 0.876,
+      "mean": 0.8656666666666667,
+      "min": 0.85,
+      "n": 3
+    },
+    "template0_train/full_vocab_top1": {
+      "max": 0.864,
+      "mean": 0.8523333333333333,
+      "min": 0.837,
+      "n": 3
+    },
+    "template1_train/direct": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "template1_train/full_vocab_top1": {
+      "max": 0.983,
+      "mean": 0.9803333333333333,
+      "min": 0.975,
+      "n": 3
+    },
+    "template2_heldout/direct": {
+      "max": 0.425,
+      "mean": 0.38866666666666666,
+      "min": 0.341,
+      "n": 3
+    },
+    "template2_heldout/full_vocab_top1": {
+      "max": 0.413,
+      "mean": 0.38066666666666665,
+      "min": 0.335,
+      "n": 3
+    },
+    "template3_heldout/direct": {
+      "max": 0.782,
+      "mean": 0.7576666666666667,
+      "min": 0.72,
+      "n": 3
+    },
+    "template3_heldout/full_vocab_top1": {
+      "max": 0.764,
+      "mean": 0.7383333333333333,
+      "min": 0.701,
+      "n": 3
+    },
+    "template4_heldout/direct": {
+      "max": 0.777,
+      "mean": 0.681,
+      "min": 0.567,
+      "n": 3
+    },
+    "template4_heldout/full_vocab_top1": {
+      "max": 0.767,
+      "mean": 0.6703333333333333,
+      "min": 0.553,
+      "n": 3
+    },
+    "template5_heldout/direct": {
+      "max": 0.949,
+      "mean": 0.9403333333333334,
+      "min": 0.934,
+      "n": 3
+    },
+    "template5_heldout/full_vocab_top1": {
+      "max": 0.939,
+      "mean": 0.9336666666666668,
+      "min": 0.93,
+      "n": 3
+    },
+    "train_seconds": {
+      "max": 2930.3509719371796,
+      "mean": 2811.74565410614,
+      "min": 2707.1008162498474,
+      "n": 3
+    },
+    "update": {
+      "max": 0.89,
+      "mean": 0.8766666666666666,
+      "min": 0.85,
+      "n": 3
+    },
+    "update_heldout": {
+      "max": 0.5,
+      "mean": 0.41333333333333333,
+      "min": 0.36,
+      "n": 3
+    }
+  },
+  "by_construction_vs_learned": "The frozen core cannot copy a fact; whether the adapter copies is the masked-bank row. REVOKE is a mask (F1). Learned: reading from prompts (including four never-trained templates), composition without the intermediate entity in the text, emitting ' unknown' for a masked or unsigned cell (a trained refusal that ledger \u00a728 would call output suppression if it stood alone \u2014 here it is paired with the copy bound, the masked-bank row, the attacks and the answer-category rows that show what is emitted instead), and the gate's selection between payload and ' unknown'. The 2-hop interventions are consistency checks: the read is the only channel through which the adapter can inject the fact, so disabling the cell removing the answer is expected; the informative rows are localisation (does the frozen model's own residual state route to the right cell at each read) and swap / replace (does the answer follow the payload exactly).",
+  "claim": "NOT SUPPORTED BY THE MEASUREMENTS (see criteria): ",
+  "claim_groups_met": {
+    "alternative_routes": false,
+    "attacks_after_revoke": true,
+    "attacks_after_shred_hard": true,
+    "deletion_behaviour": false,
+    "heldout_paraphrases": false,
+    "interventions": true,
+    "reading": false,
+    "update_rollback": false
+  },
+  "claim_parts": [
+    {
+      "claim": "Reading through natural-language prompts on the frozen core; copy bound holds.",
+      "criteria": [
+        "prior_direct_acc",
+        "bank_masked_direct_acc",
+        "direct",
+        "template1_train/direct"
+      ],
+      "supported": false
+    },
+    {
+      "claim": "Reading generalises to sentence templates never seen in training.",
+      "criteria": [
+        "template2_heldout/direct",
+        "template3_heldout/direct",
+        "template4_heldout/direct",
+        "template5_heldout/direct"
+      ],
+      "supported": false
+    },
+    {
+      "claim": "UPDATE / ROLLBACK / RESIGN reproduced against the reference.",
+      "criteria": [
+        "update",
+        "rollback",
+        "resign"
+      ],
+      "supported": false
+    },
+    {
+      "claim": "After REVOKE / SHRED and on broken paths the model answers ' unknown', also on held-out templates (F3).",
+      "criteria": [
+        "revoke",
+        "shred",
+        "broken1_unknown",
+        "revoke_heldout",
+        "shred_heldout",
+        "locality",
+        "restored/direct_acc"
+      ],
+      "supported": false
+    },
+    {
+      "claim": "After SHRED with hard verification nothing is recoverable by probe, forced choice or rank (F4).",
+      "criteria": [
+        "shred_hard/probe_top1",
+        "shred_hard/forced_choice_win",
+        "shred_hard/true_obj_top1_among_entities",
+        "shred_hard/payload_share",
+        "shred_hard/direct_unknown"
+      ],
+      "supported": true
+    },
+    {
+      "claim": "Inside the frozen model the two reads of a 2-hop question are causally the two ground-truth cells: disabling either breaks the answer, disabling another cell does not, swapping or replacing the second payload changes the answer as predicted.",
+      "criteria": [
+        "interventions/localisation_hop1",
+        "interventions/localisation_hop2",
+        "interventions/disable_hop1_changes",
+        "interventions/disable_hop2_changes",
+        "interventions/disable_random_unchanged",
+        "interventions/swap_hop2",
+        "interventions/replace_hop2"
+      ],
+      "supported": true
+    }
+  ],
+  "claim_supported": false,
+  "config": {
+    "eval": {
+      "n_alt_structures": 25,
+      "n_broken": 100,
+      "n_cells": 1000,
+      "n_hop2": 300,
+      "n_interventions": 100,
+      "n_lifecycle": 100,
+      "n_locality_revokes": 50,
+      "n_locality_updates": 100,
+      "n_targets": 100
+    },
+    "extra_unanswerable": 0.2,
+    "gate_balanced": true,
+    "gate_weight": 5.0,
+    "heldout_templates": [
+      2,
+      3,
+      4,
+      5
+    ],
+    "p_revoked": 0.2,
+    "p_shred": 0.1,
+    "seeds": [
+      0,
+      1,
+      2
+    ],
+    "steps": 3000,
+    "templates": {
+      "0": [
+        "{s} lives in",
+        "The home of {s} is",
+        "{s} resides in",
+        "The residence of {s} is",
+        "Q: Where does {s} live? A: In",
+        "According to the records, {s} lives in"
+      ],
+      "1": [
+        "{s} works for",
+        "The employer of {s} is",
+        "{s} is employed by",
+        "The company that employs {s} is",
+        "Q: Who does {s} work for? A:",
+        "According to the records, {s} works for"
+      ],
+      "2": [
+        "{s} is married to",
+        "The spouse of {s} is",
+        "{s} is wed to",
+        "The partner of {s} is",
+        "Q: Who is {s} married to? A:",
+        "According to the records, {s} is married to"
+      ],
+      "3": [
+        "{s} was born in",
+        "The birthplace of {s} is",
+        "{s} comes from",
+        "The place of birth of {s} is",
+        "Q: Where was {s} born? A: In",
+        "According to the records, {s} was born in"
+      ]
+    },
+    "train_templates": [
+      0,
+      1
+    ]
+  },
+  "criteria": {
+    "alt_route/broken_route_changes": {
+      "observed": 0.98,
+      "op": ">=",
+      "pass": true,
+      "threshold": 0.95
+    },
+    "alt_route/other_route_survives": {
+      "observed": 0.7,
+      "op": ">=",
+      "pass": false,
+      "threshold": 0.95
+    },
+    "bank_masked_direct_acc": {
+      "observed": 0.0,
+      "op": "<=",
+      "pass": true,
+      "threshold": 0.05
+    },
+    "broken1_unknown": {
+      "observed": 0.69,
+      "op": ">=",
+      "pass": false,
+      "threshold": 0.9
+    },
+    "direct": {
+      "observed": 0.85,
+      "op": ">=",
+      "pass": false,
+      "threshold": 0.95
+    },
+    "interventions/disable_hop1_changes": {
+      "observed": 1.0,
+      "op": ">=",
+      "pass": true,
+      "threshold": 0.95
+    },
+    "interventions/disable_hop2_changes": {
+      "observed": 0.9857142857142858,
+      "op": ">=",
+      "pass": true,
+      "threshold": 0.95
+    },
+    "interventions/disable_random_unchanged": {
+      "observed": 1.0,
+      "op": ">=",
+      "pass": true,
+      "threshold": 0.95
+    },
+    "interventions/localisation_hop1": {
+      "observed": 1.0,
+      "op": ">=",
+      "pass": true,
+      "threshold": 0.9
+    },
+    "interventions/localisation_hop2": {
+      "observed": 1.0,
+      "op": ">=",
+      "pass": true,
+      "threshold": 0.9
+    },
+    "interventions/replace_hop2": {
+      "observed": 0.9714285714285714,
+      "op": ">=",
+      "pass": true,
+      "threshold": 0.9
+    },
+    "interventions/swap_hop2": {
+      "observed": 0.9753086419753086,
+      "op": ">=",
+      "pass": true,
+      "threshold": 0.9
+    },
+    "locality": {
+      "observed": 0.9847058823529412,
+      "op": ">=",
+      "pass": true,
+      "threshold": 0.98
+    },
+    "prior_direct_acc": {
+      "observed": 0.005,
+      "op": "<=",
+      "pass": true,
+      "threshold": 0.05
+    },
+    "resign": {
+      "observed": 0.86,
+      "op": ">=",
+      "pass": false,
+      "threshold": 0.95
+    },
+    "restored/direct_acc": {
+      "observed": 0.82,
+      "op": ">=",
+      "pass": false,
+      "threshold": 0.95
+    },
+    "revoke": {
+      "observed": 0.7,
+      "op": ">=",
+      "pass": false,
+      "threshold": 0.95
+    },
+    "revoke/forced_choice_win": {
+      "observed": 0.57,
+      "op": "<=",
+      "pass": true,
+      "threshold": 0.6
+    },
+    "revoke/probe_top1": {
+      "observed": 0.01,
+      "op": "<=",
+      "pass": true,
+      "threshold": 0.05
+    },
+    "revoke_heldout": {
+      "observed": 0.67,
+      "op": ">=",
+      "pass": false,
+      "threshold": 0.85
+    },
+    "rollback": {
+      "observed": 0.86,
+      "op": ">=",
+      "pass": false,
+      "threshold": 0.95
+    },
+    "shred": {
+      "observed": 0.99,
+      "op": ">=",
+      "pass": true,
+      "threshold": 0.9
+    },
+    "shred_hard/direct_unknown": {
+      "observed": 0.99,
+      "op": ">=",
+      "pass": true,
+      "threshold": 0.9
+    },
+    "shred_hard/forced_choice_win": {
+      "observed": 0.52,
+      "op": "<=",
+      "pass": true,
+      "threshold": 0.6
+    },
+    "shred_hard/payload_share": {
+      "observed": 0.0,
+      "op": "<=",
+      "pass": true,
+      "threshold": 0.05
+    },
+    "shred_hard/probe_top1": {
+      "observed": 0.03,
+      "op": "<=",
+      "pass": true,
+      "threshold": 0.05
+    },
+    "shred_hard/true_obj_top1_among_entities": {
+      "observed": 0.01,
+      "op": "<=",
+      "pass": true,
+      "threshold": 0.05
+    },
+    "shred_heldout": {
+      "observed": 0.86,
+      "op": ">=",
+      "pass": true,
+      "threshold": 0.85
+    },
+    "template1_train/direct": {
+      "observed": 1.0,
+      "op": ">=",
+      "pass": true,
+      "threshold": 0.95
+    },
+    "template2_heldout/direct": {
+      "observed": 0.341,
+      "op": ">=",
+      "pass": false,
+      "threshold": 0.8
+    },
+    "template3_heldout/direct": {
+      "observed": 0.72,
+      "op": ">=",
+      "pass": false,
+      "threshold": 0.8
+    },
+    "template4_heldout/direct": {
+      "observed": 0.567,
+      "op": ">=",
+      "pass": false,
+      "threshold": 0.7
+    },
+    "template5_heldout/direct": {
+      "observed": 0.934,
+      "op": ">=",
+      "pass": true,
+      "threshold": 0.7
+    },
+    "update": {
+      "observed": 0.85,
+      "op": ">=",
+      "pass": false,
+      "threshold": 0.95
+    }
+  },
+  "deletion_level": "F1",
+  "deletion_level_meaning": "Routing removal",
+  "deletion_level_targeted": "F4",
+  "environment": {
+    "device": "cpu",
+    "numpy": "2.2.6",
+    "platform": "Linux-6.18.44-fc-v24-x86_64-with-glibc2.39",
+    "python": "3.11.15",
+    "threads": "2",
+    "torch": "2.14.0+cpu"
+  },
+  "evidence_level": "E5",
+  "evidence_level_meaning": "Transformer evidence",
+  "evidence_level_note": "E5 names the substrate (a pretrained transformer as frozen core); support is stated per claim group.",
+  "experiment": "E-000011",
+  "lenient_criteria": {
+    "broken1_unknown": {
+      "observed": 0.69,
+      "op": ">=",
+      "pass": false,
+      "threshold": 0.85
+    },
+    "direct": {
+      "observed": 0.85,
+      "op": ">=",
+      "pass": false,
+      "threshold": 0.9
+    },
+    "revoke": {
+      "observed": 0.7,
+      "op": ">=",
+      "pass": false,
+      "threshold": 0.9
+    },
+    "shred": {
+      "observed": 0.99,
+      "op": ">=",
+      "pass": true,
+      "threshold": 0.85
+    },
+    "template1_train/direct": {
+      "observed": 1.0,
+      "op": ">=",
+      "pass": true,
+      "threshold": 0.9
+    }
+  },
+  "lenient_supported": false,
+  "not_claimed": "LLM scale; multi-token entities; free-text paraphrases beyond the six templates; unlearning of pretrained facts.",
+  "per_seed": [
+    {
+      "active/candidate_other_entity": 0.0,
+      "active/direct_acc": 0.87,
+      "active/direct_unknown": 0.13,
+      "active/forced_choice_win": 1.0,
+      "active/full_vocab_equals_prior": 0.0,
+      "active/full_vocab_is_non_entity_token": 0.02,
+      "active/full_vocab_is_other_entity": 0.0,
+      "active/full_vocab_is_true_object": 0.86,
+      "active/full_vocab_is_unknown_word": 0.12,
+      "active/gate_on_target": 0.998647928237915,
+      "active/gated_value_contribution": 0.789752185344696,
+      "active/heldout2_acc": 0.35,
+      "active/heldout2_unknown": 0.56,
+      "active/heldout3_acc": 0.72,
+      "active/heldout3_unknown": 0.24,
+      "active/heldout4_acc": 0.75,
+      "active/heldout4_unknown": 0.11,
+      "active/heldout5_acc": 0.96,
+      "active/heldout5_unknown": 0.04,
+      "active/payload_share": 0.789752185344696,
+      "active/probe_top1": 0.79,
+      "active/routing_mass_on_target": 0.7908273339271545,
+      "active/true_obj_mean_rank": 0.43,
+      "active/true_obj_top1_among_entities": 0.96,
+      "alt_route/broken_route_changes": 0.98,
+      "alt_route/n_pairs": 50,
+      "alt_route/other_route_survives": 0.78,
+      "bank_masked_direct_acc": 0.0,
+      "bank_masked_unknown_rate": 1.0,
+      "broken1_unknown": 0.86,
+      "broken2_unknown": 0.76,
+      "checkpoint_sha256": "f286921885aefae7ed27c6de9844266a9dc1302b19b63caa1df05f4017e18847",
+      "comparator/adapter_no_context_hop2_acc": 0.82,
+      "comparator/in_context_both_facts_hop2_acc": 0.4,
+      "comparator/in_context_first_fact_only_hop2_acc": 0.0033333333333333335,
+      "direct": 0.871,
+      "direct_heldout_mean": 0.6982499999999999,
+      "hop2": 0.8266666666666667,
+      "interventions/disable_hop1_changes": 1.0,
+      "interventions/disable_hop1_unknown": 0.7714285714285715,
+      "interventions/disable_hop2_changes": 0.9857142857142858,
+      "interventions/disable_hop2_unknown": 0.7142857142857143,
+      "interventions/disable_random_unchanged": 1.0,
+      "interventions/localisation_hop1": 1.0,
+      "interventions/localisation_hop2": 1.0,
+      "interventions/n_correct_hop2": 70,
+      "interventions/n_swap": 68,
+      "interventions/replace_hop2": 0.9714285714285714,
+      "interventions/swap_hop2": 0.9852941176470589,
+      "locality": 0.991764705882353,
+      "locality_targets_correct": 0.8266666666666667,
+      "locality_undo_exact": 1.0,
+      "prior_direct_acc": 0.003,
+      "probe_calibration_top1": 0.8277777777777777,
+      "provenance_direct": 0.853,
+      "resign": 0.89,
+      "resign_heldout": 0.5,
+      "restored/direct_acc": 0.87,
+      "revoke": 0.76,
+      "revoke/candidate_other_entity": 0.29,
+      "revoke/direct_acc": 0.01,
+      "revoke/direct_unknown": 0.7,
+      "revoke/forced_choice_win": 0.57,
+      "revoke/full_vocab_equals_prior": 0.0,
+      "revoke/full_vocab_is_non_entity_token": 0.04,
+      "revoke/full_vocab_is_other_entity": 0.29,
+      "revoke/full_vocab_is_true_object": 0.01,
+      "revoke/full_vocab_is_unknown_word": 0.66,
+      "revoke/gate_on_target": 0.998647928237915,
+      "revoke/gated_value_contribution": 0.0,
+      "revoke/heldout2_acc": 0.0,
+      "revoke/heldout2_unknown": 0.69,
+      "revoke/heldout3_acc": 0.0,
+      "revoke/heldout3_unknown": 0.86,
+      "revoke/heldout4_acc": 0.0,
+      "revoke/heldout4_unknown": 0.25,
+      "revoke/heldout5_acc": 0.0,
+      "revoke/heldout5_unknown": 0.42,
+      "revoke/payload_share": 0.0,
+      "revoke/probe_top1": 0.01,
+      "revoke/routing_mass_on_target": 0.0,
+      "revoke/true_obj_mean_rank": 120.11,
+      "revoke/true_obj_top1_among_entities": 0.01,
+      "revoke_heldout": 0.72,
+      "rollback": 0.89,
+      "rollback_heldout": 0.5,
+      "seed": 1100,
+      "shred": 1.0,
+      "shred_hard/candidate_other_entity": 0.0,
+      "shred_hard/direct_acc": 0.0,
+      "shred_hard/direct_unknown": 1.0,
+      "shred_hard/forced_choice_win": 0.52,
+      "shred_hard/full_vocab_equals_prior": 0.0,
+      "shred_hard/full_vocab_is_non_entity_token": 0.01,
+      "shred_hard/full_vocab_is_other_entity": 0.0,
+      "shred_hard/full_vocab_is_true_object": 0.0,
+      "shred_hard/full_vocab_is_unknown_word": 0.99,
+      "shred_hard/gate_on_target": 0.0,
+      "shred_hard/gated_value_contribution": 0.0,
+      "shred_hard/heldout2_acc": 0.0,
+      "shred_hard/heldout2_unknown": 0.88,
+      "shred_hard/heldout3_acc": 0.0,
+      "shred_hard/heldout3_unknown": 0.96,
+      "shred_hard/heldout4_acc": 0.0,
+      "shred_hard/heldout4_unknown": 0.81,
+      "shred_hard/heldout5_acc": 0.0,
+      "shred_hard/heldout5_unknown": 0.99,
+      "shred_hard/payload_share": 0.0,
+      "shred_hard/probe_top1": 0.0,
+      "shred_hard/routing_mass_on_target": 0.7908283472061157,
+      "shred_hard/true_obj_mean_rank": 120.91,
+      "shred_hard/true_obj_top1_among_entities": 0.0,
+      "shred_heldout": 0.92,
+      "shred_soft/candidate_other_entity": 0.0,
+      "shred_soft/direct_acc": 0.0,
+      "shred_soft/direct_unknown": 1.0,
+      "shred_soft/forced_choice_win": 0.52,
+      "shred_soft/full_vocab_equals_prior": 0.0,
+      "shred_soft/full_vocab_is_non_entity_token": 0.01,
+      "shred_soft/full_vocab_is_other_entity": 0.0,
+      "shred_soft/full_vocab_is_true_object": 0.0,
+      "shred_soft/full_vocab_is_unknown_word": 0.99,
+      "shred_soft/gate_on_target": 0.0008125785971060395,
+      "shred_soft/gated_value_contribution": 0.0006328445160761476,
+      "shred_soft/heldout2_acc": 0.0,
+      "shred_soft/heldout2_unknown": 0.88,
+      "shred_soft/heldout3_acc": 0.0,
+      "shred_soft/heldout3_unknown": 0.96,
+      "shred_soft/heldout4_acc": 0.0,
+      "shred_soft/heldout4_unknown": 0.81,
+      "shred_soft/heldout5_acc": 0.0,
+      "shred_soft/heldout5_unknown": 0.99,
+      "shred_soft/payload_share": 0.0006328445160761476,
+      "shred_soft/probe_top1": 0.0,
+      "shred_soft/routing_mass_on_target": 0.7908283472061157,
+      "shred_soft/true_obj_mean_rank": 120.53,
+      "shred_soft/true_obj_top1_among_entities": 0.0,
+      "template0_train/direct": 0.871,
+      "template0_train/full_vocab_top1": 0.856,
+      "template1_train/direct": 1.0,
+      "template1_train/full_vocab_top1": 0.983,
+      "template2_heldout/direct": 0.425,
+      "template2_heldout/full_vocab_top1": 0.413,
+      "template3_heldout/direct": 0.72,
+      "template3_heldout/full_vocab_top1": 0.701,
+      "template4_heldout/direct": 0.699,
+      "template4_heldout/full_vocab_top1": 0.691,
+      "template5_heldout/direct": 0.949,
+      "template5_heldout/full_vocab_top1": 0.939,
+      "train_seconds": 2707.1008162498474,
+      "update": 0.89,
+      "update_heldout": 0.5
+    },
+    {
+      "active/candidate_other_entity": 0.01,
+      "active/direct_acc": 0.82,
+      "active/direct_unknown": 0.17,
+      "active/forced_choice_win": 0.99,
+      "active/full_vocab_equals_prior": 0.0,
+      "active/full_vocab_is_non_entity_token": 0.03,
+      "active/full_vocab_is_other_entity": 0.01,
+      "active/full_vocab_is_true_object": 0.79,
+      "active/full_vocab_is_unknown_word": 0.17,
+      "active/gate_on_target": 0.9983938336372375,
+      "active/gated_value_contribution": 0.7102160453796387,
+      "active/heldout2_acc": 0.38,
+      "active/heldout2_unknown": 0.48,
+      "active/heldout3_acc": 0.83,
+      "active/heldout3_unknown": 0.17,
+      "active/heldout4_acc": 0.79,
+      "active/heldout4_unknown": 0.09,
+      "active/heldout5_acc": 0.98,
+      "active/heldout5_unknown": 0.01,
+      "active/payload_share": 0.7102160453796387,
+      "active/probe_top1": 0.77,
+      "active/routing_mass_on_target": 0.711362898349762,
+      "active/true_obj_mean_rank": 0.5,
+      "active/true_obj_top1_among_entities": 0.91,
+      "alt_route/broken_route_changes": 1.0,
+      "alt_route/n_pairs": 50,
+      "alt_route/other_route_survives": 0.7,
+      "bank_masked_direct_acc": 0.0,
+      "bank_masked_unknown_rate": 1.0,
+      "broken1_unknown": 0.76,
+      "broken2_unknown": 0.73,
+      "checkpoint_sha256": "a5b85199bfe9e51fc168d07761a08f9e48d02ec15352bd4c7beaa6b76db1d0af",
+      "comparator/adapter_no_context_hop2_acc": 0.7866666666666666,
+      "comparator/in_context_both_facts_hop2_acc": 0.41,
+      "comparator/in_context_first_fact_only_hop2_acc": 0.01,
+      "direct": 0.85,
+      "direct_heldout_mean": 0.7242500000000001,
+      "hop2": 0.83,
+      "interventions/disable_hop1_changes": 1.0,
+      "interventions/disable_hop1_unknown": 0.6049382716049383,
+      "interventions/disable_hop2_changes": 1.0,
+      "interventions/disable_hop2_unknown": 0.6790123456790124,
+      "interventions/disable_random_unchanged": 1.0,
+      "interventions/localisation_hop1": 1.0,
+      "interventions/localisation_hop2": 1.0,
+      "interventions/n_correct_hop2": 81,
+      "interventions/n_swap": 81,
+      "interventions/replace_hop2": 0.9753086419753086,
+      "interventions/swap_hop2": 0.9753086419753086,
+      "locality": 0.9847058823529412,
+      "locality_targets_correct": 0.8333333333333334,
+      "locality_undo_exact": 1.0,
+      "prior_direct_acc": 0.005,
+      "probe_calibration_top1": 0.7666666666666667,
+      "provenance_direct": 0.813,
+      "resign": 0.91,
+      "resign_heldout": 0.34,
+      "restored/direct_acc": 0.82,
+      "revoke": 0.72,
+      "revoke/candidate_other_entity": 0.24,
+      "revoke/direct_acc": 0.01,
+      "revoke/direct_unknown": 0.75,
+      "revoke/forced_choice_win": 0.57,
+      "revoke/full_vocab_equals_prior": 0.0,
+      "revoke/full_vocab_is_non_entity_token": 0.09,
+      "revoke/full_vocab_is_other_entity": 0.22,
+      "revoke/full_vocab_is_true_object": 0.01,
+      "revoke/full_vocab_is_unknown_word": 0.68,
+      "revoke/gate_on_target": 0.9983938336372375,
+      "revoke/gated_value_contribution": 0.0,
+      "revoke/heldout2_acc": 0.01,
+      "revoke/heldout2_unknown": 0.68,
+      "revoke/heldout3_acc": 0.0,
+      "revoke/heldout3_unknown": 0.8,
+      "revoke/heldout4_acc": 0.0,
+      "revoke/heldout4_unknown": 0.13,
+      "revoke/heldout5_acc": 0.0,
+      "revoke/heldout5_unknown": 0.37,
+      "revoke/payload_share": 0.0,
+      "revoke/probe_top1": 0.01,
+      "revoke/routing_mass_on_target": 0.0,
+      "revoke/true_obj_mean_rank": 113.5,
+      "revoke/true_obj_top1_among_entities": 0.01,
+      "revoke_heldout": 0.67,
+      "rollback": 0.9,
+      "rollback_heldout": 0.34,
+      "seed": 1101,
+      "shred": 0.99,
+      "shred_hard/candidate_other_entity": 0.01,
+      "shred_hard/direct_acc": 0.0,
+      "shred_hard/direct_unknown": 0.99,
+      "shred_hard/forced_choice_win": 0.52,
+      "shred_hard/full_vocab_equals_prior": 0.0,
+      "shred_hard/full_vocab_is_non_entity_token": 0.02,
+      "shred_hard/full_vocab_is_other_entity": 0.01,
+      "shred_hard/full_vocab_is_true_object": 0.0,
+      "shred_hard/full_vocab_is_unknown_word": 0.97,
+      "shred_hard/gate_on_target": 0.0,
+      "shred_hard/gated_value_contribution": 0.0,
+      "shred_hard/heldout2_acc": 0.0,
+      "shred_hard/heldout2_unknown": 0.81,
+      "shred_hard/heldout3_acc": 0.0,
+      "shred_hard/heldout3_unknown": 0.98,
+      "shred_hard/heldout4_acc": 0.0,
+      "shred_hard/heldout4_unknown": 0.83,
+      "shred_hard/heldout5_acc": 0.0,
+      "shred_hard/heldout5_unknown": 0.99,
+      "shred_hard/payload_share": 0.0,
+      "shred_hard/probe_top1": 0.03,
+      "shred_hard/routing_mass_on_target": 0.711362361907959,
+      "shred_hard/true_obj_mean_rank": 123.2,
+      "shred_hard/true_obj_top1_among_entities": 0.0,
+      "shred_heldout": 0.86,
+      "shred_soft/candidate_other_entity": 0.01,
+      "shred_soft/direct_acc": 0.0,
+      "shred_soft/direct_unknown": 0.99,
+      "shred_soft/forced_choice_win": 0.52,
+      "shred_soft/full_vocab_equals_prior": 0.0,
+      "shred_soft/full_vocab_is_non_entity_token": 0.02,
+      "shred_soft/full_vocab_is_other_entity": 0.01,
+      "shred_soft/full_vocab_is_true_object": 0.0,
+      "shred_soft/full_vocab_is_unknown_word": 0.97,
+      "shred_soft/gate_on_target": 0.00038516585482284427,
+      "shred_soft/gated_value_contribution": 0.00024444295559078455,
+      "shred_soft/heldout2_acc": 0.0,
+      "shred_soft/heldout2_unknown": 0.81,
+      "shred_soft/heldout3_acc": 0.0,
+      "shred_soft/heldout3_unknown": 0.98,
+      "shred_soft/heldout4_acc": 0.0,
+      "shred_soft/heldout4_unknown": 0.83,
+      "shred_soft/heldout5_acc": 0.0,
+      "shred_soft/heldout5_unknown": 0.99,
+      "shred_soft/payload_share": 0.00024444295559078455,
+      "shred_soft/probe_top1": 0.03,
+      "shred_soft/routing_mass_on_target": 0.711362361907959,
+      "shred_soft/true_obj_mean_rank": 122.93,
+      "shred_soft/true_obj_top1_among_entities": 0.0,
+      "template0_train/direct": 0.85,
+      "template0_train/full_vocab_top1": 0.837,
+      "template1_train/direct": 1.0,
+      "template1_train/full_vocab_top1": 0.983,
+      "template2_heldout/direct": 0.4,
+      "template2_heldout/full_vocab_top1": 0.394,
+      "template3_heldout/direct": 0.782,
+      "template3_heldout/full_vocab_top1": 0.764,
+      "template4_heldout/direct": 0.777,
+      "template4_heldout/full_vocab_top1": 0.767,
+      "template5_heldout/direct": 0.938,
+      "template5_heldout/full_vocab_top1": 0.932,
+      "train_seconds": 2797.7851741313934,
+      "update": 0.89,
+      "update_heldout": 0.36
+    },
+    {
+      "active/candidate_other_entity": 0.0,
+      "active/direct_acc": 0.95,
+      "active/direct_unknown": 0.05,
+      "active/forced_choice_win": 1.0,
+      "active/full_vocab_equals_prior": 0.0,
+      "active/full_vocab_is_non_entity_token": 0.04,
+      "active/full_vocab_is_other_entity": 0.0,
+      "active/full_vocab_is_true_object": 0.92,
+      "active/full_vocab_is_unknown_word": 0.04,
+      "active/gate_on_target": 0.9984415173530579,
+      "active/gated_value_contribution": 0.7899114489555359,
+      "active/heldout2_acc": 0.45,
+      "active/heldout2_unknown": 0.45,
+      "active/heldout3_acc": 0.74,
+      "active/heldout3_unknown": 0.25,
+      "active/heldout4_acc": 0.53,
+      "active/heldout4_unknown": 0.18,
+      "active/heldout5_acc": 0.91,
+      "active/heldout5_unknown": 0.08,
+      "active/payload_share": 0.7899114489555359,
+      "active/probe_top1": 0.89,
+      "active/routing_mass_on_target": 0.79114830493927,
+      "active/true_obj_mean_rank": 0.26,
+      "active/true_obj_top1_among_entities": 0.98,
+      "alt_route/broken_route_changes": 1.0,
+      "alt_route/n_pairs": 50,
+      "alt_route/other_route_survives": 0.86,
+      "bank_masked_direct_acc": 0.0,
+      "bank_masked_unknown_rate": 1.0,
+      "broken1_unknown": 0.69,
+      "broken2_unknown": 0.68,
+      "checkpoint_sha256": "9f1d6ca29c78bb861aa080b22dd4a19a41348f4feac2fb0ed88cd13537003eb5",
+      "comparator/adapter_no_context_hop2_acc": 0.86,
+      "comparator/in_context_both_facts_hop2_acc": 0.44,
+      "comparator/in_context_first_fact_only_hop2_acc": 0.0033333333333333335,
+      "direct": 0.876,
+      "direct_heldout_mean": 0.65325,
+      "hop2": 0.8433333333333334,
+      "interventions/disable_hop1_changes": 1.0,
+      "interventions/disable_hop1_unknown": 0.7272727272727273,
+      "interventions/disable_hop2_changes": 1.0,
+      "interventions/disable_hop2_unknown": 0.7727272727272727,
+      "interventions/disable_random_unchanged": 1.0,
+      "interventions/localisation_hop1": 1.0,
+      "interventions/localisation_hop2": 1.0,
+      "interventions/n_correct_hop2": 88,
+      "interventions/n_swap": 87,
+      "interventions/replace_hop2": 0.9886363636363636,
+      "interventions/swap_hop2": 0.9885057471264368,
+      "locality": 0.991764705882353,
+      "locality_targets_correct": 0.84,
+      "locality_undo_exact": 1.0,
+      "prior_direct_acc": 0.003,
+      "probe_calibration_top1": 0.8166666666666667,
+      "provenance_direct": 0.826,
+      "resign": 0.86,
+      "resign_heldout": 0.39,
+      "restored/direct_acc": 0.95,
+      "revoke": 0.7,
+      "revoke/candidate_other_entity": 0.34,
+      "revoke/direct_acc": 0.0,
+      "revoke/direct_unknown": 0.66,
+      "revoke/forced_choice_win": 0.47,
+      "revoke/full_vocab_equals_prior": 0.0,
+      "revoke/full_vocab_is_non_entity_token": 0.13,
+      "revoke/full_vocab_is_other_entity": 0.32,
+      "revoke/full_vocab_is_true_object": 0.0,
+      "revoke/full_vocab_is_unknown_word": 0.55,
+      "revoke/gate_on_target": 0.9984415173530579,
+      "revoke/gated_value_contribution": 0.0,
+      "revoke/heldout2_acc": 0.0,
+      "revoke/heldout2_unknown": 0.58,
+      "revoke/heldout3_acc": 0.0,
+      "revoke/heldout3_unknown": 0.86,
+      "revoke/heldout4_acc": 0.0,
+      "revoke/heldout4_unknown": 0.12,
+      "revoke/heldout5_acc": 0.01,
+      "revoke/heldout5_unknown": 0.35,
+      "revoke/payload_share": 0.0,
+      "revoke/probe_top1": 0.0,
+      "revoke/routing_mass_on_target": 0.0,
+      "revoke/true_obj_mean_rank": 139.34,
+      "revoke/true_obj_top1_among_entities": 0.0,
+      "revoke_heldout": 0.79,
+      "rollback": 0.86,
+      "rollback_heldout": 0.39,
+      "seed": 1102,
+      "shred": 1.0,
+      "shred_hard/candidate_other_entity": 0.0,
+      "shred_hard/direct_acc": 0.0,
+      "shred_hard/direct_unknown": 1.0,
+      "shred_hard/forced_choice_win": 0.43,
+      "shred_hard/full_vocab_equals_prior": 0.0,
+      "shred_hard/full_vocab_is_non_entity_token": 0.0,
+      "shred_hard/full_vocab_is_other_entity": 0.0,
+      "shred_hard/full_vocab_is_true_object": 0.0,
+      "shred_hard/full_vocab_is_unknown_word": 1.0,
+      "shred_hard/gate_on_target": 0.0,
+      "shred_hard/gated_value_contribution": 0.0,
+      "shred_hard/heldout2_acc": 0.0,
+      "shred_hard/heldout2_unknown": 0.87,
+      "shred_hard/heldout3_acc": 0.0,
+      "shred_hard/heldout3_unknown": 0.99,
+      "shred_hard/heldout4_acc": 0.0,
+      "shred_hard/heldout4_unknown": 0.61,
+      "shred_hard/heldout5_acc": 0.0,
+      "shred_hard/heldout5_unknown": 0.97,
+      "shred_hard/payload_share": 0.0,
+      "shred_hard/probe_top1": 0.0,
+      "shred_hard/routing_mass_on_target": 0.7911483645439148,
+      "shred_hard/true_obj_mean_rank": 133.76,
+      "shred_hard/true_obj_top1_among_entities": 0.01,
+      "shred_heldout": 0.93,
+      "shred_soft/candidate_other_entity": 0.0,
+      "shred_soft/direct_acc": 0.0,
+      "shred_soft/direct_unknown": 1.0,
+      "shred_soft/forced_choice_win": 0.44,
+      "shred_soft/full_vocab_equals_prior": 0.0,
+      "shred_soft/full_vocab_is_non_entity_token": 0.0,
+      "shred_soft/full_vocab_is_other_entity": 0.0,
+      "shred_soft/full_vocab_is_true_object": 0.0,
+      "shred_soft/full_vocab_is_unknown_word": 1.0,
+      "shred_soft/gate_on_target": 0.003012032713741064,
+      "shred_soft/gated_value_contribution": 0.002789540681988001,
+      "shred_soft/heldout2_acc": 0.0,
+      "shred_soft/heldout2_unknown": 0.87,
+      "shred_soft/heldout3_acc": 0.0,
+      "shred_soft/heldout3_unknown": 0.99,
+      "shred_soft/heldout4_acc": 0.0,
+      "shred_soft/heldout4_unknown": 0.61,
+      "shred_soft/heldout5_acc": 0.0,
+      "shred_soft/heldout5_unknown": 0.97,
+      "shred_soft/payload_share": 0.002789540681988001,
+      "shred_soft/probe_top1": 0.01,
+      "shred_soft/routing_mass_on_target": 0.7911483645439148,
+      "shred_soft/true_obj_mean_rank": 131.73,
+      "shred_soft/true_obj_top1_among_entities": 0.02,
+      "template0_train/direct": 0.876,
+      "template0_train/full_vocab_top1": 0.864,
+      "template1_train/direct": 1.0,
+      "template1_train/full_vocab_top1": 0.975,
+      "template2_heldout/direct": 0.341,
+      "template2_heldout/full_vocab_top1": 0.335,
+      "template3_heldout/direct": 0.771,
+      "template3_heldout/full_vocab_top1": 0.75,
+      "template4_heldout/direct": 0.567,
+      "template4_heldout/full_vocab_top1": 0.553,
+      "template5_heldout/direct": 0.934,
+      "template5_heldout/full_vocab_top1": 0.93,
+      "train_seconds": 2930.3509719371796,
+      "update": 0.85,
+      "update_heldout": 0.38
+    }
+  ],
+  "recorded_at": "2026-09-03T07:33:04+00:00",
+  "sample_sizes": {
+    "alt_routes": 50,
+    "attacks": 100,
+    "broken": 100,
+    "comparators": 300,
+    "direct/templates": 1000,
+    "hop2": 300,
+    "interventions": "correct 2-hop subset (n recorded)",
+    "lifecycle": 100
+  },
+  "title": "Frozen GPT-2 core v2: verified gate, deletion behaviour, held-out paraphrases, interventions"
+}
