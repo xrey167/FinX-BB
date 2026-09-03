@@ -21,19 +21,22 @@
 | E-000008 | Frozen pretrained GPT-2 core with the mutable knowledge layer (symlink adapter) | E5 | F1 (F4) | **criteria NOT met** | 2026-09-03 00:44 |
 | E-000009 | Signature-verification gate: closing the SHRED residual | E4 | F3 (F4) | **criteria NOT met** | 2026-09-03 00:04 |
 | E-000010 | Signature-verification gate: closing the SHRED residual (class-balanced loss) | E4 | F4 (F4) | criteria met | 2026-09-03 00:05 |
-| e000011_gpt2_v2 | - | - | - | not run | - |
+| E-000011 | Frozen GPT-2 core v2: verified gate, deletion behaviour, held-out paraphrases, interventions | E5 | F1 (F4) | **criteria NOT met** | 2026-09-03 07:50 |
+| e000012_status_gated_revoke | - | - | - | not run | - |
+| e000013_prior_conflict | - | - | - | not run | - |
 | E-000014 | Addressing at 10,000 cells (2,560 entities), verified gate | E4 | F4 (F4) | criteria met | 2026-09-03 05:58 |
+| E-000015 | Explicit symlink cells: several access keys share one knowledge object (symlink arm versus duplication arm) | E4 | F3 (F4) | **criteria NOT met** | 2026-09-03 08:23 |
 
 ## The six breakthrough properties (ledger section 3)
 
 | property | experiments | status | highest level |
 |---|---|---|---|
-| Selectivity (target disappears) | E-000001-B, E-000003, E-000008 | E-000001-B: criteria met; E-000003: criteria met; E-000008: **criteria NOT met** | E5 |
-| Retention (non-target intact) | E-000001-B, E-000003, E-000008 | E-000001-B: criteria met; E-000003: criteria met; E-000008: **criteria NOT met** | E5 |
-| Generalisation (paraphrases, alternative queries) | E-000003, E-000004, E-000008 | E-000003: criteria met; E-000004: **criteria NOT met**; E-000008: **criteria NOT met** | E5 |
-| Causal isolation (effect follows from the intended structure) | E-000005, E-000006, E-000007 | E-000005: criteria met; E-000006: **criteria NOT met**; E-000007: **criteria NOT met** | E4 |
-| Reconstruction resistance | E-000004, E-000007, E-000009, E-000010, E-000008, E-000014 | E-000004: **criteria NOT met**; E-000007: **criteria NOT met**; E-000009: **criteria NOT met**; E-000010: criteria met; E-000008: **criteria NOT met**; E-000014: criteria met | E5 |
-| Scalability (path beyond toy models) | E-000002, E-000008, E-000014 | E-000002: criteria met; E-000008: **criteria NOT met**; E-000014: criteria met | E5 |
+| Selectivity (target disappears) | E-000001-B, E-000003, E-000008, E-000011 | E-000001-B: criteria met; E-000003: criteria met; E-000008: **criteria NOT met**; E-000011: **criteria NOT met** | E5 |
+| Retention (non-target intact) | E-000001-B, E-000003, E-000008, E-000011 | E-000001-B: criteria met; E-000003: criteria met; E-000008: **criteria NOT met**; E-000011: **criteria NOT met** | E5 |
+| Generalisation (paraphrases, alternative queries) | E-000003, E-000004, E-000008, E-000011 | E-000003: criteria met; E-000004: **criteria NOT met**; E-000008: **criteria NOT met**; E-000011: **criteria NOT met** | E5 |
+| Causal isolation (effect follows from the intended structure) | E-000005, E-000006, E-000007, E-000011 | E-000005: criteria met; E-000006: **criteria NOT met**; E-000007: **criteria NOT met**; E-000011: **criteria NOT met** | E5 |
+| Reconstruction resistance | E-000004, E-000007, E-000009, E-000010, E-000008, E-000011, E-000014 | E-000004: **criteria NOT met**; E-000007: **criteria NOT met**; E-000009: **criteria NOT met**; E-000010: criteria met; E-000008: **criteria NOT met**; E-000011: **criteria NOT met**; E-000014: criteria met | E5 |
+| Scalability (path beyond toy models) | E-000002, E-000008, E-000011, E-000014 | E-000002: criteria met; E-000008: **criteria NOT met**; E-000011: **criteria NOT met**; E-000014: criteria met | E5 |
 
 Scalability is the property this session can least address: E-000008 tests whether the same layer works as an adapter on a frozen pretrained GPT-2 (recorded below); the path to LLM scale is a roadmap item, not a result.
 
@@ -645,7 +648,150 @@ Chance levels: probe top-1 0.0039, forced choice 0.5, mean rank 127.5.
 
 **Interpretation (post hoc, record unchanged):** Closes the residual: with signed and unsigned markers weighted equally in the verification loss (weight 5), every reconstruction attack after SHRED is at chance in all five seeds while the payload remains physically present and routed to (routing mass 0.998), and no other family degrades. This is the F4-level result of the session, within the synthetic system. Residual caveat: the soft gate still assigns a high score to a rare unsigned marker in one seed (max 0.995 among all unsigned cells of that bank); none of the 500 shredded targets leaked.
 
-## e000011_gpt2_v2
+## E-000011 — Frozen GPT-2 core v2
+
+Evidence level: **E5** (substrate: pretrained transformer, 124M frozen). Deletion level targeted F4, recorded **F1**. Seeds: [0, 1, 2]; 3000 adapter steps; verified gate (class-balanced, weight 5); p_revoked 0.20, p_shred 0.10, 20% extra unanswerable queries; templates 0/1 trained, 2/3 (lexical variants), 4 (question form), 5 (prefixed clause) held out. Thresholds are the ones pre-registered for E-000008 (not relaxed); a lenient set (0.90 / 0.85) is reported separately.
+
+Lenient criteria met: **False**. Sample sizes: {'direct/templates': 1000, 'hop2': 300, 'broken': 100, 'lifecycle': 100, 'attacks': 100, 'interventions': 'first 100 correctly answered 2-hop questions from a pool of 400 (pool correct rate recorded)', 'alt_routes': 50, 'comparators': 300}
+
+The frozen core cannot copy a fact; whether the adapter copies is the masked-bank row. REVOKE is a mask (F1). Learned: reading from prompts (including four never-trained templates), composition without the intermediate entity in the text, emitting ' unknown' for a masked or unsigned cell (a trained refusal that ledger §28 would call output suppression if it stood alone — here it is paired with the copy bound, the masked-bank row, the attacks and the answer-category rows that show what is emitted instead), and the gate's selection between payload and ' unknown'. The 2-hop interventions are consistency checks: the read is the only channel through which the adapter can inject the fact, so disabling the cell removing the answer is expected; the informative rows are localisation (does the frozen model's own residual state route to the right cell at each read) and swap / replace (does the answer follow the payload exactly).
+
+Claim parts (each on its own pre-registered criteria, worst seed):
+
+| claim | supported |
+|---|---|
+| Reading through natural-language prompts on the frozen core; copy bound holds. | **no** |
+| Reading generalises to sentence templates never seen in training. | **no** |
+| UPDATE / ROLLBACK / RESIGN reproduced against the reference. | **no** |
+| After REVOKE / SHRED and on broken paths the model answers ' unknown', also on held-out templates (F3). | **no** |
+| After SHRED with hard verification nothing is recoverable by probe, forced choice or rank (F4). | yes |
+| Inside the frozen model the two reads of a 2-hop question are causally the two ground-truth cells: disabling either breaks the answer, disabling another cell does not, swapping or replacing the second payload changes the answer as predicted. | yes |
+
+| measure | mean over seeds | worst seed |
+|---|---|---|
+| prior_direct_acc | 0.4% | 0.3% |
+| bank_masked_direct_acc | 0.0% | 0.0% |
+| direct | 86.6% | 85.0% |
+| template0_train/full_vocab_top1 | 85.2% | 83.7% |
+| template1_train/direct | 100.0% | 100.0% |
+| template2_heldout/direct | 38.9% | 34.1% |
+| template3_heldout/direct | 75.8% | 72.0% |
+| template4_heldout/direct | 68.1% | 56.7% |
+| template5_heldout/direct | 94.0% | 93.4% |
+| direct_heldout_mean | 69.2% | 65.3% |
+| provenance_direct | 83.1% | 81.3% |
+| hop2 | 83.3% | 82.7% |
+| comparator/in_context_both_facts_hop2_acc | 41.7% | 40.0% |
+| comparator/in_context_first_fact_only_hop2_acc | 0.6% | 0.3% |
+| comparator/adapter_no_context_hop2_acc | 82.2% | 78.7% |
+| broken1_unknown | 77.0% | 69.0% |
+| broken2_unknown | 72.3% | 68.0% |
+| update | 87.7% | 85.0% |
+| rollback | 88.3% | 86.0% |
+| revoke | 72.7% | 70.0% |
+| shred | 99.7% | 99.0% |
+| resign | 88.7% | 86.0% |
+| update_heldout | 68.2% | 65.8% |
+| revoke_heldout | 51.0% | 48.8% |
+| revoke_heldout_min | 17.3% | 16.0% |
+| shred_heldout | 89.9% | 88.8% |
+| shred_heldout_min | 75.0% | 70.0% |
+| locality | 98.9% | 98.5% |
+| locality_targets_correct | 83.3% | 82.7% |
+| alt_route/broken_route_changes | 99.3% | 98.0% |
+| alt_route/other_route_survives | 78.0% | 70.0% |
+| interventions/pool_correct_rate | 82.0% | 79.0% |
+
+Attacks on 100 targets (mean over seeds; chance: forced choice 0.5, top-1 0.0039, mean rank 127.5, probe 0.0039):
+
+| attack | active | after REVOKE | after SHRED (soft) | after SHRED (hard) |
+|---|---|---|---|---|
+| direct_unknown | 0.1167 | 0.7033 | 0.9967 | 0.9967 |
+| direct_acc | 0.8800 | 0.0067 | 0.0000 | 0.0000 |
+| candidate_other_entity | 0.0033 | 0.2900 | 0.0033 | 0.0033 |
+| full_vocab_is_unknown_word | 0.1100 | 0.6300 | 0.9867 | 0.9867 |
+| full_vocab_is_true_object | 0.8567 | 0.0067 | 0.0000 | 0.0000 |
+| full_vocab_is_other_entity | 0.0033 | 0.2767 | 0.0033 | 0.0033 |
+| full_vocab_equals_prior | 0.0000 | 0.0000 | 0.0000 | 0.0000 |
+| full_vocab_is_non_entity_token | 0.0300 | 0.0867 | 0.0100 | 0.0100 |
+| heldout2_unknown | 0.4967 | 0.6500 | 0.8533 | 0.8533 |
+| heldout4_unknown | 0.1267 | 0.1667 | 0.7500 | 0.7500 |
+| forced_choice_win | 0.9967 | 0.5367 | 0.4933 | 0.4900 |
+| true_obj_top1_among_entities | 0.9500 | 0.0067 | 0.0067 | 0.0033 |
+| true_obj_mean_rank | 0.3967 | 124.3167 | 125.0633 | 125.9567 |
+| probe_top1 | 0.8167 | 0.0067 | 0.0133 | 0.0100 |
+| routing_mass_on_target | 0.7644 | 0.0000 | 0.7644 | 0.7644 |
+| gate_on_target | 0.9985 | 0.9985 | 0.0014 | 0.0000 |
+| payload_share | 0.7633 | 0.0000 | 0.0012 | 0.0000 |
+
+Causal interventions on correctly answered 2-hop questions (mean / worst seed):
+
+| intervention | mean | worst seed |
+|---|---|---|
+| localisation_hop1 | 100.0% | 100.0% |
+| localisation_hop2 | 100.0% | 100.0% |
+| disable_hop1_changes | 100.0% | 100.0% |
+| disable_hop1_unknown | 69.7% | 62.0% |
+| disable_hop2_changes | 99.7% | 99.0% |
+| disable_hop2_unknown | 71.3% | 69.0% |
+| disable_random_unchanged | 100.0% | 100.0% |
+| swap_hop2 | 98.0% | 98.0% |
+| replace_hop2 | 97.3% | 96.0% |
+
+Pre-registered criteria (worst seed):
+
+| criterion (worst seed) | required | observed | result |
+|---|---|---|---|
+| prior_direct_acc | <= 0.05 | 0.0050 | PASS |
+| bank_masked_direct_acc | <= 0.05 | 0.0000 | PASS |
+| direct | >= 0.95 | 0.8500 | FAIL |
+| template1_train/direct | >= 0.95 | 1.0000 | PASS |
+| template2_heldout/direct | >= 0.8 | 0.3410 | FAIL |
+| template3_heldout/direct | >= 0.8 | 0.7200 | FAIL |
+| template4_heldout/direct | >= 0.7 | 0.5670 | FAIL |
+| template5_heldout/direct | >= 0.7 | 0.9340 | PASS |
+| update | >= 0.95 | 0.8500 | FAIL |
+| rollback | >= 0.95 | 0.8600 | FAIL |
+| resign | >= 0.95 | 0.8600 | FAIL |
+| revoke | >= 0.95 | 0.7000 | FAIL |
+| shred | >= 0.9 | 0.9900 | PASS |
+| broken1_unknown | >= 0.9 | 0.6900 | FAIL |
+| revoke_heldout_min | >= 0.85 | 0.1600 | FAIL |
+| shred_heldout_min | >= 0.85 | 0.7000 | FAIL |
+| locality | >= 0.98 | 0.9847 | PASS |
+| restored/direct_acc | >= 0.95 | 0.8200 | FAIL |
+| revoke/probe_top1 | <= 0.05 | 0.0100 | PASS |
+| revoke/forced_choice_win | <= 0.6 | 0.5700 | PASS |
+| shred_hard/probe_top1 | <= 0.05 | 0.0300 | PASS |
+| shred_hard/forced_choice_win | <= 0.6 | 0.5200 | PASS |
+| shred_hard/true_obj_top1_among_entities | <= 0.05 | 0.0100 | PASS |
+| shred_hard/payload_share | <= 0.05 | 0.0000 | PASS |
+| shred_hard/direct_unknown | >= 0.9 | 0.9900 | PASS |
+| alt_route/broken_route_changes | >= 0.95 | 0.9800 | PASS |
+| alt_route/other_route_survives | >= 0.95 | 0.7000 | FAIL |
+| interventions/localisation_hop1 | >= 0.9 | 1.0000 | PASS |
+| interventions/localisation_hop2 | >= 0.9 | 1.0000 | PASS |
+| interventions/disable_hop1_changes | >= 0.95 | 1.0000 | PASS |
+| interventions/disable_hop2_changes | >= 0.95 | 0.9900 | PASS |
+| interventions/disable_random_unchanged | >= 0.95 | 1.0000 | PASS |
+| interventions/swap_hop2 | >= 0.9 | 0.9796 | PASS |
+| interventions/replace_hop2 | >= 0.9 | 0.9600 | PASS |
+
+Lenient criteria (secondary, worst seed):
+
+| criterion (worst seed) | required | observed | result |
+|---|---|---|---|
+| direct | >= 0.9 | 0.8500 | FAIL |
+| template1_train/direct | >= 0.9 | 1.0000 | PASS |
+| revoke | >= 0.9 | 0.7000 | FAIL |
+| shred | >= 0.85 | 0.9900 | PASS |
+| broken1_unknown | >= 0.85 | 0.6900 | FAIL |
+
+## e000012_status_gated_revoke
+
+_not run in this session_
+
+## e000013_prior_conflict
 
 _not run in this session_
 
@@ -737,3 +883,157 @@ Scaling curve, same model on fresh worlds (direct accuracy / mean routing max-ma
 | 2 | 1.000 / 0.996 | 1.000 / 0.995 | 1.000 / 0.996 |
 
 **Interpretation (post hoc, record unchanged):** Ten times the bank and ten times the read-out vocabulary at once: every family stays at the E-000001-B level (direct 100% over 30,000 pooled queries, 3-hop 99.5%, provenance 99.99%), the verified gate keeps SHRED at F4 on 500 targets with thresholds derived for 2,560 entities, and the same model reads 100% at 1,000, 3,000 and 10,000 cells with routing mass 0.995 — addressing does not degrade in this range. Residual: 1 in 500 shredded targets answered (an unsigned marker passing the gate), inside the binomial threshold; the gate's false-accept tail is the quantity to watch at larger scale.
+
+## E-000015 — Explicit symlink cells: several access keys, one knowledge object
+
+Evidence level: **E4** (synthetic system). Deletion level targeted F4, recorded **F3**. Seeds: [0, 1, 2]; 4000 steps.
+
+Two stores hold the SAME world with the SAME ground truth and are read by the SAME trained model: in the symlink arm the 200 alias keys are LINK cells pointing at 100 target cells, in the duplication arm the same keys are ordinary fact cells holding a copy of the object. Every sharing claim is the difference between the arms.
+
+Symlink versus duplication (mean over seeds), the two arms holding identical ground truth:
+
+| what is measured | symlink arm | duplication arm |
+|---|---|---|
+| one UPDATE on the shared object reaches every access path | 100.0% | 0.0% |
+| one SHRED on the shared object leaves nothing readable | 100.0% | 0.0% |
+| object recoverable by probe after that one operation | 0.7% | 87.3% |
+| operations needed to reach every access path | 1 | 3 |
+
+| claim group | supported |
+|---|---|
+| reading | yes |
+| provenance_through_the_alias | yes |
+| dereference_is_what_reads_an_alias | yes |
+| one_update_reaches_every_path | yes |
+| one_shred_deletes_every_path | yes |
+| attacks_through_every_alias | yes |
+| alias_lifecycle | **no** |
+| capability_limit_of_one_slot | yes |
+| no_regression_without_links | yes |
+
+| measure | mean over seeds | worst seed | best seed |
+|---|---|---|---|
+| direct | 1.0000 | 1.0000 | 1.0000 |
+| alias_direct | 1.0000 | 1.0000 | 1.0000 |
+| dup_direct | 1.0000 | 1.0000 | 1.0000 |
+| hop2 | 1.0000 | 1.0000 | 1.0000 |
+| broken1_unknown | 1.0000 | 1.0000 | 1.0000 |
+| provenance_direct | 1.0000 | 1.0000 | 1.0000 |
+| alias_provenance_pair | 1.0000 | 1.0000 | 1.0000 |
+| alias_provenance_len2 | 1.0000 | 1.0000 | 1.0000 |
+| deref_disabled/alias_direct | 0.0000 | 0.0000 | 0.0000 |
+| deref_disabled/direct | 1.0000 | 1.0000 | 1.0000 |
+| shared_update/alias_new_object | 1.0000 | 1.0000 | 1.0000 |
+| duplicate_update/alias_new_object | 0.0000 | 0.0000 | 0.0000 |
+| shared_update/target_new_object | 1.0000 | 1.0000 | 1.0000 |
+| rollback/alias_direct | 1.0000 | 1.0000 | 1.0000 |
+| probe_calibration_top1 | 0.8867 | 0.8400 | 0.9467 |
+| shred_target/alias_unknown | 1.0000 | 1.0000 | 1.0000 |
+| shred_target/alias_true_object | 0.0000 | 0.0000 | 0.0000 |
+| shred_target/alias_probe_top1 | 0.0067 | 0.0000 | 0.0100 |
+| shred_target/alias_forced_choice | 0.5033 | 0.5000 | 0.5100 |
+| shred_target/alias_top1_among_entities | 0.0000 | 0.0000 | 0.0000 |
+| shred_target/alias_mean_rank | 127.4250 | 125.9900 | 130.2250 |
+| dup_shred/copy_direct_acc | 1.0000 | 1.0000 | 1.0000 |
+| dup_shred/copy_probe_top1 | 0.8733 | 0.8000 | 0.9600 |
+| dup_shred/copy_forced_choice | 1.0000 | 1.0000 | 1.0000 |
+| resign_target/alias_direct | 1.0000 | 1.0000 | 1.0000 |
+| revoke_alias/alias_unknown | 1.0000 | 1.0000 | 1.0000 |
+| revoke_alias/sibling_readable | 1.0000 | 1.0000 | 1.0000 |
+| revoke_alias/target_readable | 1.0000 | 1.0000 | 1.0000 |
+| shred_alias/alias_unknown | 0.9700 | 0.9300 | 1.0000 |
+| shred_alias/target_readable | 1.0000 | 1.0000 | 1.0000 |
+| relink/alias_new_object | 1.0000 | 1.0000 | 1.0000 |
+| relink/sibling_unchanged | 1.0000 | 1.0000 | 1.0000 |
+| relink_rollback/alias_direct | 1.0000 | 1.0000 | 1.0000 |
+| delete_target/alias_unknown | 1.0000 | 1.0000 | 1.0000 |
+| delete_target/alias_true_object | 0.0000 | 0.0000 | 0.0000 |
+| refcount_before_delete | 2.0000 | 2.0000 | 2.0000 |
+| chain2/answer_acc | 0.0000 | 0.0000 | 0.0000 |
+| chain2/unknown | 1.0000 | 1.0000 | 1.0000 |
+| chain2/depth1_acc | 1.0000 | 1.0000 | 1.0000 |
+| regression/direct | 1.0000 | 1.0000 | 1.0000 |
+| regression/hop2 | 1.0000 | 1.0000 | 1.0000 |
+| regression/hop3 | 0.9967 | 0.9933 | 1.0000 |
+| regression/reverse | 1.0000 | 1.0000 | 1.0000 |
+| regression/provenance | 1.0000 | 1.0000 | 1.0000 |
+| regression/broken2_unknown | 1.0000 | 1.0000 | 1.0000 |
+
+Exact binomial intervals (pooled over seeds):
+
+| measure | mean over seeds | worst seed | pooled n | 95% CI lower | 95% CI upper |
+|---|---|---|---|---|---|
+| direct | 1.0000 | 1.0000 | 1800 | 0.9980 | 1.0000 |
+| alias_direct | 1.0000 | 1.0000 | 600 | 0.9939 | 1.0000 |
+| dup_direct | 1.0000 | 1.0000 | 600 | 0.9939 | 1.0000 |
+| hop2 | 1.0000 | 1.0000 | 900 | 0.9959 | 1.0000 |
+| broken1_unknown | 1.0000 | 1.0000 | 600 | 0.9939 | 1.0000 |
+| provenance_direct | 1.0000 | 1.0000 | 1800 | 0.9980 | 1.0000 |
+| alias_provenance_pair | 1.0000 | 1.0000 | 600 | 0.9939 | 1.0000 |
+| shared_update/alias_new_object | 1.0000 | 1.0000 | 600 | 0.9939 | 1.0000 |
+| duplicate_update/alias_new_object | 0.0000 | 0.0000 | 600 | 0.0000 | 0.0061 |
+| shred_target/alias_unknown | 1.0000 | 1.0000 | 600 | 0.9939 | 1.0000 |
+| shred_target/alias_true_object | 0.0000 | 0.0000 | 600 | 0.0000 | 0.0061 |
+| shred_target/alias_probe_top1 | 0.0067 | 0.0100 | 600 | 0.0018 | 0.0170 |
+| shred_target/alias_top1_among_entities | 0.0000 | 0.0000 | 600 | 0.0000 | 0.0061 |
+| dup_shred/copy_direct_acc | 1.0000 | 1.0000 | 600 | 0.9939 | 1.0000 |
+| revoke_alias/alias_unknown | 1.0000 | 1.0000 | 300 | 0.9878 | 1.0000 |
+| shred_alias/alias_unknown | 0.9700 | 0.9300 | 300 | 0.9438 | 0.9862 |
+| relink/alias_new_object | 1.0000 | 1.0000 | 300 | 0.9878 | 1.0000 |
+| delete_target/alias_unknown | 1.0000 | 1.0000 | 600 | 0.9939 | 1.0000 |
+| chain2/answer_acc | 0.0000 | 0.0000 | 300 | 0.0000 | 0.0122 |
+| regression/direct | 1.0000 | 1.0000 | 900 | 0.9959 | 1.0000 |
+| regression/hop2 | 1.0000 | 1.0000 | 900 | 0.9959 | 1.0000 |
+| regression/hop3 | 0.9967 | 0.9933 | 900 | 0.9903 | 0.9993 |
+| regression/reverse | 1.0000 | 1.0000 | 900 | 0.9959 | 1.0000 |
+
+Pre-registered criteria (worst seed):
+
+| criterion (worst seed) | required | observed | result |
+|---|---|---|---|
+| direct | >= 0.98 | 1.0000 | PASS |
+| alias_direct | >= 0.95 | 1.0000 | PASS |
+| dup_direct | >= 0.98 | 1.0000 | PASS |
+| hop2 | >= 0.95 | 1.0000 | PASS |
+| broken1_unknown | >= 0.95 | 1.0000 | PASS |
+| provenance_direct | >= 0.95 | 1.0000 | PASS |
+| alias_provenance_pair | >= 0.9 | 1.0000 | PASS |
+| deref_disabled/alias_direct | <= 0.2 | 0.0000 | PASS |
+| deref_disabled/direct | >= 0.9 | 1.0000 | PASS |
+| shared_update/alias_new_object | >= 0.95 | 1.0000 | PASS |
+| duplicate_update/alias_new_object | <= 0.05 | 0.0000 | PASS |
+| shared_update/target_new_object | >= 0.95 | 1.0000 | PASS |
+| rollback/alias_direct | >= 0.95 | 1.0000 | PASS |
+| shred_target/alias_unknown | >= 0.95 | 1.0000 | PASS |
+| shred_target/alias_true_object | <= 0.05 | 0.0000 | PASS |
+| dup_shred/copy_direct_acc | >= 0.95 | 1.0000 | PASS |
+| resign_target/alias_direct | >= 0.95 | 1.0000 | PASS |
+| shred_target/alias_probe_top1 | <= 0.05 | 0.0100 | PASS |
+| shred_target/alias_forced_choice | <= 0.6 | 0.5100 | PASS |
+| shred_target/alias_top1_among_entities | <= 0.05 | 0.0000 | PASS |
+| revoke_alias/alias_unknown | >= 0.95 | 1.0000 | PASS |
+| revoke_alias/sibling_readable | >= 0.95 | 1.0000 | PASS |
+| revoke_alias/target_readable | >= 0.95 | 1.0000 | PASS |
+| shred_alias/alias_unknown | >= 0.95 | 0.9300 | FAIL |
+| shred_alias/target_readable | >= 0.95 | 1.0000 | PASS |
+| relink/alias_new_object | >= 0.9 | 1.0000 | PASS |
+| relink_rollback/alias_direct | >= 0.9 | 1.0000 | PASS |
+| delete_target/alias_unknown | >= 0.95 | 1.0000 | PASS |
+| delete_target/alias_true_object | <= 0.05 | 0.0000 | PASS |
+| chain2/answer_acc | <= 0.2 | 0.0000 | PASS |
+| regression/direct | >= 0.98 | 1.0000 | PASS |
+| regression/hop2 | >= 0.95 | 1.0000 | PASS |
+| regression/hop3 | >= 0.9 | 0.9933 | PASS |
+| regression/reverse | >= 0.95 | 1.0000 | PASS |
+| regression/provenance | >= 0.95 | 1.0000 | PASS |
+| regression/broken2_unknown | >= 0.95 | 1.0000 | PASS |
+
+Two-slot control (single seed): {'seed': 0, 'chain2/answer_acc': 0.0, 'chain2/depth1_acc': 1.0, 'alias_direct': 1.0, 'direct': 1.0, 'checkpoint_sha256': '34bca206b9d9c8a94d9e16ea82e906f4990e60d87a55aaec3f5e1ff99e05eca7'}
+
+By construction: the store decides which payload a row carries (an alias row carries its target's KEY, a fact row its object), exactly as it decides the marker; the bank never exports the target's payload, its status, its signature or the chain depth; that ONE update or ONE shred on a shared object reaches every alias is a property of the store; what is measured is whether the trained model reports it, and whether the SAME model reports the duplication arm (where it does not) correctly; a deleted target keeps its key as a tombstone, so a dangling pointer stays a pointer and the miss is not pre-resolved by the control plane.
+
+Learned: following a pointer: the dereference slot's query comes from the value just read, not from the question, and the model is never told that a value is a pointer; keeping a value that was not a pointer (the passthrough column) so that fact cells still read correctly, measured as deref_disabled/direct versus deref_disabled/alias_direct; answering UNKNOWN for a dangling pointer, for a revoked or shredded alias and for a shredded target; provenance across the indirection: the routing names the alias AND the cell it points at.
+
+Not claimed: LLM scale (the frozen-GPT-2 chain does not yet carry links); chains deeper than the number of dereference slots; reference counting as a garbage-collection policy.
+
+**Interpretation (post hoc, record unchanged):** The first measurement of the Symlink hypothesis as ledger section 7 states it: sharing versus duplicating. Both arms hold the identical world and are read by the identical model, so every number in the contrast is attributable to the storage form alone. One operation on the shared object reaches or deletes every access path; the same operation in the duplication arm reaches one key and leaves the object recoverable through the copies by probe (87.3%) and forced choice (1.000). The dereference ablation is the mechanism control: with the slot disabled, alias reading is 0% and fact reading is 100%. Two results are withheld and recorded as failures: shredding the alias rather than the payload reaches only 93% on the worst seed, and the two-slot control does not resolve two-link chains because chains never occur in the training distribution.

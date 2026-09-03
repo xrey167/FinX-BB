@@ -21,7 +21,7 @@ DOC = Path(__file__).resolve().parent.parent / "docs" / "so-results-2026-09-02.m
 ORDER = ["e000001a_reference", "e000001b_mini_transformer", "e000002_memorization_control",
          "e000003_retention_generalization", "e000004_reconstruction_attacks", "e000005_causal_interventions",
          "e000006_ablations", "e000007_biomarker", "e000008_gpt2_adapter", "e000009_verification_gate",
-         "e000010_balanced_gate", "e000011_gpt2_v2", "e000012_status_gated_revoke", "e000013_prior_conflict", "e000014_bank_10k"]
+         "e000010_balanced_gate", "e000011_gpt2_v2", "e000012_status_gated_revoke", "e000013_prior_conflict", "e000014_bank_10k", "e000015_symlink_cells"]
 
 # ledger §3 properties -> the experiments that bear on them
 PROPERTIES = {
@@ -67,6 +67,14 @@ NOTES = {
         "and 10,000 cells with routing mass 0.995 — addressing does not degrade in this range. Residual: 1 in 500 shredded "
         "targets answered (an unsigned marker passing the gate), inside the binomial threshold; the gate's false-accept tail is "
         "the quantity to watch at larger scale.",
+    "e000015_symlink_cells": "The first measurement of the Symlink hypothesis as ledger section 7 states it: sharing "
+        "versus duplicating. Both arms hold the identical world and are read by the identical model, so every number in "
+        "the contrast is attributable to the storage form alone. One operation on the shared object reaches or deletes "
+        "every access path; the same operation in the duplication arm reaches one key and leaves the object recoverable "
+        "through the copies by probe (87.3%) and forced choice (1.000). The dereference ablation is the mechanism "
+        "control: with the slot disabled, alias reading is 0% and fact reading is 100%. Two results are withheld and "
+        "recorded as failures: shredding the alias rather than the payload reaches only 93% on the worst seed, and the "
+        "two-slot control does not resolve two-link chains because chains never occur in the training distribution.",
     "e000007_biomarker": "The suppression-versus-deletion separation holds in every seed (suppressed: value "
         "contribution 8.3, probe 86%, mean rank 10; shredded: 1.3, 4%, 110). The two failed criteria are the same "
         "SHRED residual as in E-000004, addressed in E-000009.",
