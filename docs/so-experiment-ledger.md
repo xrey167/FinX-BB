@@ -1047,6 +1047,15 @@ A minimal system in which the neural core is trained on worlds that are re-sampl
 3. Routing supervision is necessary for the mechanism to be learned at all at this budget (E-000006); provenance exactness is therefore a trained property.
 4. The first GPT-2 adapter design did not learn (collapse to " unknown"); an untrained injection test showed the read-out path works at gain ≥ 1, and a routing-first curriculum was required (E-000008 engineering record).
 
-### 31.5 Boundary
+### 31.5 Symlink: which half of the concept is implemented
+
+Section 7 and architecture-document section 10 describe the Symlink in two directions. Only one of them is realised in this session's code, and the record must say so.
+
+- **Representation → cell (implemented, measured).** The neural representation carries no fact; it addresses a cell by routing attention, and the routing distribution *is* the provenance. This is what the copy-problem control tests: with the layer masked the model answers 0% and the leak after REVOKE is 0% (E-000002), provenance is exact (E-000001-B: 100%; E-000014 at 10,000 cells: 99.99%), and a causal intervention on the addressed cell changes the answer (E-000005).
+- **Cell → cell (not implemented).** There is no link cell whose payload references another cell, so several access keys cannot share one knowledge object K42. Every key carries its own payload; a fact that is to be reachable under two keys is stored twice. The consequences that the analogy promises are therefore untested: one UPDATE on the target changing every alias at once, SHRED of the target followed by the attack battery through *every* alias, revoking one alias while target and sibling aliases stay intact, dangling links after DELETE, link chains, cycles, reference counting, and provenance across the indirection.
+
+What is measured in place of the second half is that all *semantic* access paths that reach the same cell are removed by a single operation: after REVOKE of one cell, every paraphrase, every 2-hop route through it and reverse access answer UNKNOWN at 100% in the worst seed, while controls, unrelated cells and bypass paths stay at 100% (E-000003). That supports the deletion claim for one cell with many query forms; it does not support the shared-object claim for several keys. Closing that gap is E-000015.
+
+### 31.6 Boundary
 
 CPU only, no GPU, no LLM above 124M parameters, synthetic worlds, single-token entities, two surface forms per relation, one session. Nothing here shows unlearning of facts already encoded in pretrained weights. Evidence levels recorded: E3–E4 for the synthetic system (F4 for SHRED with the verified gate, E-000010); E5 as substrate for the frozen-GPT-2 experiment, with reading, composition, update and the copy bound supported and behavioural deletion not yet supported at the pre-registered thresholds.
