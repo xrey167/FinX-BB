@@ -28,6 +28,7 @@
 | E-000015 | Explicit symlink cells: several access keys share one knowledge object (symlink arm versus duplication arm) | E4 | F3 (F4) | **criteria NOT met** | 2026-09-03 08:23 |
 | E-000016 | Alias chains: two dereference slots resolve a two-link chain, one slot must refuse it | E4 | F3 | criteria met | 2026-09-03 09:41 |
 | E-000017-A | Diagnosis: reading versus refusal on held-out phrasings | E5 | - | recorded | 2026-09-03 12:00 |
+| E-000017-B | Stage-2 template budget: 8 trained, 4 held out, no consistency loss | E5 | F3 | **criteria NOT met** | 2026-09-03 14:11 |
 
 ## The six breakthrough properties (ledger section 3)
 
@@ -1430,3 +1431,47 @@ No model was trained for this record: E-000012's three checkpoints are evaluated
 Read the two conditional rows together: `refusal_given_active_correct` is how often the model answers ' unknown' after REVOKE among exactly those targets it read correctly while the cell was ACTIVE, and `deleted_object_given_active_correct` is how often it returns the deleted object instead.
 
 **Interpretation (post hoc, record unchanged):** The record that reframes the programme's one measured failure. Roadmap kill criterion 5 fired on the unconditional refusal rate, and that stands. Decomposing E-000012's own checkpoints without training anything shows the cause: conditioned on the model having read the fact at all while the cell was active, it refuses after REVOKE 96.1% of the time on held-out phrasings and returns the deleted object in 0.15% of those cases. What does not generalise is reading (69.4% against 96.1%), so the defect sits in the query and routing path. The worst-seed conditional figure is 94.2%, still under the bar, so the remedy run with the template budget the roadmap prescribes is still owed.
+
+## E-000017-B — Stage-2 template budget: 8 trained, 4 held out, no consistency loss
+
+Roadmap kill criterion 5 fired on a two-template budget. This run gives the stage the budget it prescribes and reports whether the held-out failure survives it.
+
+| claim group | supported |
+|---|---|
+| reading_generalises | **no** |
+| refusal_generalises | yes |
+| refusal_on_trained_templates_holds | yes |
+| deleted_object_never_returns | yes |
+| no_key_no_injection | **no** |
+
+| measure | mean over seeds | worst seed |
+|---|---|---|
+| train/active_correct | 0.9198 | 0.9119 |
+| heldout/active_correct | 0.7400 | 0.7288 |
+| train/refusal_given_active_correct | 0.9966 | 0.9952 |
+| heldout/refusal_given_active_correct | 0.9928 | 0.9870 |
+| heldout/revoked_deleted_object | 0.0000 | 0.0000 |
+| heldout/deleted_object_given_active_correct | 0.0000 | 0.0000 |
+| revoke_train_min | 0.9583 | 0.9550 |
+| revoke_heldout_min | 0.8983 | 0.8650 |
+| shred_train_min | 0.9583 | 0.9550 |
+| shred_heldout_min | 0.8983 | 0.8650 |
+| broken1_unknown | 0.7183 | 0.6300 |
+| generic/kl_to_base | 3.2741 | 2.9591 |
+
+Pre-registered criteria (worst seed):
+
+| criterion (worst seed) | required | observed | result |
+|---|---|---|---|
+| heldout/active_correct | >= 0.9 | 0.7288 | FAIL |
+| train/active_correct | >= 0.95 | 0.9119 | FAIL |
+| revoke_heldout_min | >= 0.85 | 0.8650 | PASS |
+| shred_heldout_min | >= 0.85 | 0.8650 | PASS |
+| revoke_train_min | >= 0.95 | 0.9550 | PASS |
+| shred_train_min | >= 0.9 | 0.9550 | PASS |
+| heldout/revoked_deleted_object | <= 0.02 | 0.0000 | PASS |
+| heldout/deleted_object_given_active_correct | <= 0.02 | 0.0000 | PASS |
+| broken1_unknown | >= 0.9 | 0.6300 | FAIL |
+| generic/kl_to_base | <= 0.05 | 3.6474 | FAIL |
+
+**Interpretation (post hoc, record unchanged):** The remedy run for the fired kill criterion, and it works for the part the criterion is about: at the prescribed budget of eight trained templates, refusal after REVOKE and SHRED on unseen phrasings reaches 89.8% (worst seed 86.5%) against 52% at two templates, the conditional figure reaches 99.3%, and the deleted object returns in exactly 0.0000 of cases. The criterion's own 95% bar is still not met, so it stays fired, but it is no longer evidence against the deletion mechanism. The run also surfaces a worse problem than the one it fixed: injection where there is no key degraded rather than improved (generic text 3.27 nats against a 0.05 bar, above E-000013's 2.27), so more prompt shapes in training mean more shapes that trigger a spurious read. That is the next thing to fix, because it means the layer perturbs the frozen model on unrelated text.

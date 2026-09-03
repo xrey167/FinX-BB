@@ -21,7 +21,7 @@ DOC = Path(__file__).resolve().parent.parent / "docs" / "so-results-2026-09-02.m
 ORDER = ["e000001a_reference", "e000001b_mini_transformer", "e000002_memorization_control",
          "e000003_retention_generalization", "e000004_reconstruction_attacks", "e000005_causal_interventions",
          "e000006_ablations", "e000007_biomarker", "e000008_gpt2_adapter", "e000009_verification_gate",
-         "e000010_balanced_gate", "e000011_gpt2_v2", "e000012_status_gated_revoke", "e000013_prior_conflict", "e000014_bank_10k", "e000015_symlink_cells", "e000016_alias_chains", "e000017a_paraphrase_diagnosis"]
+         "e000010_balanced_gate", "e000011_gpt2_v2", "e000012_status_gated_revoke", "e000013_prior_conflict", "e000014_bank_10k", "e000015_symlink_cells", "e000016_alias_chains", "e000017a_paraphrase_diagnosis", "e000017b_templates8"]
 
 # ledger §3 properties -> the experiments that bear on them
 PROPERTIES = {
@@ -83,6 +83,14 @@ NOTES = {
         "control: with the slot disabled, alias reading is 0% and fact reading is 100%. Two results are withheld and "
         "recorded as failures: shredding the alias rather than the payload reaches only 93% on the worst seed, and the "
         "two-slot control does not resolve two-link chains because chains never occur in the training distribution.",
+    "e000017b_templates8": "The remedy run for the fired kill criterion, and it works for the part the criterion is "
+        "about: at the prescribed budget of eight trained templates, refusal after REVOKE and SHRED on unseen phrasings "
+        "reaches 89.8% (worst seed 86.5%) against 52% at two templates, the conditional figure reaches 99.3%, and the "
+        "deleted object returns in exactly 0.0000 of cases. The criterion's own 95% bar is still not met, so it stays "
+        "fired, but it is no longer evidence against the deletion mechanism. The run also surfaces a worse problem than "
+        "the one it fixed: injection where there is no key degraded rather than improved (generic text 3.27 nats against "
+        "a 0.05 bar, above E-000013's 2.27), so more prompt shapes in training mean more shapes that trigger a spurious "
+        "read. That is the next thing to fix, because it means the layer perturbs the frozen model on unrelated text.",
     "e000017a_paraphrase_diagnosis": "The record that reframes the programme's one measured failure. Roadmap kill "
         "criterion 5 fired on the unconditional refusal rate, and that stands. Decomposing E-000012's own checkpoints "
         "without training anything shows the cause: conditioned on the model having read the fact at all while the cell "
