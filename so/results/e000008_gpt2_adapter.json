@@ -1,0 +1,750 @@
+{
+  "aggregate": {
+    "active/direct_acc": {
+      "max": 0.9,
+      "mean": 0.8833333333333333,
+      "min": 0.86,
+      "n": 3
+    },
+    "active/direct_unknown": {
+      "max": 0.12,
+      "mean": 0.09999999999999999,
+      "min": 0.09,
+      "n": 3
+    },
+    "active/forced_choice_win": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "active/full_vocab_top1_equals_prior": {
+      "max": 0.02,
+      "mean": 0.006666666666666667,
+      "min": 0.0,
+      "n": 3
+    },
+    "active/full_vocab_top1_is_unknown_word": {
+      "max": 0.02,
+      "mean": 0.01,
+      "min": 0.0,
+      "n": 3
+    },
+    "active/gated_value_contribution": {
+      "max": 13.762333869934082,
+      "mean": 13.283150990804037,
+      "min": 12.836153984069824,
+      "n": 3
+    },
+    "active/paraphrase_unknown": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 3
+    },
+    "active/probe_top1": {
+      "max": 0.79,
+      "mean": 0.7766666666666667,
+      "min": 0.76,
+      "n": 3
+    },
+    "active/probe_top5": {
+      "max": 0.89,
+      "mean": 0.8766666666666666,
+      "min": 0.87,
+      "n": 3
+    },
+    "active/routing_mass_on_target": {
+      "max": 0.7903842926025391,
+      "mean": 0.7660723725954691,
+      "min": 0.7511265277862549,
+      "n": 3
+    },
+    "active/true_obj_mean_rank": {
+      "max": 0.5,
+      "mean": 0.21333333333333335,
+      "min": 0.04,
+      "n": 3
+    },
+    "active/true_obj_top1_among_entities": {
+      "max": 0.97,
+      "mean": 0.9466666666666667,
+      "min": 0.93,
+      "n": 3
+    },
+    "bank_masked_direct_acc": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 3
+    },
+    "bank_masked_full_vocab_top1_equals_prior": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 3
+    },
+    "bank_masked_unknown_rate": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "broken1_unknown": {
+      "max": 0.69,
+      "mean": 0.6366666666666667,
+      "min": 0.56,
+      "n": 3
+    },
+    "broken2_unknown": {
+      "max": 0.69,
+      "mean": 0.6633333333333334,
+      "min": 0.62,
+      "n": 3
+    },
+    "direct": {
+      "max": 0.891,
+      "mean": 0.8886666666666666,
+      "min": 0.885,
+      "n": 3
+    },
+    "direct_full_vocab_top1": {
+      "max": 0.858,
+      "mean": 0.8373333333333334,
+      "min": 0.805,
+      "n": 3
+    },
+    "hop2": {
+      "max": 0.7733333333333333,
+      "mean": 0.7533333333333333,
+      "min": 0.7233333333333334,
+      "n": 3
+    },
+    "lifecycle_all": {
+      "max": 0.8216666666666667,
+      "mean": 0.7961111111111111,
+      "min": 0.775,
+      "n": 3
+    },
+    "locality": {
+      "max": 0.9952941176470588,
+      "mean": 0.9925490196078431,
+      "min": 0.9894117647058823,
+      "n": 3
+    },
+    "locality_targets_correct": {
+      "max": 0.7866666666666666,
+      "mean": 0.7822222222222223,
+      "min": 0.7733333333333333,
+      "n": 3
+    },
+    "locality_undo_exact": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "paraphrase": {
+      "max": 1.0,
+      "mean": 0.9993333333333334,
+      "min": 0.999,
+      "n": 3
+    },
+    "prior_direct_acc": {
+      "max": 0.01,
+      "mean": 0.006333333333333333,
+      "min": 0.004,
+      "n": 3
+    },
+    "prior_unknown_rate": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 3
+    },
+    "probe_calibration_top1": {
+      "max": 0.8166666666666667,
+      "mean": 0.8018518518518518,
+      "min": 0.7833333333333333,
+      "n": 3
+    },
+    "probe_calibration_top5": {
+      "max": 0.8944444444444445,
+      "mean": 0.8796296296296297,
+      "min": 0.8555555555555555,
+      "n": 3
+    },
+    "provenance_direct": {
+      "max": 0.846,
+      "mean": 0.842,
+      "min": 0.836,
+      "n": 3
+    },
+    "resign": {
+      "max": 0.96,
+      "mean": 0.96,
+      "min": 0.96,
+      "n": 3
+    },
+    "restore": {
+      "max": 0.96,
+      "mean": 0.96,
+      "min": 0.96,
+      "n": 3
+    },
+    "restored/direct_acc": {
+      "max": 0.9,
+      "mean": 0.8833333333333333,
+      "min": 0.86,
+      "n": 3
+    },
+    "revoke": {
+      "max": 0.66,
+      "mean": 0.5633333333333334,
+      "min": 0.49,
+      "n": 3
+    },
+    "revoke/direct_acc": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 3
+    },
+    "revoke/direct_unknown": {
+      "max": 0.57,
+      "mean": 0.5399999999999999,
+      "min": 0.5,
+      "n": 3
+    },
+    "revoke/forced_choice_win": {
+      "max": 0.53,
+      "mean": 0.49666666666666665,
+      "min": 0.45,
+      "n": 3
+    },
+    "revoke/full_vocab_top1_equals_prior": {
+      "max": 0.1,
+      "mean": 0.03333333333333333,
+      "min": 0.0,
+      "n": 3
+    },
+    "revoke/full_vocab_top1_is_unknown_word": {
+      "max": 0.16,
+      "mean": 0.13,
+      "min": 0.11,
+      "n": 3
+    },
+    "revoke/gated_value_contribution": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 3
+    },
+    "revoke/paraphrase_unknown": {
+      "max": 0.66,
+      "mean": 0.6066666666666668,
+      "min": 0.56,
+      "n": 3
+    },
+    "revoke/probe_top1": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 3
+    },
+    "revoke/probe_top5": {
+      "max": 0.03,
+      "mean": 0.016666666666666666,
+      "min": 0.0,
+      "n": 3
+    },
+    "revoke/routing_mass_on_target": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 3
+    },
+    "revoke/true_obj_mean_rank": {
+      "max": 141.33,
+      "mean": 133.83,
+      "min": 122.44,
+      "n": 3
+    },
+    "revoke/true_obj_top1_among_entities": {
+      "max": 0.01,
+      "mean": 0.0033333333333333335,
+      "min": 0.0,
+      "n": 3
+    },
+    "rollback": {
+      "max": 0.96,
+      "mean": 0.96,
+      "min": 0.96,
+      "n": 3
+    },
+    "shred": {
+      "max": 0.44,
+      "mean": 0.38000000000000006,
+      "min": 0.33,
+      "n": 3
+    },
+    "shred/direct_acc": {
+      "max": 0.17,
+      "mean": 0.14,
+      "min": 0.11,
+      "n": 3
+    },
+    "shred/direct_unknown": {
+      "max": 0.53,
+      "mean": 0.5066666666666667,
+      "min": 0.48,
+      "n": 3
+    },
+    "shred/forced_choice_win": {
+      "max": 0.73,
+      "mean": 0.6733333333333333,
+      "min": 0.62,
+      "n": 3
+    },
+    "shred/full_vocab_top1_equals_prior": {
+      "max": 0.09,
+      "mean": 0.03,
+      "min": 0.0,
+      "n": 3
+    },
+    "shred/full_vocab_top1_is_unknown_word": {
+      "max": 0.15,
+      "mean": 0.11333333333333333,
+      "min": 0.08,
+      "n": 3
+    },
+    "shred/gated_value_contribution": {
+      "max": 0.3086816072463989,
+      "mean": 0.3019165098667145,
+      "min": 0.29650747776031494,
+      "n": 3
+    },
+    "shred/paraphrase_unknown": {
+      "max": 0.38,
+      "mean": 0.34,
+      "min": 0.3,
+      "n": 3
+    },
+    "shred/probe_top1": {
+      "max": 0.18,
+      "mean": 0.15,
+      "min": 0.11,
+      "n": 3
+    },
+    "shred/probe_top5": {
+      "max": 0.22,
+      "mean": 0.21,
+      "min": 0.2,
+      "n": 3
+    },
+    "shred/routing_mass_on_target": {
+      "max": 0.7904210686683655,
+      "mean": 0.7660844922065735,
+      "min": 0.7511266469955444,
+      "n": 3
+    },
+    "shred/true_obj_mean_rank": {
+      "max": 86.51,
+      "mean": 77.35666666666667,
+      "min": 68.02,
+      "n": 3
+    },
+    "shred/true_obj_top1_among_entities": {
+      "max": 0.21,
+      "mean": 0.18000000000000002,
+      "min": 0.13,
+      "n": 3
+    },
+    "train_seconds": {
+      "max": 1233.9811038970947,
+      "mean": 1214.5600984891255,
+      "min": 1199.4540812969208,
+      "n": 3
+    },
+    "update": {
+      "max": 0.96,
+      "mean": 0.9533333333333333,
+      "min": 0.95,
+      "n": 3
+    }
+  },
+  "by_construction_vs_learned": "The frozen core cannot copy a fact by construction; whether the ADAPTER copies is measured by the masked-bank rows (must equal the prior). REVOKE is a mask (F1); what is learned is reading the right cell from natural-language prompts, turning the value into the object token through the unchanged LM head, answering ' unknown' for null reads, and refusing a shredded payload.",
+  "claim": "NOT SUPPORTED BY THE MEASUREMENTS (see criteria): With a frozen pretrained transformer as neural core and natural-language queries, an adapter learns to read the mutable knowledge layer so that the model's own LM head emits the object; UPDATE / ROLLBACK / REVOKE / RESTORE / SHRED / RESIGN are reproduced against the reference, deletion generalises across paraphrases, unrelated cells are unaffected, and after REVOKE / SHRED the object is not recoverable by forced choice, logit rank or a linear probe on the final hidden state.",
+  "claim_supported": false,
+  "config": {
+    "adapter": {
+      "d_key": 256,
+      "marker_dim": 16,
+      "n_relations": 4,
+      "read_layers": [
+        8,
+        10
+      ],
+      "use_marker_gate": true
+    },
+    "batch_size": 32,
+    "entity_names_note": "entities are the first 256 capitalised single BPE tokens of GPT-2 (some are word fragments)",
+    "eval": {
+      "n_alt_structures": 25,
+      "n_broken": 100,
+      "n_cells": 1000,
+      "n_hop2": 300,
+      "n_lifecycle": 100,
+      "n_locality_revokes": 50,
+      "n_locality_updates": 100,
+      "n_targets": 100
+    },
+    "nouns": {
+      "0": "home",
+      "1": "employer",
+      "2": "spouse",
+      "3": "birthplace"
+    },
+    "seeds": [
+      0,
+      1,
+      2
+    ],
+    "steps": 2000,
+    "templates": {
+      "0": [
+        "{s} lives in",
+        "The home of {s} is"
+      ],
+      "1": [
+        "{s} works for",
+        "The employer of {s} is"
+      ],
+      "2": [
+        "{s} is married to",
+        "The spouse of {s} is"
+      ],
+      "3": [
+        "{s} was born in",
+        "The birthplace of {s} is"
+      ]
+    }
+  },
+  "criteria": {
+    "bank_masked_direct_acc": {
+      "observed": 0.0,
+      "op": "<=",
+      "pass": true,
+      "threshold": 0.05
+    },
+    "broken1_unknown": {
+      "observed": 0.56,
+      "op": ">=",
+      "pass": false,
+      "threshold": 0.9
+    },
+    "direct": {
+      "observed": 0.885,
+      "op": ">=",
+      "pass": false,
+      "threshold": 0.95
+    },
+    "locality": {
+      "observed": 0.9894117647058823,
+      "op": ">=",
+      "pass": true,
+      "threshold": 0.98
+    },
+    "paraphrase": {
+      "observed": 0.999,
+      "op": ">=",
+      "pass": true,
+      "threshold": 0.95
+    },
+    "prior_direct_acc": {
+      "observed": 0.01,
+      "op": "<=",
+      "pass": true,
+      "threshold": 0.05
+    },
+    "resign": {
+      "observed": 0.96,
+      "op": ">=",
+      "pass": true,
+      "threshold": 0.95
+    },
+    "restore": {
+      "observed": 0.96,
+      "op": ">=",
+      "pass": true,
+      "threshold": 0.95
+    },
+    "restored/direct_acc": {
+      "observed": 0.86,
+      "op": ">=",
+      "pass": false,
+      "threshold": 0.95
+    },
+    "revoke": {
+      "observed": 0.49,
+      "op": ">=",
+      "pass": false,
+      "threshold": 0.95
+    },
+    "revoke/forced_choice_win": {
+      "observed": 0.53,
+      "op": "<=",
+      "pass": true,
+      "threshold": 0.6
+    },
+    "revoke/probe_top1": {
+      "observed": 0.0,
+      "op": "<=",
+      "pass": true,
+      "threshold": 0.05
+    },
+    "rollback": {
+      "observed": 0.96,
+      "op": ">=",
+      "pass": true,
+      "threshold": 0.95
+    },
+    "shred": {
+      "observed": 0.33,
+      "op": ">=",
+      "pass": false,
+      "threshold": 0.9
+    },
+    "shred/forced_choice_win": {
+      "observed": 0.73,
+      "op": "<=",
+      "pass": false,
+      "threshold": 0.6
+    },
+    "shred/probe_top1": {
+      "observed": 0.18,
+      "op": "<=",
+      "pass": false,
+      "threshold": 0.05
+    },
+    "update": {
+      "observed": 0.95,
+      "op": ">=",
+      "pass": true,
+      "threshold": 0.95
+    }
+  },
+  "deletion_level": "F4",
+  "deletion_level_meaning": "Representational removal",
+  "environment": {
+    "device": "cpu",
+    "numpy": "2.2.6",
+    "platform": "Linux-6.18.44-fc-v24-x86_64-with-glibc2.39",
+    "python": "3.11.15",
+    "threads": "2",
+    "torch": "2.14.0+cpu"
+  },
+  "evidence_level": "E5",
+  "evidence_level_meaning": "Transformer evidence",
+  "experiment": "E-000008",
+  "not_claimed": "E6 at LLM scale: GPT-2 small (124M) on CPU; entities are single tokens; the core is frozen, so nothing is shown about facts already encoded in pretrained weights.",
+  "per_seed": [
+    {
+      "active/direct_acc": 0.86,
+      "active/direct_unknown": 0.12,
+      "active/forced_choice_win": 1.0,
+      "active/full_vocab_top1_equals_prior": 0.02,
+      "active/full_vocab_top1_is_unknown_word": 0.01,
+      "active/gated_value_contribution": 12.836153984069824,
+      "active/paraphrase_unknown": 0.0,
+      "active/probe_top1": 0.79,
+      "active/probe_top5": 0.89,
+      "active/routing_mass_on_target": 0.7511265277862549,
+      "active/true_obj_mean_rank": 0.5,
+      "active/true_obj_top1_among_entities": 0.93,
+      "bank_masked_direct_acc": 0.0,
+      "bank_masked_full_vocab_top1_equals_prior": 0.0,
+      "bank_masked_unknown_rate": 1.0,
+      "broken1_unknown": 0.69,
+      "broken2_unknown": 0.69,
+      "direct": 0.885,
+      "direct_full_vocab_top1": 0.849,
+      "hop2": 0.7633333333333333,
+      "lifecycle_all": 0.7916666666666666,
+      "locality": 0.9894117647058823,
+      "locality_targets_correct": 0.7733333333333333,
+      "locality_undo_exact": 1.0,
+      "paraphrase": 0.999,
+      "prior_direct_acc": 0.005,
+      "prior_unknown_rate": 0.0,
+      "probe_calibration_top1": 0.8166666666666667,
+      "probe_calibration_top5": 0.8944444444444445,
+      "provenance_direct": 0.844,
+      "resign": 0.96,
+      "restore": 0.96,
+      "restored/direct_acc": 0.86,
+      "revoke": 0.54,
+      "revoke/direct_acc": 0.0,
+      "revoke/direct_unknown": 0.5,
+      "revoke/forced_choice_win": 0.45,
+      "revoke/full_vocab_top1_equals_prior": 0.1,
+      "revoke/full_vocab_top1_is_unknown_word": 0.16,
+      "revoke/gated_value_contribution": 0.0,
+      "revoke/paraphrase_unknown": 0.6,
+      "revoke/probe_top1": 0.0,
+      "revoke/probe_top5": 0.03,
+      "revoke/routing_mass_on_target": 0.0,
+      "revoke/true_obj_mean_rank": 141.33,
+      "revoke/true_obj_top1_among_entities": 0.0,
+      "rollback": 0.96,
+      "seed": 800,
+      "shred": 0.37,
+      "shred/direct_acc": 0.11,
+      "shred/direct_unknown": 0.51,
+      "shred/forced_choice_win": 0.62,
+      "shred/full_vocab_top1_equals_prior": 0.09,
+      "shred/full_vocab_top1_is_unknown_word": 0.15,
+      "shred/gated_value_contribution": 0.29650747776031494,
+      "shred/paraphrase_unknown": 0.38,
+      "shred/probe_top1": 0.11,
+      "shred/probe_top5": 0.2,
+      "shred/routing_mass_on_target": 0.7511266469955444,
+      "shred/true_obj_mean_rank": 86.51,
+      "shred/true_obj_top1_among_entities": 0.13,
+      "train_seconds": 1233.9811038970947,
+      "update": 0.96
+    },
+    {
+      "active/direct_acc": 0.89,
+      "active/direct_unknown": 0.09,
+      "active/forced_choice_win": 1.0,
+      "active/full_vocab_top1_equals_prior": 0.0,
+      "active/full_vocab_top1_is_unknown_word": 0.0,
+      "active/gated_value_contribution": 13.762333869934082,
+      "active/paraphrase_unknown": 0.0,
+      "active/probe_top1": 0.78,
+      "active/probe_top5": 0.87,
+      "active/routing_mass_on_target": 0.7903842926025391,
+      "active/true_obj_mean_rank": 0.1,
+      "active/true_obj_top1_among_entities": 0.94,
+      "bank_masked_direct_acc": 0.0,
+      "bank_masked_full_vocab_top1_equals_prior": 0.0,
+      "bank_masked_unknown_rate": 1.0,
+      "broken1_unknown": 0.56,
+      "broken2_unknown": 0.68,
+      "direct": 0.89,
+      "direct_full_vocab_top1": 0.858,
+      "hop2": 0.7733333333333333,
+      "lifecycle_all": 0.8216666666666667,
+      "locality": 0.9952941176470588,
+      "locality_targets_correct": 0.7866666666666666,
+      "locality_undo_exact": 1.0,
+      "paraphrase": 1.0,
+      "prior_direct_acc": 0.01,
+      "prior_unknown_rate": 0.0,
+      "probe_calibration_top1": 0.8055555555555556,
+      "probe_calibration_top5": 0.8888888888888888,
+      "provenance_direct": 0.846,
+      "resign": 0.96,
+      "restore": 0.96,
+      "restored/direct_acc": 0.89,
+      "revoke": 0.66,
+      "revoke/direct_acc": 0.0,
+      "revoke/direct_unknown": 0.57,
+      "revoke/forced_choice_win": 0.51,
+      "revoke/full_vocab_top1_equals_prior": 0.0,
+      "revoke/full_vocab_top1_is_unknown_word": 0.11,
+      "revoke/gated_value_contribution": 0.0,
+      "revoke/paraphrase_unknown": 0.56,
+      "revoke/probe_top1": 0.0,
+      "revoke/probe_top5": 0.02,
+      "revoke/routing_mass_on_target": 0.0,
+      "revoke/true_obj_mean_rank": 137.72,
+      "revoke/true_obj_top1_among_entities": 0.01,
+      "rollback": 0.96,
+      "seed": 801,
+      "shred": 0.44,
+      "shred/direct_acc": 0.14,
+      "shred/direct_unknown": 0.53,
+      "shred/forced_choice_win": 0.67,
+      "shred/full_vocab_top1_equals_prior": 0.0,
+      "shred/full_vocab_top1_is_unknown_word": 0.08,
+      "shred/gated_value_contribution": 0.30056044459342957,
+      "shred/paraphrase_unknown": 0.3,
+      "shred/probe_top1": 0.18,
+      "shred/probe_top5": 0.21,
+      "shred/routing_mass_on_target": 0.7904210686683655,
+      "shred/true_obj_mean_rank": 77.54,
+      "shred/true_obj_top1_among_entities": 0.2,
+      "train_seconds": 1210.2451102733612,
+      "update": 0.95
+    },
+    {
+      "active/direct_acc": 0.9,
+      "active/direct_unknown": 0.09,
+      "active/forced_choice_win": 1.0,
+      "active/full_vocab_top1_equals_prior": 0.0,
+      "active/full_vocab_top1_is_unknown_word": 0.02,
+      "active/gated_value_contribution": 13.250965118408203,
+      "active/paraphrase_unknown": 0.0,
+      "active/probe_top1": 0.76,
+      "active/probe_top5": 0.87,
+      "active/routing_mass_on_target": 0.7567062973976135,
+      "active/true_obj_mean_rank": 0.04,
+      "active/true_obj_top1_among_entities": 0.97,
+      "bank_masked_direct_acc": 0.0,
+      "bank_masked_full_vocab_top1_equals_prior": 0.0,
+      "bank_masked_unknown_rate": 1.0,
+      "broken1_unknown": 0.66,
+      "broken2_unknown": 0.62,
+      "direct": 0.891,
+      "direct_full_vocab_top1": 0.805,
+      "hop2": 0.7233333333333334,
+      "lifecycle_all": 0.775,
+      "locality": 0.9929411764705882,
+      "locality_targets_correct": 0.7866666666666666,
+      "locality_undo_exact": 1.0,
+      "paraphrase": 0.999,
+      "prior_direct_acc": 0.004,
+      "prior_unknown_rate": 0.0,
+      "probe_calibration_top1": 0.7833333333333333,
+      "probe_calibration_top5": 0.8555555555555555,
+      "provenance_direct": 0.836,
+      "resign": 0.96,
+      "restore": 0.96,
+      "restored/direct_acc": 0.9,
+      "revoke": 0.49,
+      "revoke/direct_acc": 0.0,
+      "revoke/direct_unknown": 0.55,
+      "revoke/forced_choice_win": 0.53,
+      "revoke/full_vocab_top1_equals_prior": 0.0,
+      "revoke/full_vocab_top1_is_unknown_word": 0.12,
+      "revoke/gated_value_contribution": 0.0,
+      "revoke/paraphrase_unknown": 0.66,
+      "revoke/probe_top1": 0.0,
+      "revoke/probe_top5": 0.0,
+      "revoke/routing_mass_on_target": 0.0,
+      "revoke/true_obj_mean_rank": 122.44,
+      "revoke/true_obj_top1_among_entities": 0.0,
+      "rollback": 0.96,
+      "seed": 802,
+      "shred": 0.33,
+      "shred/direct_acc": 0.17,
+      "shred/direct_unknown": 0.48,
+      "shred/forced_choice_win": 0.73,
+      "shred/full_vocab_top1_equals_prior": 0.0,
+      "shred/full_vocab_top1_is_unknown_word": 0.11,
+      "shred/gated_value_contribution": 0.3086816072463989,
+      "shred/paraphrase_unknown": 0.34,
+      "shred/probe_top1": 0.16,
+      "shred/probe_top5": 0.22,
+      "shred/routing_mass_on_target": 0.7567057609558105,
+      "shred/true_obj_mean_rank": 68.02,
+      "shred/true_obj_top1_among_entities": 0.21,
+      "train_seconds": 1199.4540812969208,
+      "update": 0.95
+    }
+  ],
+  "recorded_at": "2026-09-03T00:41:25+00:00",
+  "title": "Frozen pretrained GPT-2 core with the mutable knowledge layer (symlink adapter)"
+}
