@@ -81,6 +81,12 @@ NOTES = {
         "control: with the slot disabled, alias reading is 0% and fact reading is 100%. Two results are withheld and "
         "recorded as failures: shredding the alias rather than the payload reaches only 93% on the worst seed, and the "
         "two-slot control does not resolve two-link chains because chains never occur in the training distribution.",
+    "e000016_alias_chains": "The follow-up that turns E-000015's two recorded failures into an explanation. Both were "
+        "caused by the training distribution rather than the architecture: with 30% chains in training, two dereference "
+        "slots resolve a two-link chain completely, a one-slot model refuses it (100% unknown, 0% answered) instead of "
+        "naming another entity, and shredding the pointer rather than the payload rises from 93% to 97% on the worst "
+        "seed. The refusal arm is the load-bearing part: it shows the depth the mechanism reaches is set by the number "
+        "of slots, and that the model reports the limit instead of hiding it.",
     "e000007_biomarker": "The suppression-versus-deletion separation holds in every seed (suppressed: value "
         "contribution 8.3, probe 86%, mean rank 10; shredded: 1.3, 4%, 110). The two failed criteria are the same "
         "SHRED residual as in E-000004, addressed in E-000009.",
