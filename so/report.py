@@ -61,6 +61,12 @@ NOTES = {
         "physically present and routed to (routing mass 0.998), and no other family degrades. This is the F4-level result "
         "of the session, within the synthetic system. Residual caveat: the soft gate still assigns a high score to a rare "
         "unsigned marker in one seed (max 0.995 among all unsigned cells of that bank); none of the 500 shredded targets leaked.",
+    "e000014_bank_10k": "Ten times the bank and ten times the read-out vocabulary at once: every family stays at the "
+        "E-000001-B level (direct 100% over 30,000 pooled queries, 3-hop 99.5%, provenance 99.99%), the verified gate keeps "
+        "SHRED at F4 on 500 targets with thresholds derived for 2,560 entities, and the same model reads 100% at 1,000, 3,000 "
+        "and 10,000 cells with routing mass 0.995 — addressing does not degrade in this range. Residual: 1 in 500 shredded "
+        "targets answered (an unsigned marker passing the gate), inside the binomial threshold; the gate's false-accept tail is "
+        "the quantity to watch at larger scale.",
     "e000007_biomarker": "The suppression-versus-deletion separation holds in every seed (suppressed: value "
         "contribution 8.3, probe 86%, mean rank 10; shredded: 1.3, 4%, 110). The two failed criteria are the same "
         "SHRED residual as in E-000004, addressed in E-000009.",

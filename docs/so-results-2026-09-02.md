@@ -21,6 +21,8 @@
 | E-000008 | Frozen pretrained GPT-2 core with the mutable knowledge layer (symlink adapter) | E5 | F1 (F4) | **criteria NOT met** | 2026-09-03 00:44 |
 | E-000009 | Signature-verification gate: closing the SHRED residual | E4 | F3 (F4) | **criteria NOT met** | 2026-09-03 00:04 |
 | E-000010 | Signature-verification gate: closing the SHRED residual (class-balanced loss) | E4 | F4 (F4) | criteria met | 2026-09-03 00:05 |
+| e000011_gpt2_v2 | - | - | - | not run | - |
+| E-000014 | Addressing at 10,000 cells (2,560 entities), verified gate | E4 | F4 (F4) | criteria met | 2026-09-03 05:58 |
 
 ## The six breakthrough properties (ledger section 3)
 
@@ -30,8 +32,8 @@
 | Retention (non-target intact) | E-000001-B, E-000003, E-000008 | E-000001-B: criteria met; E-000003: criteria met; E-000008: **criteria NOT met** | E5 |
 | Generalisation (paraphrases, alternative queries) | E-000003, E-000004, E-000008 | E-000003: criteria met; E-000004: **criteria NOT met**; E-000008: **criteria NOT met** | E5 |
 | Causal isolation (effect follows from the intended structure) | E-000005, E-000006, E-000007 | E-000005: criteria met; E-000006: **criteria NOT met**; E-000007: **criteria NOT met** | E4 |
-| Reconstruction resistance | E-000004, E-000007, E-000009, E-000010, E-000008 | E-000004: **criteria NOT met**; E-000007: **criteria NOT met**; E-000009: **criteria NOT met**; E-000010: criteria met; E-000008: **criteria NOT met** | E5 |
-| Scalability (path beyond toy models) | E-000002, E-000008 | E-000002: criteria met; E-000008: **criteria NOT met** | E5 |
+| Reconstruction resistance | E-000004, E-000007, E-000009, E-000010, E-000008, E-000014 | E-000004: **criteria NOT met**; E-000007: **criteria NOT met**; E-000009: **criteria NOT met**; E-000010: criteria met; E-000008: **criteria NOT met**; E-000014: criteria met | E5 |
+| Scalability (path beyond toy models) | E-000002, E-000008, E-000014 | E-000002: criteria met; E-000008: **criteria NOT met**; E-000014: criteria met | E5 |
 
 Scalability is the property this session can least address: E-000008 tests whether the same layer works as an adapter on a frozen pretrained GPT-2 (recorded below); the path to LLM scale is a roadmap item, not a result.
 
@@ -642,3 +644,96 @@ The soft gate's separation of signed and unsigned markers is learned. Hard verif
 Chance levels: probe top-1 0.0039, forced choice 0.5, mean rank 127.5.
 
 **Interpretation (post hoc, record unchanged):** Closes the residual: with signed and unsigned markers weighted equally in the verification loss (weight 5), every reconstruction attack after SHRED is at chance in all five seeds while the payload remains physically present and routed to (routing mass 0.998), and no other family degrades. This is the F4-level result of the session, within the synthetic system. Residual caveat: the soft gate still assigns a high score to a rare unsigned marker in one seed (max 0.995 among all unsigned cells of that bank); none of the 500 shredded targets leaked.
+
+## e000011_gpt2_v2
+
+_not run in this session_
+
+## E-000014 — Addressing at 10,000 cells
+
+Evidence level: **E4**; deletion level targeted F4, recorded **F4**. Seeds: [0, 1, 2]; 3000 steps; banks of 7,000–10,000 cells over 2560 entities; class-balanced verified gate (weight 5).
+
+| measure | mean over seeds | worst seed | pooled n | 95% CI lower | 95% CI upper |
+|---|---|---|---|---|---|
+| direct | 1.0000 | 1.0000 | 30000 | 0.9999 | 1.0000 |
+| hop2 | 0.9993 | 0.9980 | 1500 | 0.9963 | 1.0000 |
+| hop3 | 0.9947 | 0.9900 | 1500 | 0.9895 | 0.9977 |
+| hop2_broken_unknown | 1.0000 | 1.0000 | 300 | 0.9878 | 1.0000 |
+| hop3_broken_unknown | 0.9567 | 0.9500 | 300 | 0.9270 | 0.9767 |
+| provenance | 0.9999 | 0.9998 | 33000 | 0.9998 | 1.0000 |
+| reverse | 0.9978 | 0.9967 | 900 | 0.9920 | 0.9997 |
+| update | 1.0000 | 1.0000 | 300 | 0.9878 | 1.0000 |
+| update_derived | 1.0000 | 1.0000 | - | - | - |
+| rollback | 1.0000 | 1.0000 | 300 | 0.9878 | 1.0000 |
+| revoke | 1.0000 | 1.0000 | 300 | 0.9878 | 1.0000 |
+| restore | 1.0000 | 1.0000 | 300 | 0.9878 | 1.0000 |
+| shred | 0.9967 | 0.9900 | 300 | 0.9816 | 0.9999 |
+| resign | 1.0000 | 1.0000 | 300 | 0.9878 | 1.0000 |
+| update_rollback | 0.9995 | 0.9986 | - | - | - |
+| locality | 1.0000 | 1.0000 | 30450 | 0.9999 | 1.0000 |
+| locality_targets_correct | 1.0000 | 1.0000 | 450 | 0.9918 | 1.0000 |
+| locality_undo_exact | 1.0000 | 1.0000 | - | - | - |
+| alternative_path | 1.0000 | 1.0000 | 300 | 0.9878 | 1.0000 |
+| replay_deviation | 0.0000 | 0.0000 | - | - | - |
+
+Noise (bank perturbation 0.24, direct): seed 0: 0.998, seed 1: 0.998, seed 2: 0.999
+
+Attacks after SHRED on 500 targets (mean over seeds; chance: probe top-1 0.00039, mean rank 1279.5, forced choice 0.5):
+
+Core thresholds (0.98 / 0.95 / 0.90) are lower than E-000001-B's (0.99 / 0.98 / 0.95) because the task is harder in two ways at once: ten times the bank and a ten times larger read-out vocabulary. Attack thresholds are binomially derived for 500 targets at chance 1/2560.
+
+| attack after SHRED | soft gate | hard gate |
+|---|---|---|
+| direct_unknown | 0.9987 | 0.9980 |
+| direct_acc | 0.0013 | 0.0020 |
+| paraphrase_unknown | 0.9987 | 0.9980 |
+| multihop_unknown | 1.0000 | 0.9986 |
+| reverse_unknown | 0.9983 | 0.9983 |
+| forced_choice_win | 0.5227 | 0.5273 |
+| true_obj_top1_among_entities | 0.0020 | 0.0020 |
+| true_obj_mean_rank | 1259.9280 | 1245.9120 |
+| probe_top1 | 0.0040 | 0.0033 |
+| probe_top5 | 0.0067 | 0.0060 |
+| routing_mass_on_target | 0.9953 | 0.9953 |
+| gated_value_contribution | 0.0567 | 0.0290 |
+| gate_valid_mean | 0.9975 | 1.0000 |
+| gate_invalid_mean | 0.0046 | 0.0027 |
+| gate_invalid_max | 0.6984 | 0.6667 |
+
+Pre-registered criteria (worst seed):
+
+| criterion (worst seed) | required | observed | result |
+|---|---|---|---|
+| direct | >= 0.98 | 1.0000 | PASS |
+| hop2 | >= 0.95 | 0.9980 | PASS |
+| hop3 | >= 0.9 | 0.9900 | PASS |
+| hop2_broken_unknown | >= 0.95 | 1.0000 | PASS |
+| provenance | >= 0.95 | 0.9998 | PASS |
+| reverse | >= 0.95 | 0.9967 | PASS |
+| revoke | >= 0.98 | 1.0000 | PASS |
+| restore | >= 0.98 | 1.0000 | PASS |
+| shred | >= 0.95 | 0.9900 | PASS |
+| resign | >= 0.98 | 1.0000 | PASS |
+| update | >= 0.98 | 1.0000 | PASS |
+| rollback | >= 0.98 | 1.0000 | PASS |
+| locality | >= 0.99 | 1.0000 | PASS |
+| alternative_path | >= 0.95 | 1.0000 | PASS |
+| replay_deviation | <= 0 | 0.0000 | PASS |
+| hard/shred/direct_unknown | >= 0.98 | 0.9960 | PASS |
+| hard/shred/probe_top1 | <= 0.006 | 0.0060 | PASS |
+| hard/shred/true_obj_top1_among_entities | <= 0.006 | 0.0040 | PASS |
+| hard/shred/true_obj_mean_rank | >= 1150.0 | 1219.3000 | PASS |
+| hard/shred/forced_choice_win | <= 0.56 | 0.5440 | PASS |
+| hard/shred/gated_value_contribution | <= 0.1 | 0.0598 | PASS |
+| hard/active/direct_acc | >= 0.98 | 1.0000 | PASS |
+| hard/restored/direct_acc | >= 0.98 | 1.0000 | PASS |
+
+Scaling curve, same model on fresh worlds (direct accuracy / mean routing max-mass), per seed:
+
+| seed | 1,000 cells | 3,000 cells | 10,000 cells |
+|---|---|---|---|
+| 0 | 1.000 / 0.995 | 1.000 / 0.995 | 1.000 / 0.995 |
+| 1 | 1.000 / 0.995 | 1.000 / 0.995 | 1.000 / 0.995 |
+| 2 | 1.000 / 0.996 | 1.000 / 0.995 | 1.000 / 0.996 |
+
+**Interpretation (post hoc, record unchanged):** Ten times the bank and ten times the read-out vocabulary at once: every family stays at the E-000001-B level (direct 100% over 30,000 pooled queries, 3-hop 99.5%, provenance 99.99%), the verified gate keeps SHRED at F4 on 500 targets with thresholds derived for 2,560 entities, and the same model reads 100% at 1,000, 3,000 and 10,000 cells with routing mass 0.995 — addressing does not degrade in this range. Residual: 1 in 500 shredded targets answered (an unsigned marker passing the gate), inside the binomial threshold; the gate's false-accept tail is the quantity to watch at larger scale.
