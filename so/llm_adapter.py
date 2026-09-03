@@ -46,6 +46,9 @@ class AdapterConfig:
     use_marker_gate: bool = True
     hard_gate: bool = False        # verification mode: gate thresholded at 0.5
     status_gated: bool = False     # E-000012: revoked cells stay routable; the status flag is folded into the gate
+    match_gate: bool = False       # E-000018: scale the injection by how well the query matches ANY real cell key.
+                                   # The routing softmax always sums to one, so some cell always wins and the layer
+                                   # injects into text it has no key for; an absolute match score can say "nothing".
     fallback: str = "unknown"      # 'unknown': a null / unsigned / revoked read emits ' unknown';
                                    # 'prior' (E-000013): it injects nothing, so the pretrained distribution returns
 
@@ -79,6 +82,9 @@ class KnowledgeAdapterLM(nn.Module):
             nn.init.eye_(self.o_proj[str(l)].weight)
         # the injected read is RMS-matched to the residual stream (whose norm is ~30x a token embedding's)
         self.inject_gain = nn.Parameter(torch.full((len(cfg.read_layers),), 1.0))
+        if cfg.match_gate:
+            self.match_tau = nn.Parameter(torch.full((len(cfg.read_layers),), 0.3))
+            self.match_temp = nn.Parameter(torch.full((len(cfg.read_layers),), 10.0))
         self.null_key = nn.Parameter(torch.randn(len(cfg.read_layers), cfg.d_key) * 0.02)
         with torch.no_grad():
             unk = lm.transformer.wte.weight[unknown_token_id].detach().clone()
@@ -147,6 +153,17 @@ class KnowledgeAdapterLM(nn.Module):
             scores = scores.masked_fill(~allowed[None], float("-inf"))
             p = torch.softmax(scores, dim=-1)
             read = self.o_proj[str(layer)](p @ values)                        # (B, d)
+            if self.cfg.match_gate:
+                # absolute agreement with the best REAL cell key; the null key is excluded on purpose, because
+                # the question is whether any cell matches at all, not which one wins the competition
+                cells = ctx["keys"]
+                qn = q / (q.norm(dim=-1, keepdim=True) + 1e-6)
+                kn = cells / (cells.norm(dim=-1, keepdim=True) + 1e-6)
+                cos = (qn @ kn.t()).masked_fill(~ctx["allowed"][None], -1.0)
+                cos_max = cos.max(dim=-1).values if cos.shape[-1] else torch.full((B,), -1.0, device=h.device)
+                m = torch.sigmoid((cos_max - self.match_tau[read_index]) * self.match_temp[read_index].abs())
+                ctx.setdefault("match", []).append(m.detach())
+                read = read * m[:, None]
             rms_h = hl.detach().pow(2).mean(-1, keepdim=True).sqrt()
             if self.cfg.fallback == "prior":
                 read = read * rms_h * self.inject_gain[read_index]               # static: a zero read stays zero
