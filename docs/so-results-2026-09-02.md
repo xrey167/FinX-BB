@@ -8,32 +8,32 @@
 
 ## Summary
 
-| experiment | title | evidence level claimed | deletion level | status |
-|---|---|---|---|---|
-| E-000001-A | Mechanical reference implementation | E3 | F1 | all tests passed |
-| E-000001-B | Trained Mini-Transformer over the mutable knowledge layer | E4 | F3 | criteria met |
-| E-000002 | Weight-memorisation control (copy problem) | E4 | - | criteria met |
-| E-000003 | Retention and generalisation of deletion | E4 | F3 | criteria met |
-| E-000004 | Reconstruction attacks against REVOKE and SHRED | E4 | F3 | **criteria NOT met** |
-| E-000005 | Causal interventions on knowledge cells | E4 | - | criteria met |
-| E-000006 | Ablations | E4 | - | **criteria NOT met** |
-| E-000007 | Biomarker: output suppression versus representational change | E4 | F3 | **criteria NOT met** |
-| e000008_gpt2_adapter | - | - | - | not run |
-| E-000009 | Signature-verification gate: closing the SHRED residual | E4 | F3 | **criteria NOT met** |
-| E-000010 | Signature-verification gate: closing the SHRED residual (class-balanced loss) | E4 | F4 | criteria met |
+| experiment | title | evidence level recorded | deletion level recorded (targeted) | status | recorded at (UTC) |
+|---|---|---|---|---|---|
+| E-000001-A | Mechanical reference implementation | E3 | F1 | all tests passed | 2026-09-02 22:03 |
+| E-000001-B | Trained Mini-Transformer over the mutable knowledge layer | E4 | F3 | criteria met | 2026-09-02 23:59 |
+| E-000002 | Weight-memorisation control (copy problem) | E4 | - | criteria met | 2026-09-02 23:59 |
+| E-000003 | Retention and generalisation of deletion | E4 | F3 | criteria met | 2026-09-02 23:59 |
+| E-000004 | Reconstruction attacks against REVOKE and SHRED | E4 | F3 (F4) | **criteria NOT met** | 2026-09-03 00:00 |
+| E-000005 | Causal interventions on knowledge cells | E4 | - | criteria met | 2026-09-03 00:00 |
+| E-000006 | Ablations | E4 | - | **criteria NOT met** | 2026-09-03 00:39 |
+| E-000007 | Biomarker: output suppression versus representational change | E4 | F3 (F4) | **criteria NOT met** | 2026-09-03 00:01 |
+| E-000008 | Frozen pretrained GPT-2 core with the mutable knowledge layer (symlink adapter) | E5 | F1 (F4) | **criteria NOT met** | 2026-09-03 00:44 |
+| E-000009 | Signature-verification gate: closing the SHRED residual | E4 | F3 (F4) | **criteria NOT met** | 2026-09-03 00:04 |
+| E-000010 | Signature-verification gate: closing the SHRED residual (class-balanced loss) | E4 | F4 (F4) | criteria met | 2026-09-03 00:05 |
 
 ## The six breakthrough properties (ledger section 3)
 
 | property | experiments | status | highest level |
 |---|---|---|---|
-| Selectivity (target disappears) | E-000001-B, E-000003 | E-000001-B: criteria met; E-000003: criteria met | E4 |
-| Retention (non-target intact) | E-000001-B, E-000003 | E-000001-B: criteria met; E-000003: criteria met | E4 |
-| Generalisation (paraphrases, alternative queries) | E-000003, E-000004 | E-000003: criteria met; E-000004: **criteria NOT met** | E4 |
+| Selectivity (target disappears) | E-000001-B, E-000003, E-000008 | E-000001-B: criteria met; E-000003: criteria met; E-000008: **criteria NOT met** | E5 |
+| Retention (non-target intact) | E-000001-B, E-000003, E-000008 | E-000001-B: criteria met; E-000003: criteria met; E-000008: **criteria NOT met** | E5 |
+| Generalisation (paraphrases, alternative queries) | E-000003, E-000004, E-000008 | E-000003: criteria met; E-000004: **criteria NOT met**; E-000008: **criteria NOT met** | E5 |
 | Causal isolation (effect follows from the intended structure) | E-000005, E-000006, E-000007 | E-000005: criteria met; E-000006: **criteria NOT met**; E-000007: **criteria NOT met** | E4 |
-| Reconstruction resistance | E-000004, E-000007, E-000009, E-000010 | E-000004: **criteria NOT met**; E-000007: **criteria NOT met**; E-000009: **criteria NOT met**; E-000010: criteria met | E4 |
-| Scalability (path beyond toy models) | E-000002 | E-000002: criteria met | E4 |
+| Reconstruction resistance | E-000004, E-000007, E-000009, E-000010, E-000008 | E-000004: **criteria NOT met**; E-000007: **criteria NOT met**; E-000009: **criteria NOT met**; E-000010: criteria met; E-000008: **criteria NOT met** | E5 |
+| Scalability (path beyond toy models) | E-000002, E-000008 | E-000002: criteria met; E-000008: **criteria NOT met** | E5 |
 
-Scalability is the property this session can least address: E-000008 tests whether the same layer works as an adapter on a frozen pretrained GPT-2 (not yet recorded); the path to LLM scale is a roadmap item, not a result.
+Scalability is the property this session can least address: E-000008 tests whether the same layer works as an adapter on a frozen pretrained GPT-2 (recorded below); the path to LLM scale is a roadmap item, not a result.
 
 The 'status' column is the status of the whole record's pre-registered criteria; a property can be supported by an experiment whose record fails on a different criterion (E-000004 and E-000007 fail only their F4 rows while their behavioural rows pass — see the split claims inside those records).
 
@@ -375,14 +375,14 @@ n = 100 targets per seed. Pre-registered criteria (worst seed):
 
 Evidence level: **E4** (Controlled neural-network evidence). Seeds: [0, 1, 2]; variants trained 2000 steps, full model 3000 steps (E-000001-B). Values are means over seeds.
 
-| variant | direct | hop2 | hop3 | hop2_broken_unknown | provenance | reverse | revoke | shred | update | rollback | locality | alternative_path |
-|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| full | 100.0% | 100.0% | 100.0% | 100.0% | 100.0% | 100.0% | 100.0% | 100.0% | 100.0% | 100.0% | 100.0% | 100.0% |
-| full_same_budget | 100.0% | 100.0% | 100.0% | 100.0% | 100.0% | 100.0% | 100.0% | 99.3% | 100.0% | 100.0% | 100.0% | 100.0% |
-| no_marker_gate | 100.0% | 100.0% | 100.0% | 100.0% | 100.0% | 100.0% | 100.0% | 0.0% | 100.0% | 100.0% | 100.0% | 100.0% |
-| no_null_cell | 100.0% | 100.0% | 100.0% | 100.0% | 100.0% | 100.0% | 100.0% | 100.0% | 100.0% | 100.0% | 100.0% | 100.0% |
-| no_routing_loss | 0.0% | 0.0% | 0.0% | 100.0% | 0.0% | 21.0% | 100.0% | 100.0% | 0.0% | 0.0% | 100.0% | 0.0% |
-| no_routing | 0.0% | 0.0% | 0.0% | 100.0% | 0.0% | 21.0% | 100.0% | 100.0% | 0.0% | 0.0% | 100.0% | 0.0% |
+| variant | direct | direct_unknown_rate | hop2 | hop3 | hop2_broken_unknown | provenance | reverse | revoke | shred | update | rollback | locality | alternative_path |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| full | 100.0% | 0.0% | 100.0% | 100.0% | 100.0% | 100.0% | 100.0% | 100.0% | 100.0% | 100.0% | 100.0% | 100.0% | 100.0% |
+| full_same_budget | 100.0% | 0.0% | 100.0% | 100.0% | 100.0% | 100.0% | 100.0% | 100.0% | 99.3% | 100.0% | 100.0% | 100.0% | 100.0% |
+| no_marker_gate | 100.0% | 0.0% | 100.0% | 100.0% | 100.0% | 100.0% | 100.0% | 100.0% | 0.0% | 100.0% | 100.0% | 100.0% | 100.0% |
+| no_null_cell | 100.0% | 0.0% | 100.0% | 100.0% | 100.0% | 100.0% | 100.0% | 100.0% | 100.0% | 100.0% | 100.0% | 100.0% | 100.0% |
+| no_routing_loss | 0.0% | 100.0% | 0.0% | 0.0% | 100.0% | 0.0% | 21.0% | 100.0% | 100.0% | 0.0% | 0.0% | 100.0% | 0.0% |
+| no_routing | 0.0% | 100.0% | 0.0% | 0.0% | 100.0% | 0.0% | 21.0% | 100.0% | 100.0% | 0.0% | 0.0% | 100.0% | 0.0% |
 
 'no_routing' and 'no_marker_gate' remove an information path, so their failures (nothing readable / SHRED ineffective) are information-flow necessities, reported to quantify them. 'no_null_cell' and 'no_routing_loss' keep the information paths and test learned behaviour: whether UNKNOWN detection and exact provenance emerge without the dedicated cell / loss. 'full_same_budget' is the fair baseline trained with the variants' step budget.
 
@@ -439,9 +439,87 @@ n = 50 targets, 50 controls per seed. Pre-registered criteria (worst seed):
 
 **Interpretation (post hoc, record unchanged):** The suppression-versus-deletion separation holds in every seed (suppressed: value contribution 8.3, probe 86%, mean rank 10; shredded: 1.3, 4%, 110). The two failed criteria are the same SHRED residual as in E-000004, addressed in E-000009.
 
-## e000008_gpt2_adapter
+## E-000008 — Frozen pretrained GPT-2 core with the mutable knowledge layer
 
-_not run in this session_
+Evidence level recorded: **E5** (E5 = Transformer evidence; a real pretrained LM, GPT-2 small, on CPU — not LLM scale). Deletion level targeted F4, recorded **F1**. Seeds: [0, 1, 2]; adapter steps: 2000; the 124M pretrained weights are frozen.
+
+Claim parts (each judged on its own pre-registered criteria, worst seed):
+
+| claim | supported |
+|---|---|
+| With a frozen pretrained transformer as core and natural-language prompts, the adapter reads the right cell and the unchanged LM head emits the object; the pretrained prior is at chance and the adapter with every cell masked adds nothing (copy bound). | **no** |
+| UPDATE / ROLLBACK / RESTORE / RESIGN are reproduced against the reference. | yes |
+| After REVOKE / SHRED and on broken paths the model answers ' unknown' (behavioural deletion, F3). | **no** |
+| After REVOKE nothing is recoverable by probe or forced choice (mask). | yes |
+| After SHRED nothing is recoverable by probe or forced choice (representation level, F4). | **no** |
+
+| measure | mean over seeds | worst seed |
+|---|---|---|
+| prior_direct_acc | 0.6% | 0.4% |
+| bank_masked_direct_acc | 0.0% | 0.0% |
+| bank_masked_unknown_rate | 100.0% | 100.0% |
+| direct | 88.9% | 88.5% |
+| direct_full_vocab_top1 | 83.7% | 80.5% |
+| paraphrase | 99.9% | 99.9% |
+| provenance_direct | 84.2% | 83.6% |
+| hop2 | 75.3% | 72.3% |
+| broken1_unknown | 63.7% | 56.0% |
+| broken2_unknown | 66.3% | 62.0% |
+| update | 95.3% | 95.0% |
+| rollback | 96.0% | 96.0% |
+| revoke | 56.3% | 49.0% |
+| restore | 96.0% | 96.0% |
+| shred | 38.0% | 33.0% |
+| resign | 96.0% | 96.0% |
+| lifecycle_all | 79.6% | 77.5% |
+| locality | 99.3% | 98.9% |
+| locality_targets_correct | 78.2% | 77.3% |
+| locality_undo_exact | 100.0% | 100.0% |
+
+Attacks on 100 targets (mean over seeds; chance: forced choice 0.5, top-1 among entities 0.0039, mean rank 127.5, probe top-1 0.0039 / top-5 0.0195):
+
+| attack | active | after REVOKE | after SHRED |
+|---|---|---|---|
+| direct_unknown | 0.1000 | 0.5400 | 0.5067 |
+| direct_acc | 0.8833 | 0.0000 | 0.1400 |
+| paraphrase_unknown | 0.0000 | 0.6067 | 0.3400 |
+| forced_choice_win | 1.0000 | 0.4967 | 0.6733 |
+| true_obj_top1_among_entities | 0.9467 | 0.0033 | 0.1800 |
+| true_obj_mean_rank | 0.2133 | 133.8300 | 77.3567 |
+| probe_top1 | 0.7767 | 0.0000 | 0.1500 |
+| probe_top5 | 0.8767 | 0.0167 | 0.2100 |
+| routing_mass_on_target | 0.7661 | 0.0000 | 0.7661 |
+| gated_value_contribution | 13.2832 | 0.0000 | 0.3019 |
+| full_vocab_top1_equals_prior | 0.0067 | 0.0333 | 0.0300 |
+| full_vocab_top1_is_unknown_word | 0.0100 | 0.1300 | 0.1133 |
+
+Probe calibration on held-out active cells: top-1 0.802, top-5 0.880.
+
+Pre-registered criteria (worst seed):
+
+| criterion (worst seed) | required | observed | result |
+|---|---|---|---|
+| prior_direct_acc | <= 0.05 | 0.0100 | PASS |
+| bank_masked_direct_acc | <= 0.05 | 0.0000 | PASS |
+| direct | >= 0.95 | 0.8850 | FAIL |
+| paraphrase | >= 0.95 | 0.9990 | PASS |
+| broken1_unknown | >= 0.9 | 0.5600 | FAIL |
+| revoke | >= 0.95 | 0.4900 | FAIL |
+| restore | >= 0.95 | 0.9600 | PASS |
+| update | >= 0.95 | 0.9500 | PASS |
+| rollback | >= 0.95 | 0.9600 | PASS |
+| shred | >= 0.9 | 0.3300 | FAIL |
+| resign | >= 0.95 | 0.9600 | PASS |
+| locality | >= 0.98 | 0.9894 | PASS |
+| revoke/probe_top1 | <= 0.05 | 0.0000 | PASS |
+| revoke/forced_choice_win | <= 0.6 | 0.5300 | PASS |
+| shred/probe_top1 | <= 0.05 | 0.1800 | FAIL |
+| shred/forced_choice_win | <= 0.6 | 0.7300 | FAIL |
+| restored/direct_acc | >= 0.95 | 0.8600 | FAIL |
+
+The frozen core cannot copy a fact by construction; whether the ADAPTER copies is measured by the masked-bank rows (must equal the prior). REVOKE is a mask (F1); what is learned is reading the right cell from natural-language prompts, turning the value into the object token through the unchanged LM head, answering ' unknown' for null reads, and refusing a shredded payload.
+
+Reading: 'prior_direct_acc' is what frozen GPT-2 answers without the layer (chance); 'bank_masked_direct_acc' is the adapter with every cell masked — the copy bound: it must not exceed the prior. 'direct_full_vocab_top1' is the fraction of direct queries where the object token wins over the entire 50,257-token vocabulary, not only among the 257 candidates. 'full_vocab_top1_equals_prior' after REVOKE shows whether the model falls back to its pretrained prior once the cell is gone.
 
 ## E-000009 — Signature-verification gate: closing the SHRED residual
 

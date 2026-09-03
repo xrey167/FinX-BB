@@ -1,6 +1,16 @@
 # E-000008 — Frozen pretrained GPT-2 core with the mutable knowledge layer
 
-Evidence level: **E5** (Transformer evidence), partial E6 (a real pretrained LM, GPT-2 small, on CPU). Deletion level within this system: **F4**. Seeds: [0, 1, 2]; adapter steps: 2000; the 124M pretrained weights are frozen.
+Evidence level recorded: **E5** (E5 = Transformer evidence; a real pretrained LM, GPT-2 small, on CPU — not LLM scale). Deletion level targeted F4, recorded **F1**. Seeds: [0, 1, 2]; adapter steps: 2000; the 124M pretrained weights are frozen.
+
+Claim parts (each judged on its own pre-registered criteria, worst seed):
+
+| claim | supported |
+|---|---|
+| With a frozen pretrained transformer as core and natural-language prompts, the adapter reads the right cell and the unchanged LM head emits the object; the pretrained prior is at chance and the adapter with every cell masked adds nothing (copy bound). | **no** |
+| UPDATE / ROLLBACK / RESTORE / RESIGN are reproduced against the reference. | yes |
+| After REVOKE / SHRED and on broken paths the model answers ' unknown' (behavioural deletion, F3). | **no** |
+| After REVOKE nothing is recoverable by probe or forced choice (mask). | yes |
+| After SHRED nothing is recoverable by probe or forced choice (representation level, F4). | **no** |
 
 | measure | mean over seeds | worst seed |
 |---|---|---|
