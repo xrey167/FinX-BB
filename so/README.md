@@ -51,3 +51,9 @@ Every experiment writes `so/results/<name>.json` (complete record: config, per-s
 ## Design in one paragraph
 
 The neural core never stores facts. Every training step samples a fresh world, so the only stable signal is *how to read* the knowledge layer: build a query from the tokens, attend over cell keys (subject + relation), take the gated value (object), and feed it into the next hop. Knowledge therefore lives in cells that have an identity (`kid`), versions, a status and a marker, and the control plane can WRITE / UPDATE / REVOKE / RESTORE / ROLLBACK / SHRED them without touching the weights. The experiments then test whether the *learned* computation respects those lifecycle semantics (E-000001-B), whether the guarantee survives when facts *can* be copied into weights (E-000002), whether deletion generalises and retention holds (E-000003), whether the deleted object can be reconstructed (E-000004), whether the routing signature is causal (E-000005), which components are necessary (E-000006), and whether internal signals separate suppression from deletion (E-000007), and whether the same layer works as an adapter on a frozen pretrained GPT-2 with natural-language queries (E-000008).
+
+## Smoke runs
+
+A reduced run must never overwrite a recorded result. Set `SO_RESULT_SUFFIX` (for example
+`SO_RESULT_SUFFIX=-smoke`) so `so/results/<name><suffix>.json|md` is written instead, and delete
+those files afterwards; the report generator only reads the unsuffixed records.
