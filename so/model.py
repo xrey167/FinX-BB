@@ -47,6 +47,12 @@ class ModelConfig:
     hard_gate: bool = False        # verification mode: gate thresholded at 0.5 (a payload is signed or it is not)
     use_routing: bool = True       # ablation: without routing -> no knowledge layer at all
     use_null_cell: bool = True
+    # ---- E-000015 (explicit symlink cells).  Both default OFF, so every earlier configuration
+    # builds exactly the same parameters and its checkpoints keep loading.
+    use_links: bool = False        # the bank may contain alias rows whose payload is the TARGET'S KEY
+    n_deref: int = 0               # dereference slots per hop (1 resolves an alias, 2 a chain of two)
+    deref_query_from_state: bool = False   # ablation: let the deref query see the question, not only the pointer
+    use_deref_passthrough: bool = True     # the deref slot may keep the value it was given ("this was no pointer")
 
     def to_dict(self) -> Dict:
         return asdict(self)
@@ -64,19 +70,57 @@ class HopBlock(nn.Module):
         self.ff = nn.Sequential(nn.Linear(d, d_ff), nn.GELU(), nn.Linear(d_ff, d))
         self.scale = nn.Parameter(torch.tensor(1.0))
 
-    def forward(self, h: torch.Tensor, rel: torch.Tensor, hop_emb: torch.Tensor, k_f: torch.Tensor,
-                v_f: torch.Tensor, k_r: torch.Tensor, v_r: torch.Tensor, is_fwd: torch.Tensor,
-                allowed: torch.Tensor) -> Tuple[torch.Tensor, torch.Tensor]:
-        # h, rel, hop_emb: (B, d); k_*/v_*: (C, d) shared by the batch; allowed: (C,) bool
+    def read(self, h: torch.Tensor, rel: torch.Tensor, hop_emb: torch.Tensor, k_f: torch.Tensor,
+             v_f: torch.Tensor, k_r: torch.Tensor, v_r: torch.Tensor, is_fwd: torch.Tensor,
+             allowed: torch.Tensor) -> Tuple[torch.Tensor, torch.Tensor]:
+        """One routed read: returns ``(read value (B, d), routing (B, C))`` without touching the state."""
         q = self.q(self.ln_q(h + rel + hop_emb))
         scores = torch.where(is_fwd[:, None], q @ k_f.t(), q @ k_r.t())     # (B, C)
         scores = scores * (self.scale / k_f.shape[-1] ** 0.5)
         scores = scores.masked_fill(~allowed[None], float("-inf"))
         p = torch.softmax(scores, dim=-1)
         read = torch.where(is_fwd[:, None], p @ v_f, p @ v_r)               # (B, d)
+        return read, p
+
+    def apply_read(self, h: torch.Tensor, read: torch.Tensor) -> torch.Tensor:
         h = h + self.o(read)
-        h = h + self.ff(self.ln_ff(h))
-        return h, p
+        return h + self.ff(self.ln_ff(h))
+
+    def forward(self, h: torch.Tensor, rel: torch.Tensor, hop_emb: torch.Tensor, k_f: torch.Tensor,
+                v_f: torch.Tensor, k_r: torch.Tensor, v_r: torch.Tensor, is_fwd: torch.Tensor,
+                allowed: torch.Tensor) -> Tuple[torch.Tensor, torch.Tensor]:
+        # h, rel, hop_emb: (B, d); k_*/v_*: (C, d) shared by the batch; allowed: (C,) bool
+        read, p = self.read(h, rel, hop_emb, k_f, v_f, k_r, v_r, is_fwd, allowed)
+        return self.apply_read(h, read), p
+
+
+class DerefBlock(nn.Module):
+    """A second read whose query comes from the POINTER just read, not from the question (E-000015).
+
+    The last column of the bank is the null column; in a dereference slot its value is the incoming
+    read itself, so "what I just read was not a pointer" is expressible as keeping the value.
+    Which column wins is learned; the passthrough itself is architectural.
+    """
+
+    def __init__(self, d: int, use_state: bool = False, use_passthrough: bool = True):
+        super().__init__()
+        self.ln = nn.LayerNorm(d)
+        self.q = nn.Linear(d, d)
+        self.scale = nn.Parameter(torch.tensor(1.0))
+        self.use_state = use_state
+        self.use_passthrough = use_passthrough
+
+    def forward(self, read: torch.Tensor, state: Optional[torch.Tensor], k_f: torch.Tensor, v_f: torch.Tensor,
+                allowed: torch.Tensor) -> Tuple[torch.Tensor, torch.Tensor]:
+        q = self.q(self.ln(read if (state is None or not self.use_state) else read + state))
+        scores = (q @ k_f.t()) * (self.scale / k_f.shape[-1] ** 0.5)
+        scores = scores.masked_fill(~allowed[None], float("-inf"))
+        p = torch.softmax(scores, dim=-1)
+        if self.use_passthrough:
+            out = p[:, :-1] @ v_f[:-1] + p[:, -1:] * read      # last column: keep what came in
+        else:
+            out = p @ v_f
+        return out, p
 
 
 class MutableKnowledgeTransformer(nn.Module):
@@ -104,6 +148,14 @@ class MutableKnowledgeTransformer(nn.Module):
         self.null_key = nn.Parameter(torch.randn(2, d) * 0.02)
         self.null_value = nn.Parameter(torch.randn(2, d) * 0.02)
         self.hop = HopBlock(d, cfg.d_ff)
+        if cfg.use_links:
+            self.v_link = nn.Linear(d, d, bias=False)              # an alias's value: the TARGET'S KEY, projected
+            self.link_rev_key = nn.Parameter(torch.randn(d) * 0.02)  # aliases are not reverse-addressable
+        if cfg.n_deref > 0:
+            if not cfg.use_null_cell:
+                raise ValueError("n_deref > 0 needs the null column: it carries the dereference passthrough")
+            self.deref = nn.ModuleList([DerefBlock(d, cfg.deref_query_from_state, cfg.use_deref_passthrough)
+                                        for _ in range(cfg.n_deref)])
         self.out_ln = nn.LayerNorm(d)
         self.out_proj = nn.Linear(d, d)                            # tied read-out: logits = proj(h) · E^T
         self.unknown_head = nn.Linear(d, 1)                        # extra logit for UNKNOWN
@@ -128,9 +180,19 @@ class MutableKnowledgeTransformer(nn.Module):
         s, r, o = self.ent_emb(bank["subject"]), self.cell_rel_emb(bank["relation"]), self.ent_emb(bank["obj"])
         g = self.gate(bank["marker"])
         k_f = self.k_fwd(self.ln_key(s + r))
-        v_f = self.v_fwd(o) * g
+        v_f = self.v_fwd(o)
         k_r = self.k_rev(self.ln_key(o + r))
-        v_r = self.v_rev(s) * g
+        v_r = self.v_rev(s)
+        if self.cfg.use_links and "is_link" in bank:
+            # Control-plane materialisation, exactly like the marker: the store decides WHICH payload a row
+            # carries; the model is never told that a value it has read is a pointer — that it must learn.
+            il = bank["is_link"][:, None]
+            tgt_key = self.ln_key(self.ent_emb(bank["link_subject"]) + self.cell_rel_emb(bank["link_relation"]))
+            v_f = torch.where(il, self.v_link(tgt_key), v_f)
+            k_r = torch.where(il, self.link_rev_key[None].expand_as(k_r), k_r)
+            v_r = torch.where(il, torch.zeros_like(v_r), v_r)
+        v_f = v_f * g
+        v_r = v_r * g
         if noise > 0:
             def jitter(x: torch.Tensor) -> torch.Tensor:
                 rms = x.pow(2).mean().sqrt()
@@ -177,13 +239,19 @@ class MutableKnowledgeTransformer(nn.Module):
             k_r = torch.cat([k_r, self.null_key[1][None]]); v_r = torch.cat([v_r, self.null_value[1][None]])
             allowed = torch.cat([allowed, torch.ones(1, dtype=torch.bool, device=rels.device)])
         is_fwd = (mode == 0)
-        routing = torch.zeros(B, H, k_f.shape[0], device=rels.device)
+        D = self.cfg.n_deref
+        slots = H * (1 + D)
+        routing = torch.zeros(B, slots, k_f.shape[0], device=rels.device)
         for t in range(H):
             rel_t = x[:, 2 + t]
-            h_new, p = self.hop(h, rel_t, self.hop_emb.weight[t][None], k_f, v_f, k_r, v_r, is_fwd, allowed)
             valid = hop_valid[:, t]
+            read, p = self.hop.read(h, rel_t, self.hop_emb.weight[t][None], k_f, v_f, k_r, v_r, is_fwd, allowed)
+            routing[:, t * (1 + D)] = torch.where(valid[:, None], p, torch.zeros_like(p))
+            for dd in range(D):
+                read, p = self.deref[dd](read, h, k_f, v_f, allowed)
+                routing[:, t * (1 + D) + 1 + dd] = torch.where(valid[:, None], p, torch.zeros_like(p))
+            h_new = self.hop.apply_read(h, read)
             h = torch.where(valid[:, None], h_new, h)
-            routing[:, t] = torch.where(valid[:, None], p, torch.zeros_like(p))
         extras["gate"] = enc["gate"]
         extras["gate_logits"] = enc["gate_logits"]
         extras["hidden"] = h

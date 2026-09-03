@@ -40,6 +40,16 @@ class Status(str, Enum):
     DELETED = "DELETED"
 
 
+class CellKind(str, Enum):
+    """FACT cells hold an object; LINK cells hold the address of another cell (E-000015)."""
+
+    FACT = "FACT"
+    LINK = "LINK"
+
+
+LINK_OBJ = -1          # a link version has no object; -1 never denotes an entity
+
+
 @dataclass
 class Version:
     version: int
@@ -48,6 +58,8 @@ class Version:
     obj: int
     marker: np.ndarray
     op_index: int
+    kind: CellKind = CellKind.FACT
+    target: Optional[int] = None      # LINK only: the kid this cell points at
 
 
 @dataclass
@@ -57,6 +69,7 @@ class Cell:
     active_version: int = 1
     status: Status = Status.ACTIVE
     provenance: str = ""
+    tombstone_key: Optional[Tuple[int, int]] = None    # the key this cell held when it was DELETED
 
     @property
     def active(self) -> Optional[Version]:
@@ -115,6 +128,48 @@ class MVCCStore:
         self.cells[kid] = cell
         return kid
 
+    def link(self, subject: int, relation: int, target: int, provenance: str = "") -> int:
+        """Write a LINK cell: the key ``(subject, relation)`` resolves to whatever cell ``target`` holds.
+
+        The link carries its OWN valid marker, so a resolution path through an alias has two
+        independent signatures (the alias's and the payload's) and either can be shredded alone.
+        """
+        if target not in self.cells:
+            raise KeyError(f"link target {target} does not exist")
+        kid = self._next_kid
+        self._next_kid += 1
+        op = self._record("link", subject=subject, relation=relation, target=target, provenance=provenance)
+        cell = Cell(kid=kid, provenance=provenance)
+        cell.versions.append(Version(1, subject, relation, LINK_OBJ, self.new_valid_marker(), op,
+                                     kind=CellKind.LINK, target=target))
+        self.cells[kid] = cell
+        return kid
+
+    def relink(self, kid: int, target: int) -> int:
+        """Point an existing alias at a different cell (a new version, like UPDATE on a fact)."""
+        cell = self._alive(kid)
+        if target not in self.cells:
+            raise KeyError(f"link target {target} does not exist")
+        op = self._record("relink", kid=kid, target=target)
+        prev = cell.version_obj(cell.active_version)
+        v = Version(len(cell.versions) + 1, prev.subject, prev.relation, LINK_OBJ, self.new_valid_marker(), op,
+                    kind=CellKind.LINK, target=target)
+        cell.versions.append(v)
+        cell.active_version = v.version
+        cell.status = Status.ACTIVE
+        return v.version
+
+    def refcount(self, kid: int) -> int:
+        """How many non-deleted alias cells currently point at ``kid``."""
+        n = 0
+        for other in self.cells.values():
+            if other.status == Status.DELETED or not other.versions:
+                continue
+            v = other.version_obj(other.active_version)
+            if v.kind == CellKind.LINK and v.target == kid:
+                n += 1
+        return n
+
     def read(self, kid: int) -> Optional[Version]:
         cell = self.cells.get(kid)
         if cell is None:
@@ -155,6 +210,8 @@ class MVCCStore:
     def delete(self, kid: int) -> None:
         cell = self._alive(kid)
         self._record("delete", kid=kid)
+        v = cell.version_obj(cell.active_version)
+        cell.tombstone_key = (v.subject, v.relation)   # aliases keep pointing at this key: the pointer is NOT erased
         cell.status = Status.DELETED
         cell.versions = []
 
@@ -202,8 +259,84 @@ class MVCCStore:
             view[(v.subject, v.relation)] = (v.obj, kid)
         return view
 
+    def _key_index(self, respect_markers: bool) -> Dict[Tuple[int, int], Optional[Tuple[int, Version]]]:
+        """``key -> (kid, version)`` for usable cells; ``key -> None`` when the holder is unsigned.
+
+        Built once per resolution pass: resolving key by key would be quadratic in the bank size.
+        """
+        idx: Dict[Tuple[int, int], Optional[Tuple[int, Version]]] = {}
+        for kid, cell in self.cells.items():
+            v = cell.active
+            if v is None:
+                continue
+            key = (v.subject, v.relation)
+            if key in idx:
+                continue                          # first holder wins, as before
+            idx[key] = None if (respect_markers and not self.marker_valid(v.marker)) else (kid, v)
+        return idx
+
+    def _usable_cell_at(self, key: Tuple[int, int], respect_markers: bool,
+                        index: Optional[Dict[Tuple[int, int], Optional[Tuple[int, Version]]]] = None):
+        if index is not None:
+            return index.get(key)
+        for kid, cell in self.cells.items():
+            v = cell.active
+            if v is None or (v.subject, v.relation) != key:
+                continue
+            if respect_markers and not self.marker_valid(v.marker):
+                return None                       # the cell holding the key is unsigned: the key is not resolvable
+            return kid, v
+        return None
+
+    MAX_LINK_DEPTH = 4
+
+    def resolve_key(self, key: Tuple[int, int], respect_markers: bool = True,
+                    max_depth: Optional[int] = None,
+                    index: Optional[Dict[Tuple[int, int], Optional[Tuple[int, Version]]]] = None
+                    ) -> Tuple[Optional[int], Tuple[int, ...]]:
+        """Follow ``key`` through any chain of aliases: ``(object or None, trace of kids)``.
+
+        A miss (``None``) is returned when no usable cell holds the key, when the chain exceeds
+        ``max_depth``, when it revisits a cell (cycle), or when it ends on a cell that no longer
+        exists — a DANGLING alias.  The trace names every cell that was read, aliases included:
+        revoking an alias changes the answer, so the alias is part of the dependency.
+        """
+        depth = self.MAX_LINK_DEPTH if max_depth is None else max_depth
+        trace: List[int] = []
+        seen: set = set()
+        cur = key
+        for _ in range(depth + 1):
+            hit = self._usable_cell_at(cur, respect_markers, index)
+            if hit is None:
+                return None, tuple(trace)
+            kid, v = hit
+            if kid in seen:
+                return None, tuple(trace)          # cycle
+            seen.add(kid)
+            trace.append(kid)
+            if v.kind == CellKind.FACT:
+                return v.obj, tuple(trace)
+            target = self.cells.get(v.target)
+            if target is None or target.status == Status.DELETED or not target.versions:
+                return None, tuple(trace)          # dangling: the referent is gone, the pointer remains
+            tv = target.version_obj(target.active_version)
+            cur = (tv.subject, tv.relation)
+        return None, tuple(trace)                  # depth exceeded
+
+    def resolved_view(self, respect_markers: bool = True) -> Dict[Tuple[int, int], Tuple[int, Tuple[int, ...]]]:
+        """``(subject, relation) -> (object, trace)`` for every key that resolves, aliases followed."""
+        idx = self._key_index(respect_markers)
+        out: Dict[Tuple[int, int], Tuple[int, Tuple[int, ...]]] = {}
+        for key in idx:
+            obj, trace = self.resolve_key(key, respect_markers, index=idx)
+            if obj is not None:
+                out[key] = (obj, trace)
+        return out
+
     def index_view(self, respect_markers: bool = True) -> Dict[Tuple[int, int], int]:
-        return {k: o for k, (o, _) in self.active_view(respect_markers).items()}
+        """``(subject, relation) -> object``.  Aliases are followed, so a world containing links has
+        the same interface as one without."""
+        return {k: o for k, (o, _) in self.resolved_view(respect_markers).items()}
 
     def kid_of(self, key: Tuple[int, int]) -> Optional[int]:
         """kid of the cell currently holding ``key`` (any status except deleted)."""
@@ -224,6 +357,7 @@ class MVCCStore:
         reject unsigned payloads itself.
         """
         kids, subj, rel, obj, markers, active = [], [], [], [], [], []
+        is_link, l_subj, l_rel = [], [], []
         for kid, cell in self.cells.items():
             if cell.status == Status.DELETED:
                 continue
@@ -234,9 +368,25 @@ class MVCCStore:
             kids.append(kid)
             subj.append(v.subject)
             rel.append(v.relation)
-            obj.append(v.obj)
             markers.append(v.marker)
             active.append(usable)
+            link = v.kind == CellKind.LINK
+            is_link.append(link)
+            # A link row carries the TARGET'S KEY, not its payload and not its state: whether that key
+            # is held by a signed, active, existing cell is exactly what the model has to discover.
+            # ``obj`` is a constant placeholder for link rows (never the target's object).
+            obj.append(0 if link else v.obj)
+            if link:
+                t = self.cells.get(v.target)
+                if t is not None and t.versions:
+                    tv = t.version_obj(t.active_version)
+                    l_subj.append(tv.subject); l_rel.append(tv.relation)
+                elif t is not None and t.tombstone_key is not None:
+                    l_subj.append(t.tombstone_key[0]); l_rel.append(t.tombstone_key[1])   # dangling: key kept
+                else:
+                    l_subj.append(v.subject); l_rel.append(v.relation)                    # self-reference = miss
+            else:
+                l_subj.append(0); l_rel.append(0)
         return {
             "kid": np.asarray(kids, dtype=np.int64),
             "subject": np.asarray(subj, dtype=np.int64),
@@ -244,6 +394,9 @@ class MVCCStore:
             "obj": np.asarray(obj, dtype=np.int64),
             "marker": np.asarray(markers, dtype=np.float32).reshape(len(kids), self.marker_dim),
             "active": np.asarray(active, dtype=bool),
+            "is_link": np.asarray(is_link, dtype=bool),
+            "link_subject": np.asarray(l_subj, dtype=np.int64),
+            "link_relation": np.asarray(l_rel, dtype=np.int64),
         }
 
     # ------------------------------------------------------------------ replay / hashing
@@ -251,7 +404,8 @@ class MVCCStore:
         parts = []
         for kid in sorted(self.cells):
             c = self.cells[kid]
-            vs = [(v.version, v.subject, v.relation, v.obj, self.marker_valid(v.marker)) for v in c.versions]
+            vs = [(v.version, v.subject, v.relation, v.obj, self.marker_valid(v.marker), v.kind.value, v.target)
+                  for v in c.versions]
             parts.append((kid, c.status.value, c.active_version, vs))
         return hashlib.sha256(json.dumps(parts, sort_keys=True).encode()).hexdigest()
 

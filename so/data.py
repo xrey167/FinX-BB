@@ -56,6 +56,10 @@ class Bank:
     marker_valid: Optional[np.ndarray] = None  # per cell: is the marker signed? (control-plane truth for gate supervision)
     routable: Optional[np.ndarray] = None      # status-gated designs: ACTIVE or REVOKED cells are routable, stale/deleted are not
     routable_pos: Optional[Dict[Tuple[int, int], int]] = None
+    is_link: Optional[np.ndarray] = None       # E-000015: this row is an alias; its payload is the TARGET'S KEY
+    link_subject: Optional[np.ndarray] = None
+    link_relation: Optional[np.ndarray] = None
+    trace_of_key: Optional[Dict[Tuple[int, int], Tuple[int, ...]]] = None   # resolution path as row positions
 
     @property
     def size(self) -> int:
@@ -71,6 +75,12 @@ class Bank:
             "marker_valid": torch.as_tensor(self.marker_valid if self.marker_valid is not None else np.ones(self.size, dtype=bool),
                                             dtype=torch.bool, device=device),
             "routable": torch.as_tensor(self.routable if self.routable is not None else self.active, dtype=torch.bool, device=device),
+            "is_link": torch.as_tensor(self.is_link if self.is_link is not None else np.zeros(self.size, dtype=bool),
+                                       dtype=torch.bool, device=device),
+            "link_subject": torch.as_tensor(self.link_subject if self.link_subject is not None
+                                            else np.zeros(self.size, dtype=np.int64), dtype=torch.long, device=device),
+            "link_relation": torch.as_tensor(self.link_relation if self.link_relation is not None
+                                             else np.zeros(self.size, dtype=np.int64), dtype=torch.long, device=device),
         }
 
 
@@ -113,13 +123,19 @@ def bank_from_store(store, respect_markers: bool = False) -> Bank:
     valid = (np.linalg.norm(b["marker"].astype(float) - store.marker_centre[None, :], axis=1) <= store.valid_radius) \
         if b["marker"].shape[0] else np.zeros(0, dtype=bool)
     usable = valid & b["active"]
-    index_view = {(int(s), int(r)): int(o) for s, r, o, u in zip(b["subject"], b["relation"], b["obj"], usable) if u}
+    # the view FOLLOWS aliases (a link row holds no object of its own) and the trace names every cell read
+    row_of_kid = {int(k): i for i, k in enumerate(b["kid"])}
+    resolved = store.resolved_view(respect_markers=True)
+    index_view = {k: int(o) for k, (o, _) in resolved.items()}
+    trace_of_key = {k: tuple(row_of_kid[int(x)] for x in tr if int(x) in row_of_kid) for k, (_, tr) in resolved.items()}
     kid_of_key = {(int(s), int(r)): int(i) for i, (s, r, u) in enumerate(zip(b["subject"], b["relation"], usable)) if u}
     active_pos = {(int(s), int(r)): int(i) for i, (s, r, a) in enumerate(zip(b["subject"], b["relation"], b["active"])) if a}
     routable = np.ones(b["kid"].shape[0], dtype=bool)   # store.bank() returns ACTIVE and REVOKED cells (deleted excluded)
     routable_pos = {(int(s), int(r)): int(i) for i, (s, r) in enumerate(zip(b["subject"], b["relation"]))}
     return Bank(b["subject"], b["relation"], b["obj"], b["marker"], b["active"], usable, b["kid"], index_view, kid_of_key,
-                active_pos, marker_valid=valid, routable=routable, routable_pos=routable_pos)
+                active_pos, marker_valid=valid, routable=routable, routable_pos=routable_pos,
+                is_link=b.get("is_link"), link_subject=b.get("link_subject"), link_relation=b.get("link_relation"),
+                trace_of_key=trace_of_key)
 
 
 def failing_hop_target(bank: Bank, q: Query, gt, status_gated: bool = False) -> int:
