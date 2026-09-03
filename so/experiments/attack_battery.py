@@ -10,7 +10,7 @@ markers are recorded as well.
 
 from __future__ import annotations
 
-from typing import Any, Dict
+from typing import Any, Dict, Optional
 
 import numpy as np
 import torch
@@ -39,8 +39,9 @@ def gate_stats(model, store) -> Dict[str, float]:
             "gate_invalid_max": float(g[~valid].max()) if (~valid).any() else float("nan")}
 
 
-def attack_battery(model, centre: np.ndarray, seed: int, world_seed: int, n_targets: int = N_TARGETS) -> Dict[str, Any]:
-    rng, world, store, kids, ref = fresh_world(world_seed, centre)
+def attack_battery(model, centre: np.ndarray, seed: int, world_seed: int, n_targets: int = N_TARGETS,
+                   cfg: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
+    rng, world, store, kids, ref = fresh_world(world_seed, centre) if cfg is None else fresh_world(world_seed, centre, cfg)
     facts = world.facts
     perm = rng.permutation(len(facts))
     targets = [facts[int(i)] for i in perm[:n_targets]]

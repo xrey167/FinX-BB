@@ -67,10 +67,10 @@ def select_entities(tok, n: int = 256) -> List[int]:
     return ids
 
 
-def query_text(q: Query, names: List[str], n_synonyms: int) -> str:
+def query_text(q: Query, names: List[str], n_synonyms: int, template: Optional[int] = None) -> str:
     s = names[q.start]
     if q.hops == 1:
-        r, k = q.path[0], q.surface[0] % n_synonyms
+        r, k = q.path[0], (q.surface[0] % n_synonyms if template is None else template)
         return TEMPLATES[r][k].format(s=s)
     inner = " of the ".join(NOUN[r] for r in reversed(q.path))
     return f"The {inner} of {s} is"
@@ -126,14 +126,14 @@ class GPT2Knowledge:
 
     @torch.no_grad()
     def predict(self, bank: Optional[Bank], world: World, queries: Sequence[Query], batch_size: int = 64,
-                cell_mask: Optional[np.ndarray] = None) -> Dict[str, np.ndarray]:
+                cell_mask: Optional[np.ndarray] = None, template: Optional[int] = None) -> Dict[str, np.ndarray]:
         self.model.eval()
         tensors = bank.tensors() if bank is not None else None
         mask_t = None if cell_mask is None else torch.as_tensor(cell_mask, dtype=torch.bool)
         answers, full_top1, routing, hidden, cand_logits = [], [], [], [], []
         for i in range(0, len(queries), batch_size):
             chunk = list(queries[i: i + batch_size])
-            ids, am, last = encode_texts(self.tok, [query_text(q, self.names, self.n_synonyms) for q in chunk])
+            ids, am, last = encode_texts(self.tok, [query_text(q, self.names, self.n_synonyms, template) for q in chunk])
             cand, full, r, h = self.model(tensors, ids, am, last, cell_mask=mask_t)
             a = cand.argmax(-1).numpy()
             answers.append(np.where(a == self.n_entities, UNKNOWN, a))

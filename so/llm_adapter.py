@@ -42,6 +42,7 @@ class AdapterConfig:
     d_key: int = 256
     marker_dim: int = 16
     use_marker_gate: bool = True
+    hard_gate: bool = False        # verification mode: gate thresholded at 0.5
 
     def to_dict(self) -> Dict:
         return asdict(self)
@@ -89,10 +90,16 @@ class KnowledgeAdapterLM(nn.Module):
         return [p for n, p in self.named_parameters() if not n.startswith("lm.")]
 
     # ------------------------------------------------------------------ knowledge layer
+    def gate_logits(self, marker: torch.Tensor) -> torch.Tensor:
+        return self.marker_gate(marker)
+
     def gate(self, marker: torch.Tensor) -> torch.Tensor:
         if not self.cfg.use_marker_gate:
             return torch.ones(marker.shape[0], 1, device=marker.device)
-        return torch.sigmoid(self.marker_gate(marker))
+        g = torch.sigmoid(self.gate_logits(marker))
+        if self.cfg.hard_gate:
+            g = (g > 0.5).to(g.dtype)
+        return g
 
     def encode_bank(self, bank: Dict[str, torch.Tensor]) -> Dict[str, torch.Tensor]:
         subj = self.wte[self.entity_token_ids[bank["subject"]]]

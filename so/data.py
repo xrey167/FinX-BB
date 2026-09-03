@@ -105,7 +105,8 @@ def bank_from_world(rng: np.random.Generator, world: World, centre: np.ndarray, 
 def bank_from_store(store, respect_markers: bool = False) -> Bank:
     """Bank view of a real ``MVCCStore`` (used for evaluation and lifecycle operations)."""
     b = store.bank(respect_markers=False)
-    valid = np.array([store.marker_valid(m) for m in b["marker"]], dtype=bool)
+    valid = (np.linalg.norm(b["marker"].astype(float) - store.marker_centre[None, :], axis=1) <= store.valid_radius) \
+        if b["marker"].shape[0] else np.zeros(0, dtype=bool)
     usable = valid & b["active"]
     index_view = {(int(s), int(r)): int(o) for s, r, o, u in zip(b["subject"], b["relation"], b["obj"], usable) if u}
     kid_of_key = {(int(s), int(r)): int(i) for i, (s, r, u) in enumerate(zip(b["subject"], b["relation"], usable)) if u}
