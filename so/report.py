@@ -21,7 +21,7 @@ DOC = Path(__file__).resolve().parent.parent / "docs" / "so-results-2026-09-02.m
 ORDER = ["e000001a_reference", "e000001b_mini_transformer", "e000002_memorization_control",
          "e000003_retention_generalization", "e000004_reconstruction_attacks", "e000005_causal_interventions",
          "e000006_ablations", "e000007_biomarker", "e000008_gpt2_adapter", "e000009_verification_gate",
-         "e000010_balanced_gate", "e000011_gpt2_v2", "e000012_status_gated_revoke", "e000013_prior_conflict", "e000014_bank_10k", "e000015_symlink_cells", "e000016_alias_chains"]
+         "e000010_balanced_gate", "e000011_gpt2_v2", "e000012_status_gated_revoke", "e000013_prior_conflict", "e000014_bank_10k", "e000015_symlink_cells", "e000016_alias_chains", "e000017a_paraphrase_diagnosis"]
 
 # ledger §3 properties -> the experiments that bear on them
 PROPERTIES = {
@@ -83,6 +83,13 @@ NOTES = {
         "control: with the slot disabled, alias reading is 0% and fact reading is 100%. Two results are withheld and "
         "recorded as failures: shredding the alias rather than the payload reaches only 93% on the worst seed, and the "
         "two-slot control does not resolve two-link chains because chains never occur in the training distribution.",
+    "e000017a_paraphrase_diagnosis": "The record that reframes the programme's one measured failure. Roadmap kill "
+        "criterion 5 fired on the unconditional refusal rate, and that stands. Decomposing E-000012's own checkpoints "
+        "without training anything shows the cause: conditioned on the model having read the fact at all while the cell "
+        "was active, it refuses after REVOKE 96.1% of the time on held-out phrasings and returns the deleted object in "
+        "0.15% of those cases. What does not generalise is reading (69.4% against 96.1%), so the defect sits in the "
+        "query and routing path. The worst-seed conditional figure is 94.2%, still under the bar, so the remedy run with "
+        "the template budget the roadmap prescribes is still owed.",
     "e000016_alias_chains": "The follow-up that turns E-000015's two recorded failures into an explanation. Both were "
         "caused by the training distribution rather than the architecture: with 30% chains in training, two dereference "
         "slots resolve a two-link chain completely, a one-slot model refuses it (100% unknown, 0% answered) instead of "
