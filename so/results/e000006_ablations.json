@@ -13,6 +13,12 @@
         "min": 1.0,
         "n": 3
       },
+      "direct_unknown_rate": {
+        "max": 0.0,
+        "mean": 0.0,
+        "min": 0.0,
+        "n": 3
+      },
       "hop2": {
         "max": 1.0,
         "mean": 1.0,
@@ -85,6 +91,12 @@
         "max": 1.0,
         "mean": 1.0,
         "min": 1.0,
+        "n": 3
+      },
+      "direct_unknown_rate": {
+        "max": 0.0,
+        "mean": 0.0,
+        "min": 0.0,
         "n": 3
       },
       "hop2": {
@@ -161,6 +173,12 @@
         "min": 1.0,
         "n": 3
       },
+      "direct_unknown_rate": {
+        "max": 0.0,
+        "mean": 0.0,
+        "min": 0.0,
+        "n": 3
+      },
       "hop2": {
         "max": 1.0,
         "mean": 1.0,
@@ -233,6 +251,12 @@
         "max": 1.0,
         "mean": 1.0,
         "min": 1.0,
+        "n": 3
+      },
+      "direct_unknown_rate": {
+        "max": 0.0,
+        "mean": 0.0,
+        "min": 0.0,
         "n": 3
       },
       "hop2": {
@@ -309,6 +333,12 @@
         "min": 0.0,
         "n": 3
       },
+      "direct_unknown_rate": {
+        "max": 1.0,
+        "mean": 1.0,
+        "min": 1.0,
+        "n": 3
+      },
       "hop2": {
         "max": 0.0,
         "mean": 0.0,
@@ -381,6 +411,12 @@
         "max": 0.0,
         "mean": 0.0,
         "min": 0.0,
+        "n": 3
+      },
+      "direct_unknown_rate": {
+        "max": 1.0,
+        "mean": 1.0,
+        "min": 1.0,
         "n": 3
       },
       "hop2": {
@@ -1067,6 +1103,6 @@
     ]
   },
   "random_deletion_target_unchanged": 1.0,
-  "recorded_at": "2026-09-03T00:03:21+00:00",
+  "recorded_at": "2026-09-03T00:39:14+00:00",
   "title": "Ablations"
 }
