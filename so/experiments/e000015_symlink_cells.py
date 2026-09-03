@@ -59,6 +59,7 @@ from so.train import TrainConfig, lr_at, make_centre, routing_loss
 from so.world import Fact, Query, UNKNOWN, World, free_keys
 
 N_ENTITIES, N_RELATIONS, N_SYNONYMS = 256, 6, 2
+MAX_TRAIN_LINK_DEPTH = 3          # how deep the training bank resolves an alias chain
 EVAL = dict(n_base=850, n_groups=100, n_alias_per_group=2, n_direct=600, n_hop2=300, n_broken=200,
             n_targets=100, n_chain=100)
 
@@ -122,11 +123,13 @@ def load_arm(world: World, spec: AliasSpec, centre: np.ndarray, seed: int, symli
 # ------------------------------------------------------------------------------- training banks
 def bank_with_links(rng: np.random.Generator, world: World, spec: AliasSpec, centre: np.ndarray,
                     p_revoked: float = 0.10, p_shred: float = 0.05, p_stale: float = 0.05,
-                    p_dangling: float = 0.05) -> Bank:
+                    p_dangling: float = 0.05, p_chain: float = 0.0) -> Bank:
     """Training bank: the world's facts, alias rows carrying their target's key, lifecycle states.
 
     ``p_dangling`` of the alias rows point at a key that no cell holds, so the model must learn that
-    a pointer is not a promise.
+    a pointer is not a promise.  ``p_chain`` of them point at ANOTHER ALIAS instead of a fact
+    (E-000016): without chains in the training distribution a second dereference slot never sees a
+    pointer in its input and learns to pass through.
     """
     from so.data import invalid_markers, valid_markers
 
@@ -140,12 +143,19 @@ def bank_with_links(rng: np.random.Generator, world: World, spec: AliasSpec, cen
     l_sub = np.zeros(n, dtype=np.int64)
     l_rel = np.zeros(n, dtype=np.int64)
     free = free_keys(world)
-    for k, t in spec.alias_of.items():
+    alias_items = list(spec.alias_of.items())
+    by_target: Dict[Tuple[int, int], List[Tuple[int, int]]] = {}
+    for k, t in alias_items:
+        by_target.setdefault(t, []).append(k)
+    for k, t in alias_items:
         i = row_of_key[k]
         is_link[i] = True
+        siblings = [x for x in by_target.get(t, []) if x != k]
         if free and rng.random() < p_dangling:
             d = free[int(rng.integers(0, len(free)))]        # points nowhere
             l_sub[i], l_rel[i] = d
+        elif siblings and rng.random() < p_chain:
+            l_sub[i], l_rel[i] = siblings[int(rng.integers(0, len(siblings)))]   # alias -> alias -> fact
         else:
             l_sub[i], l_rel[i] = t
         obj[i] = 0                                           # placeholder: an alias holds no object
@@ -175,12 +185,22 @@ def bank_with_links(rng: np.random.Generator, world: World, spec: AliasSpec, cen
             fact_view.setdefault((int(subject[i]), int(relation[i])), (int(obj[i]), i))
     index_view: Dict[Tuple[int, int], int] = {k: o for k, (o, _) in fact_view.items()}
     trace_of_key: Dict[Tuple[int, int], Tuple[int, ...]] = {k: (i,) for k, (_, i) in fact_view.items()}
-    for i in range(total):
-        if usable[i] and is_link[i]:
-            hit = fact_view.get((int(l_sub[i]), int(l_rel[i])))
+    link_row = {(int(subject[i]), int(relation[i])): i for i in range(total) if usable[i] and is_link[i]}
+    for key, i in link_row.items():
+        trace: List[int] = [i]
+        cur = (int(l_sub[i]), int(l_rel[i]))
+        seen = {i}
+        for _ in range(MAX_TRAIN_LINK_DEPTH):
+            hit = fact_view.get(cur)
             if hit is not None:
-                index_view[(int(subject[i]), int(relation[i]))] = hit[0]
-                trace_of_key[(int(subject[i]), int(relation[i]))] = (i, hit[1])
+                index_view[key] = hit[0]
+                trace_of_key[key] = tuple(trace + [hit[1]])
+                break
+            nxt = link_row.get(cur)
+            if nxt is None or nxt in seen:
+                break                                        # dangling, unusable or a cycle
+            seen.add(nxt); trace.append(nxt)
+            cur = (int(l_sub[nxt]), int(l_rel[nxt]))
     kid_of_key = {(int(s), int(r)): int(i) for i, (s, r, u) in enumerate(zip(subject, relation, usable)) if u}
     active_pos = {(int(s), int(r)): int(i) for i, (s, r, a) in enumerate(zip(subject, relation, active)) if a}
     return Bank(subject, relation, obj, marker.astype(np.float32), active, usable, np.arange(total),
@@ -233,7 +253,7 @@ def encode_slots(queries: List[Query], bank: Bank, world: World, max_hops: int, 
 
 # ------------------------------------------------------------------------------------- training
 def train_symlink(model_cfg: ModelConfig, cfg: TrainConfig, n_groups: int = 100, n_alias_per_group: int = 2,
-                  p_dangling: float = 0.05, verbose: bool = True) -> Dict[str, Any]:
+                  p_dangling: float = 0.05, p_chain: float = 0.0, verbose: bool = True) -> Dict[str, Any]:
     torch.manual_seed(cfg.seed)
     rng = np.random.default_rng(cfg.seed)
     model = MutableKnowledgeTransformer(model_cfg)
@@ -246,7 +266,7 @@ def train_symlink(model_cfg: ModelConfig, cfg: TrainConfig, n_groups: int = 100,
         n_base = int(rng.integers(cfg.n_cells_min, cfg.n_cells_max + 1))
         world, spec = sample_alias_world(rng, n_base, n_groups, n_alias_per_group,
                                          cfg.n_entities, cfg.n_relations, cfg.n_synonyms)
-        bank = bank_with_links(rng, world, spec, centre, cfg.p_revoked, cfg.p_shred, cfg.p_stale, p_dangling)
+        bank = bank_with_links(rng, world, spec, centre, cfg.p_revoked, cfg.p_shred, cfg.p_stale, p_dangling, p_chain)
         queries = sample_training_queries(rng, world, bank, cfg.batch_size, cfg.mix)
         batch = encode_slots(queries, bank, world, model_cfg.max_hops, model_cfg.n_deref)
         for g in opt.param_groups:
