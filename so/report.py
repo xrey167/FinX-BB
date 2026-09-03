@@ -67,6 +67,12 @@ NOTES = {
         "and 10,000 cells with routing mass 0.995 — addressing does not degrade in this range. Residual: 1 in 500 shredded "
         "targets answered (an unsigned marker passing the gate), inside the binomial threshold; the gate's false-accept tail is "
         "the quantity to watch at larger scale.",
+    "e000012_status_gated_revoke": "A design result rather than a threshold result. Expressing REVOKE as a status flag "
+        "that multiplies the verification gate, instead of removing the cell from routing, raises ' unknown' after "
+        "REVOKE from 72.7% to 99.0% in the frozen GPT-2 and improves reading, composition, update and locality at the "
+        "same time. The explanation is in E-000011's own numbers: a masked cell releases its routing mass to "
+        "neighbouring keys and the model then names another entity. The pre-registered bar is still missed because "
+        "deletion does not generalise to held-out paraphrases, which is the open problem of the GPT-2 chain.",
     "e000015_symlink_cells": "The first measurement of the Symlink hypothesis as ledger section 7 states it: sharing "
         "versus duplicating. Both arms hold the identical world and are read by the identical model, so every number in "
         "the contrast is attributable to the storage form alone. One operation on the shared object reaches or deletes "
