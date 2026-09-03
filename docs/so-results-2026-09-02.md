@@ -33,6 +33,8 @@
 | e000018_gate | - | - | - | not run | - |
 | e000018_generic | - | - | - | not run | - |
 | E-000019 | Fresh-seed confirmation of the verified gate, with the SHRED residual tested against chance | E4 | F4 (F4) | criteria met | 2026-09-03 16:31 |
+| e000020_symlink_gpt2 | - | - | - | not run | - |
+| E-000021 | The verification gate as a classifier: false accepts and false rejects over fresh markers | E4 | - | criteria met | 2026-09-03 17:58 |
 
 ## The six breakthrough properties (ledger section 3)
 
@@ -1555,3 +1557,33 @@ Pre-registered criteria (worst seed):
 The soft gate's separation of signed from unsigned markers is learned; hard verification thresholds that learned score, so a residual of exactly zero after thresholding is by construction. What this record adds is that the residual measured on seeds that took no part in choosing the configuration sits where chance puts it, with the interval shown.
 
 **Interpretation (post hoc, record unchanged):** The record that turns F4 from a tolerance claim into a chance claim, and does it outside the seeds that chose the configuration. Forced choice lands on exactly 375 of 750 pooled trials, the probe on 4 of 750 against a chance of 1 in 256, the true object top-1 on 7 of 750; every exact interval contains its chance level and stays inside the pre-registered distance. Two objections from the standing audit are answered in one run. What is not answered: the hard gate still admits an unsigned marker in at least one seed, and the top-1 interval only just contains chance with a point estimate about two and a half times the chance rate, so a larger sample could still separate them.
+
+## e000020_symlink_gpt2
+
+_not run in this session_
+
+## E-000021 — The verification gate as a classifier
+
+The standing audit's objection that the deletion certificate is a learned classifier whose false-accept rate is reported only as a worst-seed maximum.
+
+Nothing was trained. Every recorded checkpoint of the verified-gate family is loaded and its gate scored on freshly drawn markers; the rest of the model is not involved, because the gate is a function of the marker alone.
+
+**Pooled over 11 checkpoints and 2,200,000 markers per class: 1867 false accepts (rate 8.49e-04, 95% interval [8.11e-04, 8.88e-04]) and 0 false rejects (rate 0.00e+00).**
+
+| family | false accepts | rate | 95% interval | false rejects | max score on an unsigned marker | min score on a signed marker |
+|---|---|---|---|---|---|---|
+| e000010 | 811/1000000 | 8.11e-04 | [7.56e-04, 8.69e-04] | 0/1000000 | 0.8610 | 0.9926 |
+| e000014 | 576/600000 | 9.60e-04 | [8.83e-04, 1.04e-03] | 0/600000 | 0.8774 | 0.9902 |
+| e000019 | 480/600000 | 8.00e-04 | [7.30e-04, 8.75e-04] | 0/600000 | 0.8929 | 0.9878 |
+
+Pre-registered criteria:
+
+| criterion (worst seed) | required | observed | result |
+|---|---|---|---|
+| false_accept_rate | <= 0.001 | 0.0008 | PASS |
+| false_reject_rate | <= 0.001 | 0.0000 | PASS |
+| false_accept_ci_upper | <= 0.01 | 0.0009 | PASS |
+
+This is the gate's error rate on markers drawn from the same two distributions the programme uses. It is not a security claim: an adversary who can choose the marker is not modelled here, and a gate that separates two fixed distributions says nothing about one that must resist a search for a passing vector.
+
+**Interpretation (post hoc, record unchanged):** The number the deletion claim needed and did not have. Across 2.2 million fresh unsigned markers and eleven checkpoints the gate admits one in about 1,180, with a tight interval and no false rejects at all. That is the bound on every SHRED result in this programme: behavioural deletion is complete and the residual sits at chance, but roughly one payload per thousand would pass verification. It just clears the pre-registered bar of one in a thousand, and it is a limit rather than a guarantee.

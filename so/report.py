@@ -21,7 +21,7 @@ DOC = Path(__file__).resolve().parent.parent / "docs" / "so-results-2026-09-02.m
 ORDER = ["e000001a_reference", "e000001b_mini_transformer", "e000002_memorization_control",
          "e000003_retention_generalization", "e000004_reconstruction_attacks", "e000005_causal_interventions",
          "e000006_ablations", "e000007_biomarker", "e000008_gpt2_adapter", "e000009_verification_gate",
-         "e000010_balanced_gate", "e000011_gpt2_v2", "e000012_status_gated_revoke", "e000013_prior_conflict", "e000014_bank_10k", "e000015_symlink_cells", "e000016_alias_chains", "e000017a_paraphrase_diagnosis", "e000017b_templates8", "e000018_both", "e000018_gate", "e000018_generic", "e000019_fresh_seed_chance", "e000020_symlink_gpt2"]
+         "e000010_balanced_gate", "e000011_gpt2_v2", "e000012_status_gated_revoke", "e000013_prior_conflict", "e000014_bank_10k", "e000015_symlink_cells", "e000016_alias_chains", "e000017a_paraphrase_diagnosis", "e000017b_templates8", "e000018_both", "e000018_gate", "e000018_generic", "e000019_fresh_seed_chance", "e000020_symlink_gpt2", "e000021_gate_error_rates"]
 
 # ledger §3 properties -> the experiments that bear on them
 PROPERTIES = {
@@ -83,6 +83,11 @@ NOTES = {
         "control: with the slot disabled, alias reading is 0% and fact reading is 100%. Two results are withheld and "
         "recorded as failures: shredding the alias rather than the payload reaches only 93% on the worst seed, and the "
         "two-slot control does not resolve two-link chains because chains never occur in the training distribution.",
+    "e000021_gate_error_rates": "The number the deletion claim needed and did not have. Across 2.2 million fresh "
+        "unsigned markers and eleven checkpoints the gate admits one in about 1,180, with a tight interval and no "
+        "false rejects at all. That is the bound on every SHRED result in this programme: behavioural deletion is "
+        "complete and the residual sits at chance, but roughly one payload per thousand would pass verification. It "
+        "just clears the pre-registered bar of one in a thousand, and it is a limit rather than a guarantee.",
     "e000019_fresh_seed_chance": "The record that turns F4 from a tolerance claim into a chance claim, and does it "
         "outside the seeds that chose the configuration. Forced choice lands on exactly 375 of 750 pooled trials, the "
         "probe on 4 of 750 against a chance of 1 in 256, the true object top-1 on 7 of 750; every exact interval "
