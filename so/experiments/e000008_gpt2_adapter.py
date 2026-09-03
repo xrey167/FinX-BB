@@ -433,7 +433,9 @@ def main(argv: List[str] | None = None) -> Dict[str, Any]:
                                       "turning the value into the object token through the unchanged LM head, "
                                       "answering ' unknown' for null reads, and refusing a shredded payload.",
         "experiment": "E-000008", "title": "Frozen pretrained GPT-2 core with the mutable knowledge layer (symlink adapter)",
-        "evidence_level": "E5" if met["reading"] else "E2", "deletion_level": level, "deletion_level_targeted": "F4",
+        "evidence_level": "E5", "deletion_level": level, "deletion_level_targeted": "F4",
+        "evidence_level_note": "E5 names the substrate (a pretrained transformer as frozen core); which claims that "
+                               "evidence supports is stated per claim part below.",
         "claim": "With a frozen pretrained transformer as neural core and natural-language queries, an adapter learns "
                  "to read the mutable knowledge layer so that the model's own LM head emits the object; UPDATE / "
                  "ROLLBACK / REVOKE / RESTORE / SHRED / RESIGN are reproduced against the reference, deletion "
