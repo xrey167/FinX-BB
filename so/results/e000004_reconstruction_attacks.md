@@ -1,6 +1,6 @@
 # E-000004 — Reconstruction attacks
 
-Evidence level: **E4** (Controlled neural-network evidence); deletion level **F4** within the synthetic system (representation-level checks, linear probe). Seeds: [0, 1, 2, 3, 4]. Probe calibration on held-out active cells: top-1 0.949, top-5 0.949. Chance: forced choice 0.5, top-1 among entities 1/256 = 0.0039, mean rank 127.5, probe top-1 0.0039, top-5 0.0195.
+Evidence level: **E4** (Controlled neural-network evidence); deletion level targeted **F4**, recorded **F3** (behavioural deletion supported, representation-level removal NOT supported). Seeds: [0, 1, 2, 3, 4]. Probe calibration on held-out active cells: top-1 0.949, top-5 0.949. Chance: forced choice 0.5, top-1 among entities 1/256 = 0.0039, mean rank 127.5, probe top-1 0.0039, top-5 0.0195.
 
 | attack (mean over seeds) | active | after REVOKE (mask) | after SHRED (learned) |
 |---|---|---|---|

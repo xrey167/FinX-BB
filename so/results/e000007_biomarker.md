@@ -1,6 +1,6 @@
 # E-000007 — Biomarker: suppression versus representational change
 
-Evidence level: **E4** (Controlled neural-network evidence); deletion level **F4** within the synthetic system. Seeds: [0, 1, 2, 3, 4]. Chance levels: probe top-1 0.0039, top-5 0.0195, mean rank 127.5, forced choice 0.5.
+Evidence level: **E4** (Controlled neural-network evidence); deletion level targeted **F4**, recorded **F3** (suppression/deletion separation supported, SHRED at F4 thresholds NOT supported). Seeds: [0, 1, 2, 3, 4]. Chance levels: probe top-1 0.0039, top-5 0.0195, mean rank 127.5, forced choice 0.5.
 
 | signal (mean over seeds) | active | revoked | shredded | suppressed |
 |---|---|---|---|---|

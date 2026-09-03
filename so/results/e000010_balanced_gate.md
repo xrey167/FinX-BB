@@ -1,6 +1,6 @@
 # E-000010 — Signature-verification gate: closing the SHRED residual (class-balanced loss)
 
-Evidence level: **E4** (Controlled neural-network evidence); deletion level claimed for SHRED with hard verification: **F4** within the synthetic system. Seeds: [0, 1, 2, 3, 4]; 3000 steps; gate loss weight 5.0, class-balanced. Baseline = the E-000001-B models (no gate loss).
+Evidence level: **E4** (Controlled neural-network evidence); deletion level targeted for SHRED with hard verification: F4, recorded **F4** within the synthetic system. Seeds: [0, 1, 2, 3, 4]; 3000 steps; gate loss weight 5.0, class-balanced. Baseline = the E-000001-B models (no gate loss).
 
 Attack battery after SHRED (mean / worst seed):
 

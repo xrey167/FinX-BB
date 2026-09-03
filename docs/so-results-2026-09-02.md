@@ -14,12 +14,12 @@
 | E-000001-B | Trained Mini-Transformer over the mutable knowledge layer | E4 | F3 | criteria met |
 | E-000002 | Weight-memorisation control (copy problem) | E4 | - | criteria met |
 | E-000003 | Retention and generalisation of deletion | E4 | F3 | criteria met |
-| E-000004 | Reconstruction attacks against REVOKE and SHRED | E4 | F4 | **criteria NOT met** |
+| E-000004 | Reconstruction attacks against REVOKE and SHRED | E4 | F3 | **criteria NOT met** |
 | E-000005 | Causal interventions on knowledge cells | E4 | - | criteria met |
 | E-000006 | Ablations | E4 | - | **criteria NOT met** |
-| E-000007 | Biomarker: output suppression versus representational change | E4 | F4 | **criteria NOT met** |
+| E-000007 | Biomarker: output suppression versus representational change | E4 | F3 | **criteria NOT met** |
 | e000008_gpt2_adapter | - | - | - | not run |
-| E-000009 | Signature-verification gate: closing the SHRED residual | E4 | F4 | **criteria NOT met** |
+| E-000009 | Signature-verification gate: closing the SHRED residual | E4 | F3 | **criteria NOT met** |
 | E-000010 | Signature-verification gate: closing the SHRED residual (class-balanced loss) | E4 | F4 | criteria met |
 
 ## The six breakthrough properties (ledger section 3)
@@ -33,11 +33,13 @@
 | Reconstruction resistance | E-000004, E-000007, E-000009, E-000010 | E-000004: **criteria NOT met**; E-000007: **criteria NOT met**; E-000009: **criteria NOT met**; E-000010: criteria met | E4 |
 | Scalability (path beyond toy models) | E-000002 | E-000002: criteria met | E4 |
 
-Scalability is the property this session can least address: E-000008 shows the mechanism attaches to a frozen pretrained transformer on CPU; the path to LLM scale is a roadmap item, not a result.
+Scalability is the property this session can least address: E-000008 tests whether the same layer works as an adapter on a frozen pretrained GPT-2 (not yet recorded); the path to LLM scale is a roadmap item, not a result.
+
+The 'status' column is the status of the whole record's pre-registered criteria; a property can be supported by an experiment whose record fails on a different criterion (E-000004 and E-000007 fail only their F4 rows while their behavioural rows pass — see the split claims inside those records).
 
 ## Boundary of this evidence
 
-Everything below was produced on 4 CPU cores in one session, with no GPU. It is therefore bounded as follows:
+Everything below was produced on one 4-core CPU box in one session, with no GPU (experiments ran with 2 or 4 torch threads; each record stores the thread count under `environment`). It is therefore bounded as follows:
 
 - **No LLM-scale evidence.** The largest neural core used is frozen GPT-2 small (124M parameters, E-000008). Nothing here shows editable knowledge inside a large pretrained model, and nothing here shows unlearning of facts that a pretrained model already encodes in its weights.
 - **Synthetic worlds.** Facts are `(subject, relation) → object` triples over 256 entities and 4 relations; queries are symbolic (E-000001 … E-000007) or short natural-language templates (E-000008). Real-world knowledge, multi-token entities and free-text questions are not covered.
@@ -164,11 +166,11 @@ Per seed:
 
 | seed | direct | hop2 | hop3 | hop2_broken_unknown | hop3_broken_unknown | provenance | reverse | update | update_derived | rollback | revoke | restore | shred | resign | update_rollback | locality | locality_targets_correct | locality_undo_exact | alternative_path | replay_deviation | train_seconds |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| 100 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 0.9900 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 0 | 205 |
-| 101 | 1.0000 | 1.0000 | 0.9980 | 1.0000 | 0.9900 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 0.9700 | 1.0000 | 0.9957 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 0 | 113 |
-| 102 | 1.0000 | 1.0000 | 0.9980 | 1.0000 | 0.9900 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 0 | 115 |
-| 103 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 0 | 112 |
-| 104 | 1.0000 | 1.0000 | 0.9980 | 1.0000 | 0.9700 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 0 | 113 |
+| 0 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 0.9900 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 0 | 205 |
+| 1 | 1.0000 | 1.0000 | 0.9980 | 1.0000 | 0.9900 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 0.9700 | 1.0000 | 0.9957 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 0 | 113 |
+| 2 | 1.0000 | 1.0000 | 0.9980 | 1.0000 | 0.9900 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 0 | 115 |
+| 3 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 0 | 112 |
+| 4 | 1.0000 | 1.0000 | 0.9980 | 1.0000 | 0.9700 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 0 | 113 |
 
 Interpretation: the behaviour is no longer mechanical — a trained neural core operates over the experimental knowledge structure. It is still a synthetic experiment and not proof of LLM-scale editable knowledge.
 
@@ -286,7 +288,7 @@ REVOKE removes routing by mask (F1), so its effect on every access path (paraphr
 
 ## E-000004 — Reconstruction attacks
 
-Evidence level: **E4** (Controlled neural-network evidence); deletion level **F4** within the synthetic system (representation-level checks, linear probe). Seeds: [0, 1, 2, 3, 4]. Probe calibration on held-out active cells: top-1 0.949, top-5 0.949. Chance: forced choice 0.5, top-1 among entities 1/256 = 0.0039, mean rank 127.5, probe top-1 0.0039, top-5 0.0195.
+Evidence level: **E4** (Controlled neural-network evidence); deletion level targeted **F4**, recorded **F3** (behavioural deletion supported, representation-level removal NOT supported). Seeds: [0, 1, 2, 3, 4]. Probe calibration on held-out active cells: top-1 0.949, top-5 0.949. Chance: forced choice 0.5, top-1 among entities 1/256 = 0.0039, mean rank 127.5, probe top-1 0.0039, top-5 0.0195.
 
 | attack (mean over seeds) | active | after REVOKE (mask) | after SHRED (learned) |
 |---|---|---|---|
@@ -397,13 +399,15 @@ Pre-registered criteria (worst seed):
 
 Random deletion (revoke another cell, target must stay): 100.0%
 
+Reading the table: for a variant that answers UNKNOWN to everything (no_routing, no_routing_loss) the rows hop2_broken_unknown, revoke, shred and locality are satisfied trivially and carry no information.
+
 Without versioning (UPDATE as in-place replace): rollback impossible (no version to return to) — structural property of the layer, not a learned one.
 
-**Interpretation (post hoc, record unchanged):** Two pre-registered expectations were wrong and are recorded as such. (1) The null cell is NOT essential: without it, broken paths are still answered UNKNOWN at 100% (the model learns to produce a low-norm read from non-matching keys). The design claim 'the null cell is what makes broken paths answer UNKNOWN' is withdrawn. (2) Without the routing loss the model collapsed to answering UNKNOWN for everything within 2000 steps (identical numbers to 'no_routing'): routing supervision is necessary for the mechanism to be *learned* at all at this budget, not only for exact provenance. That is an optimisation finding, not a by-construction one. 'no_marker_gate' and 'no_routing' confirm the information-flow necessities (SHRED 0%, nothing readable).
+**Interpretation (post hoc, record unchanged):** Two pre-registered expectations were wrong and are recorded as such. (1) The null cell is NOT essential: without it, broken paths are still answered UNKNOWN at 100% (how the model does this was not measured; a plausible mechanism is a diffuse, low-norm read over non-matching keys). The design claim 'the null cell is what makes broken paths answer UNKNOWN' is withdrawn. (2) Without the routing loss the model collapsed to answering UNKNOWN for everything within 2000 steps (identical numbers to 'no_routing'): routing supervision is necessary for the mechanism to be *learned* at all at this budget, not only for exact provenance. That is an optimisation finding, not a by-construction one. 'no_marker_gate' and 'no_routing' confirm the information-flow necessities (SHRED 0%, nothing readable).
 
 ## E-000007 — Biomarker: suppression versus representational change
 
-Evidence level: **E4** (Controlled neural-network evidence); deletion level **F4** within the synthetic system. Seeds: [0, 1, 2, 3, 4]. Chance levels: probe top-1 0.0039, top-5 0.0195, mean rank 127.5, forced choice 0.5.
+Evidence level: **E4** (Controlled neural-network evidence); deletion level targeted **F4**, recorded **F3** (suppression/deletion separation supported, SHRED at F4 thresholds NOT supported). Seeds: [0, 1, 2, 3, 4]. Chance levels: probe top-1 0.0039, top-5 0.0195, mean rank 127.5, forced choice 0.5.
 
 | signal (mean over seeds) | active | revoked | shredded | suppressed |
 |---|---|---|---|---|
@@ -441,7 +445,7 @@ _not run in this session_
 
 ## E-000009 — Signature-verification gate: closing the SHRED residual
 
-Evidence level: **E4** (Controlled neural-network evidence); deletion level claimed for SHRED with hard verification: **F4** within the synthetic system. Seeds: [0, 1, 2, 3, 4]; 3000 steps; gate loss weight 1.0. Baseline = the E-000001-B models (no gate loss).
+Evidence level: **E4** (Controlled neural-network evidence); deletion level targeted for SHRED with hard verification: F4, recorded **F3** within the synthetic system. Seeds: [0, 1, 2, 3, 4]; 3000 steps; gate loss weight 1.0. Baseline = the E-000001-B models (no gate loss).
 
 Attack battery after SHRED (mean / worst seed):
 
@@ -502,7 +506,7 @@ Chance levels: probe top-1 0.0039, forced choice 0.5, mean rank 127.5.
 
 ## E-000010 — Signature-verification gate: closing the SHRED residual (class-balanced loss)
 
-Evidence level: **E4** (Controlled neural-network evidence); deletion level claimed for SHRED with hard verification: **F4** within the synthetic system. Seeds: [0, 1, 2, 3, 4]; 3000 steps; gate loss weight 5.0, class-balanced. Baseline = the E-000001-B models (no gate loss).
+Evidence level: **E4** (Controlled neural-network evidence); deletion level targeted for SHRED with hard verification: F4, recorded **F4** within the synthetic system. Seeds: [0, 1, 2, 3, 4]; 3000 steps; gate loss weight 5.0, class-balanced. Baseline = the E-000001-B models (no gate loss).
 
 Attack battery after SHRED (mean / worst seed):
 

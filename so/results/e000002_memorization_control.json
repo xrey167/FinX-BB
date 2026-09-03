@@ -116,7 +116,7 @@
     }
   },
   "caveats": "Only 'fixed_routing' is an empirical control: 'resampled' cannot memorise by construction and 'fixed_no_routing' cannot read the layer by construction. The fixed-world regimes see the same random lifecycle states per step as the re-sampled regime (only the world is held fixed), so the no-routing model receives inconsistent labels for revoked/shredded cells and settles on the majority label. Fixed regimes are trained for fewer steps than the re-sampled E-000001-B models.",
-  "claim": "Revocation in the knowledge layer only deletes what the weights have not copied. With re-sampled worlds the weights hold no facts (layer masked -> nothing answered) and revocation leaves no leak; with a fixed training world the core copies facts into its weights and revocation leaks; without a knowledge layer everything is weight-encoded and revocation is impossible.",
+  "claim": "Revocation in the knowledge layer only deletes what the weights have not copied. With re-sampled worlds the weights hold no facts (layer masked -> nothing answered) and revocation leaves no leak. Without a knowledge layer everything is weight-encoded and revocation is impossible (leak 100%). The empirical control \u2014 a fixed training world WITH the layer available \u2014 is reported as measured: within this budget the core did not copy facts into its weights (layer masked -> nothing answered, leak 0%); this is a bound for 2000 steps, not a guarantee for longer training.",
   "claim_supported": true,
   "config": {
     "fixed_steps": 2000,
@@ -253,6 +253,7 @@
       {
         "bank_removed_acc": 0.0,
         "bank_removed_unknown": 1.0,
+        "base_checkpoint_sha256": "49197919faff163b562b048a65b31a555ee9841ecb413e10ff4aab4769d92ba8",
         "control_after_revoke": 1.0,
         "direct": 1.0,
         "seed": 0,
@@ -263,6 +264,7 @@
       {
         "bank_removed_acc": 0.0,
         "bank_removed_unknown": 1.0,
+        "base_checkpoint_sha256": "75d83f6bc9156d66e886b4d6865332d694accbd7906b44e5909af10d9076446b",
         "control_after_revoke": 1.0,
         "direct": 1.0,
         "seed": 1,
@@ -273,6 +275,7 @@
       {
         "bank_removed_acc": 0.0,
         "bank_removed_unknown": 1.0,
+        "base_checkpoint_sha256": "dea4462faa19da797f49dda7c50fb7795c485a88ec752ffebedcd52570ab0571",
         "control_after_revoke": 1.0,
         "direct": 1.0,
         "seed": 2,
@@ -282,6 +285,6 @@
       }
     ]
   },
-  "recorded_at": "2026-09-02T23:01:49+00:00",
+  "recorded_at": "2026-09-02T23:59:48+00:00",
   "title": "Weight-memorisation control (copy problem)"
 }

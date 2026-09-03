@@ -242,6 +242,28 @@
     }
   },
   "claim": "NOT SUPPORTED BY THE MEASUREMENTS (see criteria): Suppression (fine-tuned refusal) and deletion (REVOKE / SHRED) are behaviourally identical on the targets, but the internal signals separate them: under suppression the target cell still receives value contribution and a linear probe still decodes the object from the hidden state; under SHRED the cell is still routed to (routing mass stays, by construction of the key) but its gated value contribution and the probe reading vanish; under REVOKE both are zero by the mask. The gated value contribution is the separating signal; its causal role (payload -> answer) is what E-000005 intervenes on.",
+  "claim_parts": [
+    {
+      "claim": "Output suppression (fine-tuned refusal) is behaviourally identical to deletion on the targets but keeps the target cell's value contribution and a probe leak; REVOKE removes both (mask). The gated value contribution separates suppression from representational removal.",
+      "criteria": [
+        "suppressed/target_unknown",
+        "suppressed/control_acc",
+        "suppressed/gated_value_contribution",
+        "suppressed/probe_top1",
+        "revoked/probe_top1"
+      ],
+      "supported": true
+    },
+    {
+      "claim": "SHRED (unsupervised gate) removes the value contribution and the probe leak to the F4 thresholds.",
+      "criteria": [
+        "shredded/target_unknown",
+        "shredded/gated_value_contribution",
+        "shredded/probe_top1"
+      ],
+      "supported": false
+    }
+  ],
   "claim_supported": false,
   "config": {
     "n_controls": 50,
@@ -304,8 +326,9 @@
       "threshold": 0.95
     }
   },
-  "deletion_level": "F4",
-  "deletion_level_meaning": "Representational removal",
+  "deletion_level": "F3",
+  "deletion_level_meaning": "Functional forgetting",
+  "deletion_level_targeted": "F4",
   "environment": {
     "device": "cpu",
     "numpy": "2.2.6",
@@ -330,6 +353,7 @@
       "active/target_unknown": 0.0,
       "active/true_obj_mean_rank": 0.0,
       "active/true_obj_top1_among_entities": 1.0,
+      "base_checkpoint_sha256": "49197919faff163b562b048a65b31a555ee9841ecb413e10ff4aab4769d92ba8",
       "revoked/control_acc": 1.0,
       "revoked/forced_choice_win": 0.58,
       "revoked/gated_value_contribution": 0.0,
@@ -373,6 +397,7 @@
       "active/target_unknown": 0.0,
       "active/true_obj_mean_rank": 0.0,
       "active/true_obj_top1_among_entities": 1.0,
+      "base_checkpoint_sha256": "75d83f6bc9156d66e886b4d6865332d694accbd7906b44e5909af10d9076446b",
       "revoked/control_acc": 1.0,
       "revoked/forced_choice_win": 0.58,
       "revoked/gated_value_contribution": 0.0,
@@ -416,6 +441,7 @@
       "active/target_unknown": 0.0,
       "active/true_obj_mean_rank": 0.0,
       "active/true_obj_top1_among_entities": 1.0,
+      "base_checkpoint_sha256": "dea4462faa19da797f49dda7c50fb7795c485a88ec752ffebedcd52570ab0571",
       "revoked/control_acc": 1.0,
       "revoked/forced_choice_win": 0.4,
       "revoked/gated_value_contribution": 0.0,
@@ -459,6 +485,7 @@
       "active/target_unknown": 0.0,
       "active/true_obj_mean_rank": 0.0,
       "active/true_obj_top1_among_entities": 1.0,
+      "base_checkpoint_sha256": "54ee6d58e114cfff95e0e1926ffba9225fcb954a9ff2e0b0de18fb493d542689",
       "revoked/control_acc": 1.0,
       "revoked/forced_choice_win": 0.52,
       "revoked/gated_value_contribution": 0.0,
@@ -502,6 +529,7 @@
       "active/target_unknown": 0.0,
       "active/true_obj_mean_rank": 0.0,
       "active/true_obj_top1_among_entities": 1.0,
+      "base_checkpoint_sha256": "23098dc16120265f6237b1de1b2d6346347ec5b27eb11488d686cdbd02a072dd",
       "revoked/control_acc": 1.0,
       "revoked/forced_choice_win": 0.68,
       "revoked/gated_value_contribution": 0.0,
@@ -535,6 +563,6 @@
       "suppressed/true_obj_top1_among_entities": 0.62
     }
   ],
-  "recorded_at": "2026-09-02T22:55:58+00:00",
+  "recorded_at": "2026-09-03T00:01:36+00:00",
   "title": "Biomarker: output suppression versus representational change"
 }

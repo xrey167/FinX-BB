@@ -18,6 +18,24 @@
       "min": 1.0,
       "n": 5
     },
+    "active/gate_invalid_max": {
+      "max": NaN,
+      "mean": NaN,
+      "min": NaN,
+      "n": 5
+    },
+    "active/gate_invalid_mean": {
+      "max": NaN,
+      "mean": NaN,
+      "min": NaN,
+      "n": 5
+    },
+    "active/gate_valid_mean": {
+      "max": 0.8955815434455872,
+      "mean": 0.8924222588539124,
+      "min": 0.8888802528381348,
+      "n": 5
+    },
     "active/gated_value_contribution": {
       "max": 14.079907417297363,
       "mean": 13.924329376220703,
@@ -138,6 +156,24 @@
       "min": 0.46,
       "n": 5
     },
+    "revoke/gate_invalid_max": {
+      "max": NaN,
+      "mean": NaN,
+      "min": NaN,
+      "n": 5
+    },
+    "revoke/gate_invalid_mean": {
+      "max": NaN,
+      "mean": NaN,
+      "min": NaN,
+      "n": 5
+    },
+    "revoke/gate_valid_mean": {
+      "max": 0.8955815434455872,
+      "mean": 0.8924222588539124,
+      "min": 0.8888802528381348,
+      "n": 5
+    },
     "revoke/gated_value_contribution": {
       "max": 0.0,
       "mean": 0.0,
@@ -210,6 +246,24 @@
       "min": 0.41,
       "n": 5
     },
+    "shred/gate_invalid_max": {
+      "max": 0.5676513314247131,
+      "mean": 0.4639521658420563,
+      "min": 0.2840854525566101,
+      "n": 5
+    },
+    "shred/gate_invalid_mean": {
+      "max": 0.10252391546964645,
+      "mean": 0.0841052696108818,
+      "min": 0.052901096642017365,
+      "n": 5
+    },
+    "shred/gate_valid_mean": {
+      "max": 0.8954706192016602,
+      "mean": 0.8923603296279907,
+      "min": 0.888724148273468,
+      "n": 5
+    },
     "shred/gated_value_contribution": {
       "max": 1.5889296531677246,
       "mean": 1.31462721824646,
@@ -267,6 +321,33 @@
   },
   "by_construction_vs_learned": "After REVOKE the routing mass and value contribution on the target are zero by the mask, not by learning \u2014 those two rows are reported for completeness only. After SHRED the cell is still routable, so every row is a measurement of learned behaviour; the SHRED column carries the F4-level evidence.",
   "claim": "NOT SUPPORTED BY THE MEASUREMENTS (see criteria): After REVOKE or SHRED the deleted object is not recoverable through direct, paraphrase, multi-hop or reverse queries, forced choice is at chance, the true object's logit rank is at chance, a linear probe on the hidden state is at chance, and the target cell's gated value contribution is zero \u2014 within the synthetic system. Dependency reconstruction shows that deleting a derivable fact alone is meaningless until its dependency closure is revoked.",
+  "claim_parts": [
+    {
+      "claim": "After REVOKE and SHRED the object is not recoverable through direct, paraphrase, multi-hop or reverse queries (behavioural deletion, F3).",
+      "criteria": [
+        "revoke/direct_unknown",
+        "shred/direct_unknown",
+        "shred/paraphrase_unknown",
+        "restored/direct_acc"
+      ],
+      "supported": true
+    },
+    {
+      "claim": "After SHRED the object is also not recoverable at the representation level: forced choice, logit rank and a linear probe at chance, gated value contribution zero (F4).",
+      "criteria": [
+        "shred/probe_top1",
+        "shred/forced_choice_win",
+        "shred/true_obj_top1_among_entities",
+        "shred/gated_value_contribution"
+      ],
+      "supported": false
+    },
+    {
+      "claim": "Deleting a derivable fact alone is meaningless until its dependency closure is revoked.",
+      "criteria": [],
+      "supported": true
+    }
+  ],
   "claim_supported": false,
   "config": {
     "n_targets": 100,
@@ -358,8 +439,9 @@
       "threshold": 0.05
     }
   },
-  "deletion_level": "F4",
-  "deletion_level_meaning": "Representational removal",
+  "deletion_level": "F3",
+  "deletion_level_meaning": "Functional forgetting",
+  "deletion_level_targeted": "F4",
   "environment": {
     "device": "cpu",
     "numpy": "2.2.6",
@@ -377,6 +459,9 @@
       "active/direct_acc": 1.0,
       "active/direct_unknown": 0.0,
       "active/forced_choice_win": 1.0,
+      "active/gate_invalid_max": NaN,
+      "active/gate_invalid_mean": NaN,
+      "active/gate_valid_mean": 0.8888802528381348,
       "active/gated_value_contribution": 13.909463882446289,
       "active/multihop_unknown": 0.0,
       "active/paraphrase_unknown": 0.0,
@@ -386,6 +471,7 @@
       "active/routing_mass_on_target": 0.9981043338775635,
       "active/true_obj_mean_rank": 0.0,
       "active/true_obj_top1_among_entities": 1.0,
+      "base_checkpoint_sha256": "49197919faff163b562b048a65b31a555ee9841ecb413e10ff4aab4769d92ba8",
       "dependency/collateral_bypass_acc_after_closure": 1.0,
       "dependency/derivable_recovery_after_closure": 0.0,
       "dependency/derivable_recovery_after_revoke_K3": 1.0,
@@ -397,6 +483,9 @@
       "revoke/direct_acc": 0.0,
       "revoke/direct_unknown": 1.0,
       "revoke/forced_choice_win": 0.51,
+      "revoke/gate_invalid_max": NaN,
+      "revoke/gate_invalid_mean": NaN,
+      "revoke/gate_valid_mean": 0.8888802528381348,
       "revoke/gated_value_contribution": 0.0,
       "revoke/multihop_unknown": 1.0,
       "revoke/paraphrase_unknown": 1.0,
@@ -410,6 +499,9 @@
       "shred/direct_acc": 0.0,
       "shred/direct_unknown": 1.0,
       "shred/forced_choice_win": 0.57,
+      "shred/gate_invalid_max": 0.5676513314247131,
+      "shred/gate_invalid_mean": 0.09497174620628357,
+      "shred/gate_valid_mean": 0.888724148273468,
       "shred/gated_value_contribution": 1.4839075803756714,
       "shred/multihop_unknown": 1.0,
       "shred/paraphrase_unknown": 1.0,
@@ -424,6 +516,9 @@
       "active/direct_acc": 1.0,
       "active/direct_unknown": 0.0,
       "active/forced_choice_win": 1.0,
+      "active/gate_invalid_max": NaN,
+      "active/gate_invalid_mean": NaN,
+      "active/gate_valid_mean": 0.8929514288902283,
       "active/gated_value_contribution": 13.930503845214844,
       "active/multihop_unknown": 0.0,
       "active/paraphrase_unknown": 0.0,
@@ -433,6 +528,7 @@
       "active/routing_mass_on_target": 0.9981599450111389,
       "active/true_obj_mean_rank": 0.0,
       "active/true_obj_top1_among_entities": 1.0,
+      "base_checkpoint_sha256": "75d83f6bc9156d66e886b4d6865332d694accbd7906b44e5909af10d9076446b",
       "dependency/collateral_bypass_acc_after_closure": 1.0,
       "dependency/derivable_recovery_after_closure": 0.0,
       "dependency/derivable_recovery_after_revoke_K3": 1.0,
@@ -444,6 +540,9 @@
       "revoke/direct_acc": 0.0,
       "revoke/direct_unknown": 1.0,
       "revoke/forced_choice_win": 0.6,
+      "revoke/gate_invalid_max": NaN,
+      "revoke/gate_invalid_mean": NaN,
+      "revoke/gate_valid_mean": 0.8929514288902283,
       "revoke/gated_value_contribution": 0.0,
       "revoke/multihop_unknown": 1.0,
       "revoke/paraphrase_unknown": 1.0,
@@ -457,6 +556,9 @@
       "shred/direct_acc": 0.0,
       "shred/direct_unknown": 1.0,
       "shred/forced_choice_win": 0.69,
+      "shred/gate_invalid_max": 0.5505869388580322,
+      "shred/gate_invalid_mean": 0.06970885396003723,
+      "shred/gate_valid_mean": 0.8929352760314941,
       "shred/gated_value_contribution": 1.0909128189086914,
       "shred/multihop_unknown": 1.0,
       "shred/paraphrase_unknown": 1.0,
@@ -471,6 +573,9 @@
       "active/direct_acc": 1.0,
       "active/direct_unknown": 0.0,
       "active/forced_choice_win": 1.0,
+      "active/gate_invalid_max": NaN,
+      "active/gate_invalid_mean": NaN,
+      "active/gate_valid_mean": 0.8923943042755127,
       "active/gated_value_contribution": 13.836085319519043,
       "active/multihop_unknown": 0.0,
       "active/paraphrase_unknown": 0.0,
@@ -480,6 +585,7 @@
       "active/routing_mass_on_target": 0.9977293610572815,
       "active/true_obj_mean_rank": 0.0,
       "active/true_obj_top1_among_entities": 1.0,
+      "base_checkpoint_sha256": "dea4462faa19da797f49dda7c50fb7795c485a88ec752ffebedcd52570ab0571",
       "dependency/collateral_bypass_acc_after_closure": 1.0,
       "dependency/derivable_recovery_after_closure": 0.0,
       "dependency/derivable_recovery_after_revoke_K3": 1.0,
@@ -491,6 +597,9 @@
       "revoke/direct_acc": 0.0,
       "revoke/direct_unknown": 1.0,
       "revoke/forced_choice_win": 0.46,
+      "revoke/gate_invalid_max": NaN,
+      "revoke/gate_invalid_mean": NaN,
+      "revoke/gate_valid_mean": 0.8923943042755127,
       "revoke/gated_value_contribution": 0.0,
       "revoke/multihop_unknown": 1.0,
       "revoke/paraphrase_unknown": 1.0,
@@ -504,6 +613,9 @@
       "shred/direct_acc": 0.0,
       "shred/direct_unknown": 1.0,
       "shred/forced_choice_win": 0.48,
+      "shred/gate_invalid_max": 0.2840854525566101,
+      "shred/gate_invalid_mean": 0.052901096642017365,
+      "shred/gate_valid_mean": 0.8924015164375305,
       "shred/gated_value_contribution": 0.8211772441864014,
       "shred/multihop_unknown": 1.0,
       "shred/paraphrase_unknown": 1.0,
@@ -518,6 +630,9 @@
       "active/direct_acc": 1.0,
       "active/direct_unknown": 0.0,
       "active/forced_choice_win": 1.0,
+      "active/gate_invalid_max": NaN,
+      "active/gate_invalid_mean": NaN,
+      "active/gate_valid_mean": 0.8923037648200989,
       "active/gated_value_contribution": 14.079907417297363,
       "active/multihop_unknown": 0.0,
       "active/paraphrase_unknown": 0.0,
@@ -527,6 +642,7 @@
       "active/routing_mass_on_target": 0.9976965188980103,
       "active/true_obj_mean_rank": 0.0,
       "active/true_obj_top1_among_entities": 1.0,
+      "base_checkpoint_sha256": "54ee6d58e114cfff95e0e1926ffba9225fcb954a9ff2e0b0de18fb493d542689",
       "dependency/collateral_bypass_acc_after_closure": 1.0,
       "dependency/derivable_recovery_after_closure": 0.0,
       "dependency/derivable_recovery_after_revoke_K3": 1.0,
@@ -538,6 +654,9 @@
       "revoke/direct_acc": 0.0,
       "revoke/direct_unknown": 1.0,
       "revoke/forced_choice_win": 0.53,
+      "revoke/gate_invalid_max": NaN,
+      "revoke/gate_invalid_mean": NaN,
+      "revoke/gate_valid_mean": 0.8923037648200989,
       "revoke/gated_value_contribution": 0.0,
       "revoke/multihop_unknown": 1.0,
       "revoke/paraphrase_unknown": 1.0,
@@ -551,6 +670,9 @@
       "shred/direct_acc": 0.0,
       "shred/direct_unknown": 1.0,
       "shred/forced_choice_win": 0.63,
+      "shred/gate_invalid_max": 0.46109089255332947,
+      "shred/gate_invalid_mean": 0.10042073577642441,
+      "shred/gate_valid_mean": 0.8922700881958008,
       "shred/gated_value_contribution": 1.588208794593811,
       "shred/multihop_unknown": 1.0,
       "shred/paraphrase_unknown": 1.0,
@@ -565,6 +687,9 @@
       "active/direct_acc": 1.0,
       "active/direct_unknown": 0.0,
       "active/forced_choice_win": 1.0,
+      "active/gate_invalid_max": NaN,
+      "active/gate_invalid_mean": NaN,
+      "active/gate_valid_mean": 0.8955815434455872,
       "active/gated_value_contribution": 13.865686416625977,
       "active/multihop_unknown": 0.0,
       "active/paraphrase_unknown": 0.0,
@@ -574,6 +699,7 @@
       "active/routing_mass_on_target": 0.997524619102478,
       "active/true_obj_mean_rank": 0.0,
       "active/true_obj_top1_among_entities": 1.0,
+      "base_checkpoint_sha256": "23098dc16120265f6237b1de1b2d6346347ec5b27eb11488d686cdbd02a072dd",
       "dependency/collateral_bypass_acc_after_closure": 1.0,
       "dependency/derivable_recovery_after_closure": 0.0,
       "dependency/derivable_recovery_after_revoke_K3": 1.0,
@@ -585,6 +711,9 @@
       "revoke/direct_acc": 0.0,
       "revoke/direct_unknown": 1.0,
       "revoke/forced_choice_win": 0.5,
+      "revoke/gate_invalid_max": NaN,
+      "revoke/gate_invalid_mean": NaN,
+      "revoke/gate_valid_mean": 0.8955815434455872,
       "revoke/gated_value_contribution": 0.0,
       "revoke/multihop_unknown": 1.0,
       "revoke/paraphrase_unknown": 1.0,
@@ -598,6 +727,9 @@
       "shred/direct_acc": 0.0,
       "shred/direct_unknown": 1.0,
       "shred/forced_choice_win": 0.41,
+      "shred/gate_invalid_max": 0.45634621381759644,
+      "shred/gate_invalid_mean": 0.10252391546964645,
+      "shred/gate_valid_mean": 0.8954706192016602,
       "shred/gated_value_contribution": 1.5889296531677246,
       "shred/multihop_unknown": 1.0,
       "shred/paraphrase_unknown": 1.0,
@@ -609,6 +741,6 @@
       "shred/true_obj_top1_among_entities": 0.0
     }
   ],
-  "recorded_at": "2026-09-02T22:54:25+00:00",
+  "recorded_at": "2026-09-03T00:00:00+00:00",
   "title": "Reconstruction attacks against REVOKE and SHRED"
 }

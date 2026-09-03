@@ -26,4 +26,6 @@ Pre-registered criteria (worst seed):
 
 Random deletion (revoke another cell, target must stay): 100.0%
 
+Reading the table: for a variant that answers UNKNOWN to everything (no_routing, no_routing_loss) the rows hop2_broken_unknown, revoke, shred and locality are satisfied trivially and carry no information.
+
 Without versioning (UPDATE as in-place replace): rollback impossible (no version to return to) — structural property of the layer, not a learned one.

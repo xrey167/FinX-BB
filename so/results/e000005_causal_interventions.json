@@ -50,7 +50,7 @@
     }
   },
   "by_construction_vs_learned": "That the read equation uses the cell's payload is by construction; what is tested is that the trained core actually routes each query to its own cell (localisation), does not draw the answer from anywhere else (disable -> UNKNOWN, random-other -> unchanged) and turns a swapped or replaced payload into exactly the predicted answer. Localisation is a trained objective (routing loss); E-000006 'no_routing_loss' reports how much of it emerges without that supervision.",
-  "claim": "The cell the model routes to for a query is the ground-truth cell, and intervening on it (disable / swap / restore / replace) changes the answer exactly as predicted while intervening on another cell changes nothing: the routing signature is causal, not merely correlated.",
+  "claim": "The cell the model routes to for a query is the ground-truth cell, and intervening on it (disable / swap / restore / replace) changes the answer exactly as predicted while intervening on another cell changes nothing. In this architecture the cell read is the only knowledge channel, so this establishes that the trained core uses that channel as intended (no answer from elsewhere, exact localisation); it is a consistency result, not a discovery of localisation in a model with competing channels.",
   "claim_supported": true,
   "config": {
     "n_targets": 100,
@@ -127,6 +127,7 @@
   "not_claimed": "Causal localisation inside a pretrained LLM.",
   "per_seed": [
     {
+      "base_checkpoint_sha256": "49197919faff163b562b048a65b31a555ee9841ecb413e10ff4aab4769d92ba8",
       "disable": 1.0,
       "disable_random_other": 1.0,
       "localization": 1.0,
@@ -138,6 +139,7 @@
       "swap_partner": 1.0
     },
     {
+      "base_checkpoint_sha256": "75d83f6bc9156d66e886b4d6865332d694accbd7906b44e5909af10d9076446b",
       "disable": 1.0,
       "disable_random_other": 1.0,
       "localization": 1.0,
@@ -149,6 +151,7 @@
       "swap_partner": 1.0
     },
     {
+      "base_checkpoint_sha256": "dea4462faa19da797f49dda7c50fb7795c485a88ec752ffebedcd52570ab0571",
       "disable": 1.0,
       "disable_random_other": 1.0,
       "localization": 1.0,
@@ -160,6 +163,7 @@
       "swap_partner": 1.0
     },
     {
+      "base_checkpoint_sha256": "54ee6d58e114cfff95e0e1926ffba9225fcb954a9ff2e0b0de18fb493d542689",
       "disable": 1.0,
       "disable_random_other": 1.0,
       "localization": 1.0,
@@ -171,6 +175,7 @@
       "swap_partner": 1.0
     },
     {
+      "base_checkpoint_sha256": "23098dc16120265f6237b1de1b2d6346347ec5b27eb11488d686cdbd02a072dd",
       "disable": 1.0,
       "disable_random_other": 1.0,
       "localization": 1.0,
@@ -182,6 +187,6 @@
       "swap_partner": 1.0
     }
   ],
-  "recorded_at": "2026-09-02T22:54:57+00:00",
+  "recorded_at": "2026-09-03T00:00:33+00:00",
   "title": "Causal interventions on knowledge cells"
 }

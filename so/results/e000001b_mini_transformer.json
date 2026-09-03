@@ -227,7 +227,7 @@
     "numpy": "2.2.6",
     "platform": "Linux-6.18.44-fc-v24-x86_64-with-glibc2.39",
     "python": "3.11.15",
-    "threads": "4",
+    "threads": "2",
     "torch": "2.14.0+cpu"
   },
   "eval_config": {
@@ -252,6 +252,7 @@
   "model_config": {
     "d_ff": 256,
     "d_model": 128,
+    "hard_gate": false,
     "marker_dim": 16,
     "max_hops": 3,
     "n_core_layers": 2,
@@ -282,9 +283,11 @@
   "per_seed": [
     {
       "alternative_path": 1.0,
-      "checkpoint_loaded": false,
+      "checkpoint_loaded": true,
+      "checkpoint_sha256": "49197919faff163b562b048a65b31a555ee9841ecb413e10ff4aab4769d92ba8",
       "direct": 1.0,
       "direct_unknown_rate": 0.0,
+      "eval_world_seed": 100,
       "final_train_loss": 0.010016907937824726,
       "hop2": 1.0,
       "hop2_broken_unknown": 1.0,
@@ -315,7 +318,7 @@
       "reverse": 1.0,
       "revoke": 1.0,
       "rollback": 1.0,
-      "seed": 100,
+      "seed": 0,
       "shred": 1.0,
       "train_config_used": {
         "batch_size": 128,
@@ -350,9 +353,11 @@
     },
     {
       "alternative_path": 1.0,
-      "checkpoint_loaded": false,
+      "checkpoint_loaded": true,
+      "checkpoint_sha256": "75d83f6bc9156d66e886b4d6865332d694accbd7906b44e5909af10d9076446b",
       "direct": 1.0,
       "direct_unknown_rate": 0.0,
+      "eval_world_seed": 101,
       "final_train_loss": 0.008986327797174454,
       "hop2": 1.0,
       "hop2_broken_unknown": 1.0,
@@ -383,7 +388,7 @@
       "reverse": 1.0,
       "revoke": 1.0,
       "rollback": 1.0,
-      "seed": 101,
+      "seed": 1,
       "shred": 0.97,
       "train_config_used": {
         "batch_size": 128,
@@ -418,9 +423,11 @@
     },
     {
       "alternative_path": 1.0,
-      "checkpoint_loaded": false,
+      "checkpoint_loaded": true,
+      "checkpoint_sha256": "dea4462faa19da797f49dda7c50fb7795c485a88ec752ffebedcd52570ab0571",
       "direct": 1.0,
       "direct_unknown_rate": 0.0,
+      "eval_world_seed": 102,
       "final_train_loss": 0.00641240831464529,
       "hop2": 1.0,
       "hop2_broken_unknown": 1.0,
@@ -451,7 +458,7 @@
       "reverse": 1.0,
       "revoke": 1.0,
       "rollback": 1.0,
-      "seed": 102,
+      "seed": 2,
       "shred": 1.0,
       "train_config_used": {
         "batch_size": 128,
@@ -486,9 +493,11 @@
     },
     {
       "alternative_path": 1.0,
-      "checkpoint_loaded": false,
+      "checkpoint_loaded": true,
+      "checkpoint_sha256": "54ee6d58e114cfff95e0e1926ffba9225fcb954a9ff2e0b0de18fb493d542689",
       "direct": 1.0,
       "direct_unknown_rate": 0.0,
+      "eval_world_seed": 103,
       "final_train_loss": 0.012392331846058369,
       "hop2": 1.0,
       "hop2_broken_unknown": 1.0,
@@ -519,7 +528,7 @@
       "reverse": 1.0,
       "revoke": 1.0,
       "rollback": 1.0,
-      "seed": 103,
+      "seed": 3,
       "shred": 1.0,
       "train_config_used": {
         "batch_size": 128,
@@ -554,9 +563,11 @@
     },
     {
       "alternative_path": 1.0,
-      "checkpoint_loaded": false,
+      "checkpoint_loaded": true,
+      "checkpoint_sha256": "23098dc16120265f6237b1de1b2d6346347ec5b27eb11488d686cdbd02a072dd",
       "direct": 1.0,
       "direct_unknown_rate": 0.0,
+      "eval_world_seed": 104,
       "final_train_loss": 0.1085825189948082,
       "hop2": 1.0,
       "hop2_broken_unknown": 1.0,
@@ -587,7 +598,7 @@
       "reverse": 1.0,
       "revoke": 1.0,
       "rollback": 1.0,
-      "seed": 104,
+      "seed": 4,
       "shred": 1.0,
       "train_config_used": {
         "batch_size": 128,
@@ -621,7 +632,7 @@
       "update_rollback": 1.0
     }
   ],
-  "recorded_at": "2026-09-02T22:54:06+00:00",
+  "recorded_at": "2026-09-02T23:59:43+00:00",
   "sample_sizes_per_seed": {
     "alternative_path": 100,
     "direct": 1000,
@@ -644,6 +655,8 @@
   "train_config_requested": {
     "batch_size": 128,
     "fixed_world": false,
+    "gate_balanced": false,
+    "gate_weight": 0.0,
     "log_every": 250,
     "lr": 0.001,
     "mix": {
