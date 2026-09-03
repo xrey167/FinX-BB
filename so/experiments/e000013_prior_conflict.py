@@ -69,11 +69,27 @@ TEMPLATES_PC = {
     2: ["{s} works for", "The employer of {s} is", "{s} is employed by", "Q: Who does {s} work for? A:"],
     3: ["{s} was born in", "The birthplace of {s} is", "{s} comes from", "Q: Where was {s} born? A: In"],
 }
+NOUN_PC = {0: "capital", 1: "home", 2: "employer", 3: "birthplace"}   # must match TEMPLATES_PC: used for 2-hop prompts
 TRAIN_TEMPLATES, HELDOUT_TEMPLATES = (0, 1), (2, 3)
 GENERIC = ["{s} said that", "The story of {s} begins", "In the morning, {s}", "Everyone knows that {s}", "{s} walked into the"]
 N_NAMES = 256
 
 EVAL = dict(n_cells=1000, n_hop2=200, n_broken=100, n_generic=200, n_locality_updates=100, n_locality_revokes=50)
+
+
+def query_text_pc(q: Query, names: List[str], n_synonyms: int, template: Optional[int] = None) -> str:
+    """E-000008's prompt builder over THIS experiment's templates and relation nouns.
+
+    E-000013 remaps the relations (0 is the prior-laden "capital"), so E-000008's module-level
+    TEMPLATES / NOUN must not be used here — and must not be monkeypatched either, because
+    E-000011 and E-000012 index templates 4 and 5 of their own table in the same process.
+    """
+    s = names[q.start]
+    if q.hops == 1:
+        r, k = q.path[0], (q.surface[0] % n_synonyms if template is None else template)
+        return TEMPLATES_PC[r][k].format(s=s)
+    inner = " of the ".join(NOUN_PC[r] for r in reversed(q.path))
+    return f"The {inner} of {s} is"
 
 
 class GPT2KnowledgePrior(E8.GPT2Knowledge):
@@ -113,7 +129,7 @@ class GPT2KnowledgePrior(E8.GPT2Knowledge):
         tensors = bank.tensors() if bank is not None else None
         mask_t = None if cell_mask is None else torch.as_tensor(cell_mask, dtype=torch.bool)
         if texts is None:
-            texts = [E8.query_text(q, self.names, self.n_synonyms, template) for q in queries]
+            texts = [query_text_pc(q, self.names, self.n_synonyms, template) for q in queries]
         out: Dict[str, List[np.ndarray]] = {"answers": [], "full": [], "cand": [], "hidden": [], "routing": []}
         for i in range(0, len(texts), batch_size):
             ids, am, last = E8.encode_texts(self.tok, texts[i: i + batch_size])
@@ -152,32 +168,32 @@ def train_adapter_prior(gk: GPT2KnowledgePrior, seed: int, steps: int, batch_siz
     t0 = time.time()
     n_extra = int(round(batch_size * extra_unanswerable))
     n_reads = len(model.cfg.read_layers)
+    model.eval()          # the frozen core keeps dropout OFF: base and adapter forward must be comparable
     for step in range(steps):
-        model.train()
         route_only = step < route_only_steps
         n_cells = int(rng.integers(150, 301)) if route_only else int(rng.integers(700, 1001))
         world = World.sample(rng, gk.n_entities, 4, n_cells, gk.n_synonyms)
         bank = bank_from_world(rng, world, centre, p_revoked, p_shred, 0.05)
         queries = sample_training_queries(rng, world, bank, batch_size - n_extra, mix)
         queries += world.sample_queries(rng, n_extra, 1, "fwd", require_answer=False, index=bank.index_view)
-        ids, am, last = E8.encode_texts(gk.tok, [E8.query_text(q, gk.names, gk.n_synonyms) for q in queries])
+        ids, am, last = E8.encode_texts(gk.tok, [query_text_pc(q, gk.names, gk.n_synonyms) for q in queries])
         target = E8.targets_of(queries, bank, world)
         answerable = target != gk.n_entities
+        n_edges = np.array([len(world.answer(q, bank.index_view).edges) for q in queries])
+        fb_mask = torch.as_tensor((~answerable.numpy()) & (n_edges == 0))
         route = route_targets_status_gated(queries, bank, world, n_reads)
         for g in opt.param_groups:
             g["lr"] = lr_at(step, tcfg)
         tensors = bank.tensors()
         with torch.no_grad():
-            model.eval()
             base_full = model(None, ids, am, last)[1]
-            model.train()
         cand, full, routing, _ = model(tensors, ids, am, last)
         if answerable.any():
             loss_ans = F.cross_entropy(full[answerable], model.entity_token_ids[target[answerable]])
         else:
             loss_ans = full.sum() * 0
-        if (~answerable).any():
-            loss_fb = F.kl_div(F.log_softmax(full[~answerable], -1), F.log_softmax(base_full[~answerable], -1),
+        if fb_mask.any():
+            loss_fb = F.kl_div(F.log_softmax(full[fb_mask], -1), F.log_softmax(base_full[fb_mask], -1),
                                log_target=True, reduction="batchmean")
         else:
             loss_fb = full.sum() * 0
@@ -266,6 +282,12 @@ def evaluate(gk: GPT2KnowledgePrior, seed: int, centre: np.ndarray) -> Dict[str,
     p = torch.softmax(torch.as_tensor(base[0]["full"]), -1).numpy()
     m["prior/true_capital_prob"] = float(p[np.arange(n_c), cap_tok].mean())
     m["prior/counterfactual_prob"] = float(p[np.arange(n_c), np.array(gk.entity_ids)[cf_obj]].mean())
+    m["prior/counterfactual_top1"] = float((base[0]["answers"] == cf_obj).mean())
+    m["prior/counterfactual_top1_pooled"] = float(np.mean([(base[t]["answers"] == cf_obj).mean() for t in range(4)]))
+    m["prior/forced_choice_win"] = forced_choice(base[0]["cand"], cf_obj, np.random.default_rng(seed), n_ent)
+    rk0 = object_rank(base[0]["cand"], cf_obj, n_ent)
+    m["prior/counterfactual_top1_among_entities"] = rk0["top1"]
+    m["prior/counterfactual_mean_rank"] = rk0["mean_rank"]
     base_f = gk.predict_full(None, q_f)
 
     # ---- copy bound (by construction in this design): every cell masked == base model
@@ -298,13 +320,27 @@ def evaluate(gk: GPT2KnowledgePrior, seed: int, centre: np.ndarray) -> Dict[str,
     m["broken1/kl_to_base"] = float(kl.mean()); m["broken1/kl_to_base_max"] = float(kl.max())
     m["broken1/top1_matches_base"] = float((pb["full"].argmax(-1) == bb["full"].argmax(-1)).mean())
     m["broken1/routing_mass_on_null"] = float(pb["routing"][:, -1, -1].mean())
-    gen_texts = [GENERIC[int(rng.integers(0, len(GENERIC)))].format(s=gk.names[int(rng.integers(0, gk.n_names))])
-                 for _ in range(EVAL["n_generic"])]
+    m["broken1/routing_mass_on_null_first_read"] = float(pb["routing"][:, 0, -1].mean())
+    gen_idx = [int(rng.integers(0, len(GENERIC))) for _ in range(EVAL["n_generic"])]
+    gen_texts = [GENERIC[i].format(s=gk.names[int(rng.integers(0, gk.n_names))]) for i in gen_idx]
     pg, bg = gk.predict_full(bank(), [], texts=gen_texts), gk.predict_full(None, [], texts=gen_texts)
     kl = kl_rows(bg["full"], pg["full"])
     m["generic/kl_to_base"] = float(kl.mean()); m["generic/kl_to_base_max"] = float(kl.max())
     m["generic/top1_matches_base"] = float((pg["full"].argmax(-1) == bg["full"].argmax(-1)).mean())
     m["generic/routing_mass_on_null"] = float(pg["routing"][:, -1, -1].mean())
+    m["generic/routing_mass_on_null_first_read"] = float(pg["routing"][:, 0, -1].mean())
+    gi = np.array(gen_idx)
+    per_prompt = []
+    for k in range(len(GENERIC)):
+        sel = gi == k
+        if not sel.any():
+            continue
+        m[f"generic/prompt{k}_kl_to_base"] = float(kl[sel].mean())
+        m[f"generic/prompt{k}_top1_matches_base"] = float((pg["full"].argmax(-1)[sel] == bg["full"].argmax(-1)[sel]).mean())
+        per_prompt.append(m[f"generic/prompt{k}_kl_to_base"])
+    # two of the prompts end on the subject token, i.e. a half key the model never saw in training:
+    # the worst single prompt is reported separately so a pooled mean cannot hide it
+    m["generic/kl_to_base_worst_prompt"] = float(max(per_prompt)) if per_prompt else float("nan")
 
     # ---- override while ACTIVE (counterfactual cells), on every template
     def override(tag: str, objs: np.ndarray) -> None:
@@ -331,6 +367,7 @@ def evaluate(gk: GPT2KnowledgePrior, seed: int, centre: np.ndarray) -> Dict[str,
     probe = LinearProbe(pf0["hidden"].shape[1], n_ent, seed=seed)
     probe.fit(pf0["hidden"][:split], f_truth[:split])
     m["probe_calibration_top1"] = probe.accuracy(pf0["hidden"][split:], f_truth[split:])
+    m["prior/probe_top1"] = probe.accuracy(base[0]["hidden"], cf_obj)      # what the probe reads without any injection
     pos_c = [int(np.where(store.bank()["kid"] == kids[f.key])[0][0]) for f in cf_facts]
 
     # ---- fallback after REVOKE / SHRED: the pretrained distribution returns, nothing counterfactual remains
@@ -363,7 +400,30 @@ def evaluate(gk: GPT2KnowledgePrior, seed: int, centre: np.ndarray) -> Dict[str,
                 m[f"{tag}/gate_on_target"] = float(enc["gate"].numpy()[pos_c].mean())
                 m[f"{tag}/injection_rms_share"] = float(np.mean([pa["routing"][i, -1, pp] * enc["gate"].numpy()[pp] for i, pp in enumerate(pos_c)]))
         m[f"{tag}/heldout_kl_max"] = float(max(kls[t] for t in HELDOUT_TEMPLATES))
+        m[f"{tag}/kl_to_base_pooled"] = float(np.mean(kls))
+        # pooled over item x template (n = 4 x 50 per seed): 50 items cannot resolve a 0.05 bar
+        m[f"{tag}/counterfactual_top1_pooled"] = float(np.mean([m[f"{tag}/template{t}_counterfactual_top1"] for t in range(4)]))
+        m[f"{tag}/top1_matches_base_pooled"] = float(np.mean([m[f"{tag}/template{t}_top1_matches_base"] for t in range(4)]))
+        # PAIRED excess over the frozen model itself: the counterfactual object is a real capital token that the
+        # pretrained prior already favours, so only the excess over the base model can show leakage
+        m[f"{tag}/forced_choice_excess"] = m[f"{tag}/forced_choice_win"] - m["prior/forced_choice_win"]
+        m[f"{tag}/probe_excess"] = m[f"{tag}/probe_top1"] - m["prior/probe_top1"]
+        m[f"{tag}/counterfactual_top1_excess"] = m[f"{tag}/counterfactual_top1_pooled"] - m["prior/counterfactual_top1_pooled"]
+        m[f"{tag}/counterfactual_rank_excess"] = m["prior/counterfactual_mean_rank"] - m[f"{tag}/counterfactual_mean_rank"]
+        # retention: what happens to the counterfactual cells must not touch the 950 prior-free filler cells
+        pfx = gk.predict_full(bank(), q_f)
+        m[f"{tag}/filler_direct"] = float((pfx["answers"] == f_truth).mean())
+        m[f"{tag}/filler_kl_to_active"] = float(kl_rows(pf0["full"], pfx["full"]).mean())
+        with torch.no_grad():
+            tb = bank().tensors()
+            gate_all = gk.model.encode_bank(tb)["gate"].numpy()
+        mv = tb["marker_valid"].numpy()
+        m[f"{tag}/gate_on_signed_cells"] = float(gate_all[mv].mean()) if mv.any() else float("nan")
+        m[f"{tag}/gate_on_unsigned_cells"] = float(gate_all[~mv].mean()) if (~mv).any() else float("nan")
 
+    # positive control: with the counterfactual cells ACTIVE every attack must SUCCEED, otherwise
+    # "nothing is recoverable after deletion" is vacuous (ledger section 28)
+    fallback("active")
     for f in cf_facts: store.revoke(kids[f.key])
     fallback("revoke")
     for f in cf_facts: store.restore(kids[f.key])
@@ -396,32 +456,79 @@ def evaluate(gk: GPT2KnowledgePrior, seed: int, centre: np.ndarray) -> Dict[str,
 
 
 def criteria_groups():
+    """Pre-registered before the first run (no checkpoint existed when these thresholds were written).
+
+    Two conventions that the review of this protocol forced:
+      * every attack bar is a PAIRED EXCESS over the frozen model itself.  The counterfactual object is a
+        real capital token, so an absolute forced-choice or probe bar would measure GPT-2's prior and not
+        leakage from the cell.
+      * ``attack_validity`` is a validity condition, not a claim: if the same attacks do not succeed while
+        the cell is ACTIVE, then their failure after deletion says nothing.
+    """
     groups = {
         "copy_bound_by_construction": {"masked/kl_to_base": ("<=", 0.05), "masked/top1_matches_base": (">=", 0.95)},
         "reading_prior_free": {"direct": (">=", 0.95), "template1_train/direct": (">=", 0.95), "direct_heldout_min": (">=", 0.70)},
         "override": {"override/direct": (">=", 0.90), "override/full_vocab_top1": (">=", 0.80), "override_heldout_min": (">=", 0.70),
                      "agree/direct": (">=", 0.95)},
-        "fallback_after_revoke": {"revoke/kl_to_base": ("<=", 0.05), "revoke/top1_matches_base": (">=", 0.95),
-                                  "revoke/counterfactual_top1": ("<=", 0.05), "revoke/probe_top1": ("<=", 0.05),
-                                  "revoke/forced_choice_win": ("<=", 0.6), "revoke/heldout_kl_max": ("<=", 0.10)},
-        "fallback_after_shred_hard": {"shred_hard/kl_to_base": ("<=", 0.05), "shred_hard/top1_matches_base": (">=", 0.95),
-                                      "shred_hard/counterfactual_top1": ("<=", 0.05), "shred_hard/probe_top1": ("<=", 0.05),
-                                      "shred_hard/forced_choice_win": ("<=", 0.6), "shred_hard/heldout_kl_max": ("<=", 0.10)},
-        "no_key_no_injection": {"broken1/kl_to_base": ("<=", 0.05), "generic/kl_to_base": ("<=", 0.05)},
+        "attack_validity": {"probe_calibration_top1": (">=", 0.20), "active/probe_top1": (">=", 0.25),
+                            "active/counterfactual_top1_excess": (">=", 0.50), "active/forced_choice_excess": (">=", 0.10)},
+        "fallback_after_revoke_by_construction": {"revoke/kl_to_base": ("<=", 0.05), "revoke/top1_matches_base_pooled": (">=", 0.95),
+                                                  "revoke/counterfactual_top1_excess": ("<=", 0.05), "revoke/probe_excess": ("<=", 0.05),
+                                                  "revoke/forced_choice_excess": ("<=", 0.05), "revoke/heldout_kl_max": ("<=", 0.10),
+                                                  "revoke/routing_mass_on_target": (">=", 0.90)},
+        "fallback_after_shred_soft": {"shred_soft/kl_to_base": ("<=", 0.05), "shred_soft/top1_matches_base_pooled": (">=", 0.95),
+                                      "shred_soft/counterfactual_top1_excess": ("<=", 0.05), "shred_soft/probe_excess": ("<=", 0.05),
+                                      "shred_soft/forced_choice_excess": ("<=", 0.05), "shred_soft/heldout_kl_max": ("<=", 0.10)},
+        "fallback_after_shred_hard": {"shred_hard/kl_to_base": ("<=", 0.05), "shred_hard/top1_matches_base_pooled": (">=", 0.95),
+                                      "shred_hard/counterfactual_top1_excess": ("<=", 0.05), "shred_hard/probe_excess": ("<=", 0.05),
+                                      "shred_hard/forced_choice_excess": ("<=", 0.05), "shred_hard/heldout_kl_max": ("<=", 0.10)},
+        "no_key_no_injection": {"broken1/kl_to_base": ("<=", 0.05), "generic/kl_to_base": ("<=", 0.05),
+                                "generic/kl_to_base_worst_prompt": ("<=", 0.10)},
+        "retention_under_deletion": {"revoke/filler_direct": (">=", 0.95), "shred_soft/filler_direct": (">=", 0.95),
+                                     "shred_hard/filler_direct": (">=", 0.95), "shred_hard/filler_kl_to_active": ("<=", 0.05)},
         "locality_restore": {"locality": (">=", 0.98), "restored/direct": (">=", 0.90), "resigned/direct": (">=", 0.90),
                              "rollback/direct": (">=", 0.90)},
     }
     return groups
 
 
-KEYS = ["prior/restricted_top1", "prior/true_capital_prob", "masked/kl_to_base", "direct", "template1_train/direct",
-        "direct_heldout_min", "hop2", "provenance_direct", "broken1/kl_to_base", "generic/kl_to_base", "override/direct",
-        "override/full_vocab_top1", "override_heldout_min", "override/true_capital_restricted_top1", "agree/direct",
-        "revoke/kl_to_base", "revoke/top1_matches_base", "revoke/restricted_matches_base", "revoke/true_capital_restricted_top1",
-        "revoke/counterfactual_top1", "revoke/probe_top1", "revoke/forced_choice_win", "revoke/heldout_kl_max",
-        "revoke/routing_mass_on_target", "revoke/gate_on_target", "shred_soft/kl_to_base", "shred_hard/kl_to_base",
-        "shred_hard/top1_matches_base", "shred_hard/counterfactual_top1", "shred_hard/probe_top1", "shred_hard/forced_choice_win",
-        "shred_hard/heldout_kl_max", "restored/direct", "resigned/direct", "locality", "locality_counterfactual_unchanged"]
+def deletion_level(met: Dict[str, bool]) -> str:
+    """F3/F4 rest on the LEARNED gate, never on the revoke group.
+
+    In this design a revoked cell's value is exactly zero (the status flag multiplies the gate) and the
+    null read is a fixed zero, so "the base distribution returns after REVOKE" is by construction; only
+    the routing residue is learned.  SHRED goes through the learned verification gate, so the soft-gate
+    group carries F3 and the hard-gate group F4 — and both only if the attacks were valid at all.
+    """
+    if not met["attack_validity"]:
+        return "F1"
+    if met["fallback_after_shred_soft"] and met["fallback_after_shred_hard"] and met["retention_under_deletion"]:
+        return "F4"
+    if met["fallback_after_shred_soft"] and met["retention_under_deletion"]:
+        return "F3"
+    return "F1"
+
+
+KEYS = ["prior/restricted_top1", "prior/true_capital_prob", "prior/counterfactual_top1_pooled", "prior/forced_choice_win",
+        "prior/probe_top1", "prior/counterfactual_mean_rank", "probe_calibration_top1",
+        "masked/kl_to_base", "direct", "template1_train/direct", "direct_heldout_min", "hop2", "provenance_direct",
+        "broken1/kl_to_base", "broken1/routing_mass_on_null", "generic/kl_to_base", "generic/kl_to_base_worst_prompt",
+        "generic/routing_mass_on_null",
+        "override/direct", "override/full_vocab_top1", "override_heldout_min", "override/true_capital_restricted_top1",
+        "agree/direct", "rollback/direct",
+        "active/probe_top1", "active/forced_choice_excess", "active/counterfactual_top1_excess", "active/kl_to_base",
+        "active/routing_mass_on_target", "active/gate_on_target",
+        "revoke/kl_to_base", "revoke/top1_matches_base_pooled", "revoke/restricted_matches_base",
+        "revoke/true_capital_restricted_top1", "revoke/counterfactual_top1_pooled", "revoke/counterfactual_top1_excess",
+        "revoke/probe_top1", "revoke/probe_excess", "revoke/forced_choice_win", "revoke/forced_choice_excess",
+        "revoke/heldout_kl_max", "revoke/routing_mass_on_target", "revoke/gate_on_target", "revoke/filler_direct",
+        "shred_soft/kl_to_base", "shred_soft/top1_matches_base_pooled", "shred_soft/counterfactual_top1_excess",
+        "shred_soft/probe_excess", "shred_soft/forced_choice_excess", "shred_soft/heldout_kl_max",
+        "shred_soft/injection_rms_share", "shred_soft/gate_on_unsigned_cells", "shred_soft/filler_direct",
+        "shred_hard/kl_to_base", "shred_hard/top1_matches_base_pooled", "shred_hard/counterfactual_top1_excess",
+        "shred_hard/probe_excess", "shred_hard/forced_choice_excess", "shred_hard/heldout_kl_max",
+        "shred_hard/filler_direct", "shred_hard/filler_kl_to_active",
+        "restored/direct", "resigned/direct", "locality", "locality_counterfactual_unchanged"]
 
 
 def main(argv: List[str] | None = None) -> Dict[str, Any]:
@@ -433,7 +540,6 @@ def main(argv: List[str] | None = None) -> Dict[str, Any]:
     args = ap.parse_args(argv)
     if args.threads:
         torch.set_num_threads(args.threads)
-    E8.TEMPLATES = TEMPLATES_PC
     per_seed: List[Dict[str, Any]] = []
     for seed in args.seeds:
         gk = GPT2KnowledgePrior(AdapterConfig(status_gated=True, fallback="prior"))
@@ -450,12 +556,7 @@ def main(argv: List[str] | None = None) -> Dict[str, Any]:
     all_criteria = {k: v for g in groups.values() for k, v in g.items()}
     check = ledger.check_criteria(agg, all_criteria)
     met = {g: all(check["criteria"][k]["pass"] for k in ks) for g, ks in groups.items()}
-    if met["fallback_after_revoke"] and met["fallback_after_shred_hard"]:
-        level = "F4"
-    elif met["fallback_after_revoke"]:
-        level = "F3"
-    else:
-        level = "F1"
+    level = deletion_level(met)
     record = {
         "experiment": "E-000013", "title": "Frozen GPT-2 core: prior conflict — counterfactual cells override a pretrained fact, "
                                            "the pretrained distribution returns after REVOKE / SHRED",
@@ -465,18 +566,54 @@ def main(argv: List[str] | None = None) -> Dict[str, Any]:
         "claim_parts": [{"claim": g, "criteria": list(ks), "supported": met[g]} for g, ks in groups.items()],
         "by_construction": ["copy_bound_by_construction: the adapter acts only through the injection; with every cell masked the "
                             "null read is a fixed zero, so the base distribution is returned exactly (recorded, not learned)",
+                            "fallback_after_revoke_by_construction: with status_gated the status flag multiplies the gate, so a "
+                            "revoked cell's value is exactly zero and the injection vanishes. Exact equality to the base model "
+                            "after REVOKE is therefore arithmetic, not a learned behaviour; the LEARNED residue is that the "
+                            "routing does not spill onto neighbouring ACTIVE cells (kl_to_base, heldout_kl_max) while the "
+                            "revoked cell itself stays addressed (routing_mass_on_target). This group is recorded and does NOT "
+                            "grant a deletion level.",
                             "the pretrained fact is never deleted: the weights are frozen; what is measured is that the model "
                             "answers with it again after REVOKE / SHRED"],
         "learned": ["override (the injected direction wins over a pretrained fact the model knows)",
-                    "fallback to the base distribution after REVOKE (status-gated) and after SHRED (verification gate)",
+                    "fallback to the base distribution after SHRED, through the class-balanced verification gate (soft gate "
+                    "carries F3, hard gate F4); the SHRED payload is physically present and routed to",
+                    "routing precision after REVOKE: no spill onto neighbouring active cells, on train and held-out templates",
                     "no key, no injection on broken paths and generic text (routing to the null key)"],
+        "attack_convention": "Every attack bar is a PAIRED EXCESS over the frozen model itself, because the counterfactual "
+                             "object is a real capital token the pretrained prior already favours: an absolute forced-choice "
+                             "or probe threshold would measure GPT-2's prior, not leakage from the cell. The floors are "
+                             "recorded as prior/forced_choice_win, prior/probe_top1 and prior/counterfactual_top1_pooled, "
+                             "measured on the same rows with the same distractor draws.",
+        "validity_condition": "attack_validity: with the cell ACTIVE the same attacks must succeed. If they do not, "
+                              "their failure after deletion is uninformative and the record reports F1 regardless of the "
+                              "fallback groups.",
         "not_claimed": "unlearning of pretrained facts; LLM scale; multi-token entities.",
         "config": {"seeds": args.seeds, "steps": args.steps, "adapter": AdapterConfig(status_gated=True, fallback="prior").to_dict(),
                    "eval": EVAL, "templates": TEMPLATES_PC, "train_templates": TRAIN_TEMPLATES, "heldout_templates": HELDOUT_TEMPLATES,
                    "pairs": PAIRS, "n_names": N_NAMES, "generic_prompts": GENERIC,
-                   "training": {"loss": "full-vocabulary CE on answerable + KL(base||adapter) on unanswerable + routing CE + "
-                                        "class-balanced gate BCE (weight 5); routing-first curriculum 300 steps",
+                   "nouns": NOUN_PC,
+                   "training": {"loss": "full-vocabulary CE on answerable + KL(base||adapter) on queries with NO resolved edge "
+                                        "(a partially resolved 2-hop query legitimately injects at the first read layer) + "
+                                        "routing CE + class-balanced gate BCE (weight 5); routing-first curriculum 300 steps",
+                                "core_mode": "the frozen GPT-2 stays in eval mode during training, so the KL target and the "
+                                             "adapter forward see the same (dropout-free) core state",
                                 "p_revoked": 0.20, "p_shred": 0.10, "extra_unanswerable": 0.2, "lr": 2e-3, "batch": 32}},
+        "sample_sizes": {"direct": EVAL["n_cells"] - len(PAIRS), "template1_train/direct": EVAL["n_cells"] - len(PAIRS),
+                         "direct_heldout_min": EVAL["n_cells"] - len(PAIRS), "hop2": EVAL["n_hop2"],
+                         "broken1/top1_matches_base": EVAL["n_broken"], "generic/top1_matches_base": EVAL["n_generic"],
+                         "override/direct": len(PAIRS), "agree/direct": len(PAIRS), "restored/direct": len(PAIRS),
+                         "resigned/direct": len(PAIRS), "rollback/direct": len(PAIRS),
+                         "prior/counterfactual_top1_pooled": 4 * len(PAIRS),
+                         "revoke/counterfactual_top1_pooled": 4 * len(PAIRS), "revoke/top1_matches_base_pooled": 4 * len(PAIRS),
+                         "shred_soft/counterfactual_top1_pooled": 4 * len(PAIRS), "shred_soft/top1_matches_base_pooled": 4 * len(PAIRS),
+                         "shred_hard/counterfactual_top1_pooled": 4 * len(PAIRS), "shred_hard/top1_matches_base_pooled": 4 * len(PAIRS),
+                         "revoke/probe_top1": len(PAIRS), "shred_hard/probe_top1": len(PAIRS), "active/probe_top1": len(PAIRS),
+                         "revoke/forced_choice_win": len(PAIRS), "shred_hard/forced_choice_win": len(PAIRS),
+                         "revoke/filler_direct": EVAL["n_cells"] - len(PAIRS), "shred_hard/filler_direct": EVAL["n_cells"] - len(PAIRS),
+                         "locality": EVAL["n_cells"] - len(PAIRS) - EVAL["n_locality_updates"] - EVAL["n_locality_revokes"]},
+        "sample_size_note": "50 counterfactual items per seed cannot resolve a 0.05 bar on their own; the gating rate "
+                            "criteria are therefore pooled over item x template (200 per seed, 600 over three seeds) and "
+                            "the exact binomial intervals below are reported for the pooled counts.",
         "criteria": check["criteria"], "claim_supported": check["claim_supported"],
         "per_seed": per_seed, "aggregate": agg,
     }
@@ -489,6 +626,13 @@ def main(argv: List[str] | None = None) -> Dict[str, Any]:
         ledger.table(["claim group", "supported"], [(c["claim"], "yes" if c["supported"] else "**no**") for c in record["claim_parts"]]), "",
         ledger.table(["measure", "mean over seeds", "min", "max"], rows), "",
         "Pre-registered criteria (worst seed):", "", ledger.criteria_table(check), "",
+        "Exact binomial intervals (pooled over seeds):", "",
+        ledger.table(ledger.CI_HEADERS, ledger.ci_rows(per_seed, [k for k in KEYS if k in record["sample_sizes"]],
+                                                       record["sample_sizes"],
+                                                       lower_is_better=[k for k in KEYS if "counterfactual" in k or "kl_to" in k])), "",
+        "Sample sizes: " + record["sample_size_note"], "",
+        "Attack convention: " + record["attack_convention"], "",
+        "Validity condition: " + record["validity_condition"], "",
         "By construction: " + "; ".join(record["by_construction"]) + ".", "",
         "Not claimed: " + record["not_claimed"],
     ])
