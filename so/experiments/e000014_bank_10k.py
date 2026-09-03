@@ -34,6 +34,21 @@ CORE = ["direct", "hop2", "hop3", "hop2_broken_unknown", "provenance", "reverse"
         "restore", "shred", "resign", "locality", "alternative_path", "replay_deviation"]
 
 
+def scaling_curve(model, centre: np.ndarray, seed: int) -> Dict[str, Dict[str, float]]:
+    """The same model read on fresh worlds of 1k / 3k / 10k cells: direct accuracy and routing margin."""
+    from so.evaluation import build_eval_world, predict
+    out: Dict[str, Dict[str, float]] = {}
+    for n_cells in (1000, 3000, 10000):
+        rng, world, store, kids = build_eval_world(seed + n_cells, N_ENT, 4, 2, n_cells, 10, centre)
+        sample = [world.facts[int(i)] for i in rng.choice(len(world.facts), size=1000, replace=False)]
+        qs = [world.make_query(rng, "fwd", f.subject, [f.relation]) for f in sample]
+        p = predict(model, store, world, qs)
+        top = p.routing[:, 0, :].max(axis=1)
+        out[str(n_cells)] = {"direct": float(np.mean([a == f.obj for a, f in zip(p.answers, sample)])),
+                             "routing_max_mass_mean": float(top.mean()), "routing_max_mass_min": float(top.min())}
+    return out
+
+
 def main(argv: List[str] | None = None) -> Dict[str, Any]:
     ap = argparse.ArgumentParser()
     ap.add_argument("--seeds", type=int, nargs="*", default=[0, 1, 2])
@@ -59,7 +74,9 @@ def main(argv: List[str] | None = None) -> Dict[str, Any]:
         model.cfg.hard_gate = True
         hard.append(attack_battery(model, centre, seed, 1450 + seed, cfg=EVAL10K))
         model.cfg.hard_gate = False
+        m["scaling"] = scaling_curve(model, centre, 1480 + seed)
         print({k: (round(v, 4) if isinstance(v, float) else v) for k, v in m.items() if k in CORE}, flush=True)
+        print("scaling:", m["scaling"], flush=True)
         print("hard-gate SHRED:", {k: round(v, 4) for k, v in hard[-1].items() if k.startswith("shred/")}, flush=True)
     agg = ledger.aggregate(suite, SUITE_KEYS)
     keys_b = [k for k in soft[0] if k != "seed"]
@@ -70,14 +87,20 @@ def main(argv: List[str] | None = None) -> Dict[str, Any]:
          "reverse": (">=", 0.95), "revoke": (">=", 0.98), "shred": (">=", 0.95), "update": (">=", 0.98),
          "rollback": (">=", 0.98), "locality": (">=", 0.99), "alternative_path": (">=", 0.95),
          "replay_deviation": ("<=", 0), "hard/shred/direct_unknown": (">=", 0.98),
-         "hard/shred/probe_top1": ("<=", 0.02), "hard/shred/forced_choice_win": ("<=", 0.6),
+         "hard/shred/probe_top1": ("<=", 0.02), "hard/shred/true_obj_top1_among_entities": ("<=", 0.02),
+         "hard/shred/true_obj_mean_rank": (">=", 1100.0), "hard/shred/forced_choice_win": ("<=", 0.6),
          "hard/shred/gated_value_contribution": ("<=", 0.1), "hard/active/direct_acc": (">=", 0.98)})
+    # thresholds at 2,560 entities: chance probe/top-1 = 0.00039 (n = 100 targets, so one hit = 0.01), chance rank 1279.5
     record = {
         "experiment": "E-000014", "title": "Addressing at 10,000 cells (2,560 entities), verified gate",
         "evidence_level": "E4", "deletion_level": "F4" if check["claim_supported"] else "F3", "deletion_level_targeted": "F4",
-        "claim": "At ten times the bank size the core still reads, composes and traces the right cell, reproduces every "
-                 "lifecycle operation, and after SHRED with hard verification every reconstruction attack is at chance.",
-        "not_claimed": "Anything about approximate retrieval or banks beyond 10,000 cells; the synthetic boundary applies.",
+        "claim": "At ten times the bank size (and a ten times larger entity vocabulary) the core still reads, composes and "
+                 "traces the right cell, reproduces every lifecycle operation, and after SHRED with hard verification the "
+                 "reconstruction attacks stay within the thresholds set for a 2,560-entity vocabulary (probe / top-1 at most "
+                 "0.02 with 100 targets, mean rank at least 1100 of 1279.5, forced choice at most 0.6).",
+        "not_claimed": "A same-task scale-up of E-000001-B: the entity vocabulary is 2,560 instead of 256, so the task is "
+                       "harder in two ways at once (bank size and read-out classes). Nothing about approximate retrieval or "
+                       "banks beyond 10,000 cells; the synthetic boundary applies.",
         "config": {"seeds": args.seeds, "steps": args.steps, "model": model_cfg.to_dict(), "eval": EVAL10K,
                    "train": {"n_entities": N_ENT, "n_cells_min": 7000, "n_cells_max": 10000, "gate_weight": 5.0, "gate_balanced": True}},
         "criteria": check["criteria"], "claim_supported": check["claim_supported"],
@@ -85,9 +108,9 @@ def main(argv: List[str] | None = None) -> Dict[str, Any]:
         "aggregate": agg, "aggregate_attacks_soft": agg_soft, "aggregate_attacks_hard": agg_hard,
         "chance_levels": {"probe_top1": 1 / N_ENT, "mean_rank": (N_ENT - 1) / 2, "forced_choice": 0.5},
     }
-    sizes = {"direct": 10000, "hop2": 500, "hop3": 500, "hop2_broken_unknown": 100, "provenance": 11000, "reverse": 300,
-             "update": 100, "rollback": 100, "revoke": 100, "restore": 100, "shred": 100, "resign": 100,
-             "locality": 10000 - 150 + 300, "alternative_path": 100}
+    sizes = {"direct": 10000, "hop2": 500, "hop3": 500, "hop2_broken_unknown": 100, "hop3_broken_unknown": 100, "provenance": 11000,
+             "reverse": 300, "update": 100, "rollback": 100, "revoke": 100, "restore": 100, "shred": 100, "resign": 100,
+             "locality": 10000 - 150 + 300, "locality_targets_correct": 150, "alternative_path": 100}
     rows_b = [(a, f"{agg_soft[f'shred/{a}']['mean']:.4f}", f"{agg_hard[f'shred/{a}']['mean']:.4f}") for a in ATTACK_ROWS]
     md = "\n".join([
         "# E-000014 — Addressing at 10,000 cells", "",
@@ -97,7 +120,10 @@ def main(argv: List[str] | None = None) -> Dict[str, Any]:
         "Noise (bank perturbation 0.24, direct): " + ", ".join(f"seed {s['seed']}: {s['noise']['0.24']:.3f}" for s in suite), "",
         f"Attacks after SHRED (mean over seeds; chance: probe top-1 {1/N_ENT:.5f}, mean rank {(N_ENT-1)/2:.1f}, forced choice 0.5):", "",
         ledger.table(["attack after SHRED", "soft gate", "hard gate"], rows_b), "",
-        "Pre-registered criteria (worst seed):", "", ledger.criteria_table(check),
+        "Pre-registered criteria (worst seed):", "", ledger.criteria_table(check), "",
+        "Scaling curve, same model on fresh worlds (direct accuracy / mean routing max-mass), per seed:", "",
+        ledger.table(["seed", "1,000 cells", "3,000 cells", "10,000 cells"],
+                     [(s["seed"], *(f"{s['scaling'][k]['direct']:.3f} / {s['scaling'][k]['routing_max_mass_mean']:.3f}" for k in ("1000", "3000", "10000"))) for s in suite]),
     ])
     path = ledger.save("e000014_bank_10k", record, md)
     print(md); print(f"\nsaved {path}")

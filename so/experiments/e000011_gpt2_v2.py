@@ -36,14 +36,19 @@ from so.reference import ReferenceResolver, load_world
 from so.train import TrainConfig, lr_at, make_centre, routing_loss
 from so.world import Query, UNKNOWN, World, fill_random, inject_alternative_paths
 
-TEMPLATES4 = {
-    0: ["{s} lives in", "The home of {s} is", "{s} resides in", "The residence of {s} is"],
-    1: ["{s} works for", "The employer of {s} is", "{s} is employed by", "The company that employs {s} is"],
-    2: ["{s} is married to", "The spouse of {s} is", "{s} is wed to", "The partner of {s} is"],
-    3: ["{s} was born in", "The birthplace of {s} is", "{s} comes from", "The place of birth of {s} is"],
+TEMPLATES6 = {
+    0: ["{s} lives in", "The home of {s} is", "{s} resides in", "The residence of {s} is",
+        "Q: Where does {s} live? A: In", "According to the records, {s} lives in"],
+    1: ["{s} works for", "The employer of {s} is", "{s} is employed by", "The company that employs {s} is",
+        "Q: Who does {s} work for? A:", "According to the records, {s} works for"],
+    2: ["{s} is married to", "The spouse of {s} is", "{s} is wed to", "The partner of {s} is",
+        "Q: Who is {s} married to? A:", "According to the records, {s} is married to"],
+    3: ["{s} was born in", "The birthplace of {s} is", "{s} comes from", "The place of birth of {s} is",
+        "Q: Where was {s} born? A: In", "According to the records, {s} was born in"],
 }
-TRAIN_TEMPLATES, HELDOUT_TEMPLATES = (0, 1), (2, 3)
-E8.TEMPLATES = TEMPLATES4          # training only ever draws indices 0 and 1 (n_synonyms = 2)
+TEMPLATES4 = TEMPLATES6
+TRAIN_TEMPLATES, HELDOUT_TEMPLATES = (0, 1), (2, 3, 4, 5)   # 2/3 lexical variants, 4 question form, 5 prefixed clause
+E8.TEMPLATES = TEMPLATES6          # training only ever draws indices 0 and 1 (n_synonyms = 2)
 
 
 def train_adapter_v2(gk: E8.GPT2Knowledge, seed: int, steps: int, batch_size: int = 32, route_weight: float = 1.0,
@@ -219,11 +224,22 @@ def evaluate(gk: E8.GPT2Knowledge, seed: int, centre: np.ndarray) -> Dict[str, A
     probe.fit(po["hidden"][:split], y_o[:split])
     m["probe_calibration_top1"] = probe.accuracy(po["hidden"][split:], y_o[split:])
     pos = [int(np.where(store.bank()["kid"] == kids[f.key])[0][0]) for f in targets]
+    prior_t = gk.predict(None, world, q_t)["full_top1"]
+    entity_id_set = set(int(i) for i in gk.entity_ids)
 
     def attack(tag: str) -> None:
         p = gk.predict(bank(), world, q_t)
         m[f"{tag}/direct_unknown"] = float((p["answers"] == UNKNOWN).mean())
         m[f"{tag}/direct_acc"] = float((p["answers"] == np.array(t_truth)).mean())
+        # what does the model actually emit over the full vocabulary?
+        ft = p["full_top1"]
+        m[f"{tag}/full_vocab_is_unknown_word"] = float((ft == gk.unknown_id).mean())
+        m[f"{tag}/full_vocab_is_true_object"] = float((ft == np.array(gk.entity_ids)[t_truth]).mean())
+        m[f"{tag}/full_vocab_is_other_entity"] = float(np.mean([int(x) in entity_id_set and int(x) != gk.entity_ids[t] and int(x) != gk.unknown_id
+                                                                for x, t in zip(ft, t_truth)]))
+        m[f"{tag}/full_vocab_equals_prior"] = float((ft == prior_t).mean())
+        m[f"{tag}/full_vocab_is_non_entity_token"] = float(np.mean([int(x) not in entity_id_set and int(x) != gk.unknown_id for x in ft]))
+        m[f"{tag}/candidate_other_entity"] = float(np.mean([(a != UNKNOWN) and (a != t) for a, t in zip(p["answers"], t_truth)]))
         for t in HELDOUT_TEMPLATES:
             ph2 = gk.predict(bank(), world, q_t, template=t)
             m[f"{tag}/heldout{t}_unknown"] = float((ph2["answers"] == UNKNOWN).mean())
@@ -234,9 +250,12 @@ def evaluate(gk: E8.GPT2Knowledge, seed: int, centre: np.ndarray) -> Dict[str, A
         m[f"{tag}/probe_top1"] = probe.accuracy(p["hidden"], np.array(t_truth))
         mass = np.array([p["routing"][i, -1, pp] for i, pp in enumerate(pos)])
         with torch.no_grad():
-            vn = gk.model.encode_bank(bank().tensors())["values"].norm(dim=-1).numpy()
+            enc = gk.model.encode_bank(bank().tensors())
+            gate = enc["gate"].numpy()
         m[f"{tag}/routing_mass_on_target"] = float(mass.mean())
-        m[f"{tag}/gated_value_contribution"] = float(np.mean(mass * vn[pos]))
+        m[f"{tag}/gate_on_target"] = float(gate[pos].mean())
+        m[f"{tag}/payload_share"] = float(np.mean(mass * gate[pos]))     # biomarker: mass x gate (payload actually selected)
+        m[f"{tag}/gated_value_contribution"] = m[f"{tag}/payload_share"]  # name kept for the shared criteria
 
     attack("active")
     for f in targets: store.revoke(kids[f.key])
@@ -250,6 +269,43 @@ def evaluate(gk: E8.GPT2Knowledge, seed: int, centre: np.ndarray) -> Dict[str, A
     for f in targets: store.resign(kids[f.key])
     m["restored/direct_acc"] = float((gk.predict(bank(), world, q_t)["answers"] == np.array(t_truth)).mean())
 
+    # ---- in-context comparators for 2-hop (frozen model WITHOUT adapter, facts stated in the prompt)
+    hop2c = [q for q in world.sample_queries(rng, 2 * EVAL["n_hop2"], 2, "fwd", require_answer=True)][: EVAL["n_hop2"]]
+    def stated(sub: int, rel: int, obj: int) -> str:
+        return TEMPLATES6[rel][0].format(s=gk.names[sub]) + gk.names[obj] + "."
+    texts_both, texts_first, truth_c = [], [], []
+    for q in hop2c:
+        gt = world.answer(q)
+        (s1, r1), (s2, r2) = gt.edges
+        o1, o2 = world.index[(s1, r1)], world.index[(s2, r2)]
+        question = E8.query_text(q, gk.names, gk.n_synonyms)
+        texts_both.append(f"{stated(s1, r1, o1)} {stated(s2, r2, o2)} {question}")
+        texts_first.append(f"{stated(s1, r1, o1)} {question}")
+        truth_c.append(o2)
+    with torch.no_grad():
+        for tag, texts in (("in_context_both_facts", texts_both), ("in_context_first_fact_only", texts_first)):
+            hits = 0
+            for i in range(0, len(texts), 32):
+                ids, am, last = E8.encode_texts(gk.tok, texts[i:i + 32])
+                cand, _, _, _ = gk.model(None, ids, am, last)
+                a = cand.argmax(-1).numpy()
+                hits += int(sum(int(x == t) for x, t in zip(a, truth_c[i:i + 32])))
+            m[f"comparator/{tag}_hop2_acc"] = hits / len(texts)
+    m["comparator/adapter_no_context_hop2_acc"] = float(np.mean([a == ref.resolve(q).answer for a, q in zip(gk.predict(bank(), world, hop2c)["answers"], hop2c)]))
+
+    # ---- alternative routes: revoking one edge breaks only the route that uses it
+    pairs = world.alternative_path_pairs(rng, 50)
+    alt_ok_a = alt_ok_b = 0
+    for qa, qb, edge in pairs:
+        target = world.answer(qa).answer
+        store.revoke(kids[edge])
+        a = gk.predict(bank(), world, [qa, qb])["answers"]
+        alt_ok_a += int(a[0] != target); alt_ok_b += int(a[1] == target)
+        store.restore(kids[edge])
+    m["alt_route/n_pairs"] = len(pairs)
+    m["alt_route/broken_route_changes"] = alt_ok_a / len(pairs) if pairs else float("nan")
+    m["alt_route/other_route_survives"] = alt_ok_b / len(pairs) if pairs else float("nan")
+
     # ---- causal interventions on 2-hop questions inside the frozen model
     hop2q = [q for q in world.sample_queries(rng, 4 * EVAL["n_interventions"], 2, "fwd", require_answer=True)][: EVAL["n_interventions"]]
     base = gk.predict(bank(), world, hop2q)
@@ -257,6 +313,7 @@ def evaluate(gk: E8.GPT2Knowledge, seed: int, centre: np.ndarray) -> Dict[str, A
     c = {k: 0 for k in ("disable_hop1_changes", "disable_hop1_unknown", "disable_hop2_changes", "disable_hop2_unknown",
                         "disable_random_unchanged", "localisation_hop1", "localisation_hop2", "swap_hop2", "replace_hop2")}
     n_used = 0
+    n_swap = 0
     bank_kids = store.bank()["kid"]
     for i, q in enumerate(hop2q):
         if not correct[i]:
@@ -276,29 +333,34 @@ def evaluate(gk: E8.GPT2Knowledge, seed: int, centre: np.ndarray) -> Dict[str, A
         mask = np.ones(len(facts), dtype=bool); mask[other] = False
         c["disable_random_unchanged"] += int(int(gk.predict(bank(), world, [q], cell_mask=mask)["answers"][0]) == gt.answer)
         partner = facts[int(rng.integers(0, len(facts)))]
-        if partner.key != gt.edges[1] and partner.key != gt.edges[0]:
+        if partner.key not in (gt.edges[0], gt.edges[1]) and partner.obj != gt.answer:
+            n_swap += 1
             store.swap(k2, kids[partner.key])
             c["swap_hop2"] += int(int(gk.predict(bank(), world, [q])["answers"][0]) == partner.obj)
             store.swap(k2, kids[partner.key])
-        else:
-            c["swap_hop2"] += 1
         new = int((gt.answer + 1 + rng.integers(0, n_ent - 1)) % n_ent)
         old = store.read(k2).obj
         store.replace(k2, new)
         c["replace_hop2"] += int(int(gk.predict(bank(), world, [q])["answers"][0]) == new)
         store.replace(k2, old)
     m["interventions/n_correct_hop2"] = n_used
+    m["interventions/n_swap"] = n_swap
     for k, v in c.items():
-        m[f"interventions/{k}"] = v / n_used if n_used else float("nan")
+        denom = n_swap if k == "swap_hop2" else n_used
+        m[f"interventions/{k}"] = v / denom if denom else float("nan")
     return m
 
 
-KEYS = ["prior_direct_acc", "bank_masked_direct_acc", "direct", "template1_train/direct", "template2_heldout/direct",
-        "template3_heldout/direct", "direct_heldout_mean", "provenance_direct", "hop2", "broken1_unknown", "broken2_unknown",
-        "update", "rollback", "revoke", "shred", "resign", "update_heldout", "revoke_heldout", "shred_heldout",
-        "locality", "locality_targets_correct"]
-ATT = ["direct_unknown", "direct_acc", "heldout2_unknown", "heldout3_unknown", "forced_choice_win",
-       "true_obj_top1_among_entities", "true_obj_mean_rank", "probe_top1", "routing_mass_on_target", "gated_value_contribution"]
+KEYS = ["prior_direct_acc", "bank_masked_direct_acc", "direct", "template0_train/full_vocab_top1", "template1_train/direct",
+        "template2_heldout/direct", "template3_heldout/direct", "template4_heldout/direct", "template5_heldout/direct",
+        "direct_heldout_mean", "provenance_direct", "hop2", "comparator/in_context_both_facts_hop2_acc",
+        "comparator/in_context_first_fact_only_hop2_acc", "comparator/adapter_no_context_hop2_acc", "broken1_unknown",
+        "broken2_unknown", "update", "rollback", "revoke", "shred", "resign", "update_heldout", "revoke_heldout", "shred_heldout",
+        "locality", "locality_targets_correct", "alt_route/broken_route_changes", "alt_route/other_route_survives"]
+ATT = ["direct_unknown", "direct_acc", "candidate_other_entity", "full_vocab_is_unknown_word", "full_vocab_is_true_object",
+       "full_vocab_is_other_entity", "full_vocab_equals_prior", "full_vocab_is_non_entity_token", "heldout2_unknown",
+       "heldout4_unknown", "forced_choice_win", "true_obj_top1_among_entities", "true_obj_mean_rank", "probe_top1",
+       "routing_mass_on_target", "gate_on_target", "payload_share"]
 INT = ["localisation_hop1", "localisation_hop2", "disable_hop1_changes", "disable_hop1_unknown", "disable_hop2_changes",
        "disable_hop2_unknown", "disable_random_unchanged", "swap_hop2", "replace_hop2"]
 
@@ -324,21 +386,29 @@ def main(argv: List[str] | None = None) -> Dict[str, Any]:
         print({k: (round(v, 4) if isinstance(v, float) else v) for k, v in m.items()}, flush=True)
     keys = [k for k in per_seed[0] if k not in ("seed", "checkpoint_sha256")]
     agg = ledger.aggregate(per_seed, keys)
+    # STRICT thresholds = the ones pre-registered for E-000008 (kept unchanged so that nothing is relaxed after seeing E-000008)
     groups = {
-        "reading": {"prior_direct_acc": ("<=", 0.05), "bank_masked_direct_acc": ("<=", 0.05), "direct": (">=", 0.90),
-                    "template1_train/direct": (">=", 0.90)},
-        "heldout_paraphrases": {"template2_heldout/direct": (">=", 0.80), "template3_heldout/direct": (">=", 0.80)},
+        "reading": {"prior_direct_acc": ("<=", 0.05), "bank_masked_direct_acc": ("<=", 0.05), "direct": (">=", 0.95),
+                    "template1_train/direct": (">=", 0.95)},
+        "heldout_paraphrases": {"template2_heldout/direct": (">=", 0.80), "template3_heldout/direct": (">=", 0.80),
+                                "template4_heldout/direct": (">=", 0.70), "template5_heldout/direct": (">=", 0.70)},
         "update_rollback": {"update": (">=", 0.95), "rollback": (">=", 0.95), "resign": (">=", 0.95)},
-        "deletion_behaviour": {"revoke": (">=", 0.90), "shred": (">=", 0.90), "broken1_unknown": (">=", 0.90),
-                               "revoke_heldout": (">=", 0.85), "shred_heldout": (">=", 0.85), "locality": (">=", 0.98)},
+        "deletion_behaviour": {"revoke": (">=", 0.95), "shred": (">=", 0.90), "broken1_unknown": (">=", 0.90),
+                               "revoke_heldout": (">=", 0.85), "shred_heldout": (">=", 0.85), "locality": (">=", 0.98),
+                               "restored/direct_acc": (">=", 0.95)},
+        "attacks_after_revoke": {"revoke/probe_top1": ("<=", 0.05), "revoke/forced_choice_win": ("<=", 0.6)},
         "attacks_after_shred_hard": {"shred_hard/probe_top1": ("<=", 0.05), "shred_hard/forced_choice_win": ("<=", 0.6),
                                      "shred_hard/true_obj_top1_among_entities": ("<=", 0.05),
-                                     "shred_hard/gated_value_contribution": ("<=", 0.1), "shred_hard/direct_unknown": (">=", 0.90)},
+                                     "shred_hard/payload_share": ("<=", 0.05), "shred_hard/direct_unknown": (">=", 0.90)},
+        "alternative_routes": {"alt_route/broken_route_changes": (">=", 0.95), "alt_route/other_route_survives": (">=", 0.95)},
         "interventions": {"interventions/localisation_hop1": (">=", 0.90), "interventions/localisation_hop2": (">=", 0.90),
                           "interventions/disable_hop1_changes": (">=", 0.95), "interventions/disable_hop2_changes": (">=", 0.95),
                           "interventions/disable_random_unchanged": (">=", 0.95), "interventions/swap_hop2": (">=", 0.90),
                           "interventions/replace_hop2": (">=", 0.90)},
     }
+    lenient = {"direct": (">=", 0.90), "template1_train/direct": (">=", 0.90), "revoke": (">=", 0.90), "shred": (">=", 0.85),
+               "broken1_unknown": (">=", 0.85)}
+    check_lenient = ledger.check_criteria(agg, lenient)
     all_criteria = {k: v for g in groups.values() for k, v in g.items()}
     check = ledger.check_criteria(agg, all_criteria)
     met = {g: all(check["criteria"][k]["pass"] for k in ks) for g, ks in groups.items()}
@@ -356,7 +426,22 @@ def main(argv: List[str] | None = None) -> Dict[str, Any]:
             {"claim": "After SHRED with hard verification nothing is recoverable by probe, forced choice or rank (F4).", "criteria": list(groups["attacks_after_shred_hard"]), "supported": met["attacks_after_shred_hard"]},
             {"claim": "Inside the frozen model the two reads of a 2-hop question are causally the two ground-truth cells: disabling either breaks the answer, disabling another cell does not, swapping or replacing the second payload changes the answer as predicted.", "criteria": list(groups["interventions"]), "supported": met["interventions"]},
         ],
-        "not_claimed": "LLM scale; multi-token entities; free-text paraphrases beyond the four templates; unlearning of pretrained facts.",
+        "not_claimed": "LLM scale; multi-token entities; free-text paraphrases beyond the six templates; unlearning of pretrained facts.",
+        "by_construction_vs_learned": "The frozen core cannot copy a fact; whether the adapter copies is the masked-bank row. REVOKE "
+                                      "is a mask (F1). Learned: reading from prompts (including four never-trained templates), "
+                                      "composition without the intermediate entity in the text, emitting ' unknown' for a masked or "
+                                      "unsigned cell (a trained refusal that ledger §28 would call output suppression if it stood "
+                                      "alone — here it is paired with the copy bound, the masked-bank row, the attacks and the "
+                                      "answer-category rows that show what is emitted instead), and the gate's selection between "
+                                      "payload and ' unknown'. The 2-hop interventions are consistency checks: the read is the only "
+                                      "channel through which the adapter can inject the fact, so disabling the cell removing the "
+                                      "answer is expected; the informative rows are localisation (does the frozen model's own "
+                                      "residual state route to the right cell at each read) and swap / replace (does the answer "
+                                      "follow the payload exactly).",
+        "lenient_criteria": check_lenient["criteria"], "lenient_supported": check_lenient["claim_supported"],
+        "sample_sizes": {"direct/templates": EVAL["n_cells"], "hop2": EVAL["n_hop2"], "broken": EVAL["n_broken"],
+                         "lifecycle": EVAL["n_lifecycle"], "attacks": EVAL["n_targets"], "interventions": "correct 2-hop subset (n recorded)",
+                         "alt_routes": 50, "comparators": EVAL["n_hop2"]},
         "config": {"seeds": args.seeds, "steps": args.steps, "eval": EVAL, "templates": TEMPLATES4, "train_templates": TRAIN_TEMPLATES,
                    "heldout_templates": HELDOUT_TEMPLATES, "gate_weight": 5.0, "gate_balanced": True, "p_revoked": 0.20, "p_shred": 0.10,
                    "extra_unanswerable": 0.2},
@@ -369,7 +454,10 @@ def main(argv: List[str] | None = None) -> Dict[str, Any]:
         "# E-000011 — Frozen GPT-2 core v2", "",
         f"Evidence level: **E5** (substrate: pretrained transformer, 124M frozen). Deletion level targeted F4, recorded **{level}**. "
         f"Seeds: {args.seeds}; {args.steps} adapter steps; verified gate (class-balanced, weight 5); p_revoked 0.20, p_shred 0.10, "
-        "20% extra unanswerable queries; templates 0/1 trained, 2/3 held out.", "",
+        "20% extra unanswerable queries; templates 0/1 trained, 2/3 (lexical variants), 4 (question form), 5 (prefixed clause) held out. "
+        "Thresholds are the ones pre-registered for E-000008 (not relaxed); a lenient set (0.90 / 0.85) is reported separately.", "",
+        f"Lenient criteria met: **{check_lenient['claim_supported']}**. Sample sizes: {record['sample_sizes']}", "",
+        record["by_construction_vs_learned"], "",
         "Claim parts (each on its own pre-registered criteria, worst seed):", "",
         ledger.table(["claim", "supported"], [(c["claim"], "yes" if c["supported"] else "**no**") for c in record["claim_parts"]]), "",
         ledger.table(["measure", "mean over seeds", "worst seed"], rows), "",
@@ -377,7 +465,8 @@ def main(argv: List[str] | None = None) -> Dict[str, Any]:
         ledger.table(["attack", "active", "after REVOKE", "after SHRED (soft)", "after SHRED (hard)"], arows), "",
         "Causal interventions on correctly answered 2-hop questions (mean / worst seed):", "",
         ledger.table(["intervention", "mean", "worst seed"], irows), "",
-        "Pre-registered criteria (worst seed):", "", ledger.criteria_table(check),
+        "Pre-registered criteria (worst seed):", "", ledger.criteria_table(check), "",
+        "Lenient criteria (secondary, worst seed):", "", ledger.criteria_table(check_lenient),
     ])
     path = ledger.save("e000011_gpt2_v2", record, md)
     print(md); print(f"\nsaved {path}")

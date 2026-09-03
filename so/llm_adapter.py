@@ -17,7 +17,9 @@ residual stream of the last token.
 
 Because the value is built from the model's own (tied) token embedding of the
 object, adding it into the residual stream raises that token's logit through
-the unchanged LM head — the knowledge participates in the model's own
+the unchanged LM head.  The marker gate does not merely attenuate the value
+(the RMS-matched injection would undo that): it selects between the payload
+and the ' unknown' direction, so an unsigned payload reads as "unknown" — the knowledge participates in the model's own
 computation instead of being pasted into the prompt.
 
 Only the adapter is trained (relation embeddings, key/value/query/output
@@ -106,8 +108,12 @@ class KnowledgeAdapterLM(nn.Module):
         obj = self.wte[self.entity_token_ids[bank["obj"]]]
         keys = self.k_proj(self.ln_key(subj + self.rel_emb(bank["relation"])))
         g = self.gate(bank["marker"])
-        values = self.v_proj(obj) * g
-        return {"keys": keys, "values": values, "gate": g.squeeze(-1), "active": bank["active"]}
+        payload = self.v_proj(obj)
+        unk = self.v_proj(self.wte[self.candidate_ids[-1]][None])          # the ' unknown' direction
+        # the gate selects between the payload and "unknown": an unsigned payload READS AS unknown.
+        # (a mere attenuation would be undone by the RMS-matched injection downstream)
+        values = payload * g + unk * (1 - g)
+        return {"keys": keys, "values": values, "values_payload": payload, "gate": g.squeeze(-1), "active": bank["active"]}
 
     def _make_hook(self, read_index: int, layer: int):
         def hook(module, inputs, output):
