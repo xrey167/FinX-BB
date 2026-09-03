@@ -177,9 +177,12 @@ def evaluate(gk: E8.GPT2Knowledge, seed: int, centre: np.ndarray) -> Dict[str, A
     new_objs = {f.key: int((f.obj + 1 + rng.integers(0, n_ent - 1)) % n_ent) for f in cells}
 
     def check(name: str) -> None:
-        for t, tag in ((0, ""), (2, "_heldout")):
+        for t in TRAIN_TEMPLATES + HELDOUT_TEMPLATES:
             a = gk.predict(bank(), world, q_life, template=t)["answers"]
-            m[f"{name}{tag}"] = float(np.mean([x == ref.resolve(q).answer for x, q in zip(a, q_life)]))
+            m[f"{name}/template{t}"] = float(np.mean([x == ref.resolve(q).answer for x, q in zip(a, q_life)]))
+        m[name] = m[f"{name}/template0"]
+        m[f"{name}_heldout"] = float(np.mean([m[f"{name}/template{t}"] for t in HELDOUT_TEMPLATES]))
+        m[f"{name}_heldout_min"] = float(min(m[f"{name}/template{t}"] for t in HELDOUT_TEMPLATES))
 
     for f in cells: store.update(kids[f.key], new_objs[f.key])
     check("update")
@@ -307,9 +310,11 @@ def evaluate(gk: E8.GPT2Knowledge, seed: int, centre: np.ndarray) -> Dict[str, A
     m["alt_route/other_route_survives"] = alt_ok_b / len(pairs) if pairs else float("nan")
 
     # ---- causal interventions on 2-hop questions inside the frozen model
-    hop2q = [q for q in world.sample_queries(rng, 4 * EVAL["n_interventions"], 2, "fwd", require_answer=True)][: EVAL["n_interventions"]]
+    hop2q = list(world.sample_queries(rng, 4 * EVAL["n_interventions"], 2, "fwd", require_answer=True))   # pool
     base = gk.predict(bank(), world, hop2q)
     correct = np.array([a == ref.resolve(q).answer for a, q in zip(base["answers"], hop2q)])
+    m["interventions/pool_size"] = len(hop2q)
+    m["interventions/pool_correct_rate"] = float(correct.mean()) if len(hop2q) else float("nan")
     c = {k: 0 for k in ("disable_hop1_changes", "disable_hop1_unknown", "disable_hop2_changes", "disable_hop2_unknown",
                         "disable_random_unchanged", "localisation_hop1", "localisation_hop2", "swap_hop2", "replace_hop2")}
     n_used = 0
@@ -318,6 +323,8 @@ def evaluate(gk: E8.GPT2Knowledge, seed: int, centre: np.ndarray) -> Dict[str, A
     for i, q in enumerate(hop2q):
         if not correct[i]:
             continue
+        if n_used >= EVAL["n_interventions"]:
+            break
         n_used += 1
         gt = world.answer(q)
         k1, k2 = kids[gt.edges[0]], kids[gt.edges[1]]
@@ -355,8 +362,9 @@ KEYS = ["prior_direct_acc", "bank_masked_direct_acc", "direct", "template0_train
         "template2_heldout/direct", "template3_heldout/direct", "template4_heldout/direct", "template5_heldout/direct",
         "direct_heldout_mean", "provenance_direct", "hop2", "comparator/in_context_both_facts_hop2_acc",
         "comparator/in_context_first_fact_only_hop2_acc", "comparator/adapter_no_context_hop2_acc", "broken1_unknown",
-        "broken2_unknown", "update", "rollback", "revoke", "shred", "resign", "update_heldout", "revoke_heldout", "shred_heldout",
-        "locality", "locality_targets_correct", "alt_route/broken_route_changes", "alt_route/other_route_survives"]
+        "broken2_unknown", "update", "rollback", "revoke", "shred", "resign", "update_heldout", "revoke_heldout", "revoke_heldout_min",
+        "shred_heldout", "shred_heldout_min", "locality", "locality_targets_correct", "alt_route/broken_route_changes",
+        "alt_route/other_route_survives", "interventions/pool_correct_rate"]
 ATT = ["direct_unknown", "direct_acc", "candidate_other_entity", "full_vocab_is_unknown_word", "full_vocab_is_true_object",
        "full_vocab_is_other_entity", "full_vocab_equals_prior", "full_vocab_is_non_entity_token", "heldout2_unknown",
        "heldout4_unknown", "forced_choice_win", "true_obj_top1_among_entities", "true_obj_mean_rank", "probe_top1",
@@ -394,7 +402,7 @@ def main(argv: List[str] | None = None) -> Dict[str, Any]:
                                 "template4_heldout/direct": (">=", 0.70), "template5_heldout/direct": (">=", 0.70)},
         "update_rollback": {"update": (">=", 0.95), "rollback": (">=", 0.95), "resign": (">=", 0.95)},
         "deletion_behaviour": {"revoke": (">=", 0.95), "shred": (">=", 0.90), "broken1_unknown": (">=", 0.90),
-                               "revoke_heldout": (">=", 0.85), "shred_heldout": (">=", 0.85), "locality": (">=", 0.98),
+                               "revoke_heldout_min": (">=", 0.85), "shred_heldout_min": (">=", 0.85), "locality": (">=", 0.98),
                                "restored/direct_acc": (">=", 0.95)},
         "attacks_after_revoke": {"revoke/probe_top1": ("<=", 0.05), "revoke/forced_choice_win": ("<=", 0.6)},
         "attacks_after_shred_hard": {"shred_hard/probe_top1": ("<=", 0.05), "shred_hard/forced_choice_win": ("<=", 0.6),
@@ -440,7 +448,8 @@ def main(argv: List[str] | None = None) -> Dict[str, Any]:
                                       "follow the payload exactly).",
         "lenient_criteria": check_lenient["criteria"], "lenient_supported": check_lenient["claim_supported"],
         "sample_sizes": {"direct/templates": EVAL["n_cells"], "hop2": EVAL["n_hop2"], "broken": EVAL["n_broken"],
-                         "lifecycle": EVAL["n_lifecycle"], "attacks": EVAL["n_targets"], "interventions": "correct 2-hop subset (n recorded)",
+                         "lifecycle": EVAL["n_lifecycle"], "attacks": EVAL["n_targets"],
+                         "interventions": f"first {EVAL['n_interventions']} correctly answered 2-hop questions from a pool of {4 * EVAL['n_interventions']} (pool correct rate recorded)",
                          "alt_routes": 50, "comparators": EVAL["n_hop2"]},
         "config": {"seeds": args.seeds, "steps": args.steps, "eval": EVAL, "templates": TEMPLATES4, "train_templates": TRAIN_TEMPLATES,
                    "heldout_templates": HELDOUT_TEMPLATES, "gate_weight": 5.0, "gate_balanced": True, "p_revoked": 0.20, "p_shred": 0.10,
