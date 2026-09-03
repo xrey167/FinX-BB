@@ -46,6 +46,8 @@ class AdapterConfig:
     use_marker_gate: bool = True
     hard_gate: bool = False        # verification mode: gate thresholded at 0.5
     status_gated: bool = False     # E-000012: revoked cells stay routable; the status flag is folded into the gate
+    fallback: str = "unknown"      # 'unknown': a null / unsigned / revoked read emits ' unknown';
+                                   # 'prior' (E-000013): it injects nothing, so the pretrained distribution returns
 
     def to_dict(self) -> Dict:
         return asdict(self)
@@ -81,6 +83,9 @@ class KnowledgeAdapterLM(nn.Module):
         with torch.no_grad():
             unk = lm.transformer.wte.weight[unknown_token_id].detach().clone()
         self.null_value = nn.Parameter(unk[None].repeat(len(cfg.read_layers), 1))   # "nothing found" -> ' unknown'
+        if cfg.fallback == "prior":
+            # "nothing found" -> no injection at all (fixed, not learnable: no constant shortcut can be learned)
+            self.null_value = nn.Parameter(torch.zeros(len(cfg.read_layers), d), requires_grad=False)
         self.scale = nn.Parameter(torch.tensor(1.0))
         self._ctx: Optional[Dict] = None
         self._hooks = [lm.transformer.h[l].register_forward_hook(self._make_hook(i, l)) for i, l in enumerate(cfg.read_layers)]
@@ -90,7 +95,7 @@ class KnowledgeAdapterLM(nn.Module):
         return self.lm.transformer.wte.weight
 
     def adapter_parameters(self):
-        return [p for n, p in self.named_parameters() if not n.startswith("lm.")]
+        return [p for n, p in self.named_parameters() if not n.startswith("lm.") and p.requires_grad]
 
     # ------------------------------------------------------------------ knowledge layer
     def gate_logits(self, marker: torch.Tensor) -> torch.Tensor:
@@ -110,12 +115,18 @@ class KnowledgeAdapterLM(nn.Module):
         keys = self.k_proj(self.ln_key(subj + self.rel_emb(bank["relation"])))
         g = self.gate(bank["marker"])
         payload = self.v_proj(obj)
-        unk = self.v_proj(self.wte[self.candidate_ids[-1]][None])          # the ' unknown' direction
-        # the gate selects between the payload and "unknown": an unsigned payload READS AS unknown.
-        # (a mere attenuation would be undone by the RMS-matched injection downstream)
         if self.cfg.status_gated:
-            g = g * bank["active"].float()[:, None]          # an inactive (revoked) cell reads as unknown
-        values = payload * g + unk * (1 - g)
+            g = g * bank["active"].float()[:, None]          # an inactive (revoked) cell reads as unknown / as nothing
+        if self.cfg.fallback == "prior":
+            # unit-RMS payload: the injection downstream is scaled statically, so a closed gate or a null read
+            # injects nothing and the frozen model's own distribution is what remains
+            payload = payload / (payload.pow(2).mean(-1, keepdim=True).sqrt() + 1e-6)
+            values = payload * g
+        else:
+            unk = self.v_proj(self.wte[self.candidate_ids[-1]][None])          # the ' unknown' direction
+            # the gate selects between the payload and "unknown": an unsigned payload READS AS unknown.
+            # (a mere attenuation would be undone by the RMS-matched injection downstream)
+            values = payload * g + unk * (1 - g)
         allowed = bank["routable"] if (self.cfg.status_gated and "routable" in bank) else bank["active"]
         return {"keys": keys, "values": values, "values_payload": payload, "gate": g.squeeze(-1), "active": allowed}
 
@@ -137,8 +148,11 @@ class KnowledgeAdapterLM(nn.Module):
             p = torch.softmax(scores, dim=-1)
             read = self.o_proj[str(layer)](p @ values)                        # (B, d)
             rms_h = hl.detach().pow(2).mean(-1, keepdim=True).sqrt()
-            rms_r = read.pow(2).mean(-1, keepdim=True).sqrt() + 1e-6
-            read = read * (rms_h / rms_r) * self.inject_gain[read_index]        # RMS-matched injection
+            if self.cfg.fallback == "prior":
+                read = read * rms_h * self.inject_gain[read_index]               # static: a zero read stays zero
+            else:
+                rms_r = read.pow(2).mean(-1, keepdim=True).sqrt() + 1e-6
+                read = read * (rms_h / rms_r) * self.inject_gain[read_index]    # RMS-matched injection
             delta = torch.zeros_like(h)
             delta[ar, ctx["last_idx"]] = read
             ctx["routing"].append(p)
