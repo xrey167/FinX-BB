@@ -48,6 +48,10 @@ class AdapterConfig:
     status_gated: bool = False     # E-000012: revoked cells stay routable; the status flag is folded into the gate
     use_links: bool = False        # E-000020: the bank may contain alias rows whose payload is the TARGET'S KEY
     n_deref: int = 0               # E-000020: dereference reads after each read layer (1 resolves an alias)
+    two_channel_null: bool = False # E-000022: split the null column into a payload-absence signal (inject the
+                                   # unknown direction when a QUESTION finds no cell) and a query-relevance
+                                   # signal (inject nothing when the text is not a question about a cell).
+                                   # Without the split both live in one column and contradict each other.
     match_gate: bool = False       # E-000018: scale the injection by how well the query matches ANY real cell key.
                                    # The routing softmax always sums to one, so some cell always wins and the layer
                                    # injects into text it has no key for; an absolute match score can say "nothing".
@@ -87,6 +91,11 @@ class KnowledgeAdapterLM(nn.Module):
         if cfg.match_gate:
             self.match_tau = nn.Parameter(torch.full((len(cfg.read_layers),), 0.3))
             self.match_temp = nn.Parameter(torch.full((len(cfg.read_layers),), 10.0))
+        if cfg.two_channel_null:
+            # is this text a question about some subject and relation at all? Read from the state, not from
+            # the cells, so it can fire for a question whose cell is missing and stay silent on prose.
+            self.query_relevance = nn.ModuleDict(
+                {str(l): nn.Sequential(nn.Linear(d, 64), nn.GELU(), nn.Linear(64, 1)) for l in cfg.read_layers})
         if cfg.use_links:
             self.v_link = nn.Linear(cfg.d_key, d, bias=False)      # an alias's value: its TARGET'S KEY, in value space
         if cfg.n_deref > 0:
@@ -176,6 +185,12 @@ class KnowledgeAdapterLM(nn.Module):
                     # the null column carries the incoming value: "what I read was not a pointer"
                     val = pd[:, :-1] @ values[:-1] + pd[:, -1:] * val
                     ctx["routing"].append(pd)
+            if self.cfg.two_channel_null:
+                # the null column stops carrying the ' unknown' direction on its own: its contribution is
+                # multiplied by how much this text looks like a question about a cell at all
+                rel = torch.sigmoid(self.query_relevance[str(layer)](hl)).squeeze(-1)
+                val = val - p[:, -1:] * values[-1][None] * (1.0 - rel)[:, None]
+                ctx.setdefault("relevance", []).append(rel.detach())
             read = self.o_proj[str(layer)](val)                               # (B, d)
             if self.cfg.match_gate:
                 # absolute agreement with the best REAL cell key; the null key is excluded on purpose, because
