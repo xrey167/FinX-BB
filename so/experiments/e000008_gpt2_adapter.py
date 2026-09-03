@@ -402,15 +402,38 @@ def main(argv: List[str] | None = None) -> Dict[str, Any]:
         "update": (">=", 0.95), "rollback": (">=", 0.95), "shred": (">=", 0.90), "resign": (">=", 0.95),
         "locality": (">=", 0.98), "revoke/probe_top1": ("<=", 0.05), "revoke/forced_choice_win": ("<=", 0.6),
         "shred/probe_top1": ("<=", 0.05), "shred/forced_choice_win": ("<=", 0.6), "restored/direct_acc": (">=", 0.95)})
+    groups = {
+        "reading": ["prior_direct_acc", "bank_masked_direct_acc", "direct", "paraphrase"],
+        "update_rollback": ["update", "rollback", "restore", "resign"],
+        "deletion_behaviour": ["revoke", "shred", "broken1_unknown", "locality", "restored/direct_acc"],
+        "attacks_after_revoke": ["revoke/probe_top1", "revoke/forced_choice_win"],
+        "attacks_after_shred": ["shred/probe_top1", "shred/forced_choice_win"],
+    }
+    met = {g: all(check["criteria"][k]["pass"] for k in ks) for g, ks in groups.items()}
+    level = "F4" if met["deletion_behaviour"] and met["attacks_after_shred"] else ("F3" if met["deletion_behaviour"] else "F1")
     record = {
         "criteria": check["criteria"], "claim_supported": check["claim_supported"],
+        "claim_parts": [
+            {"claim": "With a frozen pretrained transformer as core and natural-language prompts, the adapter reads the "
+                      "right cell and the unchanged LM head emits the object; the pretrained prior is at chance and the "
+                      "adapter with every cell masked adds nothing (copy bound).", "criteria": groups["reading"], "supported": met["reading"]},
+            {"claim": "UPDATE / ROLLBACK / RESTORE / RESIGN are reproduced against the reference.",
+             "criteria": groups["update_rollback"], "supported": met["update_rollback"]},
+            {"claim": "After REVOKE / SHRED and on broken paths the model answers ' unknown' (behavioural deletion, F3).",
+             "criteria": groups["deletion_behaviour"], "supported": met["deletion_behaviour"]},
+            {"claim": "After REVOKE nothing is recoverable by probe or forced choice (mask).",
+             "criteria": groups["attacks_after_revoke"], "supported": met["attacks_after_revoke"]},
+            {"claim": "After SHRED nothing is recoverable by probe or forced choice (representation level, F4).",
+             "criteria": groups["attacks_after_shred"], "supported": met["attacks_after_shred"]},
+        ],
+        "claim_groups_met": met,
         "by_construction_vs_learned": "The frozen core cannot copy a fact by construction; whether the ADAPTER copies is "
                                       "measured by the masked-bank rows (must equal the prior). REVOKE is a mask (F1); "
                                       "what is learned is reading the right cell from natural-language prompts, "
                                       "turning the value into the object token through the unchanged LM head, "
                                       "answering ' unknown' for null reads, and refusing a shredded payload.",
         "experiment": "E-000008", "title": "Frozen pretrained GPT-2 core with the mutable knowledge layer (symlink adapter)",
-        "evidence_level": "E5", "deletion_level": "F4",
+        "evidence_level": "E5" if met["reading"] else "E2", "deletion_level": level, "deletion_level_targeted": "F4",
         "claim": "With a frozen pretrained transformer as neural core and natural-language queries, an adapter learns "
                  "to read the mutable knowledge layer so that the model's own LM head emits the object; UPDATE / "
                  "ROLLBACK / REVOKE / RESTORE / SHRED / RESIGN are reproduced against the reference, deletion "
@@ -427,9 +450,11 @@ def main(argv: List[str] | None = None) -> Dict[str, Any]:
     arows = [(a, *(f"{agg[f'{c}/{a}']['mean']:.4f}" for c in ("active", "revoke", "shred"))) for a in ATTACKS]
     md = "\n".join([
         "# E-000008 — Frozen pretrained GPT-2 core with the mutable knowledge layer", "",
-        f"Evidence level: **E5** ({ledger.EVIDENCE_LEVELS['E5']}), partial E6 (a real pretrained LM, GPT-2 small, "
-        f"on CPU). Deletion level within this system: **F4**. Seeds: {args.seeds}; adapter steps: {args.steps}; "
-        "the 124M pretrained weights are frozen.", "",
+        f"Evidence level recorded: **{record['evidence_level']}** (E5 = {ledger.EVIDENCE_LEVELS['E5']}; a real pretrained LM, "
+        f"GPT-2 small, on CPU — not LLM scale). Deletion level targeted F4, recorded **{level}**. Seeds: {args.seeds}; "
+        f"adapter steps: {args.steps}; the 124M pretrained weights are frozen.", "",
+        "Claim parts (each judged on its own pre-registered criteria, worst seed):", "",
+        ledger.table(["claim", "supported"], [(c["claim"], "yes" if c["supported"] else "**no**") for c in record["claim_parts"]]), "",
         ledger.table(["measure", "mean over seeds", "worst seed"], rows), "",
         "Attacks on 100 targets (mean over seeds; chance: forced choice 0.5, top-1 among entities 0.0039, "
         "mean rank 127.5, probe top-1 0.0039 / top-5 0.0195):", "",
