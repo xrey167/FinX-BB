@@ -21,16 +21,16 @@ DOC = Path(__file__).resolve().parent.parent / "docs" / "so-results-2026-09-02.m
 ORDER = ["e000001a_reference", "e000001b_mini_transformer", "e000002_memorization_control",
          "e000003_retention_generalization", "e000004_reconstruction_attacks", "e000005_causal_interventions",
          "e000006_ablations", "e000007_biomarker", "e000008_gpt2_adapter", "e000009_verification_gate",
-         "e000010_balanced_gate"]
+         "e000010_balanced_gate", "e000011_gpt2_v2", "e000014_bank_10k"]
 
 # ledger §3 properties -> the experiments that bear on them
 PROPERTIES = {
-    "Selectivity (target disappears)": ["e000001b_mini_transformer", "e000003_retention_generalization", "e000008_gpt2_adapter"],
-    "Retention (non-target intact)": ["e000001b_mini_transformer", "e000003_retention_generalization", "e000008_gpt2_adapter"],
-    "Generalisation (paraphrases, alternative queries)": ["e000003_retention_generalization", "e000004_reconstruction_attacks", "e000008_gpt2_adapter"],
-    "Causal isolation (effect follows from the intended structure)": ["e000005_causal_interventions", "e000006_ablations", "e000007_biomarker"],
-    "Reconstruction resistance": ["e000004_reconstruction_attacks", "e000007_biomarker", "e000009_verification_gate", "e000010_balanced_gate", "e000008_gpt2_adapter"],
-    "Scalability (path beyond toy models)": ["e000002_memorization_control", "e000008_gpt2_adapter"],
+    "Selectivity (target disappears)": ["e000001b_mini_transformer", "e000003_retention_generalization", "e000008_gpt2_adapter", "e000011_gpt2_v2"],
+    "Retention (non-target intact)": ["e000001b_mini_transformer", "e000003_retention_generalization", "e000008_gpt2_adapter", "e000011_gpt2_v2"],
+    "Generalisation (paraphrases, alternative queries)": ["e000003_retention_generalization", "e000004_reconstruction_attacks", "e000008_gpt2_adapter", "e000011_gpt2_v2"],
+    "Causal isolation (effect follows from the intended structure)": ["e000005_causal_interventions", "e000006_ablations", "e000007_biomarker", "e000011_gpt2_v2"],
+    "Reconstruction resistance": ["e000004_reconstruction_attacks", "e000007_biomarker", "e000009_verification_gate", "e000010_balanced_gate", "e000008_gpt2_adapter", "e000011_gpt2_v2", "e000014_bank_10k"],
+    "Scalability (path beyond toy models)": ["e000002_memorization_control", "e000008_gpt2_adapter", "e000011_gpt2_v2", "e000014_bank_10k"],
 }
 
 # post-hoc interpretation of recorded outcomes (the JSON records are never edited)
