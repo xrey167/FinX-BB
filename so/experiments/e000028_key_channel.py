@@ -160,6 +160,10 @@ def run_seed(seed: int, n_targets: int, steps: int, verbose: bool = True) -> Dic
 
     # EVICT: out of the addressable bank, payload retained in the store. The certificate says this
     # should behave like DELETE against the attack and unlike SHRED, while keeping the data.
+    # The targets are still SHREDDED from the arm above, and a shredded marker would make the restore
+    # check below fail for a reason that has nothing to do with eviction, so they are re-signed first.
+    for f in targets:
+        store.resign(kids[f.key])
     for f in targets:
         store.evict(kids[f.key])
     m.update(score(sweep(model, store, world, targets, locate_columns(model, store, world, targets), n_ent),
@@ -213,6 +217,21 @@ def main(argv: List[str] | None = None) -> Dict[str, Any]:
         torch.set_num_threads(args.threads)
 
     per_seed = [run_seed(s, args.n_targets, args.steps) for s in args.seeds]
+
+    # The pre-registered LEAK bar is 1/256 on the WORST seed, and at 100 targets the smallest non-zero
+    # rate is 0.01, so that bar can only be met by zero hits in every seed: it tests luck as much as
+    # mechanism, and REVOKE and DELETE -- which are correct by construction -- fail it too. The bar is
+    # left exactly as pre-registered and this pooled interval is reported beside it, which is the same
+    # remedy E-000019 used when a tolerance bound was standing in for a chance result.
+    chance = 1.0 / per_seed[0]["n_entities"]
+    pooled: Dict[str, Any] = {"chance": chance, "n": args.n_targets * len(args.seeds)}
+    for cond in ("active", "shred", "revoke", "evict", "delete"):
+        key = f"{cond}/object_top1"
+        if all(key in m for m in per_seed):
+            hits = int(round(sum(m[key] * args.n_targets for m in per_seed)))
+            ci = ledger.clopper_pearson(hits, pooled["n"])
+            pooled[cond] = {"hits": hits, "rate": hits / pooled["n"], "lower": ci["lower"],
+                            "upper": ci["upper"], "contains_chance": ci["lower"] <= chance <= ci["upper"]}
     keys = [k for k in KEYS if all(k in s for s in per_seed)]
     agg = ledger.aggregate(per_seed, keys)
     check = ledger.check_criteria(agg, {k: v for k, v in CRITERIA.items() if k in agg})
@@ -234,7 +253,8 @@ def main(argv: List[str] | None = None) -> Dict[str, Any]:
 
     record = {"experiment": "E-000028", "title": "the channel SHRED does not close",
               "trains_nothing": True, "seeds": args.seeds, "n_targets": args.n_targets,
-              "per_seed": per_seed, "aggregate": agg, "criteria": check, "key_channel_leak": leak}
+              "per_seed": per_seed, "aggregate": agg, "criteria": check, "key_channel_leak": leak,
+              "pooled_vs_chance": pooled}
     md = [f"# E-000028 — {record['title']}", "",
           f"Seeds {args.seeds}, {args.n_targets} targets, the recorded E-000010 checkpoints, no training.",
           "The attacker knows a cell's subject and relation, finds its column from the routing of the",
@@ -245,6 +265,15 @@ def main(argv: List[str] | None = None) -> Dict[str, Any]:
           "number means nothing. `revoke` and `delete` remove the row from routing altogether.", "",
           "## Pre-registered criteria", "", ledger.criteria_table(check), "",
           "## What F4 would require of this channel", "", ledger.criteria_table(leak), "",
+          "The bar above is 1/256 on the worst seed, and at 100 targets the smallest non-zero rate is",
+          "0.01, so only zero hits in every seed can meet it -- REVOKE and DELETE, correct by",
+          "construction, fail it too. It is left as pre-registered and the pooled exact interval is",
+          "reported beside it.", "",
+          ledger.table(["condition", "hits", "of", "rate", "95% CI", "contains chance"],
+                       [[c, pooled[c]["hits"], pooled["n"], f"{pooled[c]['rate']:.4f}",
+                         f"{pooled[c]['lower']:.4f} - {pooled[c]['upper']:.4f}",
+                         "yes" if pooled[c]["contains_chance"] else "NO"]
+                        for c in ("active", "shred", "revoke", "evict", "delete") if c in pooled]), "",
           "## All measures", "", ledger.table(ledger.CI_HEADERS, rows), ""]
     path = ledger.save("e000028_key_channel", record, "\n".join(md))
     print(f"\nwritten: {path}")
