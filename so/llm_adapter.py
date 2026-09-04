@@ -38,6 +38,36 @@ import torch
 import torch.nn as nn
 
 
+def transformer_blocks(lm) -> nn.ModuleList:
+    """The list of decoder blocks, for the several names the libraries use.
+
+    The read layers are attached with forward hooks, so the layer needs a handle on the blocks
+    themselves. ``lm.transformer.h`` is GPT-2's name for them; GPT-NeoX calls the same thing
+    ``gpt_neox.layers`` and the Llama family ``model.layers``. Nothing else about the core is
+    assumed: the hook takes the first element when a block returns a tuple and the tensor itself
+    when it does not, which covers all three.
+    """
+    for path in ("transformer.h", "gpt_neox.layers", "model.layers", "transformer.blocks"):
+        obj = lm
+        for part in path.split("."):
+            obj = getattr(obj, part, None)
+            if obj is None:
+                break
+        if obj is not None:
+            return obj
+    raise TypeError(f"cannot find the decoder blocks of {type(lm).__name__}; "
+                    f"add its attribute path to transformer_blocks()")
+
+
+def hidden_size(lm) -> int:
+    cfg = lm.config
+    for name in ("hidden_size", "n_embd", "d_model"):
+        v = getattr(cfg, name, None)
+        if isinstance(v, int):
+            return v
+    raise TypeError(f"cannot find the hidden size of {type(lm).__name__}")
+
+
 @dataclass
 class AdapterConfig:
     n_relations: int = 4
@@ -56,6 +86,11 @@ class AdapterConfig:
     match_gate: bool = False       # E-000018: scale the injection by how well the query matches ANY real cell key.
                                    # The routing softmax always sums to one, so some cell always wins and the layer
                                    # injects into text it has no key for; an absolute match score can say "nothing".
+    payload_from: str = "output"   # E-000027: which embedding matrix the injected value is built from.
+                                   # 'output' is the only correct choice -- the payload has to raise the
+                                   # object's logit at the LM head, and the head scores against the OUTPUT
+                                   # matrix. GPT-2 ties the two, so 'input' is indistinguishable there;
+                                   # on an untied model it is the control arm that should fail.
     fallback: str = "unknown"      # 'unknown': a null / unsigned / revoked read emits ' unknown';
                                    # 'prior' (E-000013): it injects nothing, so the pretrained distribution returns
 
@@ -70,7 +105,7 @@ class KnowledgeAdapterLM(nn.Module):
         for p in self.lm.parameters():
             p.requires_grad_(False)
         self.cfg = cfg
-        d = lm.config.n_embd
+        d = hidden_size(lm)
         self.d = d
         self.register_buffer("entity_token_ids", torch.as_tensor(list(entity_token_ids), dtype=torch.long))
         self.register_buffer("candidate_ids", torch.as_tensor(list(entity_token_ids) + [unknown_token_id], dtype=torch.long))
@@ -126,7 +161,8 @@ class KnowledgeAdapterLM(nn.Module):
             self.null_value = nn.Parameter(torch.zeros(len(cfg.read_layers), d), requires_grad=False)
         self.scale = nn.Parameter(torch.tensor(1.0))
         self._ctx: Optional[Dict] = None
-        self._hooks = [lm.transformer.h[l].register_forward_hook(self._make_hook(i, l)) for i, l in enumerate(cfg.read_layers)]
+        blocks = transformer_blocks(lm)
+        self._hooks = [blocks[l].register_forward_hook(self._make_hook(i, l)) for i, l in enumerate(cfg.read_layers)]
 
     @property
     def w_in(self) -> torch.Tensor:
@@ -174,7 +210,8 @@ class KnowledgeAdapterLM(nn.Module):
 
     def encode_bank(self, bank: Dict[str, torch.Tensor]) -> Dict[str, torch.Tensor]:
         subj = self.w_in[self.entity_token_ids[bank["subject"]]]     # a key, not a logit direction
-        obj = self.w_out[self.entity_token_ids[bank["obj"]]]
+        w_val = self.w_in if self.cfg.payload_from == "input" else self.w_out
+        obj = w_val[self.entity_token_ids[bank["obj"]]]
         keys = self.k_proj(self.ln_key(subj + self.rel_emb(bank["relation"])))
         g = self.gate(bank["marker"])
         payload = self.v_proj(obj)
@@ -192,7 +229,7 @@ class KnowledgeAdapterLM(nn.Module):
             payload = payload / (payload.pow(2).mean(-1, keepdim=True).sqrt() + 1e-6)
             values = payload * g
         else:
-            unk = self.v_proj(self.w_out[self.candidate_ids[-1]][None])        # the ' unknown' direction
+            unk = self.v_proj(w_val[self.candidate_ids[-1]][None])             # the ' unknown' direction
             # the gate selects between the payload and "unknown": an unsigned payload READS AS unknown.
             # (a mere attenuation would be undone by the RMS-matched injection downstream)
             values = payload * g + unk * (1 - g)

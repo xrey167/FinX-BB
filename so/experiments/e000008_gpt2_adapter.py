@@ -108,12 +108,23 @@ def targets_of(queries: List[Query], bank: Bank, world: World) -> torch.Tensor:
 class GPT2Knowledge:
     """Everything needed to run the adapter: tokenizer, entity names, model."""
 
-    def __init__(self, cfg: AdapterConfig, n_entities: int = 256):
-        from transformers import GPT2LMHeadModel, GPT2TokenizerFast
-        self.tok = GPT2TokenizerFast.from_pretrained("gpt2")
-        self.tok.pad_token = self.tok.eos_token
+    def __init__(self, cfg: AdapterConfig, n_entities: int = 256, model_name: str = "gpt2"):
+        """``model_name`` is any causal LM the adapter can hook.
+
+        It stays "gpt2" for every recorded experiment, and the Auto classes return exactly the GPT-2
+        classes for that name, so naming it changes nothing here. E-000027 uses the parameter to put
+        the same layer on a model that does not tie its embeddings.
+        """
+        from transformers import AutoModelForCausalLM, AutoTokenizer
+        self.model_name = model_name
+        self.tok = AutoTokenizer.from_pretrained(model_name)
+        if self.tok.pad_token is None:
+            self.tok.pad_token = self.tok.eos_token
         self.tok.padding_side = "right"
-        lm = GPT2LMHeadModel.from_pretrained("gpt2")
+        lm = AutoModelForCausalLM.from_pretrained(model_name)
+        # some checkpoints (Pythia among them) are stored in fp16; the adapter is fp32 and the two do
+        # not multiply. GPT-2 ships fp32, so this is a no-op for every recorded experiment.
+        lm = lm.float()
         lm.eval()
         self.entity_ids = select_entities(self.tok, n_entities)
         self.names = [self.tok.decode([i]) for i in self.entity_ids]
