@@ -1,0 +1,65 @@
+# SO — reproduction targets. Every timing below was measured on a 4-core CPU box
+# with no GPU; the per-model figures come from the 'train_seconds' field of the
+# recorded results, so they are what this code actually took, not an estimate.
+#
+#   make test | smoke | synthetic | gpt2 | report | clean-results
+#
+# PY       which interpreter to use          (default: python3, or .venv/bin/python if present)
+# THREADS  torch threads per experiment      (default: all cores)
+# SEEDS    seeds for the heavy targets       (default: 0 1 2)
+
+PY ?= $(shell [ -x .venv/bin/python ] && echo .venv/bin/python || echo python3)
+THREADS ?= $(shell nproc)
+SEEDS ?= 0 1 2
+RUN = OMP_NUM_THREADS=$(THREADS) SO_THREADS=$(THREADS) $(PY) -m
+
+.PHONY: help test smoke synthetic gpt2 report clean-results env
+
+help:
+	@echo "make test        unit tests, ~10 s"
+	@echo "make smoke       reduced synthetic chain, ~15 min, writes *-quick records"
+	@echo "make synthetic   recorded synthetic chain, ~3 h on 4 cores"
+	@echo "make gpt2        frozen-GPT-2 chain, ~20 h on 4 cores, downloads GPT-2 once"
+	@echo "make report      rebuild docs/so-results-2026-09-02.md from so/results/"
+	@echo "make env         print what will be used"
+	@echo ""
+	@echo "variables: PY=$(PY)  THREADS=$(THREADS)  SEEDS=$(SEEDS)"
+
+env:
+	@$(PY) -c "import sys, torch, numpy; print('python', sys.version.split()[0]); print('torch', torch.__version__); print('numpy', numpy.__version__); print('threads', torch.get_num_threads())"
+	@echo "free disk:"; df -h . | tail -1
+	@echo "note: the full gpt2 target writes about 500 MB of checkpoints into so/results/checkpoints/"
+
+test:
+	$(PY) -m pytest so/tests -q
+
+# ---------------------------------------------------------------- smoke: minutes
+smoke:
+	$(RUN) so.experiments.run_all --quick
+
+# ------------------------------------------------------- synthetic chain: hours
+# measured per model: E-000001-B 2.2 min, E-000002 1.2 min, E-000014 19.7 min,
+# E-000015 7.7 min. Everything here is the small transformer trained from scratch.
+synthetic:
+	$(RUN) so.experiments.run_all
+	$(MAKE) report
+
+# ------------------------------------------------------------ GPT-2 chain: many hours
+# measured per model: E-000008 20 min, E-000011 47 min, E-000012 48 min,
+# E-000013 66 min, E-000017-B 42 min, E-000020 89 min. Three seeds each.
+gpt2:
+	$(RUN) so.experiments.e000008_gpt2_adapter --seeds $(SEEDS)
+	$(RUN) so.experiments.e000011_gpt2_v2 --seeds $(SEEDS)
+	$(RUN) so.experiments.e000012_status_gated_revoke --seeds $(SEEDS)
+	$(RUN) so.experiments.e000013_prior_conflict --seeds $(SEEDS)
+	$(RUN) so.experiments.e000017_paraphrase_gap --phase train --seeds $(SEEDS)
+	$(RUN) so.experiments.e000017_paraphrase_gap --phase diagnose --seeds $(SEEDS)
+	$(RUN) so.experiments.e000020_symlink_gpt2 --seeds $(SEEDS)
+	$(MAKE) report
+
+report:
+	$(PY) -m so.report
+
+# results are the record; this only removes the reduced smoke output
+clean-results:
+	rm -f so/results/*-quick.json so/results/*-quick.md so/results/*-smoke.json so/results/*-smoke.md

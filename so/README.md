@@ -25,7 +25,45 @@ Code behind the SO documents in `docs/`:
 | `so/experiments/` | E-000001-A, E-000001-B, E-000002 … E-000008, `run_all.py` |
 | `so/tests/` | Unit tests |
 
-## Running
+## Running it on an Ubuntu server
+
+Nothing here needs a GPU. Every recorded number was produced on a four-core CPU box.
+
+```bash
+git clone <this repository> && cd FinX-BB
+./setup.sh                 # apt packages, a virtualenv, CPU-only PyTorch, then the unit tests
+make test                  # 45 unit tests, about 10 seconds
+make smoke                 # a reduced version of the whole synthetic chain, about 15 minutes
+```
+
+`setup.sh --system` skips the virtualenv. If you keep the virtualenv but do not activate it, pass it
+along: `make smoke PY=.venv/bin/python`.
+
+| target | what it runs | measured cost on 4 cores |
+|---|---|---|
+| `make test` | unit tests | ~10 s |
+| `make smoke` | the synthetic chain at one seed and 800 steps, records get a `-quick` suffix | ~15 min |
+| `make synthetic` | the recorded synthetic chain: E-000001-A through E-000010, plus 10k cells, symlink cells, alias chains, the fresh-seed chance test and the gate error rates | ~3 h |
+| `make gpt2` | the frozen-GPT-2 chain: E-000008, E-000011, E-000012, E-000013, E-000017, E-000020 | ~20 h, downloads GPT-2 once (~550 MB) |
+| `make report` | rebuilds `docs/so-results-2026-09-02.md` from whatever is in `so/results/` | seconds |
+| `make env` | prints interpreter, versions, thread count and free disk | instant |
+
+Useful knobs: `make gpt2 SEEDS="0"` for one seed instead of three, `make synthetic THREADS=8` on a
+bigger machine, and `python -m so.experiments.run_all --only e000015 e000016` to run part of a chain.
+
+The per-model costs below are the `train_seconds` field of the recorded results, so they are what
+this code actually took rather than an estimate: mini transformer 2.2 min, 10k-cell bank 19.7 min,
+symlink cells 7.7 min, GPT-2 adapter 20 min, GPT-2 v2 47 min, prior conflict 66 min, symlink in
+GPT-2 89 min. Three seeds each unless you change `SEEDS`.
+
+Disk: the GPT-2 chain writes about 500 MB of cached adapters into `so/results/checkpoints/`, which
+is not committed. Re-running an experiment reuses those checkpoints and only re-evaluates; pass
+`--force` to retrain.
+
+Network: only the frozen-GPT-2 experiments need it, and only once, to fetch `gpt2` from the Hugging
+Face hub. Set `HF_HOME` to move the cache. The synthetic chain runs fully offline.
+
+## Running individual experiments
 
 ```bash
 pip install -r so/requirements.txt     # numpy, torch (CPU is enough), pytest, transformers (E-000008)

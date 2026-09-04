@@ -26,21 +26,31 @@ CHAIN = [
     ("so.experiments.e000009_verification_gate",
      ["--gate-weight", "5.0", "--balanced", "--name", "e000010_balanced_gate", "--experiment", "E-000010"],
      ["--seeds", "0", "1", "--steps", "800", "--gate-weight", "5.0", "--balanced", "--name", "e000010_balanced_gate", "--experiment", "E-000010"]),
+    ("so.experiments.e000014_bank_10k", [], ["--seeds", "0", "--steps", "800"]),
+    ("so.experiments.e000015_symlink_cells", ["--skip-deref2"], ["--seeds", "0", "--steps", "800", "--skip-deref2"]),
+    ("so.experiments.e000016_alias_chains", [], ["--seeds", "0", "--steps", "800"]),
+    ("so.experiments.e000019_fresh_seed_chance", ["--seeds", "5", "6", "7"], ["--seeds", "5", "--steps", "800"]),
+    ("so.experiments.e000021_gate_error_rates", [], ["--n", "20000"]),
 ]
-# E-000008 (frozen GPT-2 + adapter) is not part of the chain: it needs 'transformers' and ~20 min per seed on CPU.
+# The frozen-GPT-2 experiments are NOT in this chain: they need `transformers`, download GPT-2 once,
+# and cost between 20 and 90 minutes per seed on a CPU. Run them with `make gpt2`, or one at a time.
 
 
 def main() -> None:
     ap = argparse.ArgumentParser()
-    ap.add_argument("--quick", action="store_true")
+    ap.add_argument("--quick", action="store_true", help="reduced seeds and steps; records get a -quick suffix")
+    ap.add_argument("--only", nargs="*", default=None, help="run only these modules (substring match)")
     args = ap.parse_args()
     if args.quick:
         import os
         os.environ["SO_RESULT_SUFFIX"] = "-quick"
     t0 = time.time()
-    for module, full_args, quick_args in CHAIN:
-        print(f"\n################ {module} ################", flush=True)
+    chain = [c for c in CHAIN if not args.only or any(o in c[0] for o in args.only)]
+    for i, (module, full_args, quick_args) in enumerate(chain, 1):
+        print(f"\n################ [{i}/{len(chain)}] {module} ################", flush=True)
+        t = time.time()
         importlib.import_module(module).main(quick_args if args.quick else full_args)
+        print(f"################ {module} took {time.time() - t:.0f}s", flush=True)
     print(f"\nchain finished in {time.time() - t0:.0f}s")
 
 
