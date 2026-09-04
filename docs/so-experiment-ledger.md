@@ -2603,6 +2603,67 @@ store design pattern that Raeesi and Roed name as future work and SQL-92 impleme
 pod experiments are a documented null at 124M parameters. There is no ninth claim to put in this
 paragraph, and the sweep that was asked to find one, with "none" allowed, said none.
 
+### 31.36 The target, clause by clause: dynamic knowledge through pods that behaves like the model's own (2026-09-04)
+
+The target, as stated at the end of the session: *knowledge added at runtime through pods, behaving
+like the model's own knowledge, with its own delete / modify / version through the pod and the
+marker, easy to add like a container, and made the same as internal knowledge by the symlinks.* A
+five-agent prior-art sweep on exactly that bundle — runtime knowledge pods with lifecycle, overlaying
+the parametric base — returned four verdicts of the same shape: **every property is owned by a
+published system, the overlay semantics are 1995 union mounts, and the composition is engineering,
+not novelty.** What follows is the target against this repository's own records, worst seed, every
+number re-read from the result files for this entry.
+
+| clause of the target | delivered? | the record |
+|---|---|---|
+| add like a container | **yes at synthetic scale; in GPT-2 at a strong template only** | E-000014: 10,000 cells, direct 1.0000, provenance 0.9998. E-000026 (GPT-2): direct 0.5633 and alias 0.5000 at template 0 — FAIL against 0.85 / 0.80 — and 0.9933 / 0.8600 at the strong template — PASS. §31.21: the gap is token position, removable by a prefix without training. |
+| behaves like the model's own knowledge | **no, by the editing field's own metrics** | E-000013: override 1.0000 on the trained template, `override_heldout_min` **0.0000** on held-out phrasings; natural held-out reading 0.66 with 88.6% of the gap in addressing (E-000039-A). Injection on generic text: `generic/kl_to_base` 2.27 nats (E-000013) and 3.27, worst 3.65 (E-000017-B), against a 0.05 bar — a locality failure. ROME reports ~96% paraphrase success; RippleEdits alias 86.8–100%. |
+| composes | **yes** | E-000016: two dereference slots resolve two-link chains at 1.0000, all five claim groups "yes"; GPT-2 hop2 0.9350 (E-000013). |
+| own delete, modify, version | **operations yes; certified for REVOKE (both gates) and SHRED (hard gate) in GPT-2; holed elsewhere** | Thirteen operations in `so/mvcc.py`. E-000030: interface-level certificate, invariant for every query. But SHRED in the synthetic model gives the object up at **1.0000** through the ungated reverse key (E-000028), and the gate's operational radius is 0.90 against the declared 0.35 (E-000029). |
+| delete reverts to the prior (the overlay) | **on the trained phrasing only, and by construction** | E-000013: `revoke/kl_to_base` 0.0004 (worst 0.0005) PASS; `revoke/heldout_kl_max` 3.70, worst **4.47**, against 0.1 FAIL; `revoke/top1_matches_base_pooled` 0.7617, worst 0.7300, against 0.95 FAIL; `fallback_after_revoke_by_construction` **no**. |
+| traceless | **no — referentially clean, not history independent** | E-000046 third run: BLANK raw disclosure 0.0000, exported-level history independence **0.0000** on cells with an alias (3.1 residue rows), raw-level 0.0000 everywhere (§31.35). |
+| the symlinks make external the same as internal | **half** | LINK cells share one object across alias *keys*: E-000015 update reach 1.0000 against 0.0000 in the copy arm, object recoverable by probe after one SHRED 0.7% against 87.3%; in GPT-2, update reach 0.8850 worst seed against the 0.90 bar (E-000026); rollback through an alias 0.5000 FAIL. *Phrasings* are not symlinked at all — they are learned addressing (§31.7, §31.21), and that is where the held-out failures live. |
+
+Read across: the row has the conjunction as *operations*, and fails its own bars on the three
+properties the target names as the point — behaves like own knowledge, reverts to the prior off the
+trained phrasing, traceless.
+
+**Owned, as the sweep reports it** (read at source by its agents). The overlay: union mounts
+(Pendry and McKusick, 1995) — upper shadows lower with the base frozen, REVOKE is 4.4BSD's `rm -W`
+that lets the lower file reappear, BLANK is a whiteout that keeps naming the key, which is the
+`T > U` disclosure E-000046 measured. Runtime knowledge entering the computation over a frozen base:
+SERAC (ICML 2022), GRACE (NeurIPS 2023), WISE / MEMOIR / MELO / T-Patcher, SoLA (2026, which names
+"removal reverts to the base" as a primitive), Larimar (ICML 2024), KBLaM (ICLR 2025, > 10K triples,
+add / remove one knowledge token), FILM and Entities-as-Experts (2020–21: one canonical object,
+many mentions, stale objects replaced at inference without training). Delete reverting to the
+parametric prior, *measured*: SILO (perplexity approaches the parametric-only model after removal),
+LMLM with Raeesi and Roed's DEL-OFF (parametric leakage 0.11% over 12,228 alias-closure deletions).
+Certified per-deletion equality with the never-ingested state: Subtract or Replay (Ramesh, July 2026,
+median KL 5.4e-15 at 1B, bitwise on a 48B recurrent model) and Forgetful Attention (August 2026).
+Versioned lifecycle with rollback: MemOS (MemCube, version chain), ChronoMem, OneEdit. Tracelessness
+for AI memory by design: MemTrust's oblivious decay (January 2026). Dependency closure with reference
+counts over agent memory: SBU. Multi-phrasing-to-one-entry: GRACE's expand rule, MELO's clusters,
+MEMOIR's mask retrieval. On the "own knowledge" half the literature is ahead of this repository, not
+behind it.
+
+**The one thing the sweep could not find, at its exact size.** An *explicit pointer row* — alias as
+address, rather than as copy, as learned radius, or as separate triple — inside a memory whose payload
+enters the computation, run against a duplication arm of the same world under the same trained
+reader, with the full battery (UPDATE, SHRED, REVOKE one alias, RELINK, dangling pointer after
+DELETE) taken through every alias, and the reader's price for the indirection measured (0.0954 for
+sharing, 0.0688 for link training, E-000025). Raeesi and Roed propose the row and call it directly
+testable; nobody publishes the paired arm. That is a measurement contribution, not a mechanism, and
+it is the same scoping §31.17 reached before any of this session's reviews. It is not an eighth or a
+ninth or a tenth claim, and the four sweeps that were asked to find one, with "none" allowed, said
+none.
+
+**What the target needs next, if it is pursued as engineering.** The failures above are specific:
+the prefix fix for token position (§31.21, no training); a paraphrase-generalisation measurement on
+the standard benchmarks against ROME / GRACE / SoLA rather than against this repository's own bars;
+E-000047 for the pod objective where the failure exists; and the key-channel sweep of E-000028 on the
+symlink arms, which has still never been run. None of these is a novelty; each is a number the target
+does not yet have.
+
 ### 31.8 Boundary
 
 CPU only, no GPU, no LLM above 124M parameters, synthetic worlds, single-token entities, two surface forms per relation, one session. Nothing here shows unlearning of facts already encoded in pretrained weights. Evidence levels recorded: E3–E4 for the synthetic system (F4 for SHRED with the verified gate, E-000010 — **on the value channel only**: E-000028 recovers the shredded object at 1.0000 through the ungated reverse key, where REVOKE and DELETE are at chance, so F4 for SHRED is a claim about answers, logits, hidden states and probes and not about routing); E5 as substrate for the frozen-GPT-2 experiment, with reading, composition, update and the copy bound supported and behavioural deletion not yet supported at the pre-registered thresholds.
