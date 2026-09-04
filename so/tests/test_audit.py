@@ -984,3 +984,127 @@ def test_sweeping_the_stores_own_bank_covers_the_tensors_the_model_reads():
     raw2, ten2 = snapshot()
     assert not all(np.array_equal(raw1[k], raw2[k]) for k in raw1)
     assert not all(torch.equal(ten1[k], ten2[k]) for k in ten1)
+
+
+# --------- exactly zero is not absent: a hard gate hides the payload in the sign bits
+
+def _hard_gated(value=-20.0):
+    m = _model(hard_gate=True)
+    with torch.no_grad():
+        m.marker_gate[-1].weight.zero_()
+        m.marker_gate[-1].bias.fill_(value)
+    return m
+
+
+def test_multiplying_by_exactly_zero_keeps_the_payload_in_the_sign_bits():
+    """IEEE-754 has a signed zero, and ``x * 0.0`` preserves the sign of ``x``.
+
+    So a hard gate does not erase the payload from the value channel: it maps it onto a vector of
+    signed zeros whose sign PATTERN is still a function of the object. Numerically the tensor is all
+    zeros for every payload; bitwise, every payload gives a different tensor.
+    """
+    m = _hard_gated()
+    a = _bank(p_shred=1.0)
+    with torch.no_grad():
+        assert float(m.gate(a["marker"]).max()) == 0.0        # the gate really is exactly zero
+
+    def v_at(value):
+        b = {k: (v.clone() if torch.is_tensor(v) else v) for k, v in a.items()}
+        b["obj"][0] = value
+        with torch.no_grad():
+            return m.encode_bank(b)["v_f"][0]
+
+    patterns = {tuple(torch.signbit(v_at(o)).tolist()) for o in range(N_ENT)}
+    assert len(patterns) == N_ENT, "every payload value must give its own sign pattern"
+    assert torch.equal(v_at(3), v_at(11))                     # and numerically they are all equal
+
+
+def test_the_comparator_is_bitwise_at_zero_tolerance():
+    """The certificate's stated claim is bit-identity. Until this was fixed it compared numerically,
+    and exactly-zero multiplication is the one operation where those two answers differ."""
+    from so.audit import _compare
+    a = torch.tensor([0.0, -0.0, 1.0])
+    b = torch.tensor([-0.0, 0.0, 1.0])
+    assert torch.equal(a, b)                                  # numerically identical
+    assert _compare([("v", a)], [("v", b)], 0.0)              # bitwise not, and the comparator says so
+    assert _compare([("v", a)], [("v", b)], 0.0)[0][0].endswith("<bits>")
+    assert not _compare([("v", a)], [("v", b)], 1e-9)         # a caller who accepts a tolerance
+    assert not _compare([("v", a)], [("v", a)], 0.0)          # and identical bits are identical
+
+
+def test_the_hard_gate_no_longer_earns_a_certificate_it_did_not_deserve():
+    """E-000030 recorded SHRED as CERTIFIED under the hard gate. It was the comparator's blind spot."""
+    m = _hard_gated()
+    a = _bank(p_shred=1.0)
+    cert = certify_encoding(m, a, [0], N_ENT, interface_keys=("k_f", "v_f", "k_r", "v_r", "active"))
+    assert not cert.output_certified, cert.summary()
+    assert cert.violations[0].module.endswith("<bits>]"), cert.violations[0].module
+
+
+def test_taking_the_row_out_of_the_bank_still_certifies_because_there_is_no_tensor_to_sign():
+    """The contrast that keeps the fix from being a blanket refusal: EVICT has no row, so no bits."""
+    m = _hard_gated()
+    a = _bank(p_shred=0.0)
+    keep = torch.ones(a["subject"].shape[0], dtype=torch.bool)
+    keep[:2] = False
+    kept = {k: (v[keep] if torch.is_tensor(v) and v.shape[:1] == keep.shape else v) for k, v in a.items()}
+    assert certify_encoding(m, kept, [], N_ENT).output_certified
+
+
+def test_the_activation_audit_sees_the_sign_bits_too():
+    """audit_independence had the same numerical comparison in both of its two places.
+
+    The full model is the wrong instrument for this: it hooks every submodule, so ``ent_emb``,
+    ``v_fwd``, ``ln_key`` and ``k_rev`` all differ numerically before any gate is applied, and a
+    sign-of-zero residue would be lost among them. A module whose ONLY output is the gated product
+    isolates the property, which is the point of a unit test.
+    """
+    import torch.nn as nn
+
+    class Zeroer(nn.Module):
+        """The gate, as a submodule, so the activation hook captures the signed zeros themselves."""
+        def forward(self, x):
+            return x * torch.zeros(1)
+
+    class GatedOnly(nn.Module):
+        """out = payload * 0.0 -- numerically constant, bitwise a function of the payload."""
+        def __init__(self):
+            super().__init__()
+            self.proj = nn.Linear(4, 8, bias=False)
+            self.gate = Zeroer()
+
+        def forward(self, x):
+            return self.gate(self.proj(x))
+
+    torch.manual_seed(0)
+    mod = GatedOnly().eval()
+    xa = torch.tensor([[1.0, -2.0, 3.0, -4.0]])
+    xb = torch.tensor([[-5.0, 6.0, -7.0, 8.0]])
+    with torch.no_grad():
+        assert torch.equal(mod(xa), mod(xb))                  # numerically identical
+        assert (torch.signbit(mod(xa)) != torch.signbit(mod(xb))).any()   # bitwise not
+
+    res = audit_independence(mod, lambda: mod(xa), lambda: mod(xb))
+    assert not res.output_independent, res.summary()
+    assert not res.activation_independent
+    assert any(d.output.endswith("<bits>") for d in res.output_differences), \
+        [d.output for d in res.output_differences]
+    # the gate submodule's own output is numerically constant and bitwise not, so its difference is
+    # the bit one; proj's is an ordinary numerical difference and is reported as a magnitude
+    gate_diffs = [d for d in res.differences if d.base == "gate"]
+    assert gate_diffs and all(d.output.endswith("<bits>") for d in gate_diffs), \
+        [(d.module, d.output) for d in res.differences]
+    assert any(d.base == "proj" and not d.output.endswith("<bits>") for d in res.differences)
+
+
+def test_the_activation_audit_still_reports_ordinary_differences_by_magnitude():
+    """The bitwise check is additive: a real numerical difference is still reported as one."""
+    m = _model()
+    _shut_gate(m)
+    a = _bank(p_shred=1.0)
+    rows = np.arange(a["subject"].shape[0])
+    b = perturbed_objects(a, rows, N_ENT)
+    q = _queries(a)
+    res = audit_independence(m, _run(m, a, q), _run(m, b, q))
+    assert not res.activation_independent
+    assert any(d.max_abs > 1.0 for d in res.differences)      # magnitudes, not bit counts

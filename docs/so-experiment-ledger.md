@@ -1646,6 +1646,55 @@ Two limits, stated because the number invites over-reading. It is a property of 
 that compacts its aliases on deletion, or never exports the target key, has no such channel. And it
 measures what a reader of the bank can see, not what the model exposes to someone who cannot.
 
+### 31.20 Exactly zero is not absent: the certificate compared numbers where it claimed to compare bits (2026-09-04)
+
+`Certificate`'s docstring says the model "returns bit-identical tensors". `_compare` implemented
+`(a - b).abs().max() > atol`. IEEE-754 has a signed zero, `-0.0 == 0.0` is true, and `x * 0.0`
+preserves the sign of `x` — so a multiplicative gate at exactly zero maps the payload onto a vector of
+**signed zeros whose sign pattern is still a function of the payload**, and the comparator could not
+see it. Measured on the synthetic model with `hard_gate=True` and the gate forced shut:
+
+```
+gate on shredded rows                                        exactly 0.0
+v_f numerically equal for every payload value                True
+distinct SIGN-BIT patterns over the 32-value payload domain  32   <- a bijection
+_compare(v_f at obj=3, v_f at obj=11)                        []   <- no violation
+```
+
+Every payload value gives its own bit pattern, and the certificate reported no difference. That is the
+sound-unsafe direction, and it opens **only when the gate is exactly shut** — which is the only
+condition under which a certificate is ever issued.
+
+**The fix.** At `atol == 0` the comparison is now bitwise, via an integer view of the tensor, in
+`_compare` and in both of `audit_independence`'s comparison sites; a violation found this way is
+reported as `<name><bits>` with the fraction of elements whose bits move, because its numerical
+magnitude is exactly zero and reporting that would hide the violation inside its own measurement. At
+`atol > 0` the numerical comparison stands: a caller who accepts a tolerance has given up bit-identity
+and asked a different question. The hard-gated SHRED that used to certify now fails at
+`encode_bank[v_f<bits>]`, and EVICT still certifies, because a row that is not in the bank has no
+tensor to carry a sign.
+
+**Which recorded numbers move: none, and the reason matters.** E-000030's synthetic arms set
+`model.cfg.hard_gate = False` (`e000030…py:110`), where the residue is numerically real and was
+already recorded as a failure. The frozen-GPT-2 arm computes `values = payload·g + unk·(1−g)`
+(`so/llm_adapter.py:240`, the `fallback="unknown"` branch the recorded E-000012 adapter uses), and
+adding a nonzero constant destroys the sign of a zero — at the soft gate the recorded run already
+reports a residual, and the hard-gate arm is being re-run under the fixed comparator rather than
+assumed. What changes is not a number but **what the word "certified" is permitted to mean** from here.
+
+Nor is this a practical attack: an adversary who can call `encode_bank` already holds `bank["obj"]`,
+and the sign of a zero does not survive the next matrix multiply. It is an instrument defect, which is
+the more expensive kind — this is the **fourth** after §31.10, §31.13 and §31.15, and they share one
+shape: an instrument that agrees with its specification on the distribution it was checked against and
+diverges on the one the system actually occupies.
+
+**Provenance.** Found by an adversarial design agent run over the certificate, which measured it on
+the recorded checkpoints before asserting it; its specification is kept verbatim at
+`docs/e000036-spec.md` (renumbered from its own E-000035, which the disclosure experiment had taken).
+The claim was re-derived here before the fix was written. The same document's arm K — whether
+`gate_reverse_key` closes E-000028's channel to chance at n=500, where a pilot at n=20 gives 0.0500
+with a 95% interval of [0.0013, 0.2487] — remains unrun and is the next thing worth running.
+
 ### 31.8 Boundary
 
 CPU only, no GPU, no LLM above 124M parameters, synthetic worlds, single-token entities, two surface forms per relation, one session. Nothing here shows unlearning of facts already encoded in pretrained weights. Evidence levels recorded: E3–E4 for the synthetic system (F4 for SHRED with the verified gate, E-000010 — **on the value channel only**: E-000028 recovers the shredded object at 1.0000 through the ungated reverse key, where REVOKE and DELETE are at chance, so F4 for SHRED is a claim about answers, logits, hidden states and probes and not about routing); E5 as substrate for the frozen-GPT-2 experiment, with reading, composition, update and the copy bound supported and behavioural deletion not yet supported at the pre-registered thresholds.

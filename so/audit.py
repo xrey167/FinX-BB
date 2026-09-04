@@ -146,6 +146,24 @@ class _Recorder:
         self._handles.clear()
 
 
+def _bit_differences(a: torch.Tensor, b: torch.Tensor) -> int:
+    """How many elements differ in their BIT PATTERN, which is what "bit-identical" means.
+
+    Numerical equality is not bit equality, and the gap is not academic here: IEEE-754 has a signed
+    zero, ``-0.0 == 0.0`` is true, and ``x * 0.0`` preserves the sign of ``x``. A hard gate multiplies
+    the payload by exactly 0.0, so ``v_fwd(o) * g`` becomes a vector of signed zeros whose SIGN PATTERN
+    is a function of the payload -- measured on a 32-value domain, all 32 values gave 32 distinct
+    patterns. Numerically the tensor is all zeros either way; bitwise it still carries the object.
+    """
+    if a.numel() == 0:
+        return 0
+    ia = a.detach().contiguous().view(torch.int8 if a.element_size() == 1 else
+                                      torch.int16 if a.element_size() == 2 else
+                                      torch.int32 if a.element_size() == 4 else torch.int64)
+    ib = b.detach().contiguous().view(ia.dtype)
+    return int((ia != ib).sum().item())
+
+
 def audit_independence(model: nn.Module, run_a: Callable[[], Any], run_b: Callable[[], Any],
                        skip: Sequence[str] = (), atol: float = 0.0,
                        outputs_of: Optional[Callable[[Any], Any]] = None) -> AuditResult:
@@ -183,6 +201,13 @@ def audit_independence(model: nn.Module, run_a: Callable[[], Any], run_b: Callab
         d = float((ta - tb).abs().max().item()) if ta.numel() else 0.0
         if d > atol:
             diffs.append(Difference(key.split("|")[0], key.split("|")[1], d, tuple(ta.shape)))
+        elif atol == 0.0 and ta.is_floating_point() and ta.dtype == tb.dtype:
+            # numerical equality is not bit equality: x * 0.0 keeps the sign of x, so a hard-gated
+            # payload survives in the sign bits of a tensor that is numerically all zeros
+            n = _bit_differences(ta, tb)
+            if n:
+                diffs.append(Difference(key.split("|")[0], key.split("|")[1] + "<bits>",
+                                        n / max(ta.numel(), 1), tuple(ta.shape)))
     for key in a:
         if key not in b:
             diffs.append(Difference(key.split("|")[0], key.split("|")[1], float("inf"), tuple(a[key].shape)))
@@ -203,6 +228,11 @@ def audit_independence(model: nn.Module, run_a: Callable[[], Any], run_b: Callab
         d = float((ta - tb).abs().max().item()) if ta.numel() else 0.0
         if d > atol:
             out_diffs.append(Difference("<returned>", name, d, tuple(ta.shape)))
+        elif atol == 0.0 and ta.dtype == tb.dtype:
+            n = _bit_differences(ta, tb)
+            if n:
+                out_diffs.append(Difference("<returned>", name + "<bits>",
+                                            n / max(ta.numel(), 1), tuple(ta.shape)))
 
     return AuditResult(output_independent=not out_diffs, activation_independent=not diffs,
                        n_modules=n_modules, n_tensors=len(shared),
@@ -282,6 +312,15 @@ def _fingerprint(x: Any) -> List[Tuple[str, torch.Tensor]]:
 
 def _compare(ref: List[Tuple[str, torch.Tensor]], got: List[Tuple[str, torch.Tensor]],
              atol: float) -> List[Tuple[str, float]]:
+    """Differences between two fingerprints. At ``atol == 0`` the comparison is BITWISE.
+
+    The certificate's stated claim is that the two computations are bit-identical, and until this was
+    fixed the comparator implemented numerical equality instead. Exactly-zero multiplication is the
+    operation where those two differ, and it is the operation the hard gate performs, so the one
+    configuration that earned a certificate in E-000030 was the one configuration the comparator could
+    not see through. ``atol > 0`` keeps the numerical comparison, because a caller who accepts a
+    tolerance has already given up bit-identity and asked a different question.
+    """
     out: List[Tuple[str, float]] = []
     gd = dict(got)
     for name, a in ref:
@@ -296,6 +335,14 @@ def _compare(ref: List[Tuple[str, torch.Tensor]], got: List[Tuple[str, torch.Ten
         d = float((a - b).abs().max().item()) if a.numel() else 0.0
         if d > atol:
             out.append((name, d))
+            continue
+        if atol == 0.0 and a.dtype == b.dtype:
+            n = _bit_differences(a, b)
+            if n:
+                # numerically identical, bitwise not. The magnitude is reported as the fraction of
+                # elements whose bits move, since the numerical difference is exactly zero and
+                # reporting that would hide the violation inside its own measurement.
+                out.append((f"{name}<bits>", n / max(a.numel(), 1)))
     return out
 
 
