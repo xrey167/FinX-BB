@@ -33,14 +33,24 @@ here, never of the recorded accuracies.  It returns {0, 2, 6, 8, 11} for all fou
 cross that split.  The prediction is specific: the held-out subject-initial forms recover, because the
 invariance trained spans the axis they differ on.
 
-WHAT THE DECIDE PHASE ALREADY FOUND, AND WHY IT SETS THE BAR RATHER THAN CLEARING IT.  On E-000017-B's
-seed-0 checkpoint, 64 targets: reading tracks ADDRESSING template for template (t8 read 0.578 / route
-hit 0.625; t11 0.438 / 0.563; t10 1.000 / 1.000), and the split is exactly the subject-initial one.
-Prepending ``PREFIX`` -- no weight changed -- takes all five subject-initial templates to read 1.0000
-and route hit 1.0000.  So the gap is addressing, the cause is positional, and a prompt-side patch
-already closes it.  The training run is therefore not "can this be fixed" but "can the invariance be
-made intrinsic": the arm has to reach the prefixed numbers WITHOUT the prefix, on phrasings it never
-saw.  If it cannot, the honest recommendation is to normalise the prompt and not to train at all.
+WHAT THE DECIDE PHASE ALREADY FOUND, AND WHY IT SETS THE BAR RATHER THAN CLEARING IT.  Run on
+E-000017-B's three recorded checkpoints (seed 0 at 64 targets, seeds 1 and 2 at 32):
+
+  * reading never exceeds ADDRESSING at any of the twelve templates, and both split on the same axis:
+    seed 0, t8 read 0.578 / route hit 0.625, t11 0.438 / 0.563, t9 0.969 / 0.969, t10 1.000 / 1.000.
+  * over the five subject-initial forms and three seeds, natural reading is 0.6562 (worst cell 0.3125)
+    and natural addressing 0.7927 (worst 0.5312).
+  * prepending ``PREFIX`` -- no weight changed -- gives addressing 640/640 (95% CI 0.9943-1.0000) and
+    reading 639/640.  On the two HELD-OUT subject-initial forms it moves reading 0.4661 -> 1.0000 and
+    addressing 0.6302 -> 1.0000, worst cell in both cases 1.0000.
+  * the tie is not vacuous: the mean cosine of the routing query between two phrasings of the same
+    fact is 0.7868 at read layer 10 (0.7745 at layer 8) against 0.2723 between different facts.
+
+So the gap is addressing, its cause is positional, and a prompt-side patch already closes it.  The
+training run is therefore not "can this be fixed" but "can the invariance be made intrinsic": the arm
+has to reach the prefixed numbers WITHOUT the prefix, on phrasings it never saw.  If it cannot, the
+honest recommendation is to normalise the prompt in the read path, note the scope on the deletion
+certificate, and not train at all.
 
 Run:  python -m so.experiments.e000039_address_tying --phase decide  [--seeds 0 1 2]
       python -m so.experiments.e000039_address_tying --phase train --arm address [--seeds 0 1 2]
@@ -231,7 +241,8 @@ def train_arm(gk: E8.GPT2Knowledge, seed: int, steps: int, arm: str, tie_weight:
 
 # ---------------------------------------------------------------- the measurement that decides
 @torch.no_grad()
-def decompose(gk: E8.GPT2Knowledge, seed: int, centre: np.ndarray, n_targets: int = 100) -> Dict[str, Any]:
+def decompose(gk: E8.GPT2Knowledge, seed: int, centre: np.ndarray, n_targets: int = 100,
+               oracle: bool = True) -> Dict[str, Any]:
     """Split reading, per template, into ADDRESSING and TRANSPORT.
 
       read(t)   top-1 = object, everything addressable      (what E-000017-B reports)
@@ -252,10 +263,12 @@ def decompose(gk: E8.GPT2Knowledge, seed: int, centre: np.ndarray, n_targets: in
     truth = np.array([f.obj for f in targets])
     cstar = np.array([bank.kid_of_key[f.key] for f in targets])
     gk.model.eval()
+    m: Dict[str, Any] = {"seed": seed, "n_targets": len(targets)}
 
     read = np.zeros((N_T, len(targets)), dtype=np.int64)
     hit = np.zeros((N_T, len(targets)), dtype=bool)
     cell = np.zeros((N_T, len(targets)), dtype=np.int64)
+    null0 = np.zeros((N_T, len(targets)), dtype=bool)
     qs = []
     for t in range(N_T):
         texts = [TEMPLATES12[f.relation][t].format(s=gk.names[f.subject]) for f in targets]
@@ -268,6 +281,11 @@ def decompose(gk: E8.GPT2Knowledge, seed: int, centre: np.ndarray, n_targets: in
             read[t, sl] = np.where(a == gk.n_entities, UNKNOWN, a)
             cell[t, sl] = routing[:, -1].numpy().argmax(-1)
             hit[t, sl] = cell[t, sl] == cstar[sl]
+            # The EARLIER read site is supervised to the null column for a 1-hop question
+            # (``route_targets_status_gated`` sets route[i, 0] = -1). If it mis-routes it injects a
+            # wrong entity that competes with the correct one injected at the later site, which is how
+            # a query can hit the right cell at read layer 10 and still answer wrongly.
+            null0[t, sl] = routing[:, 0].numpy().argmax(-1) == routing.shape[-1] - 1
             qt.append(gk.model.last_query.numpy())
         qs.append(np.concatenate(qt))
     # Is the address already invariant?  Mean cosine of the routing query between two phrasings of the
@@ -289,7 +307,7 @@ def decompose(gk: E8.GPT2Knowledge, seed: int, centre: np.ndarray, n_targets: in
     # that still routes to null answers ' unknown' rather than the object: ``oracle_read`` is a lower
     # bound on transport and ``oracle_unknown`` says how much of the shortfall is that choice.
     orc = np.zeros((N_T, len(targets)), dtype=np.int64)
-    for j, f in enumerate(targets):                      # one mask per fact; all twelve forms in one batch
+    for j, f in enumerate(targets if oracle else []):    # one mask per fact; all twelve forms in one batch
         mask = torch.zeros(bank.size, dtype=torch.bool)
         mask[cstar[j]] = True
         ids, am, last = E8.encode_texts(gk.tok, [TEMPLATES12[f.relation][t].format(s=gk.names[f.subject])
@@ -298,13 +316,13 @@ def decompose(gk: E8.GPT2Knowledge, seed: int, centre: np.ndarray, n_targets: in
         a = cand.argmax(-1).numpy()
         orc[:, j] = np.where(a == gk.n_entities, UNKNOWN, a)
 
-    m: Dict[str, Any] = {"seed": seed, "n_targets": len(targets)}
     r = {t: float((read[t] == truth).mean()) for t in range(N_T)}
-    o = {t: float((orc[t] == truth).mean()) for t in range(N_T)}
+    o = {t: (float((orc[t] == truth).mean()) if oracle else float("nan")) for t in range(N_T)}
     for t in range(N_T):
         kind = "train" if t < N_TRAIN else "heldout"
         m[f"t{t}/{kind}/read"] = r[t]
         m[f"t{t}/{kind}/route_hit"] = float(hit[t].mean())
+        m[f"t{t}/{kind}/first_read_null"] = float(null0[t].mean())
         m[f"t{t}/{kind}/oracle_read"] = o[t]
         m[f"t{t}/{kind}/oracle_unknown"] = float((orc[t] == UNKNOWN).mean())
     # the positional intervention: same weights, same fact, subject no longer token 0
@@ -333,7 +351,8 @@ def decompose(gk: E8.GPT2Knowledge, seed: int, centre: np.ndarray, n_targets: in
     m["heldout/gap"] = g
     m["heldout/residual_gap"] = s
     # the deciding number: the share of the held-out reading gap that forcing the address closes
-    m["heldout/routing_share"] = float(np.clip(1.0 - s / g, 0.0, 1.0)) if g > 1e-9 else float("nan")
+    m["heldout/routing_share"] = (float(np.clip(1.0 - s / g, 0.0, 1.0)) if (oracle and g > 1e-9)
+                                  else float("nan"))
     return m
 
 
@@ -367,6 +386,9 @@ def main(argv: Optional[List[str]] = None) -> Dict[str, Any]:
     ap.add_argument("--seeds", type=int, nargs="*", default=[0, 1, 2])
     ap.add_argument("--steps", type=int, default=3000)
     ap.add_argument("--n-targets", type=int, default=100)
+    ap.add_argument("--no-oracle", action="store_true",
+                    help="skip the cell_mask arm: the prefix intervention is the cheap decisive one "
+                         "(~5 min/seed against ~13)")
     ap.add_argument("--tie-weight", type=float, default=0.5)
     ap.add_argument("--threads", type=int, default=int(os.environ.get("SO_THREADS", "0")))
     ap.add_argument("--force", action="store_true")
@@ -383,7 +405,7 @@ def main(argv: Optional[List[str]] = None) -> Dict[str, Any]:
             gk.model.load_state_dict(ck["adapter"], strict=False)
             gk.model.eval()
             print(f"=== seed {seed}: decomposing E-000017-B's checkpoint ===", flush=True)
-            m = decompose(gk, 1700 + seed, np.asarray(ck["centre"]), args.n_targets)
+            m = decompose(gk, 1700 + seed, np.asarray(ck["centre"]), args.n_targets, not args.no_oracle)
             m["checkpoint_sha256"] = _sha256(path)
             per_seed.append(m)
             print({k: v for k, v in m.items() if "heldout/" in k or k == "best_template"}, flush=True)
@@ -426,7 +448,7 @@ def main(argv: Optional[List[str]] = None) -> Dict[str, Any]:
         out["checkpoint_sha256"] = _sha256(path)
         from so.experiments.e000017_paraphrase_gap import evaluate_templates
         m = evaluate_templates(gk, 1700 + seed, np.asarray(out["centre"]), N_TRAIN)
-        d = decompose(gk, 1700 + seed, np.asarray(out["centre"]), args.n_targets)
+        d = decompose(gk, 1700 + seed, np.asarray(out["centre"]), args.n_targets, not args.no_oracle)
         m["heldout/route_hit_min"] = min(d[f"t{t}/heldout/route_hit"] for t in range(N_TRAIN, N_T))
         m["heldout/routing_share"] = d["heldout/routing_share"]
         m["train_seconds"] = out["train_seconds"]; m["checkpoint_sha256"] = out["checkpoint_sha256"]
