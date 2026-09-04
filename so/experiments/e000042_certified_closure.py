@@ -269,7 +269,8 @@ def run(layer: int, pool_size: int, max_facts: int, seeds: Sequence[int], thread
             "musthit_vacuous": float(np.mean([c.vacuous for c in certs])),
             "musthit_subsets_tested": float(np.mean([c.subsets_tested for c in certs])),
             "lower_bound": bound.lower_bound, "bound_certified": float(bound.certified),
-            "shared_atoms": len(bound.shared_atoms),
+            "shared_atoms": len(bound.shared_atoms), "core_atoms": list(bound.shared_atoms),
+            "support_atoms": [list(x.directions) for x in supports],
             "bound_sound": float(bound.lower_bound <= len(star)),
             "tightness": float(bound.lower_bound / max(len(star), 1)),
             "greedy_excess": float(len(greedy_key) - len(star)),
@@ -303,6 +304,22 @@ def run(layer: int, pool_size: int, max_facts: int, seeds: Sequence[int], thread
         m[k] = float(np.mean([r[k] for r in good]))
     m["bound_sound_min"] = float(np.min([r["bound_sound"] for r in good]))
     m["musthit_advantage"] = m["musthit_rate"] - m["musthit_rate_random"]
+
+    # ------------------------------------------------------------------ the pod, both ways round
+    # WITHIN a fact, the core is the atoms every access path runs through: non-empty means the fact is
+    # stored as one object with several keys, which is a symlink detected in activation space, and it
+    # is why the closure is small. ACROSS facts, those same atoms turning up in another fact's core is
+    # the privacy failure, and it is why the collateral is not small. A design wants the first and not
+    # the second; a frozen model was not asked and these two numbers say what it did anyway.
+    cores = {r["subject"]: set(r["core_atoms"]) for r in good}
+    m["pod_rate"] = float(np.mean([len(c) > 0 for c in cores.values()]))
+    m["core_size"] = float(np.mean([len(c) for c in cores.values()]))
+    shares = [len(cores[a] & cores[b]) / len(cores[a])
+              for a in cores for b in cores if a != b and cores[a]]
+    m["cross_fact_core_overlap"] = float(np.mean(shares)) if shares else float("nan")
+    allsup = [set(x) for r in good for x in r["support_atoms"]]
+    pairs = [len(x & y) / max(len(x | y), 1) for i, x in enumerate(allsup) for y in allsup[i + 1:]]
+    m["support_jaccard_all"] = float(np.mean(pairs)) if pairs else float("nan")
     m["per_fact"] = rows
     m["seconds"] = time.time() - t0
     return m
@@ -313,7 +330,8 @@ KEYS = ["n_held", "n_attempted", "n_measured", "control_bound_can_exceed_one", "
         "support_size", "support_residual", "musthit_rate", "musthit_exhaustive", "musthit_vacuous",
         "musthit_subsets_tested", "lower_bound",
         "bound_certified", "shared_atoms", "bound_sound", "bound_sound_min", "tightness",
-        "musthit_rate_random", "lower_bound_random", "musthit_advantage"]
+        "musthit_rate_random", "lower_bound_random", "musthit_advantage",
+        "pod_rate", "core_size", "cross_fact_core_overlap", "support_jaccard_all"]
 
 CRITERIA = {
     # attack validity: there must be a fact to delete
@@ -398,6 +416,21 @@ def main(argv: Optional[List[str]] = None) -> Dict[str, Any]:
                "put through the identical exhaustive test on the identical table; if a random set of",
                "the same size is must-hit just as often, the pool is one where everything is must-hit,",
                "the decomposition is doing no work, and the bound is about counting.", "",
+               "## The pod, both ways round", "",
+               "WITHIN a fact, the core is the set of atoms every access path runs through. Non-empty",
+               "means the fact is stored as one object with several keys -- a symlink detected in",
+               "activation space -- and it is why the closure is small. ACROSS facts, those same atoms",
+               "turning up in another fact's core is the privacy failure, and it is why the collateral",
+               "is not small. A design wants the first and not the second; a frozen model was not asked",
+               "and these two numbers say what it did anyway.", "",
+               ledger.table(["measure", "mean over facts"],
+                            [["facts whose access paths share a core (stored as a pod)",
+                              f"{m['pod_rate']:.4f}"],
+                             ["atoms in that core", f"{m['core_size']:.2f}"],
+                             ["share of a fact's core that is ANOTHER fact's core too",
+                              f"{m['cross_fact_core_overlap']:.4f}"],
+                             ["Jaccard overlap of supports across all facts and phrasings",
+                              f"{m['support_jaccard_all']:.4f}"]]), "",
                "## What the deletion costs bystanders", "",
                ledger.table(["measure", "mean over facts"],
                             [["bystander facts with nothing removed", f"{m['collateral_before']:.4f}"],
