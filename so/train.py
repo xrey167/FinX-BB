@@ -21,6 +21,7 @@ import torch.nn.functional as F
 from .data import Bank, bank_from_world, encode_queries, sample_training_queries
 from .model import ModelConfig, MutableKnowledgeTransformer
 from .carrier import ablation_loss, privacy_loss
+from .pod import pod_private, pod_queries
 from .world import World
 
 
@@ -51,6 +52,16 @@ class TrainConfig:
     # projection -- which is what stops the model simply learning to play dead when it detects one.
     carrier_privacy: float = 0.0
     carrier_ablation: float = 0.0
+    # E-000044: the POD objective, on the hidden state the readout actually consumes rather than on a
+    # weight tensor. POD pulls every access path of one fact onto one carrier, so the deletion closure
+    # is 1 instead of the number of ways the fact can be asked; PRIVATE pushes the carriers of
+    # different facts apart, hinged at the larger of the Welch bound and the centring floor, so that
+    # removing one leaves the others standing. E-000043 measured that a model has the room for both
+    # and takes neither, which is what makes this a training objective rather than a limit.
+    pod_weight: float = 0.0
+    private_weight: float = 0.0
+    pod_facts: int = 24              # facts per pod batch; every surface form of each is included
+    pod_every: int = 1               # compute the pod terms every N steps
     gate_balanced: bool = False      # E-000010: weight signed and unsigned markers equally (unsigned are ~5% of cells)
     mix: Dict[str, float] = field(default_factory=lambda: {"fwd1": 0.40, "fwd2": 0.25, "fwd3": 0.20, "rev1": 0.15})
     fixed_world: bool = False        # E-000002: train on ONE world so that facts can be memorised
@@ -134,6 +145,19 @@ def train(model_cfg: ModelConfig, cfg: TrainConfig, world_override: Optional[Wor
                 gate_loss = per_cell.mean()
             loss = loss + cfg.gate_weight * gate_loss
         carrier_stats: Dict[str, float] = {}
+        if (cfg.pod_weight > 0 or cfg.private_weight > 0) and step % cfg.pod_every == 0:
+            # A pod loss needs several ACCESS PATHS of one fact in the same batch, and an ordinary
+            # training batch almost never contains two, so the pod batch is built deliberately.
+            picks = rng.choice(len(world.facts), size=min(cfg.pod_facts, len(world.facts)),
+                               replace=False)
+            chosen = [(int(world.facts[i].subject), int(world.facts[i].relation)) for i in picks]
+            pq, fact_ids = pod_queries(world, chosen, rng)
+            pbatch = encode_queries(pq, bank, world, model_cfg.max_hops)
+            _, _, pextras = model(tensors, pbatch.mode, pbatch.start, pbatch.rels, pbatch.hop_valid,
+                                  noise=cfg.train_noise)
+            lp, lpr, pstats = pod_private(pextras["hidden"], fact_ids)
+            loss = loss + cfg.pod_weight * lp + cfg.private_weight * lpr
+            carrier_stats.update(pstats)
         if cfg.carrier_privacy > 0:
             pl, st = privacy_loss(model)
             loss = loss + cfg.carrier_privacy * pl

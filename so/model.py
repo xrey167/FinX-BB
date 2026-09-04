@@ -25,7 +25,7 @@ the observable used as a *biomarker* (ledger section 20).
 from __future__ import annotations
 
 from dataclasses import asdict, dataclass
-from typing import Dict, List, Optional, Tuple
+from typing import Callable, Dict, List, Optional, Tuple
 
 import torch
 import torch.nn as nn
@@ -243,10 +243,17 @@ class MutableKnowledgeTransformer(nn.Module):
     # ------------------------------------------------------------------ forward
     def forward(self, bank: Dict[str, torch.Tensor], mode: torch.Tensor, start: torch.Tensor, rels: torch.Tensor,
                 hop_valid: torch.Tensor, noise: float = 0.0, generator: Optional[torch.Generator] = None,
-                cell_mask: Optional[torch.Tensor] = None) -> Tuple[torch.Tensor, torch.Tensor, Dict[str, torch.Tensor]]:
+                cell_mask: Optional[torch.Tensor] = None,
+                hidden_edit: Optional[Callable[[torch.Tensor], torch.Tensor]] = None
+                ) -> Tuple[torch.Tensor, torch.Tensor, Dict[str, torch.Tensor]]:
         """Returns ``(logits (B, n_entities+1), routing (B, H, C+1), extras)``.
 
         ``cell_mask`` (C,) bool optionally restricts routing further (causal interventions).
+
+        ``hidden_edit`` is applied to the final hidden state immediately before the readout, which is
+        where a subspace ablation has to act if it is to be a deletion rather than a change of input.
+        E-000043 measures deletion subspaces in exactly this state, so this is the hook that lets the
+        same measurement be made on a model this repository trains rather than only on a frozen one.
         """
         B, H = rels.shape
         d = self.cfg.d_model
@@ -261,6 +268,8 @@ class MutableKnowledgeTransformer(nn.Module):
             for t in range(H):
                 h_new = h + self.no_route_ff(x[:, 2 + t] + h)
                 h = torch.where(hop_valid[:, t, None], h_new, h)
+            if hidden_edit is not None:
+                h = hidden_edit(h)
             extras["hidden"] = h
             return self.readout(h), routing, extras
         enc = self.encode_bank(bank, noise=noise, generator=generator)
@@ -292,6 +301,8 @@ class MutableKnowledgeTransformer(nn.Module):
             h = torch.where(valid[:, None], h_new, h)
         extras["gate"] = enc["gate"]
         extras["gate_logits"] = enc["gate_logits"]
+        if hidden_edit is not None:
+            h = hidden_edit(h)
         extras["hidden"] = h
         extras["value_norm"] = torch.cat([v_f.norm(dim=-1)[:-1], v_f.new_zeros(1)]) if self.cfg.use_null_cell else v_f.norm(dim=-1)
         return self.readout(h), routing, extras
