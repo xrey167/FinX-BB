@@ -230,7 +230,12 @@ class KnowledgeAdapterLM(nn.Module):
                 read = read * rms_h * self.inject_gain[read_index]               # static: a zero read stays zero
             else:
                 rms_r = read.pow(2).mean(-1, keepdim=True).sqrt() + 1e-6
-                read = read * (rms_h / rms_r) * self.inject_gain[read_index]    # RMS-matched injection
+                # The ratio is clamped because a read can cancel to almost nothing — the two-channel null
+                # subtracts part of the null value, and an exact cancellation sends rms_r to the epsilon and
+                # the ratio to a million, which is what made E-000022 diverge to NaN on its second seed at
+                # the step where the generic term switches on. In a healthy read the ratio is near one, so
+                # this bound never binds and no recorded result changes.
+                read = read * (rms_h / rms_r).clamp(max=10.0) * self.inject_gain[read_index]
             delta = torch.zeros_like(h)
             delta[ar, ctx["last_idx"]] = read
             if self.cfg.n_deref == 0:

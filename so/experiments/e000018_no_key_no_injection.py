@@ -74,6 +74,7 @@ def train_arm(gk: E8.GPT2Knowledge, seed: int, steps: int, generic_share: float,
     n_extra = int(round(batch_size * extra_unanswerable))
     n_gen = int(round(batch_size * generic_share))
     n_reads = len(model.cfg.read_layers)
+    n_skipped = 0
     for step in range(steps):
         model.train()
         route_only = step < route_only_steps
@@ -112,6 +113,10 @@ def train_arm(gk: E8.GPT2Knowledge, seed: int, steps: int, generic_share: float,
             loss_gen = F.kl_div(la, lb, log_target=True, reduction="batchmean")
         loss = (loss_route + gate_weight * loss_gate) if route_only else \
             (loss_ans + route_weight * loss_route + gate_weight * loss_gate + generic_weight * loss_gen)
+        if not torch.isfinite(loss):
+            n_skipped += 1                      # never update on a non-finite loss; the count is recorded
+            opt.zero_grad(set_to_none=True)
+            continue
         opt.zero_grad(set_to_none=True)
         loss.backward()
         torch.nn.utils.clip_grad_norm_(params, 1.0)
@@ -129,7 +134,9 @@ def train_arm(gk: E8.GPT2Knowledge, seed: int, steps: int, generic_share: float,
                       f"route {rec['route_loss']:.4f}  gen {rec['generic_loss']:.4f}  acc {acc:.3f}  "
                       f"{rec['elapsed_s']:.0f}s", flush=True)
     model.eval()
-    return {"centre": centre, "history": history, "train_seconds": time.time() - t0}
+    if n_skipped:
+        print(f"  WARNING: {n_skipped} of {steps} steps skipped for a non-finite loss", flush=True)
+    return {"centre": centre, "history": history, "train_seconds": time.time() - t0, "skipped_steps": n_skipped}
 
 
 def train_or_load(gk: E8.GPT2Knowledge, seed: int, steps: int, arm: str, force: bool = False) -> Dict[str, Any]:
