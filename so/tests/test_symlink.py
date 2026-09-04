@@ -125,3 +125,98 @@ def test_default_model_is_unchanged_by_the_symlink_extension():
     b = MutableKnowledgeTransformer(model_config(1))
     assert not any(n.startswith(("v_link", "link_rev_key", "deref")) for n, _ in a.named_parameters())
     assert any(n.startswith("deref") for n, _ in b.named_parameters())
+
+
+# ------------- E-000034: what the separate v_link projection gives away, and the arm that closes it
+
+def test_the_two_payload_kinds_go_through_different_parameters_and_start_indistinguishable():
+    """The precondition for E-000034's finding, and the correction to how it was first described.
+
+    A pointer's value and an object's are separable by norm alone at 1.0000 on every recorded
+    checkpoint -- but NOT at initialisation, where the ranges overlap. The separation is therefore
+    LEARNED, not built in. What the architecture supplies is only the freedom: two distinct
+    projections, so nothing couples the two scales and the model is free to tag the kinds apart. It
+    does, completely. ``share_link_value`` removes the freedom; whether the model finds another way is
+    what E-000034's second phase measures.
+    """
+    import torch
+    from so.data import bank_from_store
+    from so.model import ModelConfig, MutableKnowledgeTransformer
+    from so.mvcc import MVCCStore
+    from so.train import make_centre
+
+    centre = make_centre(0, 16)
+    st = MVCCStore(marker_dim=16, seed=0, marker_centre=centre)
+    targets = [st.write(i, 1, 10 + i, provenance="f") for i in range(8)]
+    for i, t in enumerate(targets):
+        st.link(50 + i, 1, t, provenance="a")
+    t = bank_from_store(st).tensors()
+
+    def norms(share: bool):
+        cfg = ModelConfig(n_entities=64, n_relations=4, d_model=32, marker_dim=16, n_core_layers=1,
+                          n_heads=2, use_links=True, n_deref=1, share_link_value=share)
+        torch.manual_seed(0)
+        m = MutableKnowledgeTransformer(cfg).eval()
+        with torch.no_grad():
+            v = m.encode_bank(t)["v_f"].norm(dim=-1).numpy()
+        link = t["is_link"].numpy().astype(bool)
+        return m, v[link], v[~link]
+
+    m, a, b = norms(False)
+    # different parameters carry the two kinds: the model MAY separate them, and E-000034 finds it does
+    assert m.v_link.weight is not m.v_fwd.weight
+    assert a.min() < b.max() and b.min() < a.max(), "at init the ranges must overlap: the gap is learned"
+
+
+def test_sharing_the_value_projection_removes_the_norm_cue():
+    """The remedy, as a property of the encoder rather than of a trained model.
+
+    Both payload kinds through the same LayerNorm and the same projection: the ranges must overlap,
+    so no single threshold can separate them and recognising a pointer stops being free.
+    """
+    import numpy as np
+    import torch
+    from so.data import bank_from_store
+    from so.model import ModelConfig, MutableKnowledgeTransformer
+    from so.mvcc import MVCCStore
+    from so.train import make_centre
+
+    centre = make_centre(0, 16)
+    st = MVCCStore(marker_dim=16, seed=0, marker_centre=centre)
+    targets = [st.write(i, 1, 10 + i, provenance="f") for i in range(8)]
+    for i, t in enumerate(targets):
+        st.link(50 + i, 1, t, provenance="a")
+    cfg = ModelConfig(n_entities=64, n_relations=4, d_model=32, marker_dim=16, n_core_layers=1,
+                      n_heads=2, use_links=True, n_deref=1, share_link_value=True)
+    torch.manual_seed(0)
+    m = MutableKnowledgeTransformer(cfg).eval()
+    t = bank_from_store(st).tensors()
+    with torch.no_grad():
+        v = m.encode_bank(t)["v_f"].norm(dim=-1).numpy()
+    link = t["is_link"].numpy().astype(bool)
+    a, b = v[link], v[~link]
+    assert a.min() < b.max() and b.min() < a.max(), (a.min(), a.max(), b.min(), b.max())
+
+
+def test_the_shared_projection_still_distinguishes_the_two_kinds_somewhere():
+    """Removing the NORM cue must not remove the information: the direction still has to differ, or
+    the model could not follow a pointer at all and the arm would be unfalsifiable."""
+    import torch
+    from so.data import bank_from_store
+    from so.model import ModelConfig, MutableKnowledgeTransformer
+    from so.mvcc import MVCCStore
+    from so.train import make_centre
+
+    centre = make_centre(0, 16)
+    st = MVCCStore(marker_dim=16, seed=0, marker_centre=centre)
+    t0 = st.write(1, 1, 11, provenance="f")
+    st.link(50, 1, t0, provenance="a")
+    cfg = ModelConfig(n_entities=64, n_relations=4, d_model=32, marker_dim=16, n_core_layers=1,
+                      n_heads=2, use_links=True, n_deref=1, share_link_value=True)
+    torch.manual_seed(0)
+    m = MutableKnowledgeTransformer(cfg).eval()
+    t = bank_from_store(st).tensors()
+    with torch.no_grad():
+        v = m.encode_bank(t)["v_f"]
+    link = t["is_link"].numpy().astype(bool)
+    assert not torch.allclose(v[link][0], v[~link][0])

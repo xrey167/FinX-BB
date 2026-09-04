@@ -1486,6 +1486,73 @@ The general rule, which is the third time this programme has paid for it after �
 instrument that cannot fail is not evidence.** A certificate needs a case where it says no, and the
 cheapest way to find whether it has one is to run it on the state the deletion was supposed to change.
 
+### 31.16 A pointer is separable from an object by its norm alone (2026-09-04)
+
+E-000015's record, E-000020's record and the code that produced both say, in these words: *the store
+decides which payload a row carries; the model is never told that a value it has read is a pointer —
+that it must learn.* A prior-art review of the symlink concept asked whether recognising a pointer is
+learned at all or given away by the geometry. E-000034 measured it on the recorded checkpoints:
+
+| value projection | pointer norm | object norm | gap (pooled sd) | best single threshold | linear probe | direct read | alias read |
+|---|---|---|---|---|---|---|---|
+| recorded (separate `v_link`) | 18.557 | 11.917 | 7.6 | **1.0000** | 1.0000 | 1.0000 | 1.0000 |
+
+`encode_bank` carries a fact row's value through `v_fwd(ent_emb(obj))` and an alias row's through
+`v_link(ln_key(ent_emb(link_subject) + cell_rel_emb(link_relation)))` — two projections whose scales
+nothing couples. **At initialisation the two ranges overlap.** The gap is therefore learned, not built
+in: the architecture supplies the freedom to tag the kinds apart and training takes it, completely.
+The first write-up of this finding blamed the architecture and was wrong on that point.
+
+So the recorded sentence is literally true — the model is not told — and false as a claim about
+difficulty, which is what it was doing in the record.
+
+**The claim that survives is narrower and still real: recognising a pointer is free; only following one
+is learned.** E-000016's one-slot arm refuses a two-link chain rather than inventing an answer, which a
+branch on a flag would not do, and E-000015's passthrough column keeps non-pointer values readable.
+What is retired is the difficulty claim, not the capability.
+
+`ModelConfig.share_link_value` is the arm that could earn the original wording back: both payload kinds
+through the same LayerNorm and the same projection. That removes the freedom, not the possibility — the
+model can still learn a scale difference by growing `cell_rel_emb` — so the criterion is a measurement
+and not a theorem. Pre-registered at `shared/norm_threshold_accuracy <= 0.75` with
+`shared/alias_direct >= 0.80`; if resolution collapses without the cue, what gets recorded is the
+design's dependence on it.
+
+### 31.17 What the prior art owns, checked against the sources (2026-09-04)
+
+Six literatures were reviewed for the pod claim before any of §31.15–§31.16 was written up. Two
+findings changed what this work may say, and both were verified against the primary source rather than
+taken from the review.
+
+**The metric already has a name.** What `so/closure.py` computes is RESILIENCE in the database sense —
+the minimum number of tuples whose removal makes a Boolean query false — and the set is a CONTINGENCY
+SET. It is studied under deletion propagation and causal responsibility and carries a PTIME/NP-complete
+dichotomy for self-join-free conjunctive queries. The module now says so, uses those words, and exposes
+`resilience` as the name of `fact_closure`. Inventing vocabulary for an existing metric would have made
+the work unreadable to the people who own it.
+
+**The remedy is already proposed, and not built.** Raeesi and Roed, *Auditing Forgetting in Limited
+Memory Language Models* (arXiv:2607.00605), audit deletion in a database-backed LM over 12,228
+deletions and conclude that parametric leakage is near zero while post-deletion correctness is
+reconstituted from retrieval, so "the unlearning boundary is drawn primarily by the database
+administrator rather than by the model". Their §9 proposes the pod verbatim: *"A second direction is
+canonicalization at write time, in which aliases and paraphrastic forms are stored as pointers into a
+single canonical record rather than as independent triplets."* Their §8 asks for "a closure procedure".
+They report post-deletion correctness and no contingency-set size.
+
+So the pod is not this programme's idea, and the ledger should stop implying it is. What remains, stated
+as narrowly as the evidence allows:
+
+1. the closure **computed** as a store statistic, with a certified lower bound so `optimal` is verified
+   rather than assumed (§31.18, E-000032);
+2. its **composition** with a record-level deletion certificate into a fact-level one — which nobody
+   else can do yet, because E-000030 is the first such certificate in this line of work;
+3. the closure **predicting** the reader: `(closure − 1) / keys_per_group`, computed before the model
+   runs, against what the model actually still answers;
+4. the **price** the neural reader charges for the indirection — 0.0954 for sharing and 0.0688 for link
+   training, worst of three seeds over twelve phrasings (E-000025) — which is the part that is not in
+   Codd, because a join is exact and a learned dereference is not.
+
 ### 31.8 Boundary
 
 CPU only, no GPU, no LLM above 124M parameters, synthetic worlds, single-token entities, two surface forms per relation, one session. Nothing here shows unlearning of facts already encoded in pretrained weights. Evidence levels recorded: E3–E4 for the synthetic system (F4 for SHRED with the verified gate, E-000010 — **on the value channel only**: E-000028 recovers the shredded object at 1.0000 through the ungated reverse key, where REVOKE and DELETE are at chance, so F4 for SHRED is a claim about answers, logits, hidden states and probes and not about routing); E5 as substrate for the frozen-GPT-2 experiment, with reading, composition, update and the copy bound supported and behavioural deletion not yet supported at the pre-registered thresholds.

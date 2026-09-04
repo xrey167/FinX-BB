@@ -10,19 +10,41 @@ a checkpoint: given a fact, how many records have to be removed before no query 
 the deletion closure. It is computed here with the mechanical reference resolver and never touches the
 model, so it says what the store makes possible rather than what one trained network happens to do.
 
+THE QUANTITY ALREADY HAS A NAME, AND IT IS NOT OURS. In the database literature this is RESILIENCE:
+the minimum number of tuples whose removal makes a Boolean query false, and the set itself is a
+CONTINGENCY SET. It is studied with deletion propagation and causal responsibility, and it carries a
+PTIME/NP-complete dichotomy for self-join-free conjunctive queries characterised by a structure called
+a triad (Freire, Gatterbauer, Immerman and Meliou, and the deletion-propagation line that follows it).
+Nothing here invents a metric. What is done here is to compute that metric on a NEURAL memory's store,
+report a certified lower bound beside the greedy answer, and compose it with a model-side deletion
+certificate -- and the names above are used so the result can be read by the people who own them.
+
 Two honest limits, stated because a number without them invites over-reading:
 
-  * The general problem is deletion propagation -- given a view tuple, find a minimal set of base
-    tuples whose removal deletes it -- and it is NP-hard in general. What is computed here is a GREEDY
-    upper bound: repeatedly remove the records the current derivation actually uses, until the answer
-    changes. It is exact when the derivations are disjoint, which is the canonical and the duplicated
-    case alike, and an upper bound when they share records.
+  * Deletion propagation is NP-hard in general, and so is finding the minimum contingency set. What is
+    computed here is a GREEDY upper bound: repeatedly remove the records the current derivation
+    actually uses, until the answer changes. ``fact_closure`` additionally computes a certified lower
+    bound and reports ``optimal`` only when greedy MEETS it, so exactness is verified case by case
+    rather than assumed from the shape of the store.
   * It is a statement about the store's own semantics. A frozen model that already knew the fact from
     pretraining is outside it, which is exactly what E-000013 measured separately.
 
 Why the number matters: a store where every fact has closure size one admits deletion as a single,
 certifiable, constant-cost operation. A store where the distribution has a tail requires a search
 before you can even begin, and every erasure claim about it is a claim about the search.
+
+THE CLOSEST WORK, AND WHAT IT LEAVES OPEN. Raeesi and Roed, "Auditing Forgetting in Limited Memory
+Language Models" (arXiv:2607.00605), audit deletion in a database-backed LM across 12,228 deletions
+and reach the conclusion this module is built on: parametric leakage is near zero and post-deletion
+correctness is reconstituted from retrieval, so "the unlearning boundary is drawn primarily by the
+database administrator rather than by the model". Their section 9 proposes the remedy measured here,
+in these words: "A second direction is canonicalization at write time, in which aliases and
+paraphrastic forms are stored as pointers into a single canonical record rather than as independent
+triplets." It is proposed and not built, and they report post-deletion correctness rather than any
+contingency-set size. So the pod is not a new idea; what is new here is the measurement -- a fact
+closure with a certified lower bound, its composition with a record-level certificate (so.audit), and
+the price a neural reader charges for the indirection (E-000025: 0.0954 for sharing, 0.0688 for link
+training, alias resolution 0.9250 on a held-out phrasing).
 """
 
 from __future__ import annotations
@@ -162,9 +184,12 @@ class FactClosure:
     what the symlink buys.
 
     The search is greedy maximum coverage over the records the live derivations use. The general
-    problem -- deletion propagation -- is NP-hard, so an exact answer is not on offer in general and is
-    not claimed. What IS claimed, when ``optimal`` is set, is verified rather than assumed: see
-    ``lower_bound``.
+    problem -- deletion propagation, and equivalently finding a minimum contingency set -- is NP-hard,
+    so an exact answer is not on offer in general and is not claimed. What IS claimed, when ``optimal``
+    is set, is verified rather than assumed: see ``lower_bound``.
+
+    ``size`` is the RESILIENCE of the Boolean query "some key in ``keys`` still yields ``obj``", and
+    ``records`` is a contingency set for it, in the database sense of both words.
     """
 
     obj: int
@@ -262,6 +287,12 @@ def fact_closure(store: MVCCStore, keys: Sequence[Tuple[int, int]], obj: Optiona
 
     optimal = (not exhausted) and len(removed) == bound
     return FactClosure(obj, targets, tuple(removed), exhausted, bound, optimal)
+
+
+#: The database name for what ``fact_closure`` computes: the minimum contingency set for the Boolean
+#: query "some key still yields this object", and its size is the query's resilience. Aliased so a
+#: reader coming from that literature finds the function under the name they already use.
+resilience = fact_closure
 
 
 def pod_keys(store: MVCCStore, target_kid: int) -> Tuple[Tuple[int, int], ...]:

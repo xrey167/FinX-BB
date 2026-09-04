@@ -27,8 +27,10 @@ hypothesis (sharing versus duplicating):
     NOT erased by the control plane, so discovering the miss is the model's job.
 
 WHAT IS BY CONSTRUCTION AND WHAT IS LEARNED.  The store decides which payload a row carries (the
-target's key instead of an object), exactly as it decides the marker; the model is never told that
-a value it has read is a pointer.  What is learned is to follow it: each hop is followed by a
+target's key instead of an object), exactly as it decides the marker.  E-000034 measured how much
+that gives away: a separate ``v_link`` projection puts a pointer's value at a different scale from an
+object's, and one threshold on the norm separates them at 1.0000 on every recorded seed, so
+RECOGNISING a pointer is free and only FOLLOWING one is learned.  What is learned is to follow it: each hop is followed by a
 dereference slot whose query comes from the pointer alone, and whose passthrough column lets the
 model keep a value that was not a pointer.  Routing therefore names both cells of an alias path,
 which is the provenance claim.
@@ -699,7 +701,8 @@ def main(argv: Optional[List[str]] = None) -> Dict[str, Any]:
                             "a deleted target keeps its key as a tombstone, so a dangling pointer stays a pointer and the "
                             "miss is not pre-resolved by the control plane"],
         "learned": ["following a pointer: the dereference slot's query comes from the value just read, not from the "
-                    "question, and the model is never told that a value is a pointer",
+                    "question. Recognising one is NOT learned: E-000034 tells the two payload kinds "
+                    "apart by the value norm alone at 1.0000 on every recorded seed",
                     "keeping a value that was not a pointer (the passthrough column) so that fact cells still read "
                     "correctly, measured as deref_disabled/direct versus deref_disabled/alias_direct",
                     "answering UNKNOWN for a dangling pointer, for a revoked or shredded alias and for a shredded target",

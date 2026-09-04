@@ -1,0 +1,360 @@
+{
+  "aggregate": {
+    "canonical/control_reachable_before": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 1
+    },
+    "canonical/fact_closure_max": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 1
+    },
+    "canonical/fact_closure_mean": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 1
+    },
+    "canonical/fact_closure_min": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 1
+    },
+    "canonical/fact_closure_optimal_rate": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 1
+    },
+    "canonical/one_record_fact_certified": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 1
+    },
+    "canonical/one_record_payload_absent": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 1
+    },
+    "canonical/one_record_still_readable": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 1
+    },
+    "canonical/per_key_closure_max": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 1
+    },
+    "canonical/per_key_closure_mean": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 1
+    },
+    "canonical/read_before_deletion": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 1
+    },
+    "canonical/whole_closure_fact_certified": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 1
+    },
+    "canonical/whole_closure_still_readable": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 1
+    },
+    "control/interface_identical": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 1
+    },
+    "control/n_keys": {
+      "max": 1050.0,
+      "mean": 1050.0,
+      "min": 1050.0,
+      "n": 1
+    },
+    "control/read_before_deletion": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 1
+    },
+    "duplicated/control_reachable_before": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 1
+    },
+    "duplicated/fact_closure_max": {
+      "max": 3.0,
+      "mean": 3.0,
+      "min": 3.0,
+      "n": 1
+    },
+    "duplicated/fact_closure_mean": {
+      "max": 3.0,
+      "mean": 3.0,
+      "min": 3.0,
+      "n": 1
+    },
+    "duplicated/fact_closure_min": {
+      "max": 3.0,
+      "mean": 3.0,
+      "min": 3.0,
+      "n": 1
+    },
+    "duplicated/fact_closure_optimal_rate": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 1
+    },
+    "duplicated/one_record_fact_certified": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 1
+    },
+    "duplicated/one_record_payload_absent": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 1
+    },
+    "duplicated/one_record_still_readable": {
+      "max": 0.6666666666666666,
+      "mean": 0.6666666666666666,
+      "min": 0.6666666666666666,
+      "n": 1
+    },
+    "duplicated/per_key_closure_max": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 1
+    },
+    "duplicated/per_key_closure_mean": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 1
+    },
+    "duplicated/read_before_deletion": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 1
+    },
+    "duplicated/whole_closure_fact_certified": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 1
+    },
+    "duplicated/whole_closure_still_readable": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 1
+    },
+    "gap/certificates_per_record": {
+      "max": 3.0,
+      "mean": 3.0,
+      "min": 3.0,
+      "n": 1
+    },
+    "n_groups": {
+      "max": 2.0,
+      "mean": 2.0,
+      "min": 2.0,
+      "n": 1
+    }
+  },
+  "arms": [
+    "canonical",
+    "duplicated"
+  ],
+  "criteria": {
+    "claim_supported": true,
+    "criteria": {
+      "canonical/control_reachable_before": {
+        "observed": 1.0,
+        "op": ">=",
+        "pass": true,
+        "threshold": 1.0
+      },
+      "canonical/fact_closure_max": {
+        "observed": 1.0,
+        "op": "<=",
+        "pass": true,
+        "threshold": 1.0
+      },
+      "canonical/fact_closure_optimal_rate": {
+        "observed": 1.0,
+        "op": ">=",
+        "pass": true,
+        "threshold": 1.0
+      },
+      "canonical/one_record_fact_certified": {
+        "observed": 1.0,
+        "op": ">=",
+        "pass": true,
+        "threshold": 1.0
+      },
+      "canonical/one_record_still_readable": {
+        "observed": 0.0,
+        "op": "<=",
+        "pass": true,
+        "threshold": 0.1
+      },
+      "canonical/per_key_closure_max": {
+        "observed": 1.0,
+        "op": "<=",
+        "pass": true,
+        "threshold": 1.0
+      },
+      "canonical/whole_closure_fact_certified": {
+        "observed": 1.0,
+        "op": ">=",
+        "pass": true,
+        "threshold": 1.0
+      },
+      "control/interface_identical": {
+        "observed": 1.0,
+        "op": ">=",
+        "pass": true,
+        "threshold": 1.0
+      },
+      "control/read_before_deletion": {
+        "observed": 1.0,
+        "op": ">=",
+        "pass": true,
+        "threshold": 0.9
+      },
+      "duplicated/control_reachable_before": {
+        "observed": 1.0,
+        "op": ">=",
+        "pass": true,
+        "threshold": 1.0
+      },
+      "duplicated/fact_closure_min": {
+        "observed": 3.0,
+        "op": ">=",
+        "pass": true,
+        "threshold": 3.0
+      },
+      "duplicated/fact_closure_optimal_rate": {
+        "observed": 1.0,
+        "op": ">=",
+        "pass": true,
+        "threshold": 1.0
+      },
+      "duplicated/one_record_fact_certified": {
+        "observed": 0.0,
+        "op": "<=",
+        "pass": true,
+        "threshold": 0.0
+      },
+      "duplicated/one_record_still_readable": {
+        "observed": 0.6666666666666666,
+        "op": ">=",
+        "pass": true,
+        "threshold": 0.6
+      },
+      "duplicated/per_key_closure_max": {
+        "observed": 1.0,
+        "op": "<=",
+        "pass": true,
+        "threshold": 1.0
+      },
+      "duplicated/whole_closure_fact_certified": {
+        "observed": 1.0,
+        "op": ">=",
+        "pass": true,
+        "threshold": 1.0
+      },
+      "duplicated/whole_closure_still_readable": {
+        "observed": 0.0,
+        "op": "<=",
+        "pass": true,
+        "threshold": 0.1
+      }
+    }
+  },
+  "environment": {
+    "device": "cpu",
+    "numpy": "2.2.6",
+    "platform": "Linux-6.18.44-fc-v24-x86_64-with-glibc2.39",
+    "python": "3.11.15",
+    "threads": "4",
+    "torch": "2.14.0+cpu"
+  },
+  "experiment": "E-000032",
+  "n_groups": 2,
+  "per_seed": [
+    {
+      "canonical/control_reachable_before": 1.0,
+      "canonical/fact_closure_max": 1.0,
+      "canonical/fact_closure_mean": 1.0,
+      "canonical/fact_closure_min": 1.0,
+      "canonical/fact_closure_optimal_rate": 1.0,
+      "canonical/one_record_fact_certified": 1.0,
+      "canonical/one_record_payload_absent": 1.0,
+      "canonical/one_record_still_readable": 0.0,
+      "canonical/per_key_closure_max": 1.0,
+      "canonical/per_key_closure_mean": 1.0,
+      "canonical/per_key_n": 6,
+      "canonical/read_before_deletion": 1.0,
+      "canonical/whole_closure_fact_certified": 1.0,
+      "canonical/whole_closure_still_readable": 0.0,
+      "checkpoint_sha256": "104f5c4549a0a57ea7e31fd0dad4c83324478e8cc330419329ac927018d9b456",
+      "control/interface_identical": 1.0,
+      "control/n_keys": 1050,
+      "control/read_before_deletion": 1.0,
+      "duplicated/control_reachable_before": 1.0,
+      "duplicated/fact_closure_max": 3.0,
+      "duplicated/fact_closure_mean": 3.0,
+      "duplicated/fact_closure_min": 3.0,
+      "duplicated/fact_closure_optimal_rate": 1.0,
+      "duplicated/one_record_fact_certified": 0.0,
+      "duplicated/one_record_payload_absent": 1.0,
+      "duplicated/one_record_still_readable": 0.6666666666666666,
+      "duplicated/per_key_closure_max": 1.0,
+      "duplicated/per_key_closure_mean": 1.0,
+      "duplicated/per_key_n": 6,
+      "duplicated/read_before_deletion": 1.0,
+      "duplicated/whole_closure_fact_certified": 1.0,
+      "duplicated/whole_closure_still_readable": 0.0,
+      "gap/certificates_per_record": 3.0,
+      "keys_per_group": 3,
+      "n_alias_per_group": 2,
+      "n_entities": 256,
+      "n_groups": 2,
+      "seconds": 59.385966777801514,
+      "seed": 0
+    }
+  ],
+  "recorded_at": "2026-09-04T16:21:19+00:00",
+  "seeds": [
+    0
+  ],
+  "title": "the deletion closure of a store, and the certificate that composes with it",
+  "trains_nothing": true
+}

@@ -71,8 +71,36 @@ from so.experiments.e000001b_mini_transformer import _sha256, CHECKPOINTS, CKPT_
 from so.reference import ReferenceResolver
 from so.world import UNKNOWN, World
 
-ARMS = ("canonical", "duplicated")
+ARMS = ("canonical", "mixed", "duplicated")
 N_GROUPS = 25            # alias groups certified per seed; each costs one encoding sweep per arm
+
+
+def load_mixed(world, spec, centre, seed: int, n_linked: int):
+    """A store where only SOME of each group's aliases are links; the rest are copies.
+
+    Partial normalization is the realistic state of any store that grew, and it is what makes the
+    closure a scale rather than a label. ``n_linked`` aliases per group become LINK cells and the
+    remainder are written out as their own facts, so the group's closure is
+    ``1 + (n_alias - n_linked)`` while its interface is unchanged.
+    """
+    from so.mvcc import MVCCStore
+    store = MVCCStore(marker_dim=centre.shape[0], seed=seed, marker_centre=centre)
+    kids: Dict[Tuple[int, int], int] = {}
+    linked: Dict[Tuple[int, int], bool] = {}
+    for t, aliases in spec.groups:
+        for i, k in enumerate(aliases):
+            linked[k] = i < n_linked
+    for f in world.facts:
+        if f.key not in spec.alias_of:
+            kids[f.key] = store.write(f.subject, f.relation, f.obj, provenance="fact")
+    for f in world.facts:
+        if f.key in spec.alias_of:
+            if linked.get(f.key, False):
+                kids[f.key] = store.link(f.subject, f.relation, kids[spec.alias_of[f.key]],
+                                         provenance="alias")
+            else:
+                kids[f.key] = store.write(f.subject, f.relation, f.obj, provenance="copy")
+    return store, kids
 
 
 def group_keys(spec, target_key) -> Tuple[Tuple[int, int], ...]:
@@ -133,7 +161,9 @@ def run_seed(seed: int, n_groups: int, steps: int, verbose: bool = True) -> Dict
 
     rng = np.random.default_rng(seed)
     world, spec = sample_alias_world(rng, EVAL["n_base"], EVAL["n_groups"], EVAL["n_alias_per_group"])
+    n_alias = EVAL["n_alias_per_group"]
     stores = {"canonical": load_arm(world, spec, centre, seed, symlink=True),
+              "mixed": load_mixed(world, spec, centre, seed, n_linked=n_alias // 2),
               "duplicated": load_arm(world, spec, centre, seed, symlink=False)}
 
     m: Dict[str, Any] = {"seed": seed, "n_entities": world.n_entities,
@@ -145,7 +175,7 @@ def run_seed(seed: int, n_groups: int, steps: int, verbose: bool = True) -> Dict
     # ---- control 1: the two arms present the same interface, or nothing below compares anything
     views = {a: ReferenceResolver(st).view() for a, (st, _) in stores.items()}
     answers = {a: {k: int(o) for k, (o, _) in v.items()} for a, v in views.items()}
-    m["control/interface_identical"] = float(answers["canonical"] == answers["duplicated"])
+    m["control/interface_identical"] = float(all(answers[a] == answers["canonical"] for a in ARMS))
     m["control/n_keys"] = len(answers["canonical"])
 
     # ---- control 2: per-key closure is one in BOTH arms -- indistinguishable at the record level
@@ -219,6 +249,17 @@ def run_seed(seed: int, n_groups: int, steps: int, verbose: bool = True) -> Dict
         m[f"{arm}/one_record_still_readable"] = float(np.mean(one_reads))
         m[f"{arm}/whole_closure_fact_certified"] = float(np.mean(all_valid))
         m[f"{arm}/whole_closure_still_readable"] = float(np.mean(all_reads))
+        # The closure is a store statistic; this is what makes it more than bookkeeping. After
+        # removing ONLY the object, the records that survive are exactly the closure's other members,
+        # one per access path that is a copy rather than a pointer, so the reader should still answer
+        # for (closure - 1) of the group's keys and for no others. Predicted per group from the store
+        # alone, then compared -- a store-side number put at risk against a neural measurement rather
+        # than reported beside one.
+        predicted = [(c - 1) / m["keys_per_group"] for c in sizes]
+        err = np.abs(np.array(predicted) - np.array(one_reads))
+        m[f"{arm}/predicted_still_readable"] = float(np.mean(predicted))
+        m[f"{arm}/prediction_error"] = float(np.mean(err))
+        m[f"{arm}/prediction_error_max"] = float(np.max(err))
         if verbose:
             print(f"  seed {seed} {arm:<11} closure {m[f'{arm}/fact_closure_mean']:.2f} "
                   f"(optimal {m[f'{arm}/fact_closure_optimal_rate']:.2f})  one-record certified "
@@ -240,7 +281,8 @@ KEYS = (["control/interface_identical", "control/read_before_deletion", "control
                    "fact_closure_mean", "fact_closure_min", "fact_closure_max",
                    "fact_closure_optimal_rate", "one_record_fact_certified",
                    "one_record_payload_absent", "control_reachable_before", "one_record_still_readable",
-                   "whole_closure_fact_certified", "whole_closure_still_readable")])
+                   "whole_closure_fact_certified", "whole_closure_still_readable",
+                   "predicted_still_readable", "prediction_error", "prediction_error_max")])
 
 CRITERIA = {
     # controls: any of these failing voids the comparison rather than weakening it
@@ -264,6 +306,14 @@ CRITERIA = {
     "canonical/whole_closure_fact_certified": (">=", 1.0),
     "duplicated/whole_closure_fact_certified": (">=", 1.0),
     "duplicated/whole_closure_still_readable": ("<=", 0.10),
+    # partial normalization buys exactly the part it normalized, and no more
+    "mixed/fact_closure_mean": (">=", 2.0),
+    "mixed/fact_closure_max": ("<=", 2.0),
+    "mixed/one_record_fact_certified": ("<=", 0.0),
+    # the store statistic predicts the reader, in every arm, or it is only bookkeeping
+    "canonical/prediction_error": ("<=", 0.05),
+    "mixed/prediction_error": ("<=", 0.05),
+    "duplicated/prediction_error": ("<=", 0.05),
 }
 
 
@@ -288,12 +338,13 @@ def main(argv: Optional[List[str]] = None) -> Dict[str, Any]:
              f"{agg[f'{arm}/fact_closure_mean']['mean']:.2f}",
              f"{agg[f'{arm}/fact_closure_optimal_rate']['min']:.2f}",
              f"{agg[f'{arm}/one_record_fact_certified']['min']:.4f}",
-             f"{agg[f'{arm}/one_record_still_readable']['min']:.4f}",
+             f"{agg[f'{arm}/one_record_still_readable']['mean']:.4f}",
+             f"{agg[f'{arm}/predicted_still_readable']['mean']:.4f}",
              f"{agg[f'{arm}/whole_closure_fact_certified']['min']:.4f}"]
             for arm in ARMS]
     tbl = ledger.table(["store", "closure per KEY", "closure per FACT", "proved optimal",
                         "one record: fact certified", "one record: still readable",
-                        "whole closure: fact certified"], rows)
+                        "predicted from the closure", "whole closure: fact certified"], rows)
 
     record = {"experiment": "E-000032",
               "title": "the deletion closure of a store, and the certificate that composes with it",
@@ -313,7 +364,10 @@ def main(argv: Optional[List[str]] = None) -> Dict[str, Any]:
           "`one record: fact certified` removes exactly the object -- what a record-level certificate",
           "covers today -- and asks whether that licenses a fact-level statement. `still readable` is",
           "the model's own answer afterwards, so the verdict is confirmed by behaviour and not only by",
-          "bookkeeping.", "",
+          "bookkeeping. `predicted from the closure` is `(closure - 1) / keys_per_group`, computed from",
+          "the store before the model is run at all: removing only the object leaves exactly the copies",
+          "that are separate records. A store-side statistic is thereby put at risk against a neural",
+          "measurement rather than reported beside it.", "",
           "## Pre-registered criteria", "", ledger.criteria_table(check), "",
           "## What this is and is not", "",
           "The gap between the two arms is Codd's deletion anomaly and normalization is its 1971 remedy;",

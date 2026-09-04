@@ -219,7 +219,10 @@ class KnowledgeAdapterLM(nn.Module):
         payload = self.v_proj(obj)
         if self.cfg.use_links and "is_link" in bank:
             # Control-plane materialisation, exactly like the marker: an alias row carries its TARGET'S KEY
-            # instead of an object. The model is never told that a value it has read is a pointer.
+            # instead of an object. What that does NOT buy is concealment: v_link is a separate projection
+            # over a layer-normalised input, so a pointer's payload sits at a different scale from an
+            # object's and E-000034 separates the two by norm alone at 1.0000. Recognising a pointer is
+            # free; only following one is learned.
             tgt = self.k_proj(self.ln_key(self.w_in[self.entity_token_ids[bank["link_subject"]]]
                                           + self.rel_emb(bank["link_relation"])))
             payload = torch.where(bank["is_link"][:, None], self.v_link(tgt), payload)

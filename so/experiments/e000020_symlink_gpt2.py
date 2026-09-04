@@ -350,7 +350,8 @@ def main(argv: Optional[List[str]] = None) -> Dict[str, Any]:
                   "in the symlink arm the alias keys are LINK cells over shared targets, in the duplication arm they "
                   "are ordinary fact cells holding a copy. Every sharing claim is the difference between the arms.",
         "by_construction": ["the store decides which payload a row carries; the bank never exports the target's "
-                            "payload, status or signature, and the model is never told that a value is a pointer",
+                            "payload, status or signature. Recognising a pointer is free, not learned: E-000034 "
+                            "separates the two payload kinds by the value norm alone",
                             "that one operation on a shared object reaches every alias is a property of the store; "
                             "what is measured is whether the frozen model reports it, and whether the SAME model "
                             "reports the duplication arm, where it does not, correctly"],

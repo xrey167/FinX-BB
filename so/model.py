@@ -52,6 +52,8 @@ class ModelConfig:
     gate_reverse_key: bool = False # E-000028: blend the reverse key towards a shared constant as the gate
                                    # closes, so a shredded cell's key stops naming the object it held.
                                    # Off by default: every recorded result was measured without it.
+    share_link_value: bool = False # E-000034: one projection and one normalisation for BOTH payload
+                                   # kinds, so a pointer is not separable from an object by its norm
     use_links: bool = False        # the bank may contain alias rows whose payload is the TARGET'S KEY
     n_deref: int = 0               # dereference slots per hop (1 resolves an alias, 2 a chain of two)
     deref_query_from_state: bool = False   # ablation: let the deref query see the question, not only the pointer
@@ -153,6 +155,7 @@ class MutableKnowledgeTransformer(nn.Module):
         self.null_value = nn.Parameter(torch.randn(2, d) * 0.02)
         self.hop = HopBlock(d, cfg.d_ff)
         if cfg.use_links:
+            # kept even under share_link_value so a checkpoint's state dict stays loadable either way
             self.v_link = nn.Linear(d, d, bias=False)              # an alias's value: the TARGET'S KEY, projected
             self.link_rev_key = nn.Parameter(torch.randn(d) * 0.02)  # aliases are not reverse-addressable
         if cfg.gate_reverse_key:
@@ -193,15 +196,26 @@ class MutableKnowledgeTransformer(nn.Module):
             o = o + bank["payload_delta"]
         g = self.gate(bank["marker"])
         k_f = self.k_fwd(self.ln_key(s + r))
-        v_f = self.v_fwd(o)
+        v_f = self.v_fwd(self.ln_key(o)) if self.cfg.share_link_value else self.v_fwd(o)
         k_r = self.k_rev(self.ln_key(o + r))
         v_r = self.v_rev(s)
         if self.cfg.use_links and "is_link" in bank:
-            # Control-plane materialisation, exactly like the marker: the store decides WHICH payload a row
-            # carries; the model is never told that a value it has read is a pointer — that it must learn.
+            # Control-plane materialisation, exactly like the marker: the store decides WHICH payload a
+            # row carries. What that does NOT buy is concealment; see below.
             il = bank["is_link"][:, None]
             tgt_key = self.ln_key(self.ent_emb(bank["link_subject"]) + self.cell_rel_emb(bank["link_relation"]))
-            v_f = torch.where(il, self.v_link(tgt_key), v_f)
+            # E-000034: on every recorded E-000015 checkpoint a pointer's value vector and an
+            # object's are separable by their NORM alone at 1.0000, ranges disjoint, 7.6 pooled sd
+            # apart (link ~18.5, fact ~12.0). At INITIALISATION they overlap, so the model learns to
+            # tag the kinds apart; the architecture only permits it, by carrying the two payloads
+            # through two unrelated projections whose scales nothing couples. "The model is never told
+            # that a value it has read is a pointer" therefore stands as written and fails as a claim
+            # about difficulty: recognition is solved completely and for free, and what remains
+            # genuinely learned is FOLLOWING the pointer. ``share_link_value`` sends both kinds
+            # through the same LayerNorm and the same projection, removing the freedom; whether the
+            # model finds another route to the same cue is measured, not assumed.
+            v_f = torch.where(il, self.v_fwd(tgt_key) if self.cfg.share_link_value
+                              else self.v_link(tgt_key), v_f)
             k_r = torch.where(il, self.link_rev_key[None].expand_as(k_r), k_r)
             v_r = torch.where(il, torch.zeros_like(v_r), v_r)
         v_f = v_f * g

@@ -1,0 +1,290 @@
+{
+  "aggregate": {
+    "bank_masked_direct_acc": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 2
+    },
+    "bank_masked_full_vocab_top1_equals_prior": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 2
+    },
+    "broken1_unknown": {
+      "max": 1.0,
+      "mean": 0.87,
+      "min": 0.74,
+      "n": 2
+    },
+    "broken2_unknown": {
+      "max": 1.0,
+      "mean": 0.975,
+      "min": 0.95,
+      "n": 2
+    },
+    "direct": {
+      "max": 0.817,
+      "mean": 0.4085,
+      "min": 0.0,
+      "n": 2
+    },
+    "direct_full_vocab_top1": {
+      "max": 0.156,
+      "mean": 0.078,
+      "min": 0.0,
+      "n": 2
+    },
+    "hop2": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 2
+    },
+    "lifecycle_all": {
+      "max": 0.8133333333333334,
+      "mean": 0.5733333333333334,
+      "min": 0.3333333333333333,
+      "n": 2
+    },
+    "locality": {
+      "max": 1.0,
+      "mean": 0.9923529411764707,
+      "min": 0.9847058823529412,
+      "n": 2
+    },
+    "paraphrase": {
+      "max": 0.74,
+      "mean": 0.37,
+      "min": 0.0,
+      "n": 2
+    },
+    "prior_direct_acc": {
+      "max": 0.007,
+      "mean": 0.0045000000000000005,
+      "min": 0.002,
+      "n": 2
+    },
+    "probe_calibration_top1": {
+      "max": 0.38333333333333336,
+      "mean": 0.19166666666666668,
+      "min": 0.0,
+      "n": 2
+    },
+    "provenance_direct": {
+      "max": 0.954,
+      "mean": 0.9385,
+      "min": 0.923,
+      "n": 2
+    },
+    "revoke": {
+      "max": 1.0,
+      "mean": 0.9099999999999999,
+      "min": 0.82,
+      "n": 2
+    },
+    "shred": {
+      "max": 1.0,
+      "mean": 0.94,
+      "min": 0.88,
+      "n": 2
+    },
+    "update": {
+      "max": 0.84,
+      "mean": 0.42,
+      "min": 0.0,
+      "n": 2
+    }
+  },
+  "arm": "output",
+  "criteria": {
+    "claim_supported": false,
+    "criteria": {
+      "bank_masked_direct_acc": {
+        "observed": 0.0,
+        "op": "<=",
+        "pass": true,
+        "threshold": 0.01
+      },
+      "direct": {
+        "observed": 0.0,
+        "op": ">=",
+        "pass": false,
+        "threshold": 0.7
+      },
+      "paraphrase": {
+        "observed": 0.0,
+        "op": ">=",
+        "pass": false,
+        "threshold": 0.6
+      }
+    }
+  },
+  "environment": {
+    "device": "cpu",
+    "numpy": "2.2.6",
+    "platform": "Linux-6.18.44-fc-v24-x86_64-with-glibc2.39",
+    "python": "3.11.15",
+    "threads": "1",
+    "torch": "2.14.0+cpu"
+  },
+  "eval": {
+    "n_alt_structures": 25,
+    "n_broken": 100,
+    "n_cells": 1000,
+    "n_hop2": 300,
+    "n_lifecycle": 100,
+    "n_locality_revokes": 50,
+    "n_locality_updates": 100,
+    "n_targets": 100
+  },
+  "experiment": "E-000027",
+  "model": "EleutherAI/pythia-160m",
+  "per_seed": [
+    {
+      "active/direct_acc": 0.0,
+      "active/direct_unknown": 1.0,
+      "active/forced_choice_win": 0.63,
+      "active/full_vocab_top1_equals_prior": 0.0,
+      "active/full_vocab_top1_is_unknown_word": 0.0,
+      "active/gated_value_contribution": 31.792177200317383,
+      "active/paraphrase_unknown": 1.0,
+      "active/probe_top1": 0.01,
+      "active/probe_top5": 0.03,
+      "active/routing_mass_on_target": 0.8347859978675842,
+      "active/true_obj_mean_rank": 91.63,
+      "active/true_obj_top1_among_entities": 0.0,
+      "bank_masked_direct_acc": 0.0,
+      "bank_masked_full_vocab_top1_equals_prior": 0.0,
+      "bank_masked_unknown_rate": 1.0,
+      "broken1_unknown": 1.0,
+      "broken2_unknown": 1.0,
+      "checkpoint_sha256": "a832d02f07519711fdadbfa7024b2e535f65ce0e8796a7edd3a4c838c4118c97",
+      "direct": 0.0,
+      "direct_full_vocab_top1": 0.0,
+      "hop2": 0.0,
+      "lifecycle_all": 0.3333333333333333,
+      "locality": 1.0,
+      "locality_targets_correct": 0.3333333333333333,
+      "locality_undo_exact": 1.0,
+      "paraphrase": 0.0,
+      "prior_direct_acc": 0.002,
+      "prior_unknown_rate": 0.0,
+      "probe_calibration_top1": 0.0,
+      "probe_calibration_top5": 0.011111111111111112,
+      "provenance_direct": 0.923,
+      "resign": 0.0,
+      "restore": 0.0,
+      "restored/direct_acc": 0.0,
+      "revoke": 1.0,
+      "revoke/direct_acc": 0.0,
+      "revoke/direct_unknown": 1.0,
+      "revoke/forced_choice_win": 0.51,
+      "revoke/full_vocab_top1_equals_prior": 0.0,
+      "revoke/full_vocab_top1_is_unknown_word": 0.1,
+      "revoke/gated_value_contribution": 0.0,
+      "revoke/paraphrase_unknown": 1.0,
+      "revoke/probe_top1": 0.01,
+      "revoke/probe_top5": 0.03,
+      "revoke/routing_mass_on_target": 0.0,
+      "revoke/true_obj_mean_rank": 129.84,
+      "revoke/true_obj_top1_among_entities": 0.0,
+      "rollback": 0.0,
+      "seed": 800,
+      "shred": 1.0,
+      "shred/direct_acc": 0.0,
+      "shred/direct_unknown": 1.0,
+      "shred/forced_choice_win": 0.58,
+      "shred/full_vocab_top1_equals_prior": 0.0,
+      "shred/full_vocab_top1_is_unknown_word": 0.0,
+      "shred/gated_value_contribution": 32.369930267333984,
+      "shred/paraphrase_unknown": 1.0,
+      "shred/probe_top1": 0.01,
+      "shred/probe_top5": 0.03,
+      "shred/routing_mass_on_target": 0.8347870707511902,
+      "shred/true_obj_mean_rank": 112.17,
+      "shred/true_obj_top1_among_entities": 0.0,
+      "train_seconds": 2661.517897605896,
+      "update": 0.0
+    },
+    {
+      "active/direct_acc": 0.78,
+      "active/direct_unknown": 0.05,
+      "active/forced_choice_win": 1.0,
+      "active/full_vocab_top1_equals_prior": 0.04,
+      "active/full_vocab_top1_is_unknown_word": 0.0,
+      "active/gated_value_contribution": 7.366973876953125,
+      "active/paraphrase_unknown": 0.0,
+      "active/probe_top1": 0.43,
+      "active/probe_top5": 0.66,
+      "active/routing_mass_on_target": 0.9079164862632751,
+      "active/true_obj_mean_rank": 0.85,
+      "active/true_obj_top1_among_entities": 0.81,
+      "bank_masked_direct_acc": 0.0,
+      "bank_masked_full_vocab_top1_equals_prior": 0.0,
+      "bank_masked_unknown_rate": 1.0,
+      "broken1_unknown": 0.74,
+      "broken2_unknown": 0.95,
+      "checkpoint_sha256": "54458c6c3a99ce1d8225e5a06f21bf55fe201a41fdc473b2cd937675a3125505",
+      "direct": 0.817,
+      "direct_full_vocab_top1": 0.156,
+      "hop2": 0.0,
+      "lifecycle_all": 0.8133333333333334,
+      "locality": 0.9847058823529412,
+      "locality_targets_correct": 0.7666666666666667,
+      "locality_undo_exact": 1.0,
+      "paraphrase": 0.74,
+      "prior_direct_acc": 0.007,
+      "prior_unknown_rate": 0.0,
+      "probe_calibration_top1": 0.38333333333333336,
+      "probe_calibration_top5": 0.55,
+      "provenance_direct": 0.954,
+      "resign": 0.78,
+      "restore": 0.78,
+      "restored/direct_acc": 0.78,
+      "revoke": 0.82,
+      "revoke/direct_acc": 0.0,
+      "revoke/direct_unknown": 0.7,
+      "revoke/forced_choice_win": 0.55,
+      "revoke/full_vocab_top1_equals_prior": 0.0,
+      "revoke/full_vocab_top1_is_unknown_word": 0.01,
+      "revoke/gated_value_contribution": 0.0,
+      "revoke/paraphrase_unknown": 0.9,
+      "revoke/probe_top1": 0.0,
+      "revoke/probe_top5": 0.02,
+      "revoke/routing_mass_on_target": 0.0,
+      "revoke/true_obj_mean_rank": 125.86,
+      "revoke/true_obj_top1_among_entities": 0.0,
+      "rollback": 0.78,
+      "seed": 801,
+      "shred": 0.88,
+      "shred/direct_acc": 0.05,
+      "shred/direct_unknown": 0.94,
+      "shred/forced_choice_win": 0.76,
+      "shred/full_vocab_top1_equals_prior": 0.0,
+      "shred/full_vocab_top1_is_unknown_word": 0.0,
+      "shred/gated_value_contribution": 7.7661519050598145,
+      "shred/paraphrase_unknown": 0.94,
+      "shred/probe_top1": 0.04,
+      "shred/probe_top5": 0.07,
+      "shred/routing_mass_on_target": 0.9079152941703796,
+      "shred/true_obj_mean_rank": 66.6,
+      "shred/true_obj_top1_among_entities": 0.14,
+      "train_seconds": 3403.2368376255035,
+      "update": 0.84
+    }
+  ],
+  "read_layers": [
+    8,
+    10
+  ],
+  "recorded_at": "2026-09-04T16:26:38+00:00",
+  "seeds": [
+    0,
+    1
+  ],
+  "steps": 1500,
+  "ties_embeddings": false,
+  "title": "the knowledge layer on EleutherAI/pythia-160m (untied embeddings), payload from the output embedding"
+}
