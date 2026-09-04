@@ -1,9 +1,55 @@
-# The claim: canonicalisation is an erasure–disclosure duality
+# The claim: traceless erasure is invariant under canonicalisation
 
 *2026-09-04. One claim, its evidence, and the prior art it has to survive. Everything here is measured
 in this repository; every citation was read at the source and the sentence relied on is quoted.*
 
-## The claim
+## The law
+
+For a fact reachable through **k access paths**, two costs, for the same goal:
+
+* **U** — the minimum records to remove so that **no access path yields the object**;
+* **T** — the minimum to remove so that no path yields it **and no surviving row points at anything
+  that is gone**: unreachable *and* traceless.
+
+Measured exhaustively over the whole spectrum between a fully duplicated store and a fully canonical
+one — k from 2 to 8, every number of links from 0 to k−1, three seeds, **105 of 105 cells**, with the
+mechanical resolver and no model at all (E-000041):
+
+| k access paths | U, by links (0 = all copies … k−1 = full pod) | T, same order |
+|---|---|---|
+| 2 | 2 1 | 2 2 |
+| 3 | 3 2 1 | 3 3 3 |
+| 4 | 4 3 2 1 | 4 4 4 4 |
+| 5 | 5 4 3 2 1 | 5 5 5 5 5 |
+| 6 | 6 5 4 3 2 1 | 6 6 6 6 6 6 |
+| 7 | 7 6 5 4 3 2 1 | 7 7 7 7 7 7 7 |
+| 8 | 8 7 6 5 4 3 2 1 | 8 8 8 8 8 8 8 8 |
+
+**U = 1 + (paths still stored as copies). T = k, in every cell.**
+
+Reading a row left to right is walking from a duplicated store to a canonical pod. U falls from k to
+one. **T does not move.**
+
+So **canonicalisation is not a reduction in the cost of erasure. It is a move along a trade-off**: it
+buys the cheap-but-visible regime and gives nothing in the traceless one. A pod's k−1 aliases *are*
+its references, so cleaning them costs k−1 on top of the object; a duplicated store has no references
+to clean, and its k copies already cost k. The same total, reached from opposite ends.
+
+Every claim of the form *normalise, and erasure becomes one operation* is a claim about **U**, and it
+is true. The same design leaves **T** exactly where it was — and T is the number a data subject is
+promised when they are told a record is gone.
+
+**Why it is not owned.** Codd's modification anomaly is about U. Database resilience — the minimum
+contingency set, with its PTIME/NP-complete dichotomy — is U. Raeesi & Roed's §9 proposal to store
+aliases "as pointers into a single canonical record", offered with *"Both approaches are directly
+testable within our framework"*, is a proposal about U, untested. None of them states T, and none
+shows it invariant.
+
+**What is not claimed:** that T is invariant in stores unlike this one. A store that compacts its
+aliases on deletion, or never exports a target key, has a different T and the law would have to be
+restated for it — which is why it is a measurement over a spectrum rather than an identity.
+
+## The consequence, measured: canonicalisation discloses
 
 Let a fact be reachable through **k access paths**. There are two ways to hold it:
 

@@ -56,6 +56,7 @@ else
         retrieval) "$PY" -m so.experiments.e000033_retrieval_closure --seeds 0 1 2 ;;
         pointers)  "$PY" -m so.experiments.e000034_pointer_separability --phase diagnose --seeds 0 1 2 ;;
         disclosure) "$PY" -m so.experiments.e000035_deletion_disclosure --seeds 0 1 2 ;;
+        traceless) "$PY" -m so.experiments.e000041_traceless_cost --seeds 0 1 2 ;;
         keychannel) "$PY" -m so.experiments.e000028_key_channel --seeds 0 1 2 3 4 ;;
         untied)    "$PY" -m so.experiments.e000027_untied_model --arm output --seeds 0 1 2 \
                      && "$PY" -m so.experiments.e000027_untied_model --arm input --seeds 0 1 2 ;;

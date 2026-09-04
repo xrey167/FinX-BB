@@ -1748,6 +1748,56 @@ The finding is E-000039's, from an adversarial design agent, and the numbers abo
 re-measurement written without its code. The honest recommendation is its own: **normalise the prompt,
 and do not train.**
 
+### 31.22 Traceless erasure is invariant under canonicalisation (2026-09-04, E-000041)
+
+§31.19 recorded that a pod and a duplicated store invert: the pod makes a fact unreachable in one
+record instead of k and pays by naming the deleted key to anyone who reads the store. That inversion
+has a reason, and the reason is a law rather than an observation.
+
+Two costs, for the same goal, for a fact reachable through **k access paths**:
+
+* **U** — the minimum records to remove so that no access path yields the object.
+* **T** — the minimum to remove so that no path yields it **and no surviving row points at anything
+  that is gone**.
+
+Measured exhaustively over the whole spectrum between the two arms §31.19 compared — k from 2 to 8,
+every number of links from 0 to k−1, three seeds, **105 of 105 cells**, mechanical resolver, no model:
+
+| k | U, by links (0 = all copies … k−1 = full pod) | T, same order |
+|---|---|---|
+| 2 | 2 1 | 2 2 |
+| 4 | 4 3 2 1 | 4 4 4 4 |
+| 6 | 6 5 4 3 2 1 | 6 6 6 6 6 6 |
+| 8 | 8 7 6 5 4 3 2 1 | 8 8 8 8 8 8 8 8 |
+
+**U = 1 + (paths still stored as copies). T = k, in every cell.** Reading a row left to right is
+walking from a duplicated store to a canonical pod: U falls from k to one, and T does not move.
+
+**What it says.** Canonicalisation is not a reduction in the cost of erasure — it is a move along a
+trade-off. A pod's k−1 aliases *are* its references, so cleaning them costs k−1 on top of the object;
+a duplicated store has no references to clean and its k copies already cost k. The same total, reached
+from opposite ends. Every claim of the form *normalise and erasure becomes one operation* is a claim
+about U and is true; the same design leaves T where it was.
+
+**Why it is the interesting half.** Codd's modification anomaly is U. Database resilience — the
+minimum contingency set — is U. Raeesi and Roed's §9 proposal to store aliases "as pointers into a
+single canonical record", offered with "Both approaches are directly testable within our framework",
+is a proposal about U, untested. T is what a data subject is promised when they are told a record is
+gone, and none of them states it.
+
+**The pre-registered criteria that could have failed** and did not: `T_equals_k >= 1.0` and
+`U_matches_prediction >= 1.0` are checked in every cell of the grid, so a single deviation anywhere
+falsifies the law; `all_valid >= 1.0` is the control that a traceless search which emptied the store
+would fail; and `U_min <= 1.0` with `U_max >= 4.0` require the contrast to be real rather than a flat
+line described as a trade-off.
+
+**Scope, stated because the number invites over-reading.** T is invariant *for this store's
+semantics*, where `MVCCStore.bank()` exports a link's target key and keeps doing so after the target
+is gone (§31.19). A store that compacts its aliases on deletion, or never exports a target key, has a
+different T, and the law would have to be restated for it. That is why it is recorded as a measurement
+over a spectrum and not as an identity — and it is also the actionable part, because it names a design
+choice a system can now make knowingly.
+
 ### 31.8 Boundary
 
 CPU only, no GPU, no LLM above 124M parameters, synthetic worlds, single-token entities, two surface forms per relation, one session. Nothing here shows unlearning of facts already encoded in pretrained weights. Evidence levels recorded: E3–E4 for the synthetic system (F4 for SHRED with the verified gate, E-000010 — **on the value channel only**: E-000028 recovers the shredded object at 1.0000 through the ungated reverse key, where REVOKE and DELETE are at chance, so F4 for SHRED is a claim about answers, logits, hidden states and probes and not about routing); E5 as substrate for the frozen-GPT-2 experiment, with reading, composition, update and the copy bound supported and behavioural deletion not yet supported at the pre-registered thresholds.

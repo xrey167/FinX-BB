@@ -14,7 +14,7 @@ SEEDS ?= 0 1 2
 RUN = OMP_NUM_THREADS=$(THREADS) SO_THREADS=$(THREADS) $(PY) -m
 
 .PHONY: help test smoke synthetic gpt2 demo compare rescore certify closure retrieval pointers \
-        disclosure keychannel untied report clean-results env
+        disclosure traceless keychannel untied report clean-results env
 
 help:
 	@echo "make test        unit tests, ~3 min (the deletion certificate sweeps its whole payload domain)"
@@ -29,6 +29,7 @@ help:
 	@echo "make retrieval   the same closure in a chunked vector index, where practitioners meet it"
 	@echo "make pointers    what the store gives away: a pointer separable from an object by its norm"
 	@echo "make disclosure  what a deletion leaves behind: a pod's aliases point at what was removed"
+	@echo "make traceless   the law: canonicalisation moves U from k to 1 and leaves T at k"
 	@echo "make keychannel  the channel SHRED does not close: recover a shredded object from the keys"
 	@echo "make untied      the layer on a model that does not tie its embeddings (downloads Pythia-160m)"
 	@echo "make report      rebuild docs/so-results-2026-09-02.md from so/results/"
@@ -107,6 +108,10 @@ pointers:
 # no model at all: whether an adversary reading the bank can name the key that was deleted. Seconds.
 disclosure:
 	$(RUN) so.experiments.e000035_deletion_disclosure --seeds $(SEEDS)
+
+# no model at all: U falls from k to 1 across the canonicalisation spectrum, T stays at k. Seconds.
+traceless:
+	$(RUN) so.experiments.e000041_traceless_cost --seeds $(SEEDS)
 
 # no training: the channel SHRED does not close, against the recorded E-000010 checkpoints, ~3 min per seed
 keychannel:
