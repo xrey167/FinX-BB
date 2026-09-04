@@ -49,6 +49,9 @@ class ModelConfig:
     use_null_cell: bool = True
     # ---- E-000015 (explicit symlink cells).  Both default OFF, so every earlier configuration
     # builds exactly the same parameters and its checkpoints keep loading.
+    gate_reverse_key: bool = False # E-000028: blend the reverse key towards a shared constant as the gate
+                                   # closes, so a shredded cell's key stops naming the object it held.
+                                   # Off by default: every recorded result was measured without it.
     use_links: bool = False        # the bank may contain alias rows whose payload is the TARGET'S KEY
     n_deref: int = 0               # dereference slots per hop (1 resolves an alias, 2 a chain of two)
     deref_query_from_state: bool = False   # ablation: let the deref query see the question, not only the pointer
@@ -152,6 +155,9 @@ class MutableKnowledgeTransformer(nn.Module):
         if cfg.use_links:
             self.v_link = nn.Linear(d, d, bias=False)              # an alias's value: the TARGET'S KEY, projected
             self.link_rev_key = nn.Parameter(torch.randn(d) * 0.02)  # aliases are not reverse-addressable
+        if cfg.gate_reverse_key:
+            # one key shared by every gate-closed row: they become indistinguishable to a reverse query
+            self.shred_rev_key = nn.Parameter(torch.randn(d) * 0.02)
         if cfg.n_deref > 0:
             if not cfg.use_null_cell:
                 raise ValueError("n_deref > 0 needs the null column: it carries the dereference passthrough")
@@ -194,6 +200,13 @@ class MutableKnowledgeTransformer(nn.Module):
             v_r = torch.where(il, torch.zeros_like(v_r), v_r)
         v_f = v_f * g
         v_r = v_r * g
+        if self.cfg.gate_reverse_key:
+            # The values are gated; the KEYS never were, and k_r is a function of the object. That is the
+            # whole of E-000028: after SHRED the payload is unreadable but the reverse key still names the
+            # object, and a candidate sweep recovers it. Blending towards a shared constant as the gate
+            # closes leaves an active cell's key untouched (g is ~1) and makes every shredded cell's key
+            # the same one, which is what "the object is gone" has to mean for this channel.
+            k_r = g * k_r + (1 - g) * self.shred_rev_key[None]
         if noise > 0:
             def jitter(x: torch.Tensor) -> torch.Tensor:
                 rms = x.pow(2).mean().sqrt()

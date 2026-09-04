@@ -100,3 +100,82 @@ def test_no_routing_variant_ignores_bank():
     empty = dict(bank.tensors()); empty["active"] = torch.zeros_like(empty["active"])
     l2, _, _ = model(empty, b.mode, b.start, b.rels, b.hop_valid)
     assert torch.allclose(l1, l2)
+
+
+# ------------------------------------------------------- the key channel (E-000028)
+
+def _bank_with_gate(seed=0, n_cells=24):
+    import numpy as np
+    from so.data import bank_from_world
+    from so.train import make_centre
+    from so.world import World
+    rng = np.random.default_rng(seed)
+    world = World.sample(rng, 32, 4, n_cells, 2)
+    return bank_from_world(rng, world, make_centre(seed, 16), 0.0, 0.5, 0.0).tensors()
+
+
+def test_the_reverse_key_names_the_object_by_default():
+    """The defect E-000028 measures, pinned so a later change cannot hide it.
+
+    Nothing in the gate touches k_r, so two cells differing only in their object have different
+    reverse keys whatever their marker says -- which is what lets a candidate sweep recover a
+    shredded object.
+    """
+    cfg = ModelConfig(n_entities=32, n_relations=4, d_model=32, marker_dim=16, n_core_layers=1, n_heads=2)
+    torch.manual_seed(0)
+    m = MutableKnowledgeTransformer(cfg).eval()
+    b = _bank_with_gate()
+    with torch.no_grad():
+        enc_a = m.encode_bank(b)
+        b2 = {k: (v.clone() if torch.is_tensor(v) else v) for k, v in b.items()}
+        b2["obj"] = (b2["obj"] + 1) % cfg.n_entities          # same cells, different objects
+        enc_b = m.encode_bank(b2)
+    assert not torch.allclose(enc_a["k_r"], enc_b["k_r"], atol=1e-4)
+
+
+def _force_gate(m, value: float):
+    """Drive the marker gate to a constant. An untrained gate sits near 0.5 for every marker, so the
+    open and closed regimes have to be produced deliberately rather than sampled."""
+    last = m.marker_gate[-1]
+    with torch.no_grad():
+        last.weight.zero_()
+        last.bias.fill_(value)
+
+
+def test_gating_the_reverse_key_makes_gate_closed_cells_indistinguishable():
+    cfg = ModelConfig(n_entities=32, n_relations=4, d_model=32, marker_dim=16, n_core_layers=1, n_heads=2,
+                      gate_reverse_key=True)
+    torch.manual_seed(0)
+    m = MutableKnowledgeTransformer(cfg).eval()
+    b = _bank_with_gate()
+    b2 = {k: (v.clone() if torch.is_tensor(v) else v) for k, v in b.items()}
+    b2["obj"] = (b2["obj"] + 1) % cfg.n_entities              # same cells, different objects
+
+    _force_gate(m, -20.0)                                     # every marker invalid: shredded
+    with torch.no_grad():
+        assert float(m.gate(b["marker"]).max()) < 1e-6
+        assert torch.allclose(m.encode_bank(b)["k_r"], m.encode_bank(b2)["k_r"], atol=1e-6)
+
+    _force_gate(m, 20.0)                                      # every marker valid: the key still addresses
+    with torch.no_grad():
+        assert float(m.gate(b["marker"]).min()) > 1 - 1e-6
+        assert not torch.allclose(m.encode_bank(b)["k_r"], m.encode_bank(b2)["k_r"], atol=1e-4)
+
+
+def test_without_the_flag_a_closed_gate_leaves_the_reverse_key_naming_the_object():
+    """The defect itself, pinned: with the gate shut the key is still a function of the object."""
+    cfg = ModelConfig(n_entities=32, n_relations=4, d_model=32, marker_dim=16, n_core_layers=1, n_heads=2)
+    torch.manual_seed(0)
+    m = MutableKnowledgeTransformer(cfg).eval()
+    b = _bank_with_gate()
+    b2 = {k: (v.clone() if torch.is_tensor(v) else v) for k, v in b.items()}
+    b2["obj"] = (b2["obj"] + 1) % cfg.n_entities
+    _force_gate(m, -20.0)
+    with torch.no_grad():
+        assert float(m.gate(b["marker"]).max()) < 1e-6        # nothing readable through the value channel
+        assert torch.allclose(m.encode_bank(b)["v_f"], torch.zeros_like(m.encode_bank(b)["v_f"]), atol=1e-6)
+        assert not torch.allclose(m.encode_bank(b)["k_r"], m.encode_bank(b2)["k_r"], atol=1e-4)
+
+
+def test_the_flag_is_off_by_default_so_recorded_models_are_unchanged():
+    assert ModelConfig().gate_reverse_key is False
