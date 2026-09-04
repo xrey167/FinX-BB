@@ -2033,6 +2033,75 @@ subsets at pool 8, and 0 of 1 so far across all 1024 at pool 10. The earlier eig
 that *did* take the answer to 0.0000 removed the unembedding rows of the candidate answers, which
 blinds the readout rather than deleting anything.
 
+### 31.26 The capacity theorem is false in the regime I measured, and two of its numbers could not fail (2026-09-04)
+
+An adversarial review of `so/capacity.py` and E-000043 returned three findings, each demonstrated by
+running code rather than by argument. All three stand and the claim is withdrawn.
+
+**1. The theorem is FALSE under the notion of collateral the experiment actually uses.** The step
+"zero collateral requires the projection to fix every other fact's readout subspace, so `A_i ⊥ A_j`"
+silently reads *zero collateral* as *every other fact's ACTIVATION is fixed pointwise*. E-000043 does
+not measure that. It measures whether the bystander's restricted argmax still yields its object — a
+behavioural condition, which is not closed under intersection and yields no packing bound. The
+reviewer built the counterexample: **d = 12, 66 facts** indexed by coordinate pairs, each with an
+exactly minimal **1-dimensional** deletion subspace; **66/66 unreachable after their own deletion,
+4290/4290 bystander checks exactly unchanged**, largest principal cosine 0.5000, and
+**Σ dim A_i = 66 ≫ d = 12**. With k-wise readouts the same construction gives C(d,k), exponential.
+So *"clean-deletion capacity is linear in d while representation capacity is exponential"* is false
+where it was applied. My own write-up stated this as a caveat and then quoted the headline anyway; as
+the reviewer puts it, the caveat and the headline cannot both be load-bearing.
+
+**2. `pressure` and `headroom` are algebraic identities — the criterion could not fail.** `pressure =
+Σ dim A_i / d` and `bound = d / (Σ dim A_i / n)` give `pressure ≡ n_measured / bound` identically:
+12 / 158.89655 = 58 / 768 = 0.07552083333, matching to fifteen digits. And `fact_basis` returns
+exactly 8 rows, so `dim A_i ≤ 8` and `n_held ≤ 17`, hence **`pressure ≤ 0.1771 < 0.50` for any model
+and any data**. The pre-registered criterion "pressure ≤ 0.50, and it can fail" cannot. Worse, running
+the identical pipeline on **pure Gaussian noise** returns pressure 0.0755 and rank-efficiency 58/58 —
+bit-for-bit the GPT-2 values. *"The model had 92% of its dimension budget free"* restates *"twelve
+facts were tested."* This is the ninth instrument in this ledger that certified by not testing, and it
+is the number I quoted hardest.
+
+**3. Greedy over an ordered basis is a PREFIX, not a minimal subspace.** The search accumulates rows
+0, 1, 2, … and never tests whether an earlier one can be dropped, while the ordering feeds in the
+highest-variance, most-shared template directions first. Backward elimination under the run's own
+criterion cuts **58 directions to 23** — China 8→1, Cuba 6→1, France 7→3 — so **60% of the counted
+directions are passengers**, and the "shared fact direction" placed first is load-bearing for only
+4 of 12 facts. On the truly minimal subspaces the headline overlap falls **0.5566 → 0.2756**, the max
+**0.8559 → 0.6743**, s falls **4.83 → 1.92**, and the bound moves 159 → 401.
+
+**And the hypotheses were satisfied by nothing measured.** A clean deletion requires zero collateral;
+collateral was 0.3897 from 1.0000, with **11 of 12 facts failing it**. `V_j` is also not the readout
+subspace: for 5 of 17 facts, removing *all* of `V_j` leaves the answer at 0.975.
+
+**What survives the review.** Against a dimension- and anisotropy-matched null the minimal subspaces
+still show a **~2× excess** (0.2756 against 0.1334 ± 0.007) — real, and an order smaller than the 0.86
+cosine the verdict quoted. And one premise held that I had not tested: **the deletion generalises to
+phrasings it was never fitted to**, held-out survival 0.1333 from 0.9167, 11 of 12 facts under the bar.
+
+### 31.27 E-000045: U measured on readers, and the three faults its controls caught (2026-09-04)
+
+The idea behind it survives the above, because it does not use the capacity argument. E-000041's law
+has k on both sides because a store's **alias row does two jobs** — a way *in* to the object, and a
+record that survives carrying the object's key. That coincidence is what a symlink is. A representation
+does not fuse the roles, so U is governed by fan-in and T by fan-out. E-000045 uses the workspace
+paper's own **swap** on J-lens vectors rather than an ablation.
+
+Three faults, each caught by a control that could fail and did. (1) The hook applied the swap at every
+layer; the swap is an involution, so it swapped and unswapped alternately — and it read coordinates
+with `lstsq`, whose default driver assumes full rank, while the identity arm builds a rank-one `V`.
+(2) Predicates where two entities *share* a value scored as "followed" with no intervention at all;
+the identity control read 0.2000 where an exactly-zero patch must read 0. Off-diagonal only, as the
+paper does; both controls then read exactly **0.0000**. (3) **U was hardcoded to 1.0** — six of ten
+entities had broadcast exactly 0.000, meaning nothing followed, and were being scored as T > U when U
+had never been achieved.
+
+**Outcome, with the failure kept: `u_rate` 0.3250 against a pre-registered 0.50 — FAIL.** GPT-2 small
+is too weak for this instrument at the strength registered in advance. On the subset where U *was*
+achieved: broadcast 0.3438, residue 0.8375, T/U 2.75, controls 0.0000 — consistent with the prediction
+and **not a test of it**, because that subset is selected by whether the intervention worked. The
+pre-registered correlation of T/U with broadcast is likewise not evidence: `T = 1 + residue × fan-out`,
+so its sign was fixed by arithmetic before any state was read.
+
 ### 31.8 Boundary
 
 CPU only, no GPU, no LLM above 124M parameters, synthetic worlds, single-token entities, two surface forms per relation, one session. Nothing here shows unlearning of facts already encoded in pretrained weights. Evidence levels recorded: E3–E4 for the synthetic system (F4 for SHRED with the verified gate, E-000010 — **on the value channel only**: E-000028 recovers the shredded object at 1.0000 through the ungated reverse key, where REVOKE and DELETE are at chance, so F4 for SHRED is a claim about answers, logits, hidden states and probes and not about routing); E5 as substrate for the frozen-GPT-2 experiment, with reading, composition, update and the copy bound supported and behavioural deletion not yet supported at the pre-registered thresholds.
