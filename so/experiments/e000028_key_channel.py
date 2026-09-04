@@ -32,6 +32,9 @@ Controls that decide what the number means:
   active     the same sweep before SHRED. If it fails here the attack is simply weak and the
              shredded result says nothing.
   revoked    a revoked cell is not routable at all, so no candidate can put mass on it.
+  evicted    E-000030's prescription: the row leaves the addressable bank while the store keeps the
+             payload. It should behave like a deleted cell against this attack and unlike a shredded
+             one, AND still be restorable -- which is the thing DELETE cannot offer.
   deleted    a deleted cell has no column.
 
 Trains nothing: it scores the recorded E-000010 checkpoints, the F4 result itself.
@@ -154,6 +157,23 @@ def run_seed(seed: int, n_targets: int, steps: int, verbose: bool = True) -> Dic
                    truth, n_ent, "revoke"))
     for f in targets:
         store.restore(kids[f.key])
+
+    # EVICT: out of the addressable bank, payload retained in the store. The certificate says this
+    # should behave like DELETE against the attack and unlike SHRED, while keeping the data.
+    for f in targets:
+        store.evict(kids[f.key])
+    m.update(score(sweep(model, store, world, targets, locate_columns(model, store, world, targets), n_ent),
+                   truth, n_ent, "evict"))
+    m["evict/payload_retained"] = float(np.mean([1.0 if store.cells[kids[f.key]].versions else 0.0
+                                                 for f in targets]))
+    for f in targets:
+        store.restore(kids[f.key])
+    m["evict/restore_reads_again"] = float(np.mean(
+        [1.0 if store.resolve_key(f.key)[0] == f.obj else 0.0 for f in targets]))
+    for f in targets:
+        store.revoke(kids[f.key])
+    for f in targets:
+        store.restore(kids[f.key])
         store.delete(kids[f.key])
     # after DELETE the rows are gone and the remaining columns have shifted, so the attacker re-locates
     # from scratch exactly as in every other condition
@@ -166,7 +186,8 @@ def run_seed(seed: int, n_targets: int, steps: int, verbose: bool = True) -> Dic
     return m
 
 
-KEYS = ["column_located", "shred/column_located", "active/column_mass"] + [f"{c}/{k}" for c in ("active", "shred", "revoke", "delete")
+KEYS = ["column_located", "shred/column_located", "active/column_mass",
+        "evict/payload_retained", "evict/restore_reads_again"] + [f"{c}/{k}" for c in ("active", "shred", "revoke", "evict", "delete")
                              for k in ("object_top1", "object_top5", "object_mean_rank", "margin_mean")]
 
 # Pre-registered. The claim under test is that SHRED closes the value channel and NOT the key channel,
@@ -175,7 +196,10 @@ CRITERIA = {
     "column_located": (">=", 0.90),          # the attacker can find the column from public behaviour
     "active/object_top1": (">=", 0.20),      # validity: the sweep must work on a live cell
 }
-LEAK = {"shred/object_top1": ("<=", 1.0 / 256)}   # what F4 would require of the key channel
+LEAK = {"shred/object_top1": ("<=", 1.0 / 256),   # what F4 would require of the key channel
+        "evict/object_top1": ("<=", 1.0 / 256),  # and what EVICT should deliver instead
+        "evict/payload_retained": (">=", 1.0),   # while keeping the data, which DELETE does not
+        "evict/restore_reads_again": (">=", 1.0)}
 
 
 def main(argv: List[str] | None = None) -> Dict[str, Any]:
@@ -205,7 +229,7 @@ def main(argv: List[str] | None = None) -> Dict[str, Any]:
              f"{ledger.worst(agg[f'{c}/object_top5'], c != 'active'):.4f}",
              f"{ledger.worst(agg[f'{c}/object_mean_rank'], False):.1f}",
              f"{1.0 / n_ent:.4f}", f"{(n_ent - 1) / 2.0:.1f}"]
-            for c in ("active", "shred", "revoke", "delete") if f"{c}/object_top1" in agg]
+            for c in ("active", "shred", "revoke", "evict", "delete") if f"{c}/object_top1" in agg]
     tbl = ledger.table(head, body)
 
     record = {"experiment": "E-000028", "title": "the channel SHRED does not close",
