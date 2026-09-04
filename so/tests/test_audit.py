@@ -380,3 +380,41 @@ def test_the_delta_is_numerically_a_no_op():
         b["payload_delta"] = torch.zeros(a["subject"].shape[0], D_MODEL)
         with_delta = _run(m, b, q)()[0]
     assert torch.equal(without, with_delta)
+
+
+def test_eviction_earns_the_strong_certificate_that_shred_cannot():
+    """The point of EVICT, stated as the property it was built to have.
+
+    SHRED keeps the row addressable and asks a gate to refuse it: the payload is still an input and
+    the certificate fails. EVICT takes the row out of the bank, so autograd finds no path at all --
+    the domain-free claim -- while the store still holds the versions.
+    """
+    import numpy as np
+    from so.data import bank_from_store
+    from so.mvcc import MVCCStore
+    from so.train import make_centre
+    from so.world import World
+
+    rng = np.random.default_rng(0)
+    world = World.sample(rng, N_ENT, 4, 24, 2)
+    centre = make_centre(0, 16)
+    store = MVCCStore(marker_dim=16, seed=0, marker_centre=centre)
+    kids = [store.write(f.subject, f.relation, f.obj, provenance="w") for f in world.facts]
+    m = _model()
+
+    def probe(bank_tensors, rows):
+        q = _queries(bank_tensors)
+        return certify_structural(m, bank_tensors, rows, _run_grad(m, bank_tensors, q), D_MODEL,
+                                  outputs_of=LOGITS)
+
+    store.shred(kids[0])
+    t_shred = bank_from_store(store).tensors()
+    assert t_shred["subject"].shape[0] == len(kids)          # still addressable
+    assert probe(t_shred, [0]).reachable                     # and therefore still an input
+    store.resign(kids[0])
+
+    store.evict(kids[0])
+    t_evict = bank_from_store(store).tensors()
+    assert t_evict["subject"].shape[0] == len(kids) - 1      # out of the bank
+    assert probe(t_evict, []).certified_structurally         # no path, for any payload, any domain
+    assert store.cells[kids[0]].versions                     # and the data is still there

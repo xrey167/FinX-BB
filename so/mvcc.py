@@ -38,6 +38,7 @@ class Status(str, Enum):
     ACTIVE = "ACTIVE"
     REVOKED = "REVOKED"
     DELETED = "DELETED"
+    EVICTED = "EVICTED"   # out of the addressable bank, still in the store (E-000030)
 
 
 class CellKind(str, Enum):
@@ -163,7 +164,7 @@ class MVCCStore:
         """How many non-deleted alias cells currently point at ``kid``."""
         n = 0
         for other in self.cells.values():
-            if other.status == Status.DELETED or not other.versions:
+            if other.status in (Status.DELETED, Status.EVICTED) or not other.versions:
                 continue
             v = other.version_obj(other.active_version)
             if v.kind == CellKind.LINK and v.target == kid:
@@ -195,9 +196,11 @@ class MVCCStore:
         cell.status = Status.REVOKED
 
     def restore(self, kid: int) -> None:
+        """Undo REVOKE or EVICT. A deleted cell has no versions left and cannot come back."""
         cell = self._alive(kid)
         self._record("restore", kid=kid)
         cell.status = Status.ACTIVE
+        cell.tombstone_key = None
 
     def rollback(self, kid: int, version: int) -> None:
         cell = self._alive(kid)
@@ -215,8 +218,35 @@ class MVCCStore:
         cell.status = Status.DELETED
         cell.versions = []
 
+    def evict(self, kid: int) -> None:
+        """Take the row out of the addressable bank and KEEP the payload in the store.
+
+        This exists because E-000030 measured a gap the lifecycle did not cover. SHRED keeps the row
+        addressable and asks a learned gate to refuse it, which earns no certificate: the payload is
+        still an input to the computation, and E-000028 recovered it at 1.0000 through a derived key
+        the gate never touched. DELETE earns the certificate -- the row is not in the bank, so nothing
+        the model computes can depend on it, for any payload over any domain -- but it also does
+        ``cell.versions = []``, so the data is gone and there is nothing left to audit, roll back or
+        hold for a legal case. That was what SHRED was FOR.
+
+        EVICT is the operation the certificate prescribes and the store lacked: the row leaves
+        ``bank()`` exactly as a deleted one does, so the model has no path to it, while every version
+        stays in the store so RESTORE and ROLLBACK still work. Retention and unreachability were never
+        actually in tension; they only looked that way because the payload was being kept in the same
+        place the model reads.
+        """
+        cell = self._alive(kid)
+        self._record("evict", kid=kid)
+        v = cell.version_obj(cell.active_version)
+        cell.tombstone_key = (v.subject, v.relation)
+        cell.status = Status.EVICTED
+
     def shred(self, kid: int) -> None:
-        """Destroy the marker of the active version; the payload stays in the layer."""
+        """Destroy the marker of the active version; the payload stays in the layer.
+
+        Kept as recorded. E-000030 finds it certified at neither level: see ``evict`` for the operation
+        that earns the certificate without discarding the data.
+        """
         cell = self._alive(kid)
         self._record("shred", kid=kid)
         cell.version_obj(cell.active_version).marker = self.new_invalid_marker()
@@ -243,6 +273,10 @@ class MVCCStore:
     def _alive(self, kid: int) -> Cell:
         cell = self.cells.get(kid)
         if cell is None or cell.status == Status.DELETED:
+            # EVICTED is deliberately NOT rejected here. An evicted cell is out of the addressable
+            # bank but still in the store -- that is the entire point of the operation -- so RESTORE
+            # and ROLLBACK have to be able to reach it. Rejecting it here would make eviction
+            # irreversible and turn it into a slower DELETE.
             raise KeyError(f"cell {kid} does not exist or was deleted")
         return cell
 
@@ -317,7 +351,7 @@ class MVCCStore:
             if v.kind == CellKind.FACT:
                 return v.obj, tuple(trace)
             target = self.cells.get(v.target)
-            if target is None or target.status == Status.DELETED or not target.versions:
+            if target is None or target.status in (Status.DELETED, Status.EVICTED) or not target.versions:
                 return None, tuple(trace)          # dangling: the referent is gone, the pointer remains
             tv = target.version_obj(target.active_version)
             cur = (tv.subject, tv.relation)
@@ -341,7 +375,7 @@ class MVCCStore:
     def kid_of(self, key: Tuple[int, int]) -> Optional[int]:
         """kid of the cell currently holding ``key`` (any status except deleted)."""
         for kid, cell in self.cells.items():
-            if cell.status == Status.DELETED:
+            if cell.status in (Status.DELETED, Status.EVICTED):
                 continue
             v = cell.version_obj(cell.active_version)
             if (v.subject, v.relation) == key:
@@ -359,7 +393,7 @@ class MVCCStore:
         kids, subj, rel, obj, markers, active = [], [], [], [], [], []
         is_link, l_subj, l_rel = [], [], []
         for kid, cell in self.cells.items():
-            if cell.status == Status.DELETED:
+            if cell.status in (Status.DELETED, Status.EVICTED):
                 continue
             v = cell.version_obj(cell.active_version)
             usable = cell.status == Status.ACTIVE

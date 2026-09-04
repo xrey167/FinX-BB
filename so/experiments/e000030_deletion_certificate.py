@@ -48,7 +48,7 @@ import numpy as np
 import torch
 
 from so import ledger
-from so.audit import certify_deletion, certify_encoding, check_mediation
+from so.audit import certify_deletion, certify_encoding, certify_structural, check_mediation
 from so.data import bank_from_store, encode_queries
 from so.experiments.common import fresh_world, position_of_kid
 from so.experiments.e000001b_mini_transformer import _sha256, checkpoint_path, train_or_load
@@ -136,6 +136,18 @@ def run_seed(seed: int, n_targets: int, steps: int, verbose: bool = True) -> Dic
         med = check_mediation(model, tensors, rows, n_ent, run, outputs_of=lambda o: o[0],
                               n_probes=N_PROBES, seed=seed)
 
+        # The domain-free form of the same question. certify_encoding is exact because the payload
+        # domain here happens to be 256 values; reachability does not need that and would hold for a
+        # text payload, so it is the column that survives leaving this repository.
+        def run_grad(b, _b=batch):
+            return model(b, _b.mode, _b.start, _b.rels, _b.hop_valid)
+
+        st = certify_structural(model, tensors, rows, run_grad, model.cfg.d_model,
+                                outputs_of=lambda o: o[0])
+        m[f"{op}/structurally_certified"] = bool(st.certified_structurally)
+        m[f"{op}/gradient_max"] = float(st.grad_max)
+        m[f"{op}/structural_note"] = st.summary()
+
         m[f"{op}/interface_certified"] = bool(iface.output_certified)
         m[f"{op}/interface_joint_certified"] = bool(iface.joint_certified)
         m[f"{op}/interface_evaluations"] = int(iface.n_evaluations)
@@ -158,6 +170,13 @@ def run_seed(seed: int, n_targets: int, steps: int, verbose: bool = True) -> Dic
     for f in targets:
         store.delete(kids[f.key])
     after_bank = bank_from_store(store)
+    del_tensors = after_bank.tensors()
+    del_batch = encode_queries(out_queries, after_bank, world, model.cfg.max_hops)
+    st_del = certify_structural(model, del_tensors, [], lambda b: model(b, del_batch.mode, del_batch.start,
+                                                                        del_batch.rels, del_batch.hop_valid),
+                                model.cfg.d_model, outputs_of=lambda o: o[0])
+    m["delete/structurally_certified"] = bool(st_del.certified_structurally)
+    m["delete/structural_note"] = st_del.summary()
     m["delete/rows_removed"] = int(before - after_bank.subject.shape[0])
     m["delete/object_absent_from_bank"] = bool(m["delete/rows_removed"] == len(targets))
     m["delete/structural"] = True
@@ -167,7 +186,8 @@ def run_seed(seed: int, n_targets: int, steps: int, verbose: bool = True) -> Dic
 
 KEYS = [f"{op}/{k}" for op in OPS
         for k in ("interface_certified", "interface_joint_certified", "outputs_certified",
-                  "mediation_consistent", "interface_evaluations", "outputs_evaluations")]
+                  "mediation_consistent", "interface_evaluations", "outputs_evaluations",
+                  "structurally_certified", "gradient_max")]
 
 CRITERIA = {
     # what the record already claims, restated as an independence question
@@ -279,24 +299,29 @@ def main(argv: List[str] | None = None) -> Dict[str, Any]:
     rows = []
     for op in OPS:
         rows.append([op,
+                     ("no path" if agg[f"{op}/structurally_certified"]["min"] == 1.0
+                      else ("grad 0" if agg[f"{op}/gradient_max"]["max"] == 0.0
+                            else f"grad {agg[f'{op}/gradient_max']['max']:.1e}")),
                      "yes" if agg[f"{op}/interface_certified"]["min"] == 1.0 else "no",
                      "yes" if agg[f"{op}/outputs_certified"]["min"] == 1.0 else "no",
                      "consistent" if agg[f"{op}/mediation_consistent"]["min"] == 1.0 else "VOID",
                      per_seed[0].get(f"{op}/interface_first_violation") or "-",
                      f"{int(agg[f'{op}/interface_evaluations']['mean'])}"])
-    rows.append(["delete", "yes (structural)", "yes (structural)", "n/a", "the row is not in the bank", "0"])
+    rows.append(["delete", "no path", "yes (structural)", "yes (structural)", "n/a",
+                 "the row is not in the bank", "0"])
     for gate_mode in ("soft", "hard"):
         for op in OPS:
             k = f"gpt2_{gate_mode}/{op}/interface_certified"
             if gpt2 and k in gpt2[0]:
                 ok = all(g[k] for g in gpt2)
                 res = max(g[f"gpt2_{gate_mode}/{op}/residual"] for g in gpt2)
-                rows.append([f"{op} (GPT-2, {gate_mode} gate)", "yes" if ok else "no", "-", "-",
+                rows.append([f"{op} (GPT-2, {gate_mode} gate)", "-", "yes" if ok else "no", "-", "-",
                              gpt2[0][f"gpt2_{gate_mode}/{op}/first_violation"] or "-",
                              f"{int(np.mean([g[f'gpt2_{gate_mode}/{op}/evaluations'] for g in gpt2]))}"
                              + (f"  (residual {res:.2e})" if not ok else "")])
-    tbl = ledger.table(["operation", "certified for every query (interface)", "certified on the swept queries",
-                        "mediation premise", "first quantity that moves", "encodings swept"], rows)
+    tbl = ledger.table(["operation", "reachable from the payload", "certified for every query (interface)",
+                        "certified on the swept queries", "mediation premise",
+                        "first quantity that moves", "encodings swept"], rows)
 
     record = {"experiment": "E-000030", "title": "a deletion certificate for the recorded checkpoints",
               "trains_nothing": True, "seeds": args.seeds, "n_targets": args.n_targets,

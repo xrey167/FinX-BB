@@ -75,3 +75,70 @@ def test_bank_shapes():
     b = s.bank()
     assert b["marker"].shape == (5, 8) and b["kid"].shape == (5,)
     assert b["active"].all()
+
+
+# ------------------------------------------- EVICT: unreachable and retained, which SHRED and DELETE are not
+
+def _one_cell():
+    st = MVCCStore(marker_dim=16, seed=0)
+    kid = st.write(3, 1, 7, provenance="t")
+    return st, kid
+
+
+def test_evict_takes_the_row_out_of_the_bank():
+    st, kid = _one_cell()
+    assert st.bank()["kid"].shape[0] == 1
+    st.evict(kid)
+    assert st.bank()["kid"].shape[0] == 0
+    assert st.cells[kid].status is Status.EVICTED
+
+
+def test_evict_keeps_the_payload_which_is_the_whole_point():
+    """DELETE earns the same unreachability by discarding the data. EVICT does not have to."""
+    st, kid = _one_cell()
+    st.evict(kid)
+    assert st.cells[kid].versions, "the versions must survive an eviction"
+    assert st.cells[kid].version_obj(st.cells[kid].active_version).obj == 7
+
+
+def test_delete_by_contrast_discards_it():
+    st, kid = _one_cell()
+    st.delete(kid)
+    assert st.cells[kid].versions == []
+
+
+def test_shred_by_contrast_leaves_the_row_addressable():
+    st, kid = _one_cell()
+    st.shred(kid)
+    assert st.bank()["kid"].shape[0] == 1, "SHRED keeps the row in the bank; that is what E-000028 exploits"
+
+
+def test_an_evicted_cell_comes_back_with_its_payload():
+    st, kid = _one_cell()
+    st.update(kid, 9)
+    st.evict(kid)
+    st.restore(kid)
+    b = st.bank()
+    assert b["kid"].shape[0] == 1 and int(b["obj"][0]) == 9
+    st.rollback(kid, 1)
+    assert int(st.bank()["obj"][0]) == 7
+
+
+def test_eviction_is_in_the_operation_log_and_the_state_hash():
+    st, kid = _one_cell()
+    before = st.state_hash()
+    st.evict(kid)
+    assert st.state_hash() != before
+    assert any(op == "evict" for op, _ in st.log)
+
+
+def test_an_evicted_target_does_not_resolve_for_an_alias():
+    """A link into an evicted cell must dangle exactly as it does into a deleted one."""
+    st = MVCCStore(marker_dim=16, seed=0)
+    target = st.write(3, 1, 7, provenance="t")
+    alias = st.link(4, 1, target, provenance="a")
+    assert st.resolve_key((4, 1))[0] == 7
+    st.evict(target)
+    assert st.resolve_key((4, 1))[0] is None
+    st.restore(target)
+    assert st.resolve_key((4, 1))[0] == 7
