@@ -23,3 +23,21 @@ Forschungsprojekt **SO — Modular Neural Operating System**: adressierbares, ve
 - [Sitzungsergebnisse 02.09.2026](docs/so-results-2026-09-02.md) — automatisch aus den Ergebnisdateien erzeugt: alle Messwerte, vorregistrierte Kriterien, Evidenz- und Löschstufen, Grenzen der Evidenz.
 - [Fahrplan](docs/so-roadmap-2026-09-02.md) — was heute belegt ist, die Lücken zur Durchbruchsdefinition, Stufen 0–6 bis zur externen Reproduktion, Abbruchkriterien.
 - Experimentalcode: [`so/`](so/README.md).
+
+### Selbst nachvollziehen, auf einem Ubuntu-Server
+
+Es wird keine GPU gebraucht. Alle aufgezeichneten Zahlen stammen von einer Maschine mit vier CPU-Kernen.
+
+```bash
+./setup.sh          # apt-Pakete, virtuelle Umgebung, PyTorch als CPU-Build, danach die Unit-Tests
+make test           # 48 Tests, etwa 10 Sekunden
+make smoke          # verkleinerte Fassung der synthetischen Kette, etwa 15 Minuten
+make synthetic      # die aufgezeichnete synthetische Kette, etwa 3 Stunden
+make gpt2           # die Kette mit eingefrorenem GPT-2, etwa 20 Stunden, lädt GPT-2 einmalig
+make report         # baut docs/so-results-2026-09-02.md aus so/results/ neu
+```
+
+`make env` zeigt vorab Interpreter, Versionen, Threadzahl und freien Speicher. Stellschrauben sind
+`PY`, `THREADS` und `SEEDS`, etwa `make gpt2 SEEDS="0"` für einen statt drei Seeds. Die gemessenen
+Laufzeiten je Experiment stehen in [so/README.md](so/README.md); sie stammen aus dem Feld
+`train_seconds` der Ergebnisdateien und sind damit keine Schätzung.
