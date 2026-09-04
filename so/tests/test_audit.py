@@ -794,7 +794,7 @@ def test_the_composition_runs_on_a_real_certificate_and_a_real_bank():
 
 # ------------- absence proved by a counterfactual in the store, not by a membership test
 
-from so.audit import StoreAbsence, certify_store_absence      # noqa: E402
+from so.audit import StoreAbsence, _set_version_field, certify_store_absence   # noqa: E402
 
 
 def _pod_with_alias(obj=7):
@@ -947,3 +947,38 @@ def test_a_shadowed_duplicate_on_the_same_key_is_found_by_the_search():
     # is 1 while the true answer is 2: greedy does real work here and says it is not proved optimal
     assert fc.lower_bound == 1 and not fc.optimal
     assert ReferenceResolver(st).resolve(Query("fwd", 3, (1,), (0,))).answer == 7   # and it restored
+
+
+def test_sweeping_the_stores_own_bank_covers_the_tensors_the_model_reads():
+    """E-000032 sweeps ``store.bank()``; the model reads ``Bank.tensors()``. The step between them.
+
+    ``bank_from_store`` derives every tensor the forward consumes from ``store.bank()``'s arrays plus
+    quantities computed from the marker column, so a payload that cannot move ``store.bank()`` cannot
+    move what the model reads either. That is an argument about two functions in this repository, and
+    arguments rot, so it is checked: sweep the evicted payload over its whole domain and assert BOTH
+    are invariant, then break the premise and assert both move together.
+    """
+    import numpy as np
+    from so.data import bank_from_store
+    st, target, _ = _pod_with_alias(obj=5)
+    st.evict(target)
+
+    def snapshot():
+        raw = {k: np.asarray(v).copy() for k, v in st.bank().items()}
+        ten = {k: v.clone() for k, v in bank_from_store(st).tensors().items()}
+        return raw, ten
+
+    raw0, ten0 = snapshot()
+    for value in range(32):
+        _set_version_field(st, target, "obj", value)
+        raw, ten = snapshot()
+        assert all(np.array_equal(raw0[k], raw[k]) for k in raw0), f"store.bank() moved at obj={value}"
+        assert all(torch.equal(ten0[k], ten[k]) for k in ten0), f"tensors() moved at obj={value}"
+
+    # the premise is not vacuous: a LIVE cell moves both, in step
+    live = st.write(77, 3, 1, provenance="live")
+    raw1, ten1 = snapshot()
+    _set_version_field(st, live, "obj", 9)
+    raw2, ten2 = snapshot()
+    assert not all(np.array_equal(raw1[k], raw2[k]) for k in raw1)
+    assert not all(torch.equal(ten1[k], ten2[k]) for k in ten1)
