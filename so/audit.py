@@ -375,7 +375,8 @@ class MediationCheck:
 def certify_encoding(model: nn.Module, bank: Dict[str, torch.Tensor], deleted_rows: Sequence[int],
                      n_values: int, encode: Optional[Callable[[Dict[str, torch.Tensor]], Any]] = None,
                      payload_field: str = "obj", joint_trials: int = 64, seed: int = 0,
-                     atol: float = 0.0, stop_early: bool = True) -> Certificate:
+                     atol: float = 0.0, stop_early: bool = True,
+                     interface_keys: Optional[Sequence[str]] = None) -> Certificate:
     """Certify at the interface the bank enters the computation through, not at the outputs.
 
     Both models here read the store in exactly one place. ``MutableKnowledgeTransformer.forward``
@@ -390,11 +391,28 @@ def certify_encoding(model: nn.Module, bank: Dict[str, torch.Tensor], deleted_ro
     for the queries somebody thought to sweep. The cost is one cheap encoding per payload value
     instead of a full forward over a query set.
 
+    ``interface_keys`` names WHICH of the encoding's outputs the forward actually consumes, and getting
+    it wrong breaks the certificate in one direction or the other. Too narrow and the certificate is
+    unsound -- it would ignore a quantity the model reads. Too wide and it is over-strict: the adapter's
+    ``encode_bank`` also returns ``values_payload``, the UNGATED payload, which ``forward`` never reads
+    (`so/llm_adapter.py:323` takes only ``keys``, ``values`` and the allowed set), and comparing it
+    reports a leak through a diagnostic. Name the consumed set explicitly, cite the line, and let
+    ``check_mediation`` guard the choice: if the named subset is invariant while an output moves, the
+    subset was too narrow and the certificate is void.
+
     The premise is a claim about the model, so it is checked rather than assumed: pass the result to
     ``check_mediation`` with a runner, which falsifies it if an output ever moves while the encoding
     does not.
     """
-    enc_fn = encode if encode is not None else (lambda b: model.encode_bank(b))
+    def select(enc: Any) -> Any:
+        if interface_keys is None or not isinstance(enc, dict):
+            return enc
+        missing = [k for k in interface_keys if k not in enc]
+        if missing:
+            raise KeyError(f"interface_keys names {missing}, which the encoding does not return")
+        return {k: enc[k] for k in interface_keys}
+    _enc = encode if encode is not None else (lambda b: model.encode_bank(b))
+    enc_fn = lambda b: select(_enc(b))
     rows = [int(r) for r in deleted_rows]
     rng = np.random.default_rng(seed)
     base = {k: (v.clone() if torch.is_tensor(v) else v) for k, v in bank.items()}
@@ -478,3 +496,71 @@ def check_mediation(model: nn.Module, bank: Dict[str, torch.Tensor], deleted_row
             if not consistent else
             "no probe found an output moving while the encoding held still")
     return MediationCheck(consistent, n_probes, not enc_moved, not out_moved, note)
+
+
+@dataclass
+class LocalityCheck:
+    """Whether a row's encoding depends only on that row.
+
+    This is what turns the joint claim from a sample into a proof. ``certify_encoding`` sweeps rows one
+    at a time, so on its own it certifies each deletion marginally and covers joint dependence with
+    random assignments. But if the encoding is ROW-LOCAL -- perturbing row i moves row i's encoding and
+    nothing else -- then per-row invariance over the whole payload domain implies invariance under
+    every joint assignment, because the rows do not interact. No sampling required.
+
+    Both models are row-local at noise = 0: ``encode_bank`` embeds, LayerNorms and projects per row,
+    and the marker gate is a function of that row's marker. They are NOT row-local at noise > 0:
+    ``jitter`` in ``so/model.py`` takes its rms over ALL rows, masked ones included, so a deleted row
+    perturbs the jitter of every visible one. The check reports which regime it was run in rather than
+    assuming the benign one.
+    """
+
+    row_local: bool
+    n_rows_probed: int
+    n_values_probed: int
+    offending_rows: List[int] = field(default_factory=list)
+    note: str = ""
+
+
+def check_row_locality(model: nn.Module, bank: Dict[str, torch.Tensor], probe_rows: Sequence[int],
+                       n_values: int, encode: Optional[Callable[[Dict[str, torch.Tensor]], Any]] = None,
+                       payload_field: str = "obj", n_values_probed: int = 8, seed: int = 0,
+                       atol: float = 0.0) -> LocalityCheck:
+    """Perturb one row and check that every OTHER row's encoding is untouched."""
+    enc_fn = encode if encode is not None else (lambda b: model.encode_bank(b))
+    rng = np.random.default_rng(seed + 7)
+    base = {k: (v.clone() if torch.is_tensor(v) else v) for k, v in bank.items()}
+    n_rows = int(base[payload_field].shape[0])
+    with torch.no_grad():
+        ref = _fingerprint(enc_fn(base))
+    offending: List[int] = []
+
+    for row in [int(r) for r in probe_rows]:
+        others = torch.ones(n_rows, dtype=torch.bool)
+        others[row] = False
+        for _ in range(n_values_probed):
+            probe = {k: (v.clone() if torch.is_tensor(v) else v) for k, v in base.items()}
+            probe[payload_field][row] = int(rng.integers(n_values))
+            with torch.no_grad():
+                got = _fingerprint(enc_fn(probe))
+            for (name, a), (_, b) in zip(ref, got):
+                if a.shape != b.shape or a.shape[:1] != (n_rows,):
+                    continue                       # not a per-row tensor; the sweep covers it
+                if a.is_floating_point():
+                    d = (a[others] - b[others]).abs()
+                    moved = bool(d.numel()) and float(d.max().item()) > atol
+                else:
+                    moved = not torch.equal(a[others], b[others])   # bools and ints do not subtract
+                if moved:
+                    offending.append(row)
+                    break
+            if row in offending:
+                break
+
+    ok = not offending
+    return LocalityCheck(ok, len(list(probe_rows)), n_values_probed, sorted(set(offending)),
+                         "row-local: per-row invariance over the whole domain implies joint invariance"
+                         if ok else
+                         "NOT row-local: one row's payload moves another row's encoding, so the joint "
+                         "claim stays a sample. so/model.py jitter() takes its rms over all rows, which "
+                         "is the known cause at noise > 0.")

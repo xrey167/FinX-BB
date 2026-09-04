@@ -69,6 +69,32 @@ def exhaustive_one_hop(world) -> List[Query]:
             for r in range(world.n_relations)]
 
 
+def addressing_queries(world, targets, rng, n_unrelated: int = 64) -> List[Query]:
+    """The queries the OUTPUT sweep uses, and why it is not the whole domain.
+
+    The interface certificate already covers every possible query, so the output sweep has one job the
+    interface cannot do: separate REVOKE, where the encoding moves but nothing a user sees does, from
+    SHRED, where both move. For that it needs the questions that can actually address a target -- its
+    own forward question in both surface forms, and EVERY candidate object as a reverse question,
+    which is exactly E-000028's attack surface and is exhaustive over that surface -- plus a fixed
+    sample of unrelated questions, because a target's key sits in the softmax denominator of queries
+    that are not about it. Sweeping all 2048 single-hop questions instead costs 21 minutes per
+    operation per seed and adds nothing the interface column does not already state universally.
+    """
+    qs: List[Query] = []
+    for f in targets:
+        for k in range(world.n_synonyms):
+            qs.append(Query("fwd", f.subject, (f.relation,), (world.surface_of(f.relation, k),)))
+        for o in range(world.n_entities):
+            qs.append(Query("rev", o, (f.relation,), (world.surface_of(f.relation, 0),)))
+    keys = {(f.subject, f.relation) for f in targets}
+    others = [f for f in world.facts if f.key not in keys]
+    for i in rng.choice(len(others), size=min(n_unrelated, len(others)), replace=False):
+        f = others[int(i)]
+        qs.append(Query("fwd", f.subject, (f.relation,), (world.surface_of(f.relation, 0),)))
+    return qs
+
+
 def run_seed(seed: int, n_targets: int, steps: int, verbose: bool = True) -> Dict[str, Any]:
     path = checkpoint_path("e000010", seed)
     if not path.exists():
@@ -82,9 +108,11 @@ def run_seed(seed: int, n_targets: int, steps: int, verbose: bool = True) -> Dic
     targets = [facts[int(i)] for i in rng.permutation(len(facts))[:n_targets]]
     n_ent = world.n_entities
     queries = exhaustive_one_hop(world)
+    out_queries = addressing_queries(world, targets, np.random.default_rng(700 + seed))
 
     m: Dict[str, Any] = {"seed": seed, "checkpoint_sha256": _sha256(path), "n_targets": len(targets),
-                         "n_entities": n_ent, "n_queries": len(queries), "n_cells": len(facts)}
+                         "n_entities": n_ent, "n_queries_full_domain": len(queries),
+                         "n_queries_swept": len(out_queries), "n_cells": len(facts)}
     t0 = time.time()
 
     for op in OPS:
@@ -93,13 +121,16 @@ def run_seed(seed: int, n_targets: int, steps: int, verbose: bool = True) -> Dic
         bank = bank_from_store(store)
         tensors = bank.tensors()
         rows = [position_of_kid(store, kids[f.key]) for f in targets]
-        batch = encode_queries(queries, bank, world, model.cfg.max_hops)
+        batch = encode_queries(out_queries, bank, world, model.cfg.max_hops)
 
         def run(b, _batch=batch):
             with torch.no_grad():
                 return model(b, _batch.mode, _batch.start, _batch.rels, _batch.hop_valid)
 
-        iface = certify_encoding(model, tensors, rows, n_ent, joint_trials=32, seed=seed)
+        # what MutableKnowledgeTransformer.forward reads out of the encoding (so/model.py:245-248):
+        # k_f, v_f, k_r, v_r and the allowed set. "gate" is a diagnostic it does not consume.
+        iface = certify_encoding(model, tensors, rows, n_ent, joint_trials=32, seed=seed,
+                                 interface_keys=("k_f", "v_f", "k_r", "v_r", "active"))
         outs = certify_deletion(model, tensors, rows[:1], n_ent, run, outputs_of=lambda o: o[0],
                                 check_activations=False, joint_trials=0, seed=seed)
         med = check_mediation(model, tensors, rows, n_ent, run, outputs_of=lambda o: o[0],
@@ -193,11 +224,28 @@ def run_gpt2_seed(seed: int, n_targets: int, verbose: bool = True) -> Dict[str, 
             bank = bank_from_store(store, respect_markers=True)
             tensors = bank.tensors()
             rows = [position_of_kid(store, kids[f.key]) for f in targets]
-            cert = certify_encoding(gk.model, tensors, rows, gk.n_entities, joint_trials=16, seed=seed)
+            # what KnowledgeAdapterLM.forward reads (so/llm_adapter.py:323): keys, values, allowed.
+            # values_payload is the UNGATED payload and is returned as a diagnostic only; comparing it
+            # would report a leak through a tensor the model never looks at.
+            cert = certify_encoding(gk.model, tensors, rows, gk.n_entities, joint_trials=16, seed=seed,
+                                    interface_keys=("keys", "values", "active"))
             m[f"gpt2_{gate_mode}/{op}/interface_certified"] = bool(cert.output_certified)
             m[f"gpt2_{gate_mode}/{op}/first_violation"] = cert.violations[0].module if cert.violations else ""
             m[f"gpt2_{gate_mode}/{op}/residual"] = float(cert.violations[0].max_abs) if cert.violations else 0.0
             m[f"gpt2_{gate_mode}/{op}/evaluations"] = int(cert.n_evaluations)
+            texts = [E8.query_text(Query("fwd", f.subject, (f.relation,), (0,)), gk.names, gk.n_synonyms, 0)
+                     for f in targets]
+            ids, am, last = E8.encode_texts(gk.tok, texts)
+
+            def run_adapter(b, _i=ids, _a=am, _l=last):
+                with torch.no_grad():
+                    return gk.model(b, _i, _a, _l)
+
+            med = check_mediation(gk.model, tensors, rows, gk.n_entities, run_adapter,
+                                  encode=lambda b: {k: v for k, v in gk.model.encode_bank(b).items()
+                                                    if k in ("keys", "values", "active")},
+                                  outputs_of=lambda o: o[0], n_probes=4, seed=seed)
+            m[f"gpt2_{gate_mode}/{op}/mediation_consistent"] = bool(med.consistent)
             if verbose:
                 verdict = "CERTIFIED" if cert.output_certified else f"no (residual {m[f'gpt2_{gate_mode}/{op}/residual']:.3e})"
                 print(f"  seed {seed} gpt2 {gate_mode:<4} {op:<7} {verdict}  ({time.time() - t0:.0f}s)", flush=True)
@@ -263,7 +311,7 @@ def main(argv: List[str] | None = None) -> Dict[str, Any]:
           "`interface` compares `encode_bank`'s output. The forward reads the bank only there, so an",
           "invariant encoding means an invariant computation FOR EVERY POSSIBLE QUERY, not just the swept",
           f"ones. `outputs` compares the returned logits over an exhaustive single-hop query domain",
-          f"({per_seed[0]['n_queries']} questions: every entity, every relation, forward and reverse).",
+          
           "`mediation` is the falsification check on the premise the interface column rests on: it looks",
           "for an output that moves while the encoding does not, and voids the certificate if it finds one.", "",
           "## Pre-registered criteria", "", ledger.criteria_table(check), ""]

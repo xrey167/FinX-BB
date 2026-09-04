@@ -74,8 +74,15 @@ LORA_STEPS = 6000
 LORA_LR = 3e-4
 UNLEARN_STEPS = 400
 UNLEARN_LR = 1e-4
-RELEARN_STEPS = 60
+# The relearning attacker is run until it demonstrably works on the half of the deleted facts it was
+# HANDED, then scored on the half it was not. Equal step budgets are not equal attacker strength: the
+# weights arms only have to re-fine-tune what was already in their LoRA and reach 1.000 almost at once,
+# while the cells attacker has to memorise into an adapter whose cells are shredded and reached only
+# 0.28 at 60 steps -- which made its 0.04 on the held-out half a weak attacker's number, not a result.
+RELEARN_STEPS = 400
 RELEARN_LR = 1e-4
+RELEARN_TARGET_SUPPLIED = 0.60
+RELEARN_EVAL_EVERY = 40
 PPL_TEXTS = [
     "The history of the city is long and its buildings show every period of it. A river runs through "
     "the middle, and the bridges over it were rebuilt twice. Most of the population lives on the "
@@ -458,7 +465,8 @@ def relearn_attack_weights(gk: E8.GPT2Knowledge, setup: Setup, params: List[nn.P
     known, held = setup.targets[:half], setup.targets[half:]
     pool = [(q_of(f, t), token_of_entity(gk, f.obj)) for f in known for t in (0, 1)]
     opt = torch.optim.AdamW(params, lr=RELEARN_LR, weight_decay=0.0)
-    for _ in range(RELEARN_STEPS):
+    steps = 0
+    for step in range(RELEARN_STEPS):
         gk.model.lm.train()
         idx = rng.integers(0, len(pool), 8)
         loss = lm_nll(gk, [pool[int(i)] for i in idx])
@@ -466,9 +474,16 @@ def relearn_attack_weights(gk: E8.GPT2Knowledge, setup: Setup, params: List[nn.P
         loss.backward()
         torch.nn.utils.clip_grad_norm_(params, 1.0)
         opt.step()
+        steps = step + 1
+        if steps % RELEARN_EVAL_EVERY == 0:
+            gk.model.lm.eval()
+            a = weights_scorer(gk)([q_of(f, 0) for f in known], 0)["answers"]
+            if float(np.mean([int(x == f.obj) for x, f in zip(a, known)])) >= RELEARN_TARGET_SUPPLIED:
+                break
     gk.model.lm.eval()
-    score = weights_scorer(gk)
-    return _relearn_metrics(score, gk, known, held, seed)
+    out = _relearn_metrics(weights_scorer(gk), gk, known, held, seed)
+    out["relearn/steps_used"] = float(steps)
+    return out
 
 
 def relearn_attack_cells(gk: E8.GPT2Knowledge, setup: Setup, store: MVCCStore, seed: int) -> Dict[str, float]:
@@ -481,7 +496,8 @@ def relearn_attack_cells(gk: E8.GPT2Knowledge, setup: Setup, store: MVCCStore, s
     bank = bank_from_store(store, respect_markers=True)
     tensors = bank.tensors()
     pool = [(q_of(f, t), f.obj) for f in known for t in (0, 1)]
-    for _ in range(RELEARN_STEPS):
+    steps = 0
+    for step in range(RELEARN_STEPS):
         gk.model.train()
         idx = rng.integers(0, len(pool), 8)
         items = [pool[int(i)] for i in idx]
@@ -494,9 +510,16 @@ def relearn_attack_cells(gk: E8.GPT2Knowledge, setup: Setup, store: MVCCStore, s
         loss.backward()
         torch.nn.utils.clip_grad_norm_(params, 1.0)
         opt.step()
+        steps = step + 1
+        if steps % RELEARN_EVAL_EVERY == 0:
+            gk.model.eval()
+            a = cells_scorer(gk, store, setup.world)([q_of(f, 0) for f in known], 0)["answers"]
+            if float(np.mean([int(x == f.obj) for x, f in zip(a, known)])) >= RELEARN_TARGET_SUPPLIED:
+                break
     gk.model.eval()
-    score = cells_scorer(gk, store, setup.world)
-    return _relearn_metrics(score, gk, known, held, seed)
+    out = _relearn_metrics(cells_scorer(gk, store, setup.world), gk, known, held, seed)
+    out["relearn/steps_used"] = float(steps)
+    return out
 
 
 def _relearn_metrics(score: Scorer, gk: E8.GPT2Knowledge, known, held, seed: int) -> Dict[str, float]:
@@ -619,18 +642,18 @@ REPORT_KEYS = [
     "cells/after/probe_top1", "cells/after/probe_top5", "cells/after/bystander_acc",
     "cells/ppl_base", "cells/ppl_after", "cells/ppl_delta", "cells/after/generic_kl_mean", "cells/after/generic_top1_matches_base",
     "cells/relearn/supplied_acc", "cells/relearn/heldout_acc", "cells/relearn/heldout_forced_choice",
-    "cells/relearn/heldout_top1", "cells/weight_delta_l2", "cells/delete_seconds",
+    "cells/relearn/heldout_top1", "cells/relearn/steps_used", "cells/weight_delta_l2", "cells/delete_seconds",
     "weights/before/direct_acc",
     "ga/after/direct_acc", "ga/after/paraphrase_acc", "ga/after/forced_choice", "ga/after/true_obj_top1",
     "ga/after/true_obj_mean_rank", "ga/after/probe_top1", "ga/after/probe_top5", "ga/after/bystander_acc",
     "ga/relearn/supplied_acc", "ga/relearn/heldout_acc", "ga/relearn/heldout_forced_choice",
-    "ga/relearn/heldout_top1", "ga/weight_delta_l2", "ga/delete_seconds",
+    "ga/relearn/heldout_top1", "ga/relearn/steps_used", "ga/weight_delta_l2", "ga/delete_seconds",
     "ga/ppl_after", "ga/after/generic_kl_mean", "ga/after/generic_top1_matches_base",
     "relabel/after/direct_acc", "relabel/after/paraphrase_acc", "relabel/after/forced_choice",
     "relabel/after/true_obj_top1", "relabel/after/true_obj_mean_rank", "relabel/after/probe_top1",
     "relabel/after/probe_top5", "relabel/after/bystander_acc",
     "relabel/relearn/supplied_acc", "relabel/relearn/heldout_acc", "relabel/relearn/heldout_forced_choice",
-    "relabel/relearn/heldout_top1", "relabel/weight_delta_l2", "relabel/delete_seconds",
+    "relabel/relearn/heldout_top1", "relabel/relearn/steps_used", "relabel/weight_delta_l2", "relabel/delete_seconds",
     "relabel/ppl_after", "relabel/after/generic_kl_mean", "relabel/after/generic_top1_matches_base",
     "weights/ppl_base", "weights/ppl_after_learning", "weights/before/generic_kl_mean",
     "weights/n_lora_params", "weights/train_steps_used",
@@ -649,7 +672,7 @@ CRITERIA = {
     "cells/relearn/heldout_acc": ("<=", 0.05),
     # validity: the relearning attack must demonstrably work on the facts the attacker supplied,
     # or "the others did not come back" is a statement about a weak attacker, not about the system
-    "cells/relearn/supplied_acc": (">=", 0.50),
+    "cells/relearn/supplied_acc": (">=", 0.50),   # each attacker runs until it clears this or exhausts
     "ga/relearn/supplied_acc": (">=", 0.50),
     "relabel/relearn/supplied_acc": (">=", 0.50),
     # the frozen core is untouched, bit for bit

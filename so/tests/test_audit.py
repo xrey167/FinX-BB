@@ -266,3 +266,28 @@ def test_the_mediation_check_can_fail():
                           outputs_of=LOGITS, n_probes=4)
     assert not chk.consistent
     assert "VOID" in chk.note
+
+
+# ------------------------------------------------ row locality: what upgrades the joint claim to a proof
+
+from so.audit import check_row_locality  # noqa: E402
+
+
+def test_the_encoding_is_row_local_at_zero_noise():
+    m = _model()
+    a = _bank(p_shred=0.5)
+    chk = check_row_locality(m, a, [0, 1, 2], N_ENT, n_values_probed=4)
+    assert chk.row_local, chk.note
+    assert "implies joint invariance" in chk.note
+
+
+def test_noise_breaks_row_locality_because_the_jitter_rms_is_global():
+    """A deleted row perturbs every visible one once noise is on, and the check must say so."""
+    m = _model()
+    a = _bank(p_shred=0.5)
+    g = torch.Generator().manual_seed(0)
+    chk = check_row_locality(m, a, [0, 1], N_ENT, n_values_probed=3,
+                             encode=lambda b: m.encode_bank(b, noise=0.1,
+                                                            generator=torch.Generator().manual_seed(0)))
+    assert not chk.row_local, chk.note
+    assert "NOT row-local" in chk.note
