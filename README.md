@@ -25,6 +25,11 @@ Forschungsprojekt **SO — Modular Neural Operating System**: adressierbares, ve
   die Zusammenfassung: warum der Angriffs-Standard hier gebrochen ist, das Zertifikat, das über die gesamte
   Nutzlast-Domäne und über jede mögliche Anfrage quantifiziert, die drei ersten zertifizierten Löschungen,
   und was das Halten von Fakten in Zeilen messbar einbringt.
+- **[Die Behauptung: Kanonisierung ist eine Löschung-Offenlegung-Dualität](docs/so-claim-erasure-disclosure-duality.md)**
+  (Stand 04.09.2026) — die eine Neuheitsbehauptung dieses Programms, ihre Messung und die Vorarbeiten,
+  die sie überstehen muss. Ein Pod macht einen Fakt in **einer** Löschung unerreichbar statt in k — und
+  macht die Löschung selbst aus dem Store allein eindeutig identifizierbar (1.0000 gegen 0.0000), wo
+  Duplikation den gesamten Schlüsselraum offen lässt. Die beiden Abschlüsse invertieren exakt.
 - [Was hier neu ist und was nicht](docs/so-novelty-2026-09-04.md) (Stand 04.09.2026) — die Kalibrierung
   gegen den Stand der Forschung. Der Mechanismus ist Wiedererfindung (SERAC, GRACE, Larimar, SILO, LMLM,
   MUNKEY); was bleibt, ist die Prüfung: dass ein Gate auf Werten kein Löschprimitiv ist, wenn ein anderer
