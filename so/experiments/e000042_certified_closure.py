@@ -1,6 +1,6 @@
 """Experiment E-000042 — a certified lower bound for deletion in a representation.
 
-THE GAP THIS CLOSES, IN MY OWN WORDS. ``so/workspace.py`` says:
+THE GAP THIS ADDRESSES, IN MY OWN WORDS. ``so/workspace.py`` says:
 
     "A model hands out no such trace. There is no set of directions the computation 'used' that a
      solution must intersect, so the disjointness argument does not transfer, and computing it anyway
@@ -11,40 +11,46 @@ a must-hit set, pairwise-disjoint derivations bound the optimum from below, and 
 ``proved optimal`` at 1.00 in every arm -- while a representation's closure has been a greedy number
 with nothing under it.
 
-**The J-lens decomposition is the trace.** Anthropic's workspace work writes a residual as a sparse
-nonnegative combination of lens directions. If the state a phrasing computes on is a nonnegative
-combination over a support S, then any set of directions whose removal stops that phrasing yielding
-the object has to touch S. Disjoint supports across phrasings then bound the closure from below by
-exactly the store's argument -- and sparsity is what makes the must-hit property CHECKABLE, because
-the complement of an eight-atom pool has 256 subsets where the complement of a 768-dimensional space
-has 2**768.
+The claim under test is that a J-lens sparse nonnegative decomposition is that trace, and that
+sparsity makes the must-hit property CHECKABLE rather than merely arguable.
 
-HOW THIS IS KEPT FROM BEING THE SIXTH INSTRUMENT THAT CANNOT FAIL. The ablation table is enumerated
-EXHAUSTIVELY: every one of the 2**|pool| subsets is run, and every quantity below is then read off
-that one table with no further model calls. That buys three things a greedy search cannot have.
+WHAT THE FIRST RUN TAUGHT, RECORDED BECAUSE IT CHANGED THE DESIGN TWICE.
 
-  * The TRUE optimum U*, by enumeration rather than by greedy. So the bound is not compared against
-    another estimate; it is compared against the answer.
-  * SOUNDNESS as a measurement. ``bound_sound`` is 1.0 only if the certified lower bound is <= U* for
-    every fact. One violation anywhere falsifies the claim outright, and the criterion is written so
-    that it can.
-  * A CONTROL THAT CAN KILL IT. A random support of the same size is put through the identical
-    exhaustive must-hit test. If random supports pass at the same rate, the pool is such that
-    everything is a must-hit set, the J-lens is doing no work, and the claim is about counting rather
-    than about the decomposition.
+  1. It used rows of ``W_U`` -- the logit lens, the J = I special case -- and went VOID: eight
+     directions removed, not one fact silenced. The paper's J-lens vectors are the rows of
+     ``W_U J_l``, which ``so/jlens.py`` now computes at one vector-Jacobian product per token.
+  2. A follow-up check appeared to vindicate the change and did not. Removing the eight logit-lens
+     rows of the eight CANDIDATE CAPITALS took the answer to 0.00 -- but those rows are the readout of
+     the candidate set, so removing them makes the restricted argmax noise. That silences nothing; it
+     blinds the readout. The paper guards against exactly this: its global ablation "does not ablate
+     any tokens that appear in the top-10 tokens of a clean forward pass". The guard is carried over
+     here, and it is why the pool is chosen the way it is.
 
-And because a bound of one is the correct answer for a fact stored as a pod -- every phrasing running
-through one shared direction -- a POSITIVE CONTROL is run on a synthetic table with disjoint supports
-by construction, where the bound must report the number of them. Without it, a bound that returned 1
-unconditionally would look like a finding.
+AND THE CONTROL THAT SEPARATES A DELETION FROM A BLINDING. An ablation that moves the argmax has not
+necessarily removed anything: a parallel investigation on this repository's own checkpoint found a
+closure of 1.00 at collateral 0.0044 whose ablated states STILL yielded the object to a freshly
+fitted linear probe at 0.9300 held out. So every deletion reported here is put to a refitted probe.
+A closure whose states a probe walks straight through is reported as a readout-path removal and not
+as a deletion, and ``probe_after`` is a pre-registered criterion rather than a diagnostic.
 
-WHAT THE SEEDS VARY, stated because in this experiment it is nearly nothing. The model is frozen and
-the table is exhaustive, so U*, the supports, the certificates and the bound are all deterministic.
-The seeds resample the RANDOM-SUPPORT CONTROL, which is the only stochastic quantity here.
+HOW IT IS KEPT FROM BEING AN INSTRUMENT THAT CANNOT FAIL. The ablation table is enumerated
+EXHAUSTIVELY over the pool, and every quantity is read off that one table. That buys the TRUE optimum
+by enumeration rather than by greedy, so the bound is compared against the answer; SOUNDNESS as a
+measurement, since ``bound_sound_min`` fails on one violation anywhere; and two controls -- a random
+support of the same size, and a random support that also contains the object's own direction, because
+a support containing it is must-hit for a nearly trivial reason. A synthetic positive control proves
+the bound can report more than one before any 1 it returns is read as a finding.
+
+SCOPE, stated because the number invites over-reading. The count is relative to this pool and this
+dictionary. arXiv:2608.10566 shows erasure counts are not affine-invariant -- "both quantities can
+change under an information-preserving invertible reparameterization" -- so a support size is a
+property of the J-lens dictionary, not of the model. What the certificate licenses is a statement
+about ablations drawn from this pool, exactly as ``certify_store_absence`` licenses one about payloads
+inside the domain it sweeps.
 
 Trains nothing.
 
-Run:  python -m so.experiments.e000042_certified_closure [--layer 7] [--pool 8] [--max-facts 8]
+Run:  python -m so.experiments.e000042_certified_closure [--layer 7] [--pool 8] [--max-facts 6]
 """
 
 from __future__ import annotations
@@ -59,12 +65,15 @@ import numpy as np
 import torch
 
 from so import ledger
-from so.support import (certified_closure, certify_must_hit, disjoint_lower_bound, nonneg_pursuit)
-from so.workspace import carrier_candidates, lens_logits, project_out
+from so.jlens import jlens_vectors
+from so.support import certified_closure, certify_must_hit, disjoint_lower_bound, nonneg_pursuit
+from so.workspace import project_out
 
 MODEL = "gpt2"
 LAYER = 7
 POOL = 8
+NOMINATE = 40          # tokens the logit lens nominates; J-lens vectors are computed for these
+CLEAN_GUARD = 10       # the paper's guard: never ablate a token in the clean top-k output
 
 PAIRS = [("France", " Paris"), ("Japan", " Tokyo"), ("Italy", " Rome"), ("Germany", " Berlin"),
          ("Russia", " Moscow"), ("China", " Beijing"), ("Spain", " Madrid"), ("Egypt", " Cairo"),
@@ -77,10 +86,17 @@ TEMPLATES = ["The capital of {s} is", "{s}'s capital city is", "Q: What is the c
              "In {s}, the capital is", "The seat of government of {s} is located in",
              "Everyone knows that the capital of {s} is"]
 
+CORPUS = ["The capital of France is Paris, and the capital of Japan is Tokyo.",
+          "In 1969 the Apollo program landed the first humans on the Moon.",
+          "Water boils at one hundred degrees Celsius at sea level pressure.",
+          "She opened the book and began to read the first chapter slowly.",
+          "The company reported earnings above what analysts had expected.",
+          "Rome is a city in Italy with a very long recorded history.",
+          "Machine learning models are trained on large collections of text.",
+          "He walked to the station and waited for the evening train home."]
+
 
 class Probe:
-    """E-000037's ablation: project the directions out at every layer from the read layer up."""
-
     def __init__(self, layer: int, threads: int = 0):
         from transformers import AutoModelForCausalLM, AutoTokenizer
         if threads:
@@ -115,17 +131,52 @@ class Probe:
         return [cand[i] for i in lg.argmax(-1).tolist()]
 
     @torch.no_grad()
-    def residual(self, prompts: Sequence[str]) -> torch.Tensor:
-        d = self.dirs
-        self.dirs = None
+    def clean_top(self, prompts: Sequence[str], k: int) -> List[int]:
+        """The tokens a clean forward pass already produces -- the paper's ablation never touches these."""
+        d, self.dirs = self.dirs, None
+        e, last = self._enc(prompts)
+        lg = self.lm(**e).logits[torch.arange(len(prompts)), last]
+        self.dirs = d
+        return sorted({int(t) for t in lg.topk(k, dim=-1).indices.reshape(-1).tolist()})
+
+    @torch.no_grad()
+    def state(self, prompts: Sequence[str]) -> torch.Tensor:
+        """The residual at the read layer, answer position, under whatever ablation is set."""
         e, last = self._enc(prompts)
         hs = self.lm(**e, output_hidden_states=True).hidden_states[self.layer]
-        self.dirs = d
-        return hs[torch.arange(len(prompts)), last]
+        h = hs[torch.arange(len(prompts)), last]
+        if self.dirs is not None and self.dirs.numel():
+            h = project_out(h, self.dirs)
+        return h
+
+
+def linear_probe(x: torch.Tensor, y: torch.Tensor, groups: torch.Tensor, n_class: int,
+                 steps: int = 400, lr: float = 0.5) -> float:
+    """Leave-one-group-out accuracy of a linear readout: can the object still be read off the state?
+
+    This is what separates a DELETION from a BLINDING. An ablation that moves the model's argmax may
+    have left the fact entirely intact and merely removed the path the output head was using; a probe
+    refitted on the ablated states finds it immediately if so. Groups are phrasings, so the probe is
+    never scored on a phrasing it was fitted on.
+    """
+    x = (x - x.mean(0)) / x.std(0).clamp(min=1e-6)
+    accs = []
+    for g in groups.unique():
+        tr, te = groups != g, groups == g
+        w = torch.zeros(x.shape[1], n_class, requires_grad=True)
+        b = torch.zeros(n_class, requires_grad=True)
+        opt = torch.optim.Adam([w, b], lr=lr)
+        for _ in range(steps):
+            opt.zero_grad()
+            loss = torch.nn.functional.cross_entropy(x[tr] @ w + b, y[tr]) + 1e-3 * w.pow(2).sum()
+            loss.backward()
+            opt.step()
+        with torch.no_grad():
+            accs.append(float(((x[te] @ w + b).argmax(-1) == y[te]).float().mean()))
+    return float(np.mean(accs))
 
 
 def _subsets(pool: Sequence[int]) -> List[Tuple[int, ...]]:
-    """Every subset of the pool, smallest first, so the first silencing one found is a minimum."""
     out: List[Tuple[int, ...]] = []
     for size in range(len(pool) + 1):
         out.extend(combinations(pool, size))
@@ -133,12 +184,7 @@ def _subsets(pool: Sequence[int]) -> List[Tuple[int, ...]]:
 
 
 def positive_control(n_groups: int = 3, per_group: int = 2) -> Dict[str, Any]:
-    """The bound must be able to report more than one, or a pod-shaped model would flatter it.
-
-    A synthetic table with ``n_groups`` pairwise-disjoint supports, each of which really is must-hit by
-    construction. If the machinery cannot recover ``n_groups`` here, every 1 it reports on the model is
-    uninterpretable.
-    """
+    """The bound must be able to report more than one, or a pod-shaped model would flatter it."""
     supports = [tuple(range(g * per_group, (g + 1) * per_group)) for g in range(n_groups)]
     pool = list(range(n_groups * per_group))
     certs = [certify_must_hit(lambda d, s=s: bool(set(d) & set(s)), s, pool) for s in supports]
@@ -155,6 +201,7 @@ def run(layer: int, pool_size: int, max_facts: int, seeds: Sequence[int], thread
     caps = [tok.encode(o)[0] for _, o in pairs]
     obj_of = {s: tok.encode(o)[0] for s, o in pairs}
     prompts_of = {s: [t.format(s=s) for t in TEMPLATES] for s, _ in pairs}
+    corpus = tok(CORPUS, return_tensors="pt", padding=True)
     t0 = time.time()
 
     p.dirs = None
@@ -169,6 +216,16 @@ def run(layer: int, pool_size: int, max_facts: int, seeds: Sequence[int], thread
               f"(mean {np.mean([held_rate[s] for s in held]):.4f}); measuring {len(targets)}  "
               f"({time.time() - t0:.0f}s)", flush=True)
 
+    # states for the probe, one row per (fact, phrasing), collected under each ablation of interest
+    probe_y = torch.tensor([held.index(s) for s in held for _ in TEMPLATES])
+    probe_g = torch.tensor([t for _ in held for t in range(len(TEMPLATES))])
+
+    def probe_under(dirs) -> float:
+        d, p.dirs = p.dirs, dirs
+        x = torch.cat([p.state(prompts_of[s]) for s in held])
+        p.dirs = d
+        return linear_probe(x, probe_y, probe_g, len(held))
+
     rows: List[Dict[str, Any]] = []
     for s in targets:
         obj_id = obj_of[s]
@@ -176,12 +233,18 @@ def run(layer: int, pool_size: int, max_facts: int, seeds: Sequence[int], thread
         bys = [b for b in held if b != s]
         bys_prompts = [TEMPLATES[0].format(s=b) for b in bys]
 
-        res = p.residual(prompts)                                  # (T, d) at the read layer
-        ids = carrier_candidates(res.mean(0), p.w_out, obj_id, n=pool_size, ln=p.ln)
-        atoms = p.w_out[torch.as_tensor(ids)].detach().to(torch.float32)
-        atoms = atoms / atoms.norm(dim=1, keepdim=True)
+        p.dirs = None
+        h = p.state(prompts)
+        guard = set(p.clean_top(prompts, CLEAN_GUARD))
+        lens0 = (h.mean(0) @ p.w_out.t())
+        nominated = [int(t) for t in lens0.topk(NOMINATE).indices.tolist() if int(t) not in guard]
+        jl = jlens_vectors(p.lm, layer, nominated[:NOMINATE], corpus["input_ids"],
+                           corpus["attention_mask"], p.w_out)
+        score = (h.mean(0) @ jl.vectors.t())
+        order = [int(i) for i in score.argsort(descending=True).tolist()][:pool_size]
+        ids = [int(jl.token_ids[i]) for i in order]
+        atoms = jl.vectors[torch.as_tensor(order)].detach()
 
-        # ---------------------------------------------------------------- the exhaustive table
         subsets = _subsets(ids)
         table: Dict[Tuple[int, ...], np.ndarray] = {}
         coll: Dict[Tuple[int, ...], float] = {}
@@ -193,25 +256,22 @@ def run(layer: int, pool_size: int, max_facts: int, seeds: Sequence[int], thread
         p.dirs = None
 
         answering = [q for q in range(len(prompts)) if table[()][q]]
-        if len(answering) < 2:
-            rows.append({"subject": s, "excluded": "fewer than two phrasings answer with nothing removed"})
-            if verbose:
-                print(f"  {s:<10} EXCLUDED: {len(answering)} phrasing(s) answer  ", flush=True)
-            continue
-
-        # ---------------------------------------------------------------- the TRUE optimum
         star = None
-        for d in subsets:                                          # smallest first
-            if not any(table[d][q] for q in answering):
+        for d in subsets:
+            if answering and not any(table[d][q] for q in answering):
                 star = d
                 break
+
+        base = {"subject": s, "pool": ids, "n_answering": len(answering),
+                "answer_before": held_rate[s], "guard_tokens": len(guard),
+                "silenceable": float(star is not None)}
         if star is None:
-            rows.append({"subject": s, "excluded": "no subset of the pool silences every phrasing"})
+            rows.append({**base, "excluded": "no subset of the J-lens pool silences every phrasing"})
             if verbose:
-                print(f"  {s:<10} EXCLUDED: the pool cannot silence it  ", flush=True)
+                print(f"  {s:<10} the pool CANNOT silence it: every one of {len(subsets)} subsets "
+                      f"leaves at least one phrasing answering  ({time.time() - t0:.0f}s)", flush=True)
             continue
 
-        # ---------------------------------------------------------------- greedy, for comparison
         greedy: List[int] = []
         live = list(answering)
         for atom in ids:
@@ -221,22 +281,15 @@ def run(layer: int, pool_size: int, max_facts: int, seeds: Sequence[int], thread
             live = [q for q in live if table[tuple(sorted(greedy, key=ids.index))][q]]
         greedy_key = tuple(sorted(greedy, key=ids.index))
 
-        # ---------------------------------------------------------------- supports and certificates
         def silences_for(q: int):
             def f(d: Sequence[int]) -> bool:
                 return not table[tuple(sorted((int(x) for x in d), key=ids.index))][q]
             return f
 
-        # THE SUPPORT IS CAPPED AT HALF THE POOL, and the reason is the vacuity hole. A pursuit run to
-        # a tight tolerance on a small pool takes every atom; the complement is then empty, there is no
-        # disjoint ablation to try, and the must-hit property holds by having nothing to test against.
-        # Capping keeps the complement non-empty, which makes the test HARDER -- a smaller set is a
-        # stronger claim and easier to refute -- and the pursuit takes the largest coefficients first,
-        # so what is kept is the dominant part of the state rather than an arbitrary truncation.
         n_atoms = max(1, pool_size // 2)
         supports, certs, resid = [], [], []
         for q in answering:
-            sup = nonneg_pursuit(res[q], atoms, ids=ids, n_atoms=n_atoms, tol=0.05)
+            sup = nonneg_pursuit(h[q], atoms, ids=ids, n_atoms=n_atoms, tol=0.05)
             supports.append(sup)
             resid.append(sup.residual_fraction)
             certs.append(certify_must_hit(silences_for(q), sup.directions, ids))
@@ -244,23 +297,9 @@ def run(layer: int, pool_size: int, max_facts: int, seeds: Sequence[int], thread
         cc = certified_closure(obj_id, len(star), bound, len(answering),
                                workload=f"{len(answering)} phrasings")
 
-        # ---------------------------------------------------------------- the control that can kill it
-        # TWO CONTROLS, and the second is the one that can actually kill the claim.
-        #
-        # The first is a random support of the same size. If it is must-hit as often as the J-lens
-        # support, this pool is one where nearly everything is must-hit and the bound is about
-        # counting rather than about the decomposition.
-        #
-        # The second is sharper, and is the honest test of what the decomposition CONTRIBUTES. The
-        # object's own lens direction is atom 0 of the pool by construction, and a support containing
-        # it is must-hit for a nearly trivial reason: every ablation disjoint from that support leaves
-        # the direction that reads the answer untouched. So the second control draws a random support
-        # of the same size that ALSO contains atom 0. If that passes as often as the J-lens support,
-        # the decomposition has added nothing beyond "include the object direction", and this
-        # experiment should say so rather than report a tautology wearing a certificate.
         obj_atom = ids[0]
         rest_idx = list(range(1, len(ids)))
-        rand_hold, rand_bound, rand_obj_hold = [], [], []
+        rand_hold, rand_obj_hold, rand_bound = [], [], []
         for seed in seeds:
             rng = np.random.default_rng(seed * 1000 + obj_id)
             rcerts, ocerts = [], []
@@ -277,9 +316,12 @@ def run(layer: int, pool_size: int, max_facts: int, seeds: Sequence[int], thread
             rand_obj_hold.append(float(np.mean([c.holds and not c.vacuous for c in ocerts])))
             rand_bound.append(float(disjoint_lower_bound(rcerts).lower_bound))
 
+        probe_before = probe_under(None)
+        probe_after = probe_under(atoms[[ids.index(x) for x in star]])
+        p.dirs = None
+
         row = {
-            "subject": s, "excluded": None, "pool": ids, "n_answering": len(answering),
-            "answer_before": held_rate[s],
+            **base, "excluded": None,
             "optimum": len(star), "optimum_set": list(star), "greedy": len(greedy_key),
             "collateral_at_optimum": coll[star], "collateral_before": coll[()],
             "support_size": float(np.mean([x.size for x in supports])),
@@ -298,95 +340,91 @@ def run(layer: int, pool_size: int, max_facts: int, seeds: Sequence[int], thread
             "musthit_rate_random_with_object": float(np.mean(rand_obj_hold)),
             "object_atom_in_support": float(np.mean([obj_atom in x.directions for x in supports])),
             "lower_bound_random": float(np.mean(rand_bound)),
+            "probe_before": probe_before, "probe_after": probe_after,
+            "probe_drop": probe_before - probe_after,
             "summary": cc.summary(),
         }
         rows.append(row)
         if verbose:
-            print(f"  {s:<10} {cc.summary()}  | greedy {len(greedy_key)}, true optimum {len(star)}, "
-                  f"support {row['support_size']:.1f} atoms explaining "
-                  f"{100 * (1 - row['support_residual']):.0f}% | must-hit {row['musthit_rate']:.2f} "
-                  f"vs random {row['musthit_rate_random']:.2f} | collateral "
-                  f"{row['collateral_at_optimum']:.2f} from {row['collateral_before']:.2f}  "
-                  f"({time.time() - t0:.0f}s)", flush=True)
+            print(f"  {s:<10} {cc.summary()} | greedy {len(greedy_key)}, TRUE optimum {len(star)} | "
+                  f"must-hit {row['musthit_rate']:.2f} vs random {row['musthit_rate_random']:.2f} vs "
+                  f"random+obj {row['musthit_rate_random_with_object']:.2f} | collateral "
+                  f"{row['collateral_at_optimum']:.2f} from {row['collateral_before']:.2f} | PROBE "
+                  f"{probe_before:.2f} -> {probe_after:.2f}  ({time.time() - t0:.0f}s)", flush=True)
 
     good = [r for r in rows if r.get("excluded") is None]
     m: Dict[str, Any] = {"layer": layer, "pool_size": pool_size, "n_held": len(held),
                          "n_attempted": len(rows), "n_measured": len(good),
+                         "silenceable_rate": float(np.mean([r["silenceable"] for r in rows]))
+                         if rows else float("nan"),
+                         "held/answer_before": float(np.mean([held_rate[s] for s in held])),
                          "positive_control": positive_control()}
     m["control_bound_can_exceed_one"] = m["positive_control"]["ok"]
     if len(good) < 3:
-        m["void"] = "fewer than three facts the pool can silence; there is nothing to bound"
+        m["finding"] = ("the paper-faithful J-lens ablation, with the paper's own guard against "
+                        "touching tokens in the clean output, does not silence these facts at this "
+                        "pool size -- so there is no closure to bound, and that is the result")
         m["per_fact"] = rows
+        m["seconds"] = time.time() - t0
         return m
-    for k in ("answer_before", "optimum", "greedy", "greedy_excess", "collateral_at_optimum",
-              "collateral_before", "support_size", "support_residual", "musthit_rate",
-              "musthit_exhaustive", "musthit_vacuous", "musthit_subsets_tested",
-              "lower_bound", "bound_certified", "shared_atoms", "bound_sound",
-              "tightness", "musthit_rate_random", "musthit_rate_random_with_object",
-              "object_atom_in_support", "lower_bound_random"):
+    for k in ("optimum", "greedy", "greedy_excess", "collateral_at_optimum", "collateral_before",
+              "support_size", "support_residual", "musthit_rate", "musthit_exhaustive",
+              "musthit_vacuous", "musthit_subsets_tested", "lower_bound", "bound_certified",
+              "shared_atoms", "bound_sound", "tightness", "musthit_rate_random",
+              "musthit_rate_random_with_object", "object_atom_in_support", "lower_bound_random",
+              "probe_before", "probe_after", "probe_drop"):
         m[k] = float(np.mean([r[k] for r in good]))
     m["bound_sound_min"] = float(np.min([r["bound_sound"] for r in good]))
     m["musthit_advantage"] = m["musthit_rate"] - m["musthit_rate_random"]
     m["musthit_advantage_over_object"] = m["musthit_rate"] - m["musthit_rate_random_with_object"]
-
-    # ------------------------------------------------------------------ the pod, both ways round
-    # WITHIN a fact, the core is the atoms every access path runs through: non-empty means the fact is
-    # stored as one object with several keys, which is a symlink detected in activation space, and it
-    # is why the closure is small. ACROSS facts, those same atoms turning up in another fact's core is
-    # the privacy failure, and it is why the collateral is not small. A design wants the first and not
-    # the second; a frozen model was not asked and these two numbers say what it did anyway.
     cores = {r["subject"]: set(r["core_atoms"]) for r in good}
     m["pod_rate"] = float(np.mean([len(c) > 0 for c in cores.values()]))
     m["core_size"] = float(np.mean([len(c) for c in cores.values()]))
     shares = [len(cores[a] & cores[b]) / len(cores[a])
               for a in cores for b in cores if a != b and cores[a]]
     m["cross_fact_core_overlap"] = float(np.mean(shares)) if shares else float("nan")
-    allsup = [set(x) for r in good for x in r["support_atoms"]]
-    pairs = [len(x & y) / max(len(x | y), 1) for i, x in enumerate(allsup) for y in allsup[i + 1:]]
-    m["support_jaccard_all"] = float(np.mean(pairs)) if pairs else float("nan")
     m["per_fact"] = rows
     m["seconds"] = time.time() - t0
     return m
 
 
-KEYS = ["n_held", "n_attempted", "n_measured", "control_bound_can_exceed_one", "answer_before",
-        "optimum", "greedy", "greedy_excess", "collateral_at_optimum", "collateral_before",
-        "support_size", "support_residual", "musthit_rate", "musthit_exhaustive", "musthit_vacuous",
-        "musthit_subsets_tested", "lower_bound",
-        "bound_certified", "shared_atoms", "bound_sound", "bound_sound_min", "tightness",
-        "musthit_rate_random", "musthit_rate_random_with_object", "object_atom_in_support",
-        "lower_bound_random", "musthit_advantage", "musthit_advantage_over_object",
-        "pod_rate", "core_size", "cross_fact_core_overlap", "support_jaccard_all"]
+KEYS = ["n_held", "n_attempted", "n_measured", "silenceable_rate", "held/answer_before",
+        "control_bound_can_exceed_one", "optimum", "greedy", "greedy_excess",
+        "collateral_at_optimum", "collateral_before", "support_size", "support_residual",
+        "musthit_rate", "musthit_exhaustive", "musthit_vacuous", "musthit_subsets_tested",
+        "lower_bound", "bound_certified", "shared_atoms", "bound_sound", "bound_sound_min",
+        "tightness", "musthit_rate_random", "musthit_rate_random_with_object",
+        "object_atom_in_support", "lower_bound_random", "musthit_advantage",
+        "musthit_advantage_over_object", "pod_rate", "core_size", "cross_fact_core_overlap",
+        "probe_before", "probe_after", "probe_drop"]
 
 CRITERIA = {
-    # attack validity: there must be a fact to delete
-    "answer_before": (">=", 0.75),
-    # the instrument must be able to report a bound above one, or a 1 everywhere means nothing
+    "held/answer_before": (">=", 0.75),
     "control_bound_can_exceed_one": (">=", 1.0),
-    # THE CLAIM'S SOUNDNESS, checked against the true optimum found by enumeration. One violation
-    # anywhere falsifies it, which is why the worst fact is the criterion and not the mean.
+    # soundness, checked against the true optimum found by enumeration; one violation falsifies it
     "bound_sound_min": (">=", 1.0),
-    # the certificate must be exhaustive, not truncated by budget, and must have had something to
-    # test: a support filling the pool passes by having no disjoint ablation to try
     "musthit_exhaustive": (">=", 1.0),
     "musthit_vacuous": ("<=", 0.0),
-    # the J-lens support must pass the must-hit test
     "musthit_rate": (">=", 0.70),
-    # AND THE CONTROL THAT CAN KILL IT: a random support of the same size must NOT, or the pool is
-    # one where everything is must-hit and the decomposition is doing no work
     "musthit_rate_random": ("<=", 0.40),
     "musthit_advantage": (">=", 0.30),
-    # and the sharper one: the support must beat a random set that ALSO contains the object's own
-    # direction, or the certificate's content is "include the object direction" and nothing else
     "musthit_advantage_over_object": (">=", 0.15),
+    # THE DELETION MUST BE A DELETION. If a probe refitted on the ablated states still reads the
+    # object, the closure removed a readout path and not a fact.
+    "probe_after": ("<=", 0.40),
 }
+
+DECISION_RULE = (
+    "The bound is reported as CERTIFIED only where every support in the disjoint family passed an "
+    "exhaustive, non-vacuous must-hit test. Where the pool cannot silence a fact there is no closure "
+    "to bound, and that is reported as the finding rather than as a void experiment.")
 
 
 def main(argv: Optional[List[str]] = None) -> Dict[str, Any]:
     ap = argparse.ArgumentParser()
     ap.add_argument("--layer", type=int, default=LAYER)
     ap.add_argument("--pool", type=int, default=POOL)
-    ap.add_argument("--max-facts", type=int, default=8)
+    ap.add_argument("--max-facts", type=int, default=6)
     ap.add_argument("--seeds", type=int, nargs="*", default=[0, 1, 2])
     ap.add_argument("--threads", type=int, default=int(os.environ.get("SO_THREADS", "0")))
     args = ap.parse_args(argv)
@@ -400,84 +438,71 @@ def main(argv: Optional[List[str]] = None) -> Dict[str, Any]:
         "experiment": "E-000042",
         "title": "a certified lower bound for deletion in a representation, from the J-lens support",
         "evidence_level": "E5", "trains_nothing": True, "model": MODEL, "layer": args.layer,
-        "pool_size": args.pool, "seeds": args.seeds,
-        "seeds_vary": "the random-support control only; the ablation table is exhaustive and the model "
-                      "is frozen, so the optimum, the supports, the certificates and the bound are "
-                      "deterministic",
+        "pool_size": args.pool, "seeds": args.seeds, "decision_rule": DECISION_RULE,
+        "seeds_vary": "the random-support controls only; the ablation table is exhaustive and the "
+                      "model is frozen, so the optimum, the supports and the bound are deterministic",
         "result": m, "aggregate": agg, "criteria": check}
 
     md = [f"# E-000042 — {record['title']}", "",
-          f"Frozen {MODEL}, layer {args.layer}, no training. For each fact, EVERY subset of an "
-          f"{args.pool}-direction pool",
-          "is ablated and the answers recorded, so the true optimum is found by enumeration and the",
-          "bound is compared against the answer rather than against another estimate.", ""]
-    if "void" in m:
-        md += ["## VOID", "", f"No claim is made: {m['void']}", ""]
-        record["void"] = m["void"]
+          f"Frozen {MODEL}, layer {args.layer}, no training. Directions are J-lens vectors -- rows of",
+          "`W_U J_l`, one vector-Jacobian product each (`so/jlens.py`) -- and the pool never contains a",
+          f"token in the clean top-{CLEAN_GUARD} output, which is the workspace paper's own guard",
+          "against ablating the readout instead of the fact. Every subset of the pool is ablated, so",
+          "the true optimum comes from enumeration and the bound is compared against the answer.", ""]
+    if "finding" in m:
+        md += ["## The pool cannot silence these facts", "", m["finding"] + ".", "",
+               ledger.table(["measure", "value"],
+                            [["facts the model answers at >= 0.75", f"{m['n_held']}"],
+                             ["facts attempted", f"{m['n_attempted']}"],
+                             ["facts any subset of the pool could silence",
+                              f"{m['silenceable_rate']:.4f}"]]), "",
+               "This is a result, not a failure to get one: a J-lens ablation that respects the",
+               "paper's guard does not remove a capital fact from GPT-2 small at this pool size. The",
+               "eight-direction ablation that DID silence these facts in an earlier run removed the",
+               "unembedding rows of the candidate answers themselves, which blinds the readout rather",
+               "than deleting anything.", ""]
+        record["finding"] = m["finding"]
     else:
         md += ["## The interval, against the optimum found by enumeration", "",
                ledger.table(["measure", "mean over facts"],
-                            [["the model answers the fact, before anything", f"{m['answer_before']:.4f}"],
+                            [["facts the pool can silence at all", f"{m['silenceable_rate']:.4f}"],
                              ["TRUE optimum, by exhaustive enumeration", f"{m['optimum']:.2f}"],
                              ["greedy upper bound", f"{m['greedy']:.2f}"],
-                             ["greedy's excess over the optimum", f"{m['greedy_excess']:+.2f}"],
                              ["certified lower bound from disjoint J-lens supports",
                               f"{m['lower_bound']:.2f}"],
                              ["bound / optimum (tightness)", f"{m['tightness']:.4f}"],
                              ["**bound <= optimum, worst fact**", f"**{m['bound_sound_min']:.4f}**"]]), "",
+               "## Is it a deletion, or only a blinding", "",
+               "An ablation that moves the argmax need not have removed anything. A linear probe is",
+               "refitted on the ABLATED states, leave-one-phrasing-out, and asked for the object.", "",
+               ledger.table(["measure", "mean over facts"],
+                            [["the model answers, before", f"{m['collateral_before']:.4f}"],
+                             ["probe reads the object, before", f"{m['probe_before']:.4f}"],
+                             ["**probe reads the object, after the optimum**",
+                              f"**{m['probe_after']:.4f}**"],
+                             ["bystander facts at the optimum", f"{m['collateral_at_optimum']:.4f}"]]), "",
                "## Is the support really a must-hit set", "",
                ledger.table(["measure", "mean over facts"],
                             [["atoms in the support", f"{m['support_size']:.2f}"],
-                             ["share of the state the support explains",
-                              f"{1.0 - m['support_residual']:.4f}"],
-                             ["disjoint ablations actually tried per phrasing",
+                             ["disjoint ablations tried per phrasing",
                               f"{m['musthit_subsets_tested']:.1f}"],
-                             ["certificates that had nothing to test (vacuous)",
-                              f"{m['musthit_vacuous']:.4f}"],
                              ["support passes the exhaustive must-hit test", f"{m['musthit_rate']:.4f}"],
-                             ["a RANDOM support of the same size does (control 1)",
+                             ["a random support of the same size does (control 1)",
                               f"{m['musthit_rate_random']:.4f}"],
                              ["a random support that ALSO holds the object direction (control 2)",
                               f"{m['musthit_rate_random_with_object']:.4f}"],
-                             ["the J-lens support holds the object direction",
-                              f"{m['object_atom_in_support']:.4f}"],
-                             ["advantage over control 1", f"{m['musthit_advantage']:+.4f}"],
                              ["**advantage over control 2**",
                               f"**{m['musthit_advantage_over_object']:+.4f}**"],
                              ["atoms every phrasing runs through (the pod core)",
-                              f"{m['shared_atoms']:.2f}"]]), "",
-               "Control 2 is the one that can really kill the claim. The object's own lens direction is",
-               "atom 0 of the pool by construction, and any support containing it is must-hit for a",
-               "nearly trivial reason: every ablation disjoint from that support leaves the direction",
-               "that reads the answer untouched. So control 2 draws a random support of the same size",
-               "that ALSO contains atom 0. If it passes as often as the J-lens support, the",
-               "decomposition has added nothing beyond 'include the object direction', and what is",
-               "reported here is a tautology wearing a certificate. The bolded row is that difference.",
-               "", "Control 1 is the weaker form of the same question: if any random set of the same",
-               "size is must-hit just as often, this pool is one where everything is, and the bound is",
-               "about counting.", "",
-               "## The pod, both ways round", "",
-               "WITHIN a fact, the core is the set of atoms every access path runs through. Non-empty",
-               "means the fact is stored as one object with several keys -- a symlink detected in",
-               "activation space -- and it is why the closure is small. ACROSS facts, those same atoms",
-               "turning up in another fact's core is the privacy failure, and it is why the collateral",
-               "is not small. A design wants the first and not the second; a frozen model was not asked",
-               "and these two numbers say what it did anyway.", "",
-               ledger.table(["measure", "mean over facts"],
-                            [["facts whose access paths share a core (stored as a pod)",
-                              f"{m['pod_rate']:.4f}"],
-                             ["atoms in that core", f"{m['core_size']:.2f}"],
-                             ["share of a fact's core that is ANOTHER fact's core too",
-                              f"{m['cross_fact_core_overlap']:.4f}"],
-                             ["Jaccard overlap of supports across all facts and phrasings",
-                              f"{m['support_jaccard_all']:.4f}"]]), "",
-               "## What the deletion costs bystanders", "",
-               ledger.table(["measure", "mean over facts"],
-                            [["bystander facts with nothing removed", f"{m['collateral_before']:.4f}"],
-                             ["bystander facts at the optimum", f"{m['collateral_at_optimum']:.4f}"]]), "",
+                              f"{m['core_size']:.2f}"],
+                             ["share of a core that is another fact's core too",
+                              f"{m['cross_fact_core_overlap']:.4f}"]]), "",
+               "Control 2 is the one that can really kill the claim: any support containing the",
+               "object's own direction is must-hit for a nearly trivial reason, so if a random support",
+               "that also contains it passes as often, the decomposition has added nothing.", "",
                "## The positive control", "",
                f"A synthetic table with {m['positive_control']['expected']} pairwise-disjoint supports "
-               f"by construction: the bound reports {m['positive_control']['bound']}. Without this, a "
+               f"by construction: the bound reports {m['positive_control']['bound']}. Without it a "
                "bound that returned 1 unconditionally would read as a finding about the model.", ""]
     md += ["## Pre-registered criteria", "", ledger.criteria_table(check), ""]
     path = ledger.save("e000042_certified_closure", record, "\n".join(md))
