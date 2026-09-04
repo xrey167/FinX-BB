@@ -1851,6 +1851,76 @@ none, and routing both through one column was the wrong shape. Splitting it was 
 sufficient, and no third experiment is queued on the strength of a hypothesis that has now failed
 twice.
 
+### 31.24 The gap is addressing, the law does not cross into a representation, and a theorem I mis-stated (2026-09-04)
+
+Three things landed together, and only the first is a clean win.
+
+**E-000039-A decides, now that it measures the quantity its own rule is written on.** The record had
+been saved with `--no-oracle`, which skips the `cell_mask` arm the residual gap is computed from, so
+`heldout/routing_share` was NaN and the decision rule stood on nothing. Re-run with the oracle:
+
+| measure | mean over seeds | worst seed |
+|---|---|---|
+| heldout/gap | 1.1100 | 1.0400 |
+| heldout/residual_gap | 0.1267 | 0.1100 |
+| **heldout/routing_share** | **0.8861** | **0.8818** |
+
+The rule, fixed before either arm was trained, was `routing_share >= 0.7 -> train the address arm
+alone`. It fires, at the worst seed as well as the mean. **Forcing the address closes 88.6% of the
+held-out reading gap**, so the paraphrase failure is addressing and not transport, and §31.21's
+positional diagnosis has the number it was missing.
+
+**E-000040 refuses to carry §31.22's law across the boundary, and says why.** The deletion itself
+works: 3.33 directions take the answer from 0.9444 to 0.0000 while bystanders hold at 0.8611 from
+1.0000. And the carrier is *mostly private* — only **0.0784** of a fact's basis is shared with another
+fact. But privacy is not sufficient:
+
+| measure | mean | worst seed |
+|---|---|---|
+| share of a fact's basis shared with other facts | 0.0784 | 0.0809 |
+| facts silenceable using only their OWN directions | 0.5098 | 0.4706 |
+| traceless gap (a_hide − a_answer) | +0.1236 | +0.0375 |
+| facts where that gap is positive | 0.3611 | 0.2500 |
+| `hole_detectable` (pre-registered ≥ 0.75) | **0.6667 — FAIL** | |
+
+Half the facts cannot be silenced with nothing but their own directions even though almost none of
+those directions is shared with any *single* other fact; the rest of the model is using them anyway.
+And the detector fails its own validity bar, with the traceless gap positive for barely a third of
+facts. **`T > U` is a statement about a store**, where an alias is a row that can be named. On this
+evidence it does not transfer to a representation, and the earlier draft that said it did was reading
+a mean over a minority.
+
+The report also had to be corrected against itself: it printed "most of what carries a fact is not
+that fact's" directly beneath its own measurement of 0.0784, which says the opposite.
+
+**And a theorem I mis-stated, which costs the largest version of the E-000042 claim.** I asserted that
+LEACE gives sufficiency and not a lower bound. **Theorem 4.1 is an iff** — "r(X) linearly guards Z if
+and only if the columns of the cross-covariance matrix Σ_XZ are contained in the null space of P" —
+whose *only if* half binds every affine erasure map to `dim ker(P) ≥ rank(Σ_XZ)`. LEACE attains that
+rank, so the interval is *closed*. Theorems 4.2 and 4.3 are the sufficiency results; 4.1 is the
+necessity one, and the paper deploys it only to certify that other methods suffice, which is why it
+reads as a sufficiency paper. A certified lower bound on erasure cost in a representation exists and
+predates this programme.
+
+More of the same: Adolfi, Vilas and Wareham (ICLR 2025, arXiv:2410.08025) already define
+**k-robustness** — "no set of k or fewer components erases the behaviour" — and their Problem 8 is
+literally a hitting set over neurons, NP-hard and in Σ₂ᵖ, tractable in the size of the candidate set.
+Bassan and Katz (arXiv:2210.13915) already run the **disjoint-packing dual** with sound certificates
+and report the upper/lower ratio as a certified approximation factor, over input features via a
+complete verifier. What is left for `so/support.py` is narrower and is written down as such in
+`docs/so-claim-certified-representation-closure.md`.
+
+**Two instrument failures found the same way, both about ablating the readout instead of the fact.**
+E-000042's first run used rows of `W_U` — the logit lens, the J = I case — and went VOID: eight
+directions removed, not one fact silenced. The apparent fix was worse: removing the eight logit-lens
+rows *of the candidate capitals* took the answer to 0.0000, but those rows are the readout of the
+candidate set, so the restricted argmax becomes noise. The workspace paper guards against exactly this
+— its global ablation "does not ablate any tokens that appear in the top-10 tokens of a clean forward
+pass" — and the guard is now carried over. Separately, a parallel measurement on this repository's own
+checkpoint found a closure of 1.00 at collateral 0.0044 whose ablated states still yielded the object
+to a **freshly fitted linear probe at 0.9300 held out**. So `probe_after` is a pre-registered criterion
+in E-000042 and not a diagnostic: a closure a probe walks through removed a readout path, not a fact.
+
 ### 31.8 Boundary
 
 CPU only, no GPU, no LLM above 124M parameters, synthetic worlds, single-token entities, two surface forms per relation, one session. Nothing here shows unlearning of facts already encoded in pretrained weights. Evidence levels recorded: E3–E4 for the synthetic system (F4 for SHRED with the verified gate, E-000010 — **on the value channel only**: E-000028 recovers the shredded object at 1.0000 through the ungated reverse key, where REVOKE and DELETE are at chance, so F4 for SHRED is a claim about answers, logits, hidden states and probes and not about routing); E5 as substrate for the frozen-GPT-2 experiment, with reading, composition, update and the copy bound supported and behavioural deletion not yet supported at the pre-registered thresholds.
