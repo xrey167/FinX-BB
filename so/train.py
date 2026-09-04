@@ -20,6 +20,7 @@ import torch.nn.functional as F
 
 from .data import Bank, bank_from_world, encode_queries, sample_training_queries
 from .model import ModelConfig, MutableKnowledgeTransformer
+from .carrier import ablation_loss, privacy_loss
 from .world import World
 
 
@@ -42,6 +43,14 @@ class TrainConfig:
     train_noise: float = 0.03
     route_weight: float = 0.5
     gate_weight: float = 0.0         # E-000009: BCE(gate logits, marker validity) — signature verification loss
+    # E-000038: shaping the carrier so that removing it removes the fact, and only the fact.
+    # PRIVACY pushes the per-object read directions towards mutual near-orthogonality, hinged at the
+    # Welch bound so it never fights the answer loss over a margin that provably does not exist.
+    # ABLATION trains against the certificate itself: with the carrier projected out, the model must
+    # answer UNKNOWN, while every other row of the same batch keeps its ordinary loss under the same
+    # projection -- which is what stops the model simply learning to play dead when it detects one.
+    carrier_privacy: float = 0.0
+    carrier_ablation: float = 0.0
     gate_balanced: bool = False      # E-000010: weight signed and unsigned markers equally (unsigned are ~5% of cells)
     mix: Dict[str, float] = field(default_factory=lambda: {"fwd1": 0.40, "fwd2": 0.25, "fwd3": 0.20, "rev1": 0.15})
     fixed_world: bool = False        # E-000002: train on ONE world so that facts can be memorised
@@ -124,13 +133,23 @@ def train(model_cfg: ModelConfig, cfg: TrainConfig, world_override: Optional[Wor
             else:
                 gate_loss = per_cell.mean()
             loss = loss + cfg.gate_weight * gate_loss
+        carrier_stats: Dict[str, float] = {}
+        if cfg.carrier_privacy > 0:
+            pl, st = privacy_loss(model)
+            loss = loss + cfg.carrier_privacy * pl
+            carrier_stats.update(st)
+        if cfg.carrier_ablation > 0 and extras.get("hidden") is not None:
+            al, st = ablation_loss(model, extras["hidden"], batch.target, model_cfg.n_entities)
+            loss = loss + cfg.carrier_ablation * al
+            carrier_stats.update(st)
         opt.zero_grad(set_to_none=True)
         loss.backward()
         torch.nn.utils.clip_grad_norm_(model.parameters(), 1.0)
         opt.step()
         if (step + 1) % cfg.log_every == 0 or step == 0:
             acc = (logits.argmax(-1) == batch.target).float().mean().item()
-            rec = {"step": step + 1, "loss": float(loss.item()), "answer_loss": float(loss_ans.item()),
+            rec = {**carrier_stats,
+                   "step": step + 1, "loss": float(loss.item()), "answer_loss": float(loss_ans.item()),
                    "batch_acc": acc, "elapsed_s": time.time() - t0}
             history.append(rec)
             if verbose:
