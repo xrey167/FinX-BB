@@ -124,6 +124,60 @@ Internally: "provably" is not earned — E-000002's own caveat says only `fixed_
 
 **What would not move anyone:** more seeds, more cells, another synthetic battery, or any further result at 124M on single-token entities.
 
+---
+
+### 6. Added later the same day: the record-to-fact gap, and what it is worth
+
+Section 2 says claim 4's counting argument has been known for fifty years, and section 5's second item
+asks for the sweep on the symlink arms. Both stand. What changed is that the *guarantee* was pushed
+from a record to a fact, and the honest accounting of that is narrower than it first looked and
+sharper in one place than expected.
+
+**What is not ours.** The metric: `so/closure.py` computes **resilience**, the size of a **minimum
+contingency set**, which has a PTIME/NP-complete dichotomy and an exact ILP solver in the database
+literature. The module now uses those words and exposes `resilience` as the name of `fact_closure`.
+The remedy: Raeesi & Roed's §9 proposes it verbatim — *"aliases and paraphrastic forms are stored as
+pointers into a single canonical record rather than as independent triplets"* — and adds *"Both
+approaches are directly testable within our framework."* Named, called testable, not tested. Anyone
+writing this up cites them in the first paragraph, not the related-work section.
+
+**What is measured here and is not in that paper.** The closure computed with a **certified lower
+bound**, so `optimal` is verified case by case rather than assumed from the shape of the store; its
+**composition** with a record-level certificate, which nobody else can do because E-000030 is the
+first such certificate in this line; the closure **predicting** the reader, `(closure − 1)/k` against
+what the model still answers; and the **price** the reader charges for the indirection, 0.0954 for
+sharing and 0.0688 for link training, worst of three seeds over twelve phrasings. That is a
+measurement paper's contribution, not an idea's.
+
+**What the exercise cost, and this is the part worth reading.** Building the fact-level certificate
+found three instruments in `so/audit.py` that certified by not testing — reachability on an empty row
+set returns the ladder's strongest label on a *live* bank; the payload sweep on an empty row set
+certifies in one evaluation; and membership could not see that `MVCCStore.bank()` builds an alias
+row's link key from the target cell. E-000030's recorded `delete/structurally_certified` came from the
+first of those. The general rule is §31.15's and it is now the third time this programme has paid for
+it: **an instrument that cannot fail is not evidence.**
+
+**And one result that cuts against the design rather than for it.** E-000035: a pod's surviving
+aliases name the key that was removed, at 1.0000, uniquely, from the bank alone with no model. A
+duplicated store leaves the adversary the whole 1,536-key space. The closure **inverts** with the
+guarantee — unreachable costs 1 for a pod and 3 for duplicates; leaving no trace costs 3 for a pod and
+1 for duplicates. So the sentence this programme wanted, *canonicalisation makes erasure a single
+certifiable operation*, is only half of what the same design decision does; the other half is *and it
+turns every access path into a deletion oracle*. That half is new as far as the six literatures
+reviewed here go, it is cheap to reproduce, and it is the kind of finding that travels: any store that
+keeps a dangling reference after deleting its referent has it, which includes every soft-deleting
+vector index that keeps its edges.
+
+**Revised answer to "is this publishable, and where".** Not as an architecture paper — section 1 was
+already right about that. As a short measurement-and-audit paper: *deletion certificates for
+memory-augmented models, the store-side closure they must compose with, and the disclosure channel
+canonicalisation opens.* The venue is the one that took Raeesi & Roed. What it needs before it is
+honest to send: the E-000028 sweep on the symlink arms (section 5, item ii, still not run), and
+E-000033's reproduction of the closure in a chunked vector index, so the result is about the pattern
+rather than about `so/mvcc.py`.
+
+---
+
 **Sources:** [MUNKEY](https://arxiv.org/abs/2603.15033) · [Auditing Forgetting in LMLMs](https://arxiv.org/abs/2607.00605) · [Subtract, Transport, or Replay?](https://arxiv.org/abs/2607.27539) · [Ghost Vectors](https://arxiv.org/abs/2606.18497) · [LMLM](https://arxiv.org/abs/2505.15962) · [Data Duplication (USENIX Sec 2025)](https://arxiv.org/abs/2501.16663) · [Agentic Unlearning](https://arxiv.org/abs/2602.17692) · [Kathleen Remembers](https://arxiv.org/abs/2608.30376)
 
 Primary records read: `/home/user/FinX-BB/docs/so-experiment-ledger.md` §§31.2, 31.4–31.13, 31.8; `/home/user/FinX-BB/docs/so-roadmap-2026-09-02.md`; `/home/user/FinX-BB/so/results/{e000019_fresh_seed_chance,e000021_gate_error_rates,e000028_key_channel,e000029_marker_geometry,e000011_gpt2_v2,e000012_status_gated_revoke,e000013_prior_conflict,e000015_symlink_cells,e000020_symlink_gpt2,e000025_template_rescoring,e000026_lifecycle_readable_template,e000016_alias_chains}.json`.
