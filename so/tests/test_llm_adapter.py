@@ -246,3 +246,45 @@ def test_the_null_value_is_an_output_direction_on_an_untied_model():
     lm = _untied_lm()
     m = KnowledgeAdapterLM(lm, cfg, list(range(10, 10 + N_ENT)), UNK).eval()
     assert torch.allclose(m.null_value[0], lm.get_output_embeddings().weight[UNK], atol=1e-6)
+
+
+# ------------------------------------------- the key channel, in the frozen-LM adapter (E-000028 scope)
+
+def test_the_adapter_key_carries_no_object_so_shredding_hides_it_from_routing():
+    """E-000028's leak cannot occur here, and this is why rather than an assertion from reading.
+
+    In the synthetic model the reverse key is k_rev(LN(object + relation)) and is never gated, so a
+    shredded cell's key still names the object and a candidate sweep recovers it. The adapter's key is
+    k_proj(ln_key(subject + relation)) and contains no object at all: two banks that differ only in the
+    objects of gate-closed cells must be indistinguishable to every routing distribution the layer
+    produces.
+    """
+    m = _adapter(status_gated=True)
+    with torch.no_grad():                              # an untrained gate sits near 0.5 for any marker
+        m.marker_gate[-1].weight.zero_(); m.marker_gate[-1].bias.fill_(-20.0)
+    b = _bank(p_revoked=0.0, p_shred=1.0)              # every cell shredded: the gate is shut everywhere
+    assert float(m.gate(b["marker"]).max()) < 1e-6
+    b2 = {k: (v.clone() if torch.is_tensor(v) else v) for k, v in b.items()}
+    b2["obj"] = (b2["obj"] + 1) % N_ENT
+    ids, am, last = _prompt()
+    with torch.no_grad():
+        enc, enc2 = m.encode_bank(b), m.encode_bank(b2)
+        assert torch.equal(enc["keys"], enc2["keys"])          # the keys do not move with the object
+        _, _, r1, _ = m(b, ids, am, last)
+        _, _, r2, _ = m(b2, ids, am, last)
+    assert torch.allclose(r1, r2, atol=1e-6)
+
+
+def test_an_active_cell_object_does_move_the_adapter_values_but_not_its_keys():
+    """The complement, so the test above cannot pass by the bank being ignored altogether."""
+    m = _adapter(status_gated=True)
+    with torch.no_grad():
+        m.marker_gate[-1].weight.zero_(); m.marker_gate[-1].bias.fill_(20.0)
+    b = _bank(p_revoked=0.0, p_shred=0.0)              # every marker valid: the gate is open
+    assert float(m.gate(b["marker"]).min()) > 1 - 1e-6
+    b2 = {k: (v.clone() if torch.is_tensor(v) else v) for k, v in b.items()}
+    b2["obj"] = (b2["obj"] + 1) % N_ENT
+    with torch.no_grad():
+        enc, enc2 = m.encode_bank(b), m.encode_bank(b2)
+    assert torch.equal(enc["keys"], enc2["keys"])
+    assert not torch.allclose(enc["values"], enc2["values"], atol=1e-5)

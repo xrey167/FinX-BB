@@ -1151,6 +1151,73 @@ Three consequences the programme has to carry:
    experiment in the twelve-template line reports at least one strong and one weak phrasing from here
    on, and a headline taken at one template says which.
 
+### 31.10 SHRED closes the value channel and leaves the key channel open (2026-09-04)
+
+The strongest deletion claim in this programme is F4 for SHRED with the verified gate: after the
+marker is destroyed the gate closes, the payload is unreadable, and every recorded attack comes back
+at chance (E-000010, and on fresh seeds E-000019). Every one of those attacks reads the *value*
+channel — the answer, the logits, the hidden state, the linear probe. None of them reads the keys.
+
+`shred()` writes only `Version.marker` and leaves the row ACTIVE. In `encode_bank` the routing keys
+are computed from the payload **before** the gate is applied and are never gated:
+
+    k_f = k_fwd(LN(s + r))          # subject and relation
+    k_r = k_rev(LN(o + r))          # THE OBJECT
+    v_f = v_f * g                   # only the values are gated
+
+So a shredded cell's reverse key is still a deterministic function of the object that was destroyed.
+The first consequence was already in the record and went unread: E-000019 lists
+`active/routing_mass_on_target` and `shred/routing_mass_on_target` as the same float in every seed,
+and §31.3 noted that routing does not separate the two — without asking what else routing therefore
+carries.
+
+E-000028 asks. The attacker is given exactly what the rest of the battery gives them — a cell's
+subject and relation — locates its column from the routing of the ordinary forward question, then
+sweeps every candidate object through a **reverse** query and takes the one that steers the read onto
+that column. Five seeds, 100 targets each, 500 targets pooled, on the recorded E-000010
+checkpoints, no training:
+
+| condition | object recovered, top-1 | top-5 | mean rank | winning margin |
+|---|---|---|---|---|
+| active (validity control) | 1.0000 | 1.0000 | 0.0 | 0.6195 |
+| **shred** | **1.0000** | 1.0000 | 0.0 | 0.6195 |
+| revoke | 0.0040 | 0.0220 | 128.0 | 0.0022 |
+| delete | 0.0040 | 0.0220 | 128.0 | 0.0022 |
+| chance | 0.0039 | 0.0195 | 127.5 | — |
+
+The shredded row is not merely leaky, it is **unchanged**: its numbers equal the live cell's to four
+decimals, margin included, because the keys the attack reads are the same tensors before and after.
+The attacker's located column is also identical before and after SHRED in every one of the 500
+targets. REVOKE and DELETE, which remove the row from routing altogether, land on chance —
+0.0040 against 0.0039, mean rank 128.0
+against 127.5.
+
+What changes, precisely:
+
+1. **The F4 claim for SHRED in the synthetic system is narrowed to the value channel.** It was never
+   measured on any other, and on the key channel it fails at 1.0000 against a required 0.0039. The
+   E-000010 and E-000019 records stand as produced — every number in them is about the value channel
+   and every one is still correct.
+2. **It is not a claim about the frozen-GPT-2 line.** That adapter's key is
+   `k_proj(ln_key(subject + relation))` and contains no object at all, and its link payload is gated
+   like any other value. Two tests state this as a property: with the gate forced shut, banks that
+   differ only in the objects of shredded cells produce identical keys and identical routing, while
+   an open gate moves the values.
+3. **The architecture already contains an operation that does what SHRED claimed.** REVOKE and
+   DELETE both close this channel completely, because a non-routable row has no column to steer onto.
+   The crypto-shredding analogy is the source of the error: destroying the key to a ciphertext hides
+   the plaintext, but here the *address* was derived from the plaintext too.
+4. **A fix exists and is not yet evaluated.** `ModelConfig.gate_reverse_key` blends the reverse key
+   toward a constant shared by all gate-closed rows, reusing the idiom by which `link_rev_key` makes
+   alias rows non-reverse-addressable. It is off by default, because it changes what a routing target
+   means for a reverse query against a shredded cell and therefore needs its own training run rather
+   than a flag flipped on checkpoints trained without it. Two tests pin the defect and the repair.
+
+The general lesson is the one worth carrying to any later design: **a gate on values is not a
+deletion primitive if anything else in the computation is a function of the same payload.** Every
+quantity derived from a cell has to be enumerated and gated, or the cell has to leave the addressable
+set entirely.
+
 ### 31.8 Boundary
 
-CPU only, no GPU, no LLM above 124M parameters, synthetic worlds, single-token entities, two surface forms per relation, one session. Nothing here shows unlearning of facts already encoded in pretrained weights. Evidence levels recorded: E3–E4 for the synthetic system (F4 for SHRED with the verified gate, E-000010); E5 as substrate for the frozen-GPT-2 experiment, with reading, composition, update and the copy bound supported and behavioural deletion not yet supported at the pre-registered thresholds.
+CPU only, no GPU, no LLM above 124M parameters, synthetic worlds, single-token entities, two surface forms per relation, one session. Nothing here shows unlearning of facts already encoded in pretrained weights. Evidence levels recorded: E3–E4 for the synthetic system (F4 for SHRED with the verified gate, E-000010 — **on the value channel only**: E-000028 recovers the shredded object at 1.0000 through the ungated reverse key, where REVOKE and DELETE are at chance, so F4 for SHRED is a claim about answers, logits, hidden states and probes and not about routing); E5 as substrate for the frozen-GPT-2 experiment, with reading, composition, update and the copy bound supported and behavioural deletion not yet supported at the pre-registered thresholds.

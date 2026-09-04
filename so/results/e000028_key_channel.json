@@ -1,0 +1,308 @@
+{
+  "aggregate": {
+    "active/column_mass": {
+      "max": 0.9984366297721863,
+      "mean": 0.9979639887809754,
+      "min": 0.997698962688446,
+      "n": 5
+    },
+    "active/margin_mean": {
+      "max": 0.6572781842947006,
+      "mean": 0.6195091874599458,
+      "min": 0.5968171273171902,
+      "n": 5
+    },
+    "active/object_mean_rank": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 5
+    },
+    "active/object_top1": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 5
+    },
+    "active/object_top5": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 5
+    },
+    "column_located": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 5
+    },
+    "delete/margin_mean": {
+      "max": 0.0035102814435958862,
+      "mean": 0.0021886050701141356,
+      "min": 0.0015686094760894776,
+      "n": 5
+    },
+    "delete/object_mean_rank": {
+      "max": 135.91,
+      "mean": 128.02,
+      "min": 120.63,
+      "n": 5
+    },
+    "delete/object_top1": {
+      "max": 0.02,
+      "mean": 0.004,
+      "min": 0.0,
+      "n": 5
+    },
+    "delete/object_top5": {
+      "max": 0.04,
+      "mean": 0.022,
+      "min": 0.01,
+      "n": 5
+    },
+    "revoke/margin_mean": {
+      "max": 0.003510231375694275,
+      "mean": 0.002188622236251831,
+      "min": 0.0015686362981796264,
+      "n": 5
+    },
+    "revoke/object_mean_rank": {
+      "max": 135.91,
+      "mean": 128.02,
+      "min": 120.63,
+      "n": 5
+    },
+    "revoke/object_top1": {
+      "max": 0.02,
+      "mean": 0.004,
+      "min": 0.0,
+      "n": 5
+    },
+    "revoke/object_top5": {
+      "max": 0.04,
+      "mean": 0.022,
+      "min": 0.01,
+      "n": 5
+    },
+    "shred/column_located": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 5
+    },
+    "shred/margin_mean": {
+      "max": 0.6572781842947006,
+      "mean": 0.6195091874599458,
+      "min": 0.5968171273171902,
+      "n": 5
+    },
+    "shred/object_mean_rank": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 5
+    },
+    "shred/object_top1": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 5
+    },
+    "shred/object_top5": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 5
+    }
+  },
+  "criteria": {
+    "claim_supported": true,
+    "criteria": {
+      "active/object_top1": {
+        "observed": 1.0,
+        "op": ">=",
+        "pass": true,
+        "threshold": 0.2
+      },
+      "column_located": {
+        "observed": 1.0,
+        "op": ">=",
+        "pass": true,
+        "threshold": 0.9
+      }
+    }
+  },
+  "environment": {
+    "device": "cpu",
+    "numpy": "2.2.6",
+    "platform": "Linux-6.18.44-fc-v24-x86_64-with-glibc2.39",
+    "python": "3.11.15",
+    "threads": "2",
+    "torch": "2.14.0+cpu"
+  },
+  "experiment": "E-000028",
+  "key_channel_leak": {
+    "claim_supported": false,
+    "criteria": {
+      "shred/object_top1": {
+        "observed": 1.0,
+        "op": "<=",
+        "pass": false,
+        "threshold": 0.00390625
+      }
+    }
+  },
+  "n_targets": 100,
+  "per_seed": [
+    {
+      "active/column_mass": 0.9978567361831665,
+      "active/margin_mean": 0.5968171273171902,
+      "active/object_mean_rank": 0.0,
+      "active/object_top1": 1.0,
+      "active/object_top5": 1.0,
+      "chance_mean_rank": 127.5,
+      "chance_top1": 0.00390625,
+      "checkpoint_sha256": "f0b181bc52152f26b419f2d096a7419bbbe507307a1c4e6984a4e61c441c864d",
+      "column_located": 1.0,
+      "delete/margin_mean": 0.0035102814435958862,
+      "delete/object_mean_rank": 131.39,
+      "delete/object_top1": 0.0,
+      "delete/object_top5": 0.02,
+      "n_entities": 256,
+      "n_targets": 100,
+      "revoke/margin_mean": 0.003510231375694275,
+      "revoke/object_mean_rank": 131.39,
+      "revoke/object_top1": 0.0,
+      "revoke/object_top5": 0.02,
+      "seconds": 153.23600101470947,
+      "seed": 0,
+      "shred/column_located": 1.0,
+      "shred/margin_mean": 0.5968171273171902,
+      "shred/object_mean_rank": 0.0,
+      "shred/object_top1": 1.0,
+      "shred/object_top5": 1.0
+    },
+    {
+      "active/column_mass": 0.9980608224868774,
+      "active/margin_mean": 0.6572781842947006,
+      "active/object_mean_rank": 0.0,
+      "active/object_top1": 1.0,
+      "active/object_top5": 1.0,
+      "chance_mean_rank": 127.5,
+      "chance_top1": 0.00390625,
+      "checkpoint_sha256": "e5ebb907e9e4f8a17978d43c0fe1e8f1935fd74377e6768a2424c67f56f67033",
+      "column_located": 1.0,
+      "delete/margin_mean": 0.001754785180091858,
+      "delete/object_mean_rank": 124.94,
+      "delete/object_top1": 0.0,
+      "delete/object_top5": 0.01,
+      "n_entities": 256,
+      "n_targets": 100,
+      "revoke/margin_mean": 0.0017547154426574708,
+      "revoke/object_mean_rank": 124.94,
+      "revoke/object_top1": 0.0,
+      "revoke/object_top5": 0.01,
+      "seconds": 127.32586312294006,
+      "seed": 1,
+      "shred/column_located": 1.0,
+      "shred/margin_mean": 0.6572781842947006,
+      "shred/object_mean_rank": 0.0,
+      "shred/object_top1": 1.0,
+      "shred/object_top5": 1.0
+    },
+    {
+      "active/column_mass": 0.9984366297721863,
+      "active/margin_mean": 0.6426781354844571,
+      "active/object_mean_rank": 0.0,
+      "active/object_top1": 1.0,
+      "active/object_top5": 1.0,
+      "chance_mean_rank": 127.5,
+      "chance_top1": 0.00390625,
+      "checkpoint_sha256": "18a064916cb19bf84fd32bfc9dc8b47d9cf28e68434c88a3f4dd6a7f7663f6c5",
+      "column_located": 1.0,
+      "delete/margin_mean": 0.0017216944694519044,
+      "delete/object_mean_rank": 120.63,
+      "delete/object_top1": 0.02,
+      "delete/object_top5": 0.04,
+      "n_entities": 256,
+      "n_targets": 100,
+      "revoke/margin_mean": 0.0017218053340911864,
+      "revoke/object_mean_rank": 120.63,
+      "revoke/object_top1": 0.02,
+      "revoke/object_top5": 0.04,
+      "seconds": 100.07623076438904,
+      "seed": 2,
+      "shred/column_located": 1.0,
+      "shred/margin_mean": 0.6426781354844571,
+      "shred/object_mean_rank": 0.0,
+      "shred/object_top1": 1.0,
+      "shred/object_top5": 1.0
+    },
+    {
+      "active/column_mass": 0.9977667927742004,
+      "active/margin_mean": 0.6033922511339188,
+      "active/object_mean_rank": 0.0,
+      "active/object_top1": 1.0,
+      "active/object_top5": 1.0,
+      "chance_mean_rank": 127.5,
+      "chance_top1": 0.00390625,
+      "checkpoint_sha256": "c5649b6c31c19a4fc041a3d1da6fa0376256e046808711691435efe77a777a28",
+      "column_located": 1.0,
+      "delete/margin_mean": 0.0023876547813415526,
+      "delete/object_mean_rank": 127.23,
+      "delete/object_top1": 0.0,
+      "delete/object_top5": 0.01,
+      "n_entities": 256,
+      "n_targets": 100,
+      "revoke/margin_mean": 0.0023877227306365965,
+      "revoke/object_mean_rank": 127.23,
+      "revoke/object_top1": 0.0,
+      "revoke/object_top5": 0.01,
+      "seconds": 207.1283974647522,
+      "seed": 3,
+      "shred/column_located": 1.0,
+      "shred/margin_mean": 0.6033922511339188,
+      "shred/object_mean_rank": 0.0,
+      "shred/object_top1": 1.0,
+      "shred/object_top5": 1.0
+    },
+    {
+      "active/column_mass": 0.997698962688446,
+      "active/margin_mean": 0.5973802390694618,
+      "active/object_mean_rank": 0.0,
+      "active/object_top1": 1.0,
+      "active/object_top5": 1.0,
+      "chance_mean_rank": 127.5,
+      "chance_top1": 0.00390625,
+      "checkpoint_sha256": "bd56e78905824b59a3e2236944db25ff6fcbe988ecde2de5aef0a5ad45937bcb",
+      "column_located": 1.0,
+      "delete/margin_mean": 0.0015686094760894776,
+      "delete/object_mean_rank": 135.91,
+      "delete/object_top1": 0.0,
+      "delete/object_top5": 0.03,
+      "n_entities": 256,
+      "n_targets": 100,
+      "revoke/margin_mean": 0.0015686362981796264,
+      "revoke/object_mean_rank": 135.91,
+      "revoke/object_top1": 0.0,
+      "revoke/object_top5": 0.03,
+      "seconds": 147.14592266082764,
+      "seed": 4,
+      "shred/column_located": 1.0,
+      "shred/margin_mean": 0.5973802390694618,
+      "shred/object_mean_rank": 0.0,
+      "shred/object_top1": 1.0,
+      "shred/object_top5": 1.0
+    }
+  ],
+  "recorded_at": "2026-09-04T14:33:10+00:00",
+  "seeds": [
+    0,
+    1,
+    2,
+    3,
+    4
+  ],
+  "title": "the channel SHRED does not close",
+  "trains_nothing": true
+}

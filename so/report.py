@@ -35,6 +35,20 @@ PROPERTIES = {
 
 # post-hoc interpretation of recorded outcomes (the JSON records are never edited)
 NOTES = {
+    "e000028_key_channel": "The strongest deletion claim here -- F4 for SHRED with the verified gate -- was only "
+        "ever measured on the value channel: the answer, the logits, the hidden state, the linear probe. shred() "
+        "writes only the marker and leaves the row ACTIVE, and in encode_bank the routing keys are computed before "
+        "the gate and are never gated, so a shredded cell's reverse key k_rev(LN(object + relation)) still names "
+        "the object. An attacker given the cell's subject and relation locates its column from the routing of the "
+        "ordinary forward question and sweeps candidate objects through a reverse query: over 500 targets on five "
+        "seeds the shredded object comes back at 1.0000 against a chance of 0.0039, "
+        "with numbers identical to the live cell's to four decimals -- the keys are the same tensors before and "
+        "after. REVOKE and DELETE remove the row from routing and land on chance (0.0040, "
+        "mean rank 128.0 against 127.5). The E-000010 and E-000019 records "
+        "stand: every number in them is about the value channel and every one is still correct. What is withdrawn "
+        "is the unqualified reading of F4 for SHRED. This is a synthetic-model defect: the GPT-2 adapter's key is "
+        "k_proj(ln_key(subject + relation)) and carries no object, which two tests assert as a property. "
+        "ModelConfig.gate_reverse_key repairs it and is unevaluated -- it needs its own training run. Ledger 31.10.",
     "e000025_template_rescoring": "Trains nothing: it re-reads E-000020's and E-000017-B's checkpoints at every "
         "one of the twelve templates. E-000020's headline pair -- direct 0.5667, alias 0.5067 -- is template 0, "
         "because its _answers helper defaults to it. Reading here is bimodal by phrasing and template 0 is one of "

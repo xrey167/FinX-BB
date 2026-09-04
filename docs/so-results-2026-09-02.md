@@ -43,7 +43,7 @@
 | e000026_lifecycle_readable_template | - | - | - | not run | - |
 | e000027_untied_output | - | - | - | not run | - |
 | e000027_untied_input | - | - | - | not run | - |
-| e000028_key_channel | - | - | - | not run | - |
+| E-000028 | the channel SHRED does not close | - | - | recorded | 2026-09-04 14:33 |
 
 ## The six breakthrough properties (ledger section 3)
 
@@ -1984,6 +1984,60 @@ _not run in this session_
 
 _not run in this session_
 
-## e000028_key_channel
+## E-000028 — the channel SHRED does not close
 
-_not run in this session_
+Seeds [0, 1, 2, 3, 4], 100 targets, the recorded E-000010 checkpoints, no training.
+The attacker knows a cell's subject and relation, finds its column from the routing of the
+ordinary forward question, then sweeps every candidate object through a REVERSE query and
+takes the candidate that steers the read onto that column.
+
+### Object recovery through the key channel (worst seed)
+
+| condition | object recovered top-1 | top-5 | mean rank | chance top-1 | chance rank |
+|---|---|---|---|---|---|
+| active | 1.0000 | 1.0000 | 0.0 | 0.0039 | 127.5 |
+| shred | 1.0000 | 1.0000 | 0.0 | 0.0039 | 127.5 |
+| revoke | 0.0200 | 0.0400 | 120.6 | 0.0039 | 127.5 |
+| delete | 0.0200 | 0.0400 | 120.6 | 0.0039 | 127.5 |
+
+`active` is the validity control: if the sweep cannot recover a live object, the shredded
+number means nothing. `revoke` and `delete` remove the row from routing altogether.
+
+### Pre-registered criteria
+
+| criterion (worst seed) | required | observed | result |
+|---|---|---|---|
+| column_located | >= 0.9 | 1.0000 | PASS |
+| active/object_top1 | >= 0.2 | 1.0000 | PASS |
+
+### What F4 would require of this channel
+
+| criterion (worst seed) | required | observed | result |
+|---|---|---|---|
+| shred/object_top1 | <= 0.00390625 | 1.0000 | FAIL |
+
+### All measures
+
+| measure | mean over seeds | worst seed | pooled n | 95% CI lower | 95% CI upper |
+|---|---|---|---|---|---|
+| column_located | 1.0000 | 1.0000 | 500 | 0.9926 | 1.0000 |
+| shred/column_located | 1.0000 | 1.0000 | 500 | 0.9926 | 1.0000 |
+| active/column_mass | 0.9980 | 0.9977 | - | - | - |
+| active/object_top1 | 1.0000 | 1.0000 | 500 | 0.9926 | 1.0000 |
+| active/object_top5 | 1.0000 | 1.0000 | 500 | 0.9926 | 1.0000 |
+| active/object_mean_rank | 0.0000 | 0.0000 | - | - | - |
+| active/margin_mean | 0.6195 | 0.5968 | - | - | - |
+| shred/object_top1 | 1.0000 | 1.0000 | 500 | 0.9926 | 1.0000 |
+| shred/object_top5 | 1.0000 | 1.0000 | 500 | 0.9926 | 1.0000 |
+| shred/object_mean_rank | 0.0000 | 0.0000 | - | - | - |
+| shred/margin_mean | 0.6195 | 0.5968 | - | - | - |
+| revoke/object_top1 | 0.0040 | 0.0200 | 500 | 0.0005 | 0.0144 |
+| revoke/object_top5 | 0.0220 | 0.0400 | 500 | 0.0110 | 0.0390 |
+| revoke/object_mean_rank | 128.0200 | 120.6300 | - | - | - |
+| revoke/margin_mean | 0.0022 | 0.0016 | - | - | - |
+| delete/object_top1 | 0.0040 | 0.0200 | 500 | 0.0005 | 0.0144 |
+| delete/object_top5 | 0.0220 | 0.0400 | 500 | 0.0110 | 0.0390 |
+| delete/object_mean_rank | 128.0200 | 120.6300 | - | - | - |
+| delete/margin_mean | 0.0022 | 0.0016 | - | - | - |
+
+**Interpretation (post hoc, record unchanged):** The strongest deletion claim here -- F4 for SHRED with the verified gate -- was only ever measured on the value channel: the answer, the logits, the hidden state, the linear probe. shred() writes only the marker and leaves the row ACTIVE, and in encode_bank the routing keys are computed before the gate and are never gated, so a shredded cell's reverse key k_rev(LN(object + relation)) still names the object. An attacker given the cell's subject and relation locates its column from the routing of the ordinary forward question and sweeps candidate objects through a reverse query: over 500 targets on five seeds the shredded object comes back at 1.0000 against a chance of 0.0039, with numbers identical to the live cell's to four decimals -- the keys are the same tensors before and after. REVOKE and DELETE remove the row from routing and land on chance (0.0040, mean rank 128.0 against 127.5). The E-000010 and E-000019 records stand: every number in them is about the value channel and every one is still correct. What is withdrawn is the unqualified reading of F4 for SHRED. This is a synthetic-model defect: the GPT-2 adapter's key is k_proj(ln_key(subject + relation)) and carries no object, which two tests assert as a property. ModelConfig.gate_reverse_key repairs it and is unevaluated -- it needs its own training run. Ledger 31.10.
