@@ -1695,6 +1695,59 @@ The claim was re-derived here before the fix was written. The same document's ar
 `gate_reverse_key` closes E-000028's channel to chance at n=500, where a pilot at n=20 gives 0.0500
 with a 95% interval of [0.0013, 0.2487] — remains unrun and is the next thing worth running.
 
+### 31.21 The paraphrase gap is a token-position artefact (2026-09-04)
+
+Kill criterion 5 fired because deletion did not reach phrasings nobody trained on. §31.11 recorded the
+lifecycle claims as statements about one phrasing. E-000025 recorded alias resolution at 0.9250 on one
+held-out template and 0.3078 on the worst. Two days of this programme have treated that spread as
+evidence about reading, about deletion, and most recently about carrier multiplicity.
+
+It is none of those. It is **whether the subject name is the first token of the prompt.**
+
+Split the twelve surface forms of `TEMPLATES12` by the GPT-2 token index of the subject — a property
+of the tokenizer, computed from the tokenizer, never from any recorded accuracy. It gives
+`{0, 2, 6, 8, 11}` subject-initial and the rest medial, identically for all four relations. E-000025's
+**already-published** per-template table separates on that split perfectly:
+
+| position | templates | recorded direct read |
+|---|---|---|
+| subject **initial** | 0, 2, 6, 8, 11 | 0.3078 – 0.6422 |
+| medial | 1, 3, 4, 5, 7, 9, 10 | 0.9567 – 0.9989 |
+
+No overlap. The worst medial template beats the best initial one by 0.31.
+
+And the fix costs nothing. Prepending `"It is known that "` to the prompt — **no weight changed, no
+retraining, the recorded E-000017-B seed-0 checkpoint as it stands** — on 64 targets:
+
+| | before | with the prefix |
+|---|---|---|
+| subject-initial (5 templates) | 0.6813 | **0.9844** |
+| medial (7 templates) | 0.9933 | 0.9464 |
+
+with the two worst held-out templates going **t8 0.5625 → 1.0000** and **t11 0.3750 → 0.9844**. The
+prefix is not free everywhere: the medial mean falls slightly, almost all of it one template (t9,
+0.9688 → 0.7031), so this is a targeted fix for a positional failure and not a general improvement.
+
+**What this costs.** Kill criterion 5 was measuring prompt formatting. Its held-out set {8, 9, 10, 11}
+contains two subject-initial templates, so the held-out mean it fired on was dragged down by an
+artefact of where the name sits. The criterion stays fired as recorded — records are not edited — but
+it is not evidence about the deletion mechanism, and §31.11's framing of the lifecycle claims as
+phrasing-dependent needs reading with this in front of it.
+
+**What this does not cost.** E-000025's `cost_of_sharing` (0.0954) and `cost_of_link_training`
+(0.0688) are differences between arms *at the same template*, so the positional artefact cancels in
+them. Those numbers stand.
+
+**What it falsifies of my own.** The carrier-multiplicity explanation for the paraphrase gap — that a
+fact has one carrier per phrasing, so deleting the record misses the phrasings nobody trained on — is
+wrong. The gap is addressing, and the cause is positional. E-000038's *privacy and collateral* half is
+untouched, because it rests on the measured GPT-2 collateral of 1.0000 → 0.0000 rather than on this;
+its *tying* motivation does not survive and the record says so.
+
+The finding is E-000039's, from an adversarial design agent, and the numbers above are my own
+re-measurement written without its code. The honest recommendation is its own: **normalise the prompt,
+and do not train.**
+
 ### 31.8 Boundary
 
 CPU only, no GPU, no LLM above 124M parameters, synthetic worlds, single-token entities, two surface forms per relation, one session. Nothing here shows unlearning of facts already encoded in pretrained weights. Evidence levels recorded: E3–E4 for the synthetic system (F4 for SHRED with the verified gate, E-000010 — **on the value channel only**: E-000028 recovers the shredded object at 1.0000 through the ungated reverse key, where REVOKE and DELETE are at chance, so F4 for SHRED is a claim about answers, logits, hidden states and probes and not about routing); E5 as substrate for the frozen-GPT-2 experiment, with reading, composition, update and the copy bound supported and behavioural deletion not yet supported at the pre-registered thresholds.
