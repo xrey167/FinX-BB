@@ -45,6 +45,7 @@
 | e000027_untied_input | - | - | - | not run | - |
 | E-000028 | the channel SHRED does not close | - | - | recorded | 2026-09-04 14:33 |
 | E-000029 | what the marker gate actually certifies | - | - | recorded | 2026-09-04 14:50 |
+| e000030_deletion_certificate | - | - | - | not run | - |
 
 ## The six breakthrough properties (ledger section 3)
 
@@ -2231,3 +2232,7 @@ and every checkpoint stores it verbatim, so shipping a model ships the ability t
 | uniform_accept_rate | <= 0.001 | 0.0013 | FAIL |
 
 **Interpretation (post hoc, record unchanged):** E-000021 put the gate's false-accept rate at 8.49e-04 and the programme called that the bound on the deletion guarantee. The rate is right; the distribution is not the one the guarantee is about. marker_valid deletes everything beyond 0.35 of the centre, but invalid_markers -- E-000021's unsigned class -- rejects every draw within 0.7, and new_invalid_markers, which is what shred() writes, rejects the same band. The annulus between was measured by nothing. Over eleven recorded checkpoints, with markers placed on each shell by construction because rejection sampling cannot reach the near shells in sixteen dimensions: the gate accepts EVERYTHING out to 0.70 at 1.0000, 0.2191 at 0.80, and first reaches zero at 0.90. Its operational radius is 0.90 on every checkpoint against a declared 0.35, and the deleted annulus is accepted at 1.0000 (2,200,000 markers). The rejection-sampled column reproduces E-000021 at 8.550e-04, which is how one knows the re-measurement is faithful before looking at what it missed. The boundary sits at 0.8 because training shows signed markers at 0.194 and unsigned ones at 0.7 and nothing between, so the classifier learned the MARGIN rather than the predicate -- and the recorded false-accept rate is just the tail of the shred sampler crossing it. The centre is not a secret either: the mean of 950 signed markers estimates it to 0.0076, minted markers pass marker_valid at 0.9999 and the gate at 1.0000, make_centre derives it from 10_000 + seed, and every checkpoint stores it verbatim. The gate is an integrity check, not a signature. Ledger 31.12.
+
+## e000030_deletion_certificate
+
+_not run in this session_
