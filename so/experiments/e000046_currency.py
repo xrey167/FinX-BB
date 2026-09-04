@@ -111,10 +111,19 @@ def cost(st: MVCCStore, keys, obj: int, mode: str) -> Dict[str, Any]:
     cert = certify_traceless(st, keys, obj, baseline=tuple(base),
                              ops=len(removed) + len(repaired), n_live_before=0)
     raw_named = [] if cert.raw_clean else list(cert.dangling)
+    # THE CHECK THE FIRST TWO VERSIONS DID NOT HAVE (ledger §31.35). "Raw clean" is referential
+    # cleanliness: no surviving version holds the removed key. It is not history independence, the
+    # property §31.31 adopted as the meaning of "traceless": a store that blanked its aliases still
+    # holds rows that exist only because the fact once did, and is therefore distinguishable from a
+    # store that never wrote it. check_history_independence builds that never-wrote store and
+    # compares, at the exported level (bank()) and at the raw level (cells, log, ids).
+    hi = cert.history
     st.restore_all() if hasattr(st, "restore_all") else None
     return {"T_ops": len(removed) + len(repaired), "removed": len(removed), "repaired": len(repaired),
             "exported_clean": float(exported_clean), "unreachable": float(unreach),
-            "raw_discloses": float(len(raw_named) > 0), "n_live": n_live}
+            "raw_discloses": float(len(raw_named) > 0), "n_live": n_live,
+            "exported_hi": float(hi.exported_hi), "markers_equal": float(hi.markers_equal),
+            "raw_hi": float(hi.raw_hi), "residue_rows": float(hi.residue_rows)}
 
 
 def run(kmax: int, seeds: Sequence[int], verbose: bool = True) -> Dict[str, Any]:
@@ -145,13 +154,28 @@ def run(kmax: int, seeds: Sequence[int], verbose: bool = True) -> Dict[str, Any]
         m[f"{mode}/unreachable"] = float(np.mean([r["unreachable"] for r in sel]))
         m[f"{mode}/exported_clean"] = float(np.mean([r["exported_clean"] for r in sel]))
         m[f"{mode}/raw_discloses"] = float(np.mean([r["raw_discloses"] for r in sel]))
+        m[f"{mode}/exported_hi"] = float(np.mean([r["exported_hi"] for r in sel]))
+        m[f"{mode}/markers_equal"] = float(np.mean([r["markers_equal"] for r in sel]))
+        m[f"{mode}/raw_hi"] = float(np.mean([r["raw_hi"] for r in sel]))
+        m[f"{mode}/residue_rows"] = float(np.mean([r["residue_rows"] for r in sel]))
+        # POST-HOC, LABELLED AS SUCH: the pre-registered exported_hi rows for COMPACTING and OPAQUE
+        # came back at 0.2000 rather than 0.0, and the 0.2 is exactly the cells with n_links = 0 --
+        # a pod of copies has no alias to blank or to leave dangling, so evicting its closure leaves
+        # nothing behind under every semantics. The registered criterion did not condition on
+        # n_links >= 1 and FAILS as registered; this is the same quantity over the cells the
+        # prediction was about, reported beside it and not in its place.
+        linked = [r for r in sel if r["n_links"] >= 1]
+        m[f"{mode}/exported_hi_linked"] = float(np.mean([r["exported_hi"] for r in linked]))
+        m[f"{mode}/residue_rows_linked"] = float(np.mean([r["residue_rows"] for r in linked]))
+        m[f"{mode}/n_linked_cells"] = float(len(linked))
     m["per_cell"] = rows
     return m
 
 
 KEYS = [f"{m}/{q}" for m in ("exporting", "compacting", "opaque")
         for q in ("T_mean", "T_equals_k", "T_equals_U", "unreachable", "exported_clean",
-                  "raw_discloses", "rows_kept")] + ["n_cells"]
+                  "raw_discloses", "rows_kept", "exported_hi", "markers_equal", "raw_hi",
+                  "residue_rows", "exported_hi_linked", "residue_rows_linked", "n_linked_cells")] + ["n_cells"]
 
 CRITERIA = {
     # E-000041 reproduced: under the semantics it was measured on, T = k everywhere
@@ -170,6 +194,16 @@ CRITERIA = {
     # more surprising result.
     "opaque/exported_clean": (">=", 1.0),
     "opaque/raw_discloses": (">=", 0.50),
+    # HISTORY INDEPENDENCE, added for the third run (ledger §31.35) and fixed before it. The
+    # prediction that inverts §31.30: the rows blanking KEEPS are the residue, so compacting is not
+    # history independent even at the exported level, while exporting -- evicting every row of the
+    # pod -- leaves bank() identical to a store that never held the fact. And no semantics reaches
+    # raw history independence, because an MVCC store keeps its log and its evicted cells on purpose.
+    "compacting/exported_hi": ("<=", 0.0),
+    "opaque/exported_hi": ("<=", 0.0),
+    "exporting/exported_hi": (">=", 1.0),
+    "exporting/raw_hi": ("<=", 0.0),
+    "compacting/raw_hi": ("<=", 0.0),
 }
 
 DECISION_RULE = (
@@ -178,7 +212,12 @@ DECISION_RULE = (
     "deletions, repairs, or an interface that declines to show the reference, and the third is not "
     "payment. raw_discloses at 0 under OPAQUE -> opacity is erasure and the law must be restated. "
     "T != k under COMPACTING -> repairs are cheaper than deletions and the law is about deletions "
-    "specifically. Fixed before the run.")
+    "specifically. Fixed before the run. THIRD RUN: exported_hi at 0 under COMPACTING and at 1 under "
+    "EXPORTING -> 'referentially clean' and 'history independent' are different properties, repair "
+    "buys the first and deletion the second, and §31.30's 'strictly stronger AND less destructive' "
+    "is withdrawn. exported_hi at 1 under COMPACTING -> blanked rows are not a residue and §31.30 "
+    "stands. raw_hi at 1 anywhere -> the fresh-store comparison is broken, since the log alone "
+    "distinguishes the two stores. Fixed before the third run.")
 
 
 def main(argv: Optional[List[str]] = None) -> Dict[str, Any]:
@@ -198,18 +237,38 @@ def main(argv: Optional[List[str]] = None) -> Dict[str, Any]:
     rows = [[mode,
              f"{m[mode + '/T_mean']:.2f}", f"{m[mode + '/T_equals_k']:.4f}",
              f"{m[mode + '/T_equals_U']:.4f}", f"{m[mode + '/exported_clean']:.4f}",
-             f"{m[mode + '/raw_discloses']:.4f}", f"{m[mode + '/rows_kept']:.1f}"]
+             f"{m[mode + '/raw_discloses']:.4f}", f"{m[mode + '/rows_kept']:.1f}",
+             f"{m[mode + '/exported_hi']:.4f}", f"{m[mode + '/residue_rows']:.1f}",
+             f"{m[mode + '/raw_hi']:.4f}"]
             for mode in ("exporting", "compacting", "opaque")]
     md = [f"# E-000046 — {record['title']}", "",
           "E-000041 measured T = k over 105 of 105 cells and carried one caveat: that it held for a",
           "store which exports a link's target key and goes on exporting it after the target is gone.",
           "This is that caveat, tested. Mechanical, no model.", "",
           ledger.table(["semantics", "T", "T = k", "T = U", "exported view clean",
-                        "**raw store still discloses**", "rows left live"], rows), "",
-          "The last column is the experiment. Under OPAQUE the exported view is clean by construction,",
-          "so an experiment that stopped at the fourth column would have measured its own definition.",
-          "What decides whether opacity is erasure or access control is whether the removed key is",
-          "still recoverable from the store itself.", "",
+                        "raw store still discloses", "rows left live",
+                        "**history independent (exported)**", "residue rows", "history independent (raw)"],
+                       rows), "",
+          "`raw store still discloses` is referential: does a surviving version still hold the removed",
+          "key. Under OPAQUE the exported view is clean by construction, so an experiment that stopped",
+          "at the fourth column would have measured its own definition. `history independent (exported)`",
+          "is the property §31.31 adopted as the meaning of traceless (Naor and Teague 2001, Def. 2.1):",
+          "is `bank()` identical to that of a store that never held the fact. `residue rows` counts the",
+          "exported rows that exist only because it did. `history independent (raw)` compares",
+          "`store.cells`, the operation log and the next id as well, and an MVCC store fails it by",
+          "design. The first two versions of this report had only the referential column and read it",
+          "as the history-independence one (ledger §31.35).", "",
+          "## Post hoc, labelled as such: the same column over cells that have an alias", "",
+          "The registered `exported_hi` rows for COMPACTING and OPAQUE came back at 0.2000, not 0.0, and",
+          "FAIL as registered. The 0.2 is exactly the cells with `n_links = 0` -- a pod made of copies",
+          "has no alias to blank or to leave dangling, so evicting its closure leaves nothing behind",
+          "under every semantics. The criterion should have conditioned on `n_links >= 1`; it did not,",
+          "and it is not rewritten. The same quantity over the cells the prediction was about:", "",
+          ledger.table(["semantics", "cells with an alias", "history independent (exported)", "residue rows"],
+                       [[mode, f"{m[mode + '/n_linked_cells']:.0f}",
+                         f"{m[mode + '/exported_hi_linked']:.4f}",
+                         f"{m[mode + '/residue_rows_linked']:.1f}"]
+                        for mode in ("exporting", "compacting", "opaque")]), "",
           "## The rule, fixed before the run", "", DECISION_RULE, "",
           "## Pre-registered criteria", "", ledger.criteria_table(check), ""]
     path = ledger.save("e000046_currency", record, "\n".join(md))

@@ -149,6 +149,18 @@ what the model still answers; and the **price** the reader charges for the indir
 sharing and 0.0688 for link training, worst of three seeds over twelve phrasings. That is a
 measurement paper's contribution, not an idea's.
 
+**Corrected later the same day (ledger §31.33 and §31.35).** Three of those four are withdrawn. The
+closure *predicting* the reader is star arithmetic that fails a chain topology against the store's
+own resolver with no model in the loop, and the reader it was measured on is the E-000015
+mini-transformer, not GPT-2. "Nobody else can do the composition" is false: Garg, Goldwasser and
+Vasudevan (Eurocrypt 2020, Thm 3.4) compose a history-independent store with a learned reader whose
+deletion is certified, Cohen et al. (CCS 2023) fold both into one definition, and the sweep reports
+Ramesh (arXiv:2607.27539, July 2026) as an exact-deletion certificate on a frozen LM's persistent
+memory with audited intermediate arrays — so E-000030 is not the first in its line either. The
+certified lower bound is the standard disjoint-witness packing bound of the resilience literature,
+with an LP-tight solver in print (Makhija and Gatterbauer, SIGMOD 2024). What remains of this
+paragraph is the price of the indirection, which is a measurement and was never a claim.
+
 **What the exercise cost, and this is the part worth reading.** Building the fact-level certificate
 found three instruments in `so/audit.py` that certified by not testing — reachability on an empty row
 set returns the ladder's strongest label on a *live* bank; the payload sweep on an empty row set

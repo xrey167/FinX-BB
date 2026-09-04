@@ -1252,6 +1252,124 @@ def certify_fact(record: "Certificate", closure: "FactClosure", removed: Sequenc
         residual_note=residual_note)
 
 
+# ------------------------------------------------------------------ history independence, checked
+@dataclass
+class HistoryIndependence:
+    """Whether the store's representation could have come from never writing what was removed.
+
+    Naor and Teague (STOC 2001), Definition 2.1, the WEAK form the ledger adopted in §31.31: two
+    operation sequences that yield the same content must induce the same memory representation. The
+    check builds that comparison rather than asserting it. From the store as it stands, a FRESH store
+    is built holding only the content the legitimate interface can still answer -- active FACT rows,
+    and LINK rows whose target is live -- and the two are compared at two levels.
+
+    EXPORTED: what a reader of ``bank()`` sees. Rows that exist only because something once did --
+    a blanked link, a dangling link, an inactive row -- have no counterpart in the fresh store and are
+    counted as ``residue_rows``. ``exported_hi`` holds when the content arrays are identical row for
+    row; ``markers_equal`` is reported separately, because this implementation draws markers from a
+    seeded generator whose POSITION encodes the number of prior writes, so a marker can differ for no
+    reason but history.
+
+    RAW: ``store.cells`` (which keeps evicted and deleted cells), the operation log, and the next cell
+    id. An MVCC store keeps its history on purpose; ``raw_hi`` is therefore false for any store that
+    ever removed anything, and the field exists so that a certificate cannot be read as saying
+    otherwise. A review (ledger §31.35) found ``certify_traceless`` being read exactly that way.
+    """
+
+    exported_hi: bool
+    markers_equal: bool
+    cells_equal: bool
+    log_equal: bool
+    next_kid_equal: bool
+    rows_store: int
+    rows_fresh: int
+    residue_rows: int
+    differing_fields: Tuple[str, ...] = ()
+    note: str = ""
+
+    @property
+    def raw_hi(self) -> bool:
+        return bool(self.exported_hi and self.markers_equal and self.cells_equal and self.log_equal
+                    and self.next_kid_equal)
+
+    def summary(self) -> str:
+        if self.exported_hi and self.raw_hi:
+            return "HISTORY INDEPENDENT at the exported and the raw level"
+        if self.exported_hi:
+            return ("HISTORY INDEPENDENT at the EXPORTED level only: bank() matches a store that never "
+                    "held the fact; the raw store does not"
+                    + ("" if self.markers_equal else " (markers differ: the generator position encodes history)")
+                    + ("" if self.cells_equal else " (cells retained)")
+                    + ("" if self.log_equal else " (the operation log records it)"))
+        return (f"NOT HISTORY INDEPENDENT: {self.residue_rows} exported row(s) exist only because the "
+                f"fact once did ({self.rows_store} rows against {self.rows_fresh} in a store that never "
+                f"held it)" + (f"; fields differing: {list(self.differing_fields)}" if self.differing_fields else ""))
+
+
+def check_history_independence(store: Any) -> HistoryIndependence:
+    """Compare the store with a fresh one holding only what the interface can still answer.
+
+    The fresh store is built with the store's own construction parameters, so the only difference
+    between the two is the history: what was written and then removed, blanked, revoked or evicted.
+    Mechanical, no model, and it leaves the store untouched.
+    """
+    from .mvcc import CellKind, MVCCStore, Status
+
+    fresh = MVCCStore(marker_dim=store.marker_dim, seed=store.seed, valid_radius=store.valid_radius,
+                      marker_centre=store.marker_centre)
+    fresh_kid: Dict[int, int] = {}
+    residue = 0
+    # facts first, then links, so a link's target already exists in the fresh store; within each
+    # class in kid order, which is write order
+    live = {kid: cell for kid, cell in store.cells.items()
+            if cell.status not in (Status.DELETED, Status.EVICTED) and cell.versions}
+    for kid, cell in sorted(live.items()):
+        v = cell.version_obj(cell.active_version)
+        if v.kind is CellKind.LINK:
+            continue
+        if cell.status is Status.ACTIVE:
+            fresh_kid[kid] = fresh.write(v.subject, v.relation, v.obj, provenance=v.provenance
+                                         if hasattr(v, "provenance") else "")
+        else:
+            residue += 1
+    for kid, cell in sorted(live.items()):
+        v = cell.version_obj(cell.active_version)
+        if v.kind is not CellKind.LINK:
+            continue
+        t = store.cells.get(v.target) if v.target is not None else None
+        if (cell.status is Status.ACTIVE and t is not None and t.status is Status.ACTIVE
+                and t.versions and v.target in fresh_kid):
+            fresh_kid[kid] = fresh.link(v.subject, v.relation, fresh_kid[v.target],
+                                        provenance=v.provenance if hasattr(v, "provenance") else "")
+        else:
+            residue += 1
+
+    b, f = store.bank(), fresh.bank()
+    content = ("subject", "relation", "obj", "is_link", "link_subject", "link_relation", "active")
+
+    def order(bank):
+        cols = [np.asarray(bank[c]).astype(np.int64) for c in content]
+        return np.lexsort(cols[::-1]) if len(cols[0]) else np.zeros(0, dtype=np.int64)
+
+    ob, of = order(b), order(f)
+    rows_b, rows_f = int(b["kid"].shape[0]), int(f["kid"].shape[0])
+    differing: List[str] = []
+    if rows_b == rows_f:
+        for c in content:
+            if not np.array_equal(np.asarray(b[c])[ob], np.asarray(f[c])[of]):
+                differing.append(c)
+        markers_equal = bool(np.array_equal(b["marker"][ob], f["marker"][of]))
+    else:
+        differing = ["rows"]
+        markers_equal = False
+    exported_hi = rows_b == rows_f and not differing
+    return HistoryIndependence(
+        exported_hi=bool(exported_hi), markers_equal=markers_equal,
+        cells_equal=len(store.cells) == len(fresh.cells), log_equal=len(store.log) == len(fresh.log),
+        next_kid_equal=store._next_kid == fresh._next_kid, rows_store=rows_b, rows_fresh=rows_f,
+        residue_rows=int(residue), differing_fields=tuple(differing))
+
+
 # ------------------------------------------------------------------ tracelessness, as a certificate
 @dataclass
 class TracelessCertificate:
@@ -1275,6 +1393,15 @@ class TracelessCertificate:
     So ``exported_clean`` alone cannot be the certificate. It is true by construction for any store
     that does not export a target, which would make it the tenth instrument in this programme to
     certify by not testing. ``raw_clean`` is the one that can fail, and both are reported.
+
+    WHAT THIS CERTIFIES, AFTER A REVIEW (ledger §31.35). ``raw_clean`` is a scan for surviving
+    versions that still hold a removed key -- REFERENTIAL cleanliness, ``ON DELETE SET NULL`` checked
+    after the fact. It is not history independence, and the first version of this class said
+    "TRACELESS" where it should have said "referentially clean": a blanked alias row exists only
+    because the fact once did, so a store that blanks is distinguishable from one that never wrote,
+    which is the definition of NOT history independent (Naor and Teague 2001, Def. 2.1, the form
+    §31.31 adopted). ``history`` carries that check, computed rather than assumed, and the summary
+    names both properties separately so that neither can be read as the other.
     """
 
     unreachable: bool = False
@@ -1285,11 +1412,17 @@ class TracelessCertificate:
     n_live_before: int = 0
     n_live_after: int = 0
     ops: int = 0
+    history: Optional["HistoryIndependence"] = None
 
     @property
     def certified(self) -> bool:
-        """All four, and the raw check is the one with teeth."""
+        """Referentially clean: all four, and the raw scan is the one with teeth. NOT history independence."""
         return bool(self.unreachable and self.exported_clean and self.raw_clean and self.store_retained)
+
+    @property
+    def history_independent(self) -> bool:
+        """Weak history independence at the EXPORTED level, computed against a fresh store."""
+        return bool(self.history is not None and self.history.exported_hi)
 
     def summary(self) -> str:
         if not self.store_retained:
@@ -1305,9 +1438,10 @@ class TracelessCertificate:
                     + (" -- and the EXPORTED view is clean, so this is visible only to a reader of the "
                        "store itself: the interface hid the disclosure rather than removing it."
                        if self.exported_clean else ""))
-        return (f"TRACELESS, CERTIFIED in {self.ops} operation(s): the fact is unreachable, no "
+        hi = ("" if self.history is None else f" History: {self.history.summary()}.")
+        return (f"REFERENTIALLY CLEAN in {self.ops} operation(s): the fact is unreachable, no "
                 f"surviving row names a removed key in the exported view OR in the store, and "
-                f"{self.n_live_after} of {self.n_live_before} rows were kept.")
+                f"{self.n_live_after} of {self.n_live_before} rows were kept." + hi)
 
 
 def certify_traceless(store: Any, keys: Sequence[Tuple[int, int]], obj: int,
@@ -1363,8 +1497,9 @@ def certify_traceless(store: Any, keys: Sequence[Tuple[int, int]], obj: int,
 
     resolver = ReferenceResolver(store)
     unreachable = all(resolver.resolve(Query("fwd", a, (r,), (0,))).answer != obj for a, r in keys)
+    history = check_history_independence(store) if hasattr(store, "cells") else None
     return TracelessCertificate(
         unreachable=bool(unreachable), exported_clean=bool(exported_clean), raw_clean=not raw,
         store_retained=bool(n_live_before == 0 or n_after > 0.5 * n_live_before),
         dangling=tuple(dang) if dang else tuple(raw), n_live_before=int(n_live_before),
-        n_live_after=n_after, ops=int(ops))
+        n_live_after=n_after, ops=int(ops), history=history)

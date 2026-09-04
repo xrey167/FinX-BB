@@ -2211,6 +2211,13 @@ the store, which is the same shape as the opaque case. Blanking clears the key i
 and is the only one of the three that reaches raw tracelessness — **and it keeps the most rows**
 (42.5 against 40.0), because every access key still resolves, to UNKNOWN, instead of ceasing to be
 addressable. Strictly stronger guarantee *and* strictly less destruction; the two do not trade off.
+**[Withdrawn in §31.35. "Raw tracelessness" here is referential cleanliness — no surviving version
+holds the removed key — and not history independence, the property §31.31 adopts as the meaning of
+traceless. The rows blanking keeps exist only because the fact once did: under the definition they
+are the residue, and the third run of E-000046 measures exporting (evicting every row of the pod) as
+history independent at the exported level in 1.0000 of cells and compacting in 0.0000 of the cells
+that have an alias. `blank` is `ON DELETE SET NULL` done by hand (SQL-92), and the three currencies
+are the referential-action menu.]**
 
 **Two semantics the tests pin down rather than assume.** Blanking an EVICTED row is *allowed*, because
 `_alive` deliberately admits EVICTED so RESTORE and ROLLBACK can reach it — and it is not a no-op: it
@@ -2270,6 +2277,12 @@ tracelessness certificate composes with a model-side deletion proof (§31.14, §
 history-independence result addresses, because none of them has a reader whose behaviour has to be
 certified too. `blank` and `certify_traceless` are that implementation. Whether `ON DELETE SET NULL`
 already covers `blank` at the relational level is not yet checked and should be assumed until it is.
+**[Checked in §31.35: it does, verbatim, and the composition this paragraph kept as the residue is
+Garg, Goldwasser and Vasudevan (Eurocrypt 2020, Thm 3.4) — a history-independent store composed with
+a learned reader whose deletion is certified — generalised by Godin and Vasudevan (2022) and folded
+into one definition by Cohen, Smith, Swanberg and Vasudevan (CCS 2023). And the state
+`certify_traceless` certified was not weakly history independent. Nothing in this paragraph
+survives as a contribution; what survives is an implementation of their auditor form.]**
 
 This is the seventh retraction of the session and the one that costs the most, because U/T was the
 claim that had survived every previous review. It survived them because none of them was this check.
@@ -2477,6 +2490,114 @@ highest clean rate, a per-bystander damage rate on a fixed window as the primary
 to criterion rather than to a step count, and `pressure`/`headroom` banned from every criterion. The
 mini-transformer applies `hidden_edit` immediately before `readout`, so the whole search is
 closed-form on cached states there. About seven hours on this machine.
+
+### 31.35 The residue is the rows BLANK keeps: referential cleanliness is not history independence, and the composition is 2020 (2026-09-04, E-000046 third run)
+
+A five-agent sweep asked for one unclaimed contribution in the symlink / J-space / pod programme,
+prior art first, "none" allowed. Four angles returned none, zero candidates were proposed, and the
+sweep's landing did what none of the previous eight reviews had done: it ran the definition this
+ledger adopted in §31.31 against the state this ledger's own certificate certifies. I re-ran its
+script and it reproduces line for line.
+
+**The check.** S1 = write a fact, link two aliases to it, evict the fact, blank both aliases — the
+"repair" currency §31.30 called the only one that pays. S2 = never wrote the fact. Naor and Teague's
+Definition 2.1, weak form: same content ⇒ same memory representation.
+
+```
+certify_traceless:  TRACELESS, CERTIFIED in 3 operation(s) ... 3 of 4 rows were kept
+same CONTENT (legitimate interface):  True   {(1,1): 7, (2,3): None, (4,3): None, (5,3): None}
+bank rows S1 vs S2:                   3 vs 1          (2 live LINK rows that exist only because the fact did)
+state_hash equal:                     False
+evicted cell still in store.cells:    True   status EVICTED, tombstone_key (2, 3), payload 42 in its version
+op log S1 vs S2:                      7 vs 1 entries  (the write, both links naming the target, the evict)
+next kid S1 vs S2:                    5 vs 2
+next marker identical:                False           (the generator's position encodes the number of prior writes)
+```
+
+Same content, different representation on every axis the definition names. **The state the
+certificate called traceless is not weakly history independent, and the rows `blank` keeps are the
+residue.** `raw_clean` — the check §31.30 called "the one with teeth" — is a scan for surviving
+versions that still hold the removed key: referential integrity, `ON DELETE SET NULL` verified after
+the fact. Necessary for weak history independence; not sufficient; and not what "traceless" was
+defined to mean two sections later. §31.30's "strictly stronger guarantee *and* strictly less
+destruction" is inverted: less destruction is the residue.
+
+**The instrument, rebuilt so it can fail for the right reason.** `so.audit.check_history_independence`
+builds, from the store as it stands, a fresh store with the same construction parameters holding only
+what the interface can still answer — active FACT rows and LINK rows whose target is live — and
+compares. EXPORTED level: `bank()` content arrays row for row (rows that exist only because something
+once did are `residue_rows`); markers reported separately because the seeded generator's position
+encodes history. RAW level: `store.cells`, the operation log, the next id — which an MVCC store keeps
+on purpose, so `raw_hi` is false for any store that ever removed anything and the field exists so no
+certificate can be read as saying otherwise. `TracelessCertificate` now says REFERENTIALLY CLEAN
+where it said TRACELESS, carries the history check, and its summary names both properties in one
+sentence so neither can be read as the other. The control that the comparison can pass: a store that
+never removed anything is history independent at both levels. Four tests, including the S1/S2
+scenario verbatim.
+
+**E-000046, third run**, with the columns the first two did not have and predictions fixed before it:
+
+| semantics | referentially clean (raw) | rows left live | **history independent, exported** | residue rows | history independent, raw |
+|---|---|---|---|---|---|
+| exporting (evict every row of the pod) | 0.2000 | 40.0 | **1.0000** | 0.0 | 0.0000 |
+| compacting (blank the aliases) | 1.0000 | 42.5 | 0.2000 | 2.5 | 0.0000 |
+| opaque | 0.2000 | 42.5 | 0.2000 | 2.5 | 0.0000 |
+
+The registered rows `compacting/exported_hi ≤ 0` and `opaque/exported_hi ≤ 0` **FAIL as registered**
+at 0.2000, and the 0.2 is exactly the cells with `n_links = 0`: a pod made of copies has no alias to
+blank or to leave dangling, so evicting its closure leaves nothing behind under every semantics. The
+criterion should have conditioned on `n_links ≥ 1`; it did not, and it is not rewritten. Over the 48
+cells per semantics that have an alias — the cells the prediction was about, reported beside the
+registered row and labelled post hoc — exporting is history independent in 1.0000 with 0.0 residue
+rows and compacting and opaque in 0.0000 with 3.1 residue rows each. `raw_hi` is 0.0000 everywhere,
+as predicted: the log alone distinguishes the stores. So the two properties come apart cleanly, and
+in opposite directions: **repair buys referential cleanliness and keeps rows; deletion buys history
+independence at the exported level and costs them. Neither reaches the raw level in an MVCC store,
+by design.** The instrument that closed here is the tenth of this programme to certify by not
+testing, and this one was certifying under a name it had defined itself.
+
+**The prior art, as the sweep reports it** (read by its agents at source; not re-read for this
+entry). `blank` is SQL-92 `ON DELETE SET NULL` performed by hand, strictly weaker than the declared
+action because it can be forgotten — which is why a certificate has to look for it. The three
+currencies are the referential-action menu: `CASCADE`, `SET NULL`, a view over `NO ACTION`. The
+guarantee §31.30 intended is Ficklebase (Bajaj and Sion, ICDE 2013) — all side effects removed,
+deletion undetectable — and the channels `raw_clean` does not walk (log, tombstones, kept versions,
+allocator state) are Stahlberg, Miklau and Levine (SIGMOD 2007). Cell-NULLing as the erasure
+primitive with a minimum-cost dependency search is Chakraborty et al. (VLDB 2025, arXiv:2507.00343),
+NP-hard, covering inference dependencies `blank` does not.
+
+And the residue §31.31 kept — *a tracelessness certificate composed with a model-side deletion proof
+that no history-independence result addresses, because none has a reader whose behaviour must be
+certified* — is false as stated. Garg, Goldwasser and Vasudevan (Eurocrypt 2020, arXiv:2002.10635)
+define deletion-compliance over exactly that pair, the collector's memory state and the environment's
+view of every future answer; Theorem 3.1 derives a compliant collector from a history-independent
+dictionary by the two-clause argument this repository makes; §3.3, Definition 3.4 and Theorem 3.4
+compose a history-independent store with a *learned model whose deletion operation is certified*.
+That is a reader whose behaviour has to be certified, composed with a history-independent store, in
+2020. Godin and Vasudevan (eprint 2022/033) generalise it — a collector built exclusively from
+history-independent structures is weakly deletion-compliant — and propose the certificate form:
+publish the collector with a simulator and let an auditor run experiments. Cohen, Smith, Swanberg and
+Vasudevan (CCS 2023, arXiv:2210.07876) fold the reader in outright: a model is history independent
+iff it satisfies machine unlearning. The reader-side sweep itself is bounded-exhaustive
+noninterference (Goguen and Meseguer 1982; self-composition, Barthe et al. 2004), and the sweep
+reports Ramesh (arXiv:2607.27539, July 2026) — exact deletion from a frozen LM's persistent memory,
+zero float32 residual on logits and eighty audited intermediate arrays — against the claim document's
+"E-000030 is the first such certificate in this line"; and Tavakoli and Sanderson (SIGIR 2026) for
+"revocation happens at the level of records while violations surface as facts". On the J-space side:
+one VJP per token is attribution patching; E-000042's 0 of 6 is the workspace paper's own reported
+result plus self-repair at small scale; E-000043's same-relation collateral is what linear relation
+decoding (Hernandez et al., ICLR 2024) predicts; fan-in and fan-out are separate criteria in Cohen,
+Eshel, Geva and Globerson (TACL 2024).
+
+**What is left, ninth statement, and the smallest.** The programme has (1) an executable auditor of
+the Godin–Vasudevan form for one collector — a store plus a frozen reader — whose parts are each
+owned and whose value is that its checks return NO: `certify_store_absence` on the address field,
+`check_history_independence` on the blanked rows, `certify_traceless` on eviction; (2) ten instruments
+that certified by not testing, each caught by a control that could fail and did; (3) three negatives
+with controls on GPT-2 small, all of which the literature predicts; (4) the record. The symlink is a
+store design pattern that Raeesi and Roed name as future work and SQL-92 implements; the J-space and
+pod experiments are a documented null at 124M parameters. There is no ninth claim to put in this
+paragraph, and the sweep that was asked to find one, with "none" allowed, said none.
 
 ### 31.8 Boundary
 

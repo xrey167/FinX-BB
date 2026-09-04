@@ -122,6 +122,17 @@ blanked, an alias to a removed target is indistinguishable from an alias to key 
 `delete_target/alias_unknown` stops being a discovery about the model and becomes a tautology about
 the bank. The trade is recorded as a number rather than argued.
 
+**Corrected later the same day (ledger §31.35).** Blanking is the `ON DELETE SET NULL` this document
+lists three paragraphs above as an *instance* of the channel — performed by hand, after the fact. It
+closes the channel *referentially*: no surviving version holds the removed key. It does not make the
+store history independent, which is what "traceless" was defined to mean in ledger §31.31: the blanked
+rows exist only because the fact once did, and a store that blanked is distinguishable from one that
+never wrote (E-000046, third run: 0.0000 of cells with an alias are history independent at the
+exported level after blanking, against 1.0000 after evicting every row of the pod). The two
+properties come apart in opposite directions — repair buys referential cleanliness and keeps rows,
+deletion buys exported-level history independence and costs them — and neither reaches the raw
+level in an MVCC store, which keeps its log by design.
+
 ## What the claim does not say
 
 It is a property of *this* store's bank; one that compacts its aliases on deletion, or never exports
