@@ -127,7 +127,7 @@ adapter's 2,370,692 — a 1.00x match — and are trained until they answer 95% 
 | answered the fact before deletion | 0.92 | 0.96 | 0.96 |
 | answers it after | 0.02 | 0.00 | 0.02 |
 | forced choice, chance 0.50 | **0.44** | 0.78 | **1.00** |
-| relearning attack recovers held-out facts it was never given | **0.04** | 0.48 | **0.76** |
+| relearning attack recovers held-out facts it was never given | **0.00** | 0.48 | **0.72** |
 | perplexity on ordinary prose, from 42.9 | **42.9** | 6.19e+09 | 8.49e+06 |
 | parameters changed | **0** | 2,359,296 | 2,359,296 |
 | seconds to delete 50 facts | **0.0008** | 137 | 311 |
@@ -141,10 +141,12 @@ The last row is the one that matters most. A certificate is available for the ce
 the others, and not because of effort: in a LoRA there is no finite payload domain to sweep and no
 interface the data passes through. **Putting facts in rows is what makes deletion certifiable at all.**
 
-One caveat, recorded rather than smoothed: the cells arm's relearning attacker recovered only
-0.28 of the facts it was *handed*, so its 0.04
-on the held-out half is a weak attacker's number. The attack-validity criterion caught that, and the
-attackers now run until they clear it. One seed; the three-seed run is in flight.
+The attack-validity floor is what makes the fourth row readable, and it did its job. The first seed-0
+run had the cells arm's relearning attacker recovering only 0.28 of the facts it was *handed*, below
+its own 0.50 floor, so its number on the held-out half meant nothing. The attacker now evaluates every
+40 steps and runs until it clears the floor: on the re-run it reaches 0.60 supplied in 200 of 400
+budgeted steps and recovers **0.0000** of the held-out facts, against 0.96/0.48 for gradient ascent
+and 1.00/0.72 for relabel. One seed; the three-seed run is in flight.
 
 ## 6. What this is not
 

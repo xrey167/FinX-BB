@@ -52,6 +52,9 @@ else
         compare)   "$PY" -m so.experiments.e000024_weights_vs_cells --seeds 0 1 2 ;;
         rescore)   "$PY" -m so.experiments.e000025_template_rescoring --seeds 0 1 2 ;;
         certify)   "$PY" -m so.experiments.e000030_deletion_certificate --seeds 0 1 2 --with-gpt2 ;;
+        closure)   "$PY" -m so.experiments.e000032_deletion_closure --seeds 0 1 2 ;;
+        retrieval) "$PY" -m so.experiments.e000033_retrieval_closure --seeds 0 1 2 ;;
+        pointers)  "$PY" -m so.experiments.e000034_pointer_separability --phase diagnose --seeds 0 1 2 ;;
         keychannel) "$PY" -m so.experiments.e000028_key_channel --seeds 0 1 2 3 4 ;;
         untied)    "$PY" -m so.experiments.e000027_untied_model --arm output --seeds 0 1 2 \
                      && "$PY" -m so.experiments.e000027_untied_model --arm input --seeds 0 1 2 ;;

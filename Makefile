@@ -13,7 +13,8 @@ THREADS ?= $(shell nproc)
 SEEDS ?= 0 1 2
 RUN = OMP_NUM_THREADS=$(THREADS) SO_THREADS=$(THREADS) $(PY) -m
 
-.PHONY: help test smoke synthetic gpt2 demo compare rescore certify keychannel untied report clean-results env
+.PHONY: help test smoke synthetic gpt2 demo compare rescore certify closure retrieval pointers \
+        keychannel untied report clean-results env
 
 help:
 	@echo "make test        unit tests, ~3 min (the deletion certificate sweeps its whole payload domain)"
@@ -24,6 +25,9 @@ help:
 	@echo "make compare     deletion from weights vs from cells, head to head (needs a checkpoint)"
 	@echo "make rescore     read the symlink checkpoints at all twelve templates, no training"
 	@echo "make certify     prove the model cannot depend on a deleted payload, over its whole domain"
+	@echo "make closure     how many records must go before a FACT is gone: canonical vs duplicated"
+	@echo "make retrieval   the same closure in a chunked vector index, where practitioners meet it"
+	@echo "make pointers    what the store gives away: a pointer separable from an object by its norm"
 	@echo "make keychannel  the channel SHRED does not close: recover a shredded object from the keys"
 	@echo "make untied      the layer on a model that does not tie its embeddings (downloads Pythia-160m)"
 	@echo "make report      rebuild docs/so-results-2026-09-02.md from so/results/"
@@ -84,6 +88,20 @@ rescore:
 # it could hold. ~10 min; add --with-gpt2 for the frozen-LM arm.
 certify:
 	$(RUN) so.experiments.e000030_deletion_certificate --seeds $(SEEDS) --with-gpt2
+
+# no training: the store-side half of an erasure guarantee, composed with the model-side certificate.
+# Needs the recorded E-000015 one-slot checkpoints. ~15 min per seed on 4 free cores.
+closure:
+	$(RUN) so.experiments.e000032_deletion_closure --seeds $(SEEDS)
+
+# no training: the same measurement in a chunked vector index with a frozen GPT-2 as the embedder,
+# which is the arrangement almost every deployed system uses. ~10 min per seed.
+retrieval:
+	$(RUN) so.experiments.e000033_retrieval_closure --seeds $(SEEDS)
+
+# no training for the diagnostic; --phase train adds the shared-projection arm (~40 min per seed)
+pointers:
+	$(RUN) so.experiments.e000034_pointer_separability --phase diagnose --seeds $(SEEDS)
 
 # no training: the channel SHRED does not close, against the recorded E-000010 checkpoints, ~3 min per seed
 keychannel:
