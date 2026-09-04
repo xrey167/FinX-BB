@@ -180,8 +180,10 @@ class FactClosure:
     The privacy question is about the association, not the lookup: how many records before the object
     is unobtainable through EVERY key that currently yields it. A canonical pod answers one, because
     the k access paths share one object. A duplicated store answers k, because each copy is a separate
-    place the fact lives. That is Codd's deletion anomaly, measured rather than described, and it is
-    what the symlink buys.
+    place the fact lives. That is redundancy, and one operation reaching only one of its places. In Codd's vocabulary that is the
+    MODIFICATION anomaly applied to a delete, not his DELETION anomaly -- which is the opposite failure,
+    the unintended LOSS of other information when a row goes. Measured rather than described, and it is what
+    the symlink buys.
 
     The search is greedy maximum coverage over the records the live derivations use. The general
     problem -- deletion propagation, and equivalently finding a minimum contingency set -- is NP-hard,
@@ -321,28 +323,51 @@ resilience = fact_closure
 
 
 def pod_keys(store: MVCCStore, target_kid: int) -> Tuple[Tuple[int, int], ...]:
-    """Every key that reaches ``target_kid``: its own, plus every alias pointing at it.
+    """Every key that reaches ``target_kid``: its own, plus every alias that points at it, transitively.
 
     This is the pod -- one knowledge object and the access paths that share it -- and it is the set the
-    fact-level closure has to be measured over. Only direct pointers are followed, which is the shape
-    the experiments build; a chain of aliases would need the transitive closure of ``target``.
+    fact-level closure has to be measured over. An earlier version followed DIRECT pointers only and
+    silently missed a chain ``target <- a1 <- a2``, returning two keys where three reach the object;
+    the closure measured over the short set would then have been reported as covering the pod. The
+    reachability is now transitive, and cycles terminate because a cell is admitted once.
     """
-    out: List[Tuple[int, int]] = []
+    alive = {}
     for kid, cell in store.cells.items():
         if cell.status in (Status.DELETED, Status.EVICTED) or not cell.versions:
             continue
-        v = cell.version_obj(cell.active_version)
-        if kid == target_kid or getattr(v, "target", None) == target_kid:
-            out.append((int(v.subject), int(v.relation)))
-    return tuple(out)
+        alive[int(kid)] = cell.version_obj(cell.active_version)
+    if int(target_kid) not in alive:
+        return ()
+    reached = {int(target_kid)}
+    changed = True
+    while changed:                      # transitive closure of "points at something already reached"
+        changed = False
+        for kid, v in alive.items():
+            if kid in reached:
+                continue
+            t = getattr(v, "target", None)
+            if t is not None and int(t) in reached:
+                reached.add(kid)
+                changed = True
+    return tuple(sorted((int(alive[k].subject), int(alive[k].relation)) for k in reached))
 
 
-def duplicate_keys(store: MVCCStore, obj: int) -> Tuple[Tuple[int, int], ...]:
-    """Every key that currently resolves to ``obj``, however it gets there.
+def value_keys(store: MVCCStore, obj: int) -> Tuple[Tuple[int, int], ...]:
+    """Every key that currently resolves to the VALUE ``obj``, however it gets there.
 
-    The counterpart to ``pod_keys``: the pod is defined by the object's identity, this by its value.
-    Measuring the fact closure over this set is the store-wide question -- how many records hold the
-    association at all -- and it is the set an erasure claim actually has to answer for.
+    Read the name carefully, because the obvious misreading destroys bystanders. This selects on the
+    object's value alone, so in a store holding ``Alice -> 42`` and an unrelated ``Bob -> 42`` it
+    returns both keys, and a closure measured over it removes BOTH records. That is over-deletion --
+    the dual of the failure the pod exists to prevent -- and it is wrong whenever a "fact" means the
+    (subject, relation, object) triple rather than the value.
+
+    Use it only for the store-wide question "where does this value live at all", which is the right
+    question for a value that identifies a person. For the pod, use ``pod_keys``; for a fact under one
+    subject, pass that subject's keys explicitly.
     """
     view = store.resolved_view(respect_markers=True)
     return tuple(sorted(k for k, (o, _) in view.items() if int(o) == int(obj)))
+
+
+#: Kept as the name the first version used. It selects on value, not on identity: see ``value_keys``.
+duplicate_keys = value_keys

@@ -1553,6 +1553,44 @@ as narrowly as the evidence allows:
    training, worst of three seeds over twelve phrasings (E-000025) — which is the part that is not in
    Codd, because a join is exact and a learned dereference is not.
 
+### 31.18 Three words the certificate was using loosely (2026-09-04)
+
+An adversarial pass over the fact-level certificate, run against HEAD rather than against a
+description of it, found that two of the four defects it went looking for had already been fixed and
+three claims were still stated more loosely than the code supports. All three are now instruments
+rather than sentences.
+
+**"Gone" was doing the work of "unreachable".** Every certificate in `so/audit.py` is about
+reachability: the model cannot depend on the payload, no surviving bank row is a function of it, no
+query in the workload yields it. None of them says the payload is *gone*, and under EVICT it
+demonstrably is not — keeping the versions is the operation's entire purpose, which is what makes
+RESTORE work, and the write-ahead log keeps a copy too. `check_retention` reports where the payload
+still lives, `FactCertificate` carries it, and the verdict now reads **"FACT UNREACHABLE, CERTIFIED …
+— UNREACHABLE, NOT ERASED: the store still holds the payload."** That two-part statement is what EVICT
+actually earns, and it is a useful thing to earn: reversible, auditable, and constant-cost. It is not
+erasure, and a record that said it was would be the exact mis-description this programme exists to
+avoid.
+
+**"The fact" was not individuated.** `fact_closure` measured over a pod certifies the
+(subject, relation, object) triple. It says nothing about the same VALUE stored under a different
+subject — and `so/closure.py`'s own `value_keys` selects on value alone, so measuring a closure over
+*that* set removes a bystander's record as well, which is over-deletion, the dual of the failure the
+pod exists to prevent. There is now a test that destroys the bystander on purpose so the distinction
+cannot be lost again, and `FactCertificate.individuation` prints which of the two a verdict means.
+
+**"Codd's deletion anomaly" was the wrong anomaly.** The failure the pod prevents is redundancy plus a
+delete that reaches one place of many — Codd's **modification** anomaly applied to a delete. His
+*deletion* anomaly is the opposite failure: losing information nobody asked to lose. The distinction
+matters here because this work commits both errors in different places, and the vocabulary has to keep
+them apart. Corrected in `so/closure.py`, both experiments and the tests.
+
+One case the same pass identified as untested is now tested: a **shadowed duplicate**, a second FACT
+cell holding the same key. `_key_index` is first-holder-wins, so the shadow answers nothing until the
+first record goes and then starts answering. Its two derivations are never live at once, so no
+disjoint pair exists, the certified lower bound is 1 while the true closure is 2, and `optimal` is
+correctly False. That is the case where the greedy search does non-trivial work and where saying
+"proved optimal" without checking would have been wrong.
+
 ### 31.8 Boundary
 
 CPU only, no GPU, no LLM above 124M parameters, synthetic worlds, single-token entities, two surface forms per relation, one session. Nothing here shows unlearning of facts already encoded in pretrained weights. Evidence levels recorded: E3–E4 for the synthetic system (F4 for SHRED with the verified gate, E-000010 — **on the value channel only**: E-000028 recovers the shredded object at 1.0000 through the ungated reverse key, where REVOKE and DELETE are at chance, so F4 for SHRED is a claim about answers, logits, hidden states and probes and not about routing); E5 as substrate for the frozen-GPT-2 experiment, with reading, composition, update and the copy bound supported and behavioural deletion not yet supported at the pre-registered thresholds.

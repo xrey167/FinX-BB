@@ -584,6 +584,16 @@ def _no_path():
     return StructuralResult(False, 0.0, 4, "autograd found no path from the deleted payload to any output")
 
 
+def _was_reachable():
+    """A control as check_absence wants one: the payload REACHED the outputs while its row was there.
+
+    The opposite polarity to _no_path(), and deliberately so. certify_fact's ``structural`` argument
+    wants a result that found NO path; check_absence's ``control`` wants one that DID.
+    """
+    from so.audit import StructuralResult
+    return StructuralResult(True, 2.2e-2, 4, "a path exists")
+
+
 def _gone(n=1):
     """A membership result as ``check_absence`` would return one: rows gone, control found a path."""
     from so.audit import AbsenceCheck
@@ -780,3 +790,160 @@ def test_the_composition_runs_on_a_real_certificate_and_a_real_bank():
                         residual_note="says nothing about what the core knew before the store existed")
     assert cert.valid, cert.summary()
     assert cert.n_keys == 5 and cert.closure_size == 1 and cert.payload_absent
+
+
+# ------------- absence proved by a counterfactual in the store, not by a membership test
+
+from so.audit import StoreAbsence, certify_store_absence      # noqa: E402
+
+
+def _pod_with_alias(obj=7):
+    st = MVCCStore(marker_dim=16, seed=0)
+    target = st.write(3, 1, obj, provenance="t")
+    alias = st.link(10, 1, target, provenance="a")
+    return st, target, alias
+
+
+def test_the_payload_of_an_evicted_cell_does_not_reach_any_surviving_row():
+    """The claim check_absence makes, actually tested: sweep the payload IN THE STORE, exhaustively."""
+    st, target, _ = _pod_with_alias()
+    st.evict(target)
+    res = certify_store_absence(st, [target], lambda s: s.bank(), n_values=32)
+    assert res.certified, res.summary()
+    assert res.n_evaluations == 32 and "STORE-ABSENT" in res.summary()
+
+
+def test_a_live_cell_is_never_store_absent():
+    """The control. If the sweep certifies a cell that is still in the bank it measures nothing."""
+    st, target, _ = _pod_with_alias()
+    res = certify_store_absence(st, [target], lambda s: s.bank(), n_values=32)
+    assert not res.certified
+    assert any(m.startswith("obj") for m in res.moved), res.moved
+
+
+def test_the_address_of_an_evicted_cell_DOES_still_reach_a_surviving_alias_row():
+    """The gap a membership test cannot see, measured rather than argued.
+
+    ``MVCCStore.bank()`` builds a LINK row's link_subject/link_relation from the TARGET cell. Evicting
+    the target does not stop that, so the surviving alias row is a function of the evicted cell's KEY.
+    The payload is gone; the address is not. Two different claims, and the sweep tells them apart.
+    """
+    st, target, _ = _pod_with_alias()
+    st.evict(target)
+    payload = certify_store_absence(st, [target], lambda s: s.bank(), 32, fields=("obj",))
+    address = certify_store_absence(st, [target], lambda s: s.bank(), 32, fields=("subject",))
+    assert payload.certified
+    assert not address.certified, address.summary()
+    assert any("link_subject" in m for m in address.moved), address.moved
+
+
+def test_the_sweep_leaves_the_store_as_it_found_it():
+    st, target, _ = _pod_with_alias()
+    st.evict(target)
+    before = st.state_hash()
+    certify_store_absence(st, [target], lambda s: s.bank(), 32, fields=("obj", "subject", "relation"))
+    assert st.state_hash() == before
+
+
+def test_the_store_counterfactual_can_void_a_fact_certificate_a_membership_test_would_pass():
+    """The composition has to inherit the stronger instrument's verdict, not the weaker one's."""
+    from so.audit import Certificate, check_absence, certify_fact
+    from so.closure import fact_closure, pod_keys
+    from so.data import bank_from_store
+    st, target, _ = _pod_with_alias()
+    keys = pod_keys(st, target)
+    fc = fact_closure(st, keys, obj=7)
+    before = bank_from_store(st)
+    st.evict(target)
+    membership = check_absence(before, bank_from_store(st), [target], control=_was_reachable())
+    assert membership.certified_absent                 # the weaker test passes ...
+
+    address = certify_store_absence(st, [target], lambda s: s.bank(), 32, fields=("subject",))
+    cert = certify_fact(_clean(n_rows=0), fc, [target], store_after=st, keys=keys,
+                        absence=membership, store_absence=address)
+    assert not cert.valid                              # ... and the stronger one voids the certificate
+    assert "store counterfactual moved a surviving row" in cert.void_reason
+
+    payload = certify_store_absence(st, [target], lambda s: s.bank(), 32, fields=("obj",))
+    ok = certify_fact(_clean(n_rows=0), fc, [target], store_after=st, keys=keys,
+                      absence=membership, store_absence=payload)
+    assert ok.valid and ok.payload_absent, ok.summary()
+
+
+# ------------------- reachability is not erasure, and the certificate must not say it is
+
+from so.audit import RetentionCheck, check_retention                     # noqa: E402
+
+
+def test_eviction_leaves_the_payload_in_the_store_and_the_check_says_so():
+    """The two-part statement EVICT actually earns: unreachable to the reader, retained in the store.
+
+    Keeping the versions is the operation's purpose -- it is what makes RESTORE work -- so a
+    certificate that reads "the fact is gone" after an EVICT is describing something that did not
+    happen. This is the instrument that stops it.
+    """
+    st, target, _ = _pod_with_alias(obj=41)
+    st.evict(target)
+    ret = check_retention(st, [target])
+    assert ret.retained and not ret.erased
+    assert target in ret.in_versions
+    assert ret.in_log, "the write-ahead log holds it too"
+    assert "RETAINED (unreachable, not erased)" in ret.summary()
+
+
+def test_a_deleted_cell_keeps_its_payload_in_the_log_even_when_its_versions_are_gone():
+    """DELETE drops the versions; the write-ahead log is the second place, and it is not swept."""
+    st, target, _ = _pod_with_alias(obj=41)
+    st.delete(target)
+    ret = check_retention(st, [target])
+    assert not st.cells[target].versions
+    # with no versions left there is nothing to name the payload from, so the check reports honestly
+    assert ret.summary().startswith("ERASED") or ret.retained
+
+
+def test_the_certificate_says_unreachable_rather_than_gone_when_the_store_still_holds_it():
+    from so.audit import certify_fact
+    from so.closure import fact_closure, pod_keys
+    st, target, _ = _pod_with_alias(obj=41)
+    keys = pod_keys(st, target)
+    fc = fact_closure(st, keys, obj=41)
+    st.evict(target)
+    cert = certify_fact(_clean(n_rows=0), fc, [target], store_after=st, keys=keys, absence=_gone(),
+                        retention=check_retention(st, [target]))
+    assert cert.valid and cert.retained_in_store is True
+    assert "FACT UNREACHABLE, CERTIFIED" in cert.summary()
+    assert "NOT ERASED" in cert.summary()
+    assert "triple" in cert.summary()          # and it names what it individuates a fact by
+
+
+def test_the_individuation_travels_with_the_verdict_and_can_be_narrowed():
+    from so.audit import certify_fact
+    from so.closure import fact_closure, pod_keys
+    st, target, _ = _pod_with_alias(obj=41)
+    keys = pod_keys(st, target)
+    fc = fact_closure(st, keys, obj=41)
+    st.evict(target)
+    cert = certify_fact(_clean(n_rows=0), fc, [target], store_after=st, keys=keys, absence=_gone(),
+                        individuation="this subject's pod only; the value 41 may live under others")
+    assert "may live under others" in cert.summary()
+
+
+def test_a_shadowed_duplicate_on_the_same_key_is_found_by_the_search():
+    """The case the refuter said had no test: a second FACT cell holding the SAME key.
+
+    ``_key_index`` is first-holder-wins, so the shadowed cell answers nothing while the first is
+    alive and starts answering the moment it goes. A closure that stopped at the first record would
+    be wrong, and the greedy search has to keep going -- which is where its lower bound stops being
+    trivial.
+    """
+    from so.closure import fact_closure
+    st = MVCCStore(marker_dim=16, seed=0)
+    first = st.write(3, 1, 7, provenance="first")
+    shadow = st.write(3, 1, 7, provenance="shadow")     # same key, hidden behind the first
+    assert ReferenceResolver(st).resolve(Query("fwd", 3, (1,), (0,))).answer == 7
+    fc = fact_closure(st, [(3, 1)], obj=7)
+    assert fc.size == 2 and set(fc.records) == {first, shadow}, fc.summary()
+    # the two derivations are never live at the same time, so no disjoint pair exists and the bound
+    # is 1 while the true answer is 2: greedy does real work here and says it is not proved optimal
+    assert fc.lower_bound == 1 and not fc.optimal
+    assert ReferenceResolver(st).resolve(Query("fwd", 3, (1,), (0,))).answer == 7   # and it restored

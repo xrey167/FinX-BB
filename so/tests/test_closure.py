@@ -45,8 +45,9 @@ def test_a_canonical_pod_has_closure_one_however_many_aliases_point_at_it():
 def test_duplication_makes_the_closure_grow_with_the_number_of_copies():
     """The contrast: the same fact under k keys, stored k times, needs k deletions.
 
-    Each key resolves through its OWN record, so removing one leaves the others readable -- which is
-    a deletion anomaly in Codd's sense, measured here as a closure size rather than described.
+    Each key resolves through its OWN record, so removing one leaves the others readable. In Codd's
+    vocabulary that is the MODIFICATION anomaly applied to a delete -- his DELETION anomaly is the
+    opposite failure, unintended loss -- and it is measured here as a closure size.
     """
     st = _store()
     for i in range(5):
@@ -339,3 +340,53 @@ def test_a_wider_workload_can_turn_a_valid_certificate_into_a_void_one():
     assert "misses 1 record(s)" in cert.void_reason
     # and the store agrees: the two-hop question still answers 7
     assert ReferenceResolver(st).resolve(two_hop).answer == 7
+
+
+# ---------------- the two ways the pod boundary was mis-drawn, and the tests that keep it drawn
+
+def test_pod_keys_follows_a_chain_of_aliases_and_not_only_direct_pointers():
+    """The earlier version missed a1 <- a2 and would have reported a short pod as covered."""
+    st = _store()
+    target = st.write(3, 1, 7, provenance="t")
+    a1 = st.link(10, 1, target, provenance="a1")
+    st.link(11, 1, a1, provenance="a2")            # points at the ALIAS, not at the target
+    keys = pod_keys(st, target)
+    assert set(keys) == {(3, 1), (10, 1), (11, 1)}
+    for key in keys:                               # and every one of them really does reach the object
+        assert ReferenceResolver(st).resolve(Query("fwd", key[0], (key[1],), (0,))).answer == 7
+
+
+def test_pod_keys_terminates_on_a_cycle():
+    st = _store()
+    target = st.write(3, 1, 7, provenance="t")
+    a1 = st.link(10, 1, target, provenance="a1")
+    a2 = st.link(11, 1, a1, provenance="a2")
+    st.relink(a1, a2)                              # a1 -> a2 -> a1: no answer, and no infinite walk
+    keys = pod_keys(st, target)
+    assert (3, 1) in keys and len(keys) <= 3
+
+
+def test_selecting_on_the_value_would_delete_a_bystander_and_the_name_says_so():
+    """value_keys selects on the object's VALUE, so two unrelated facts sharing it come back together.
+
+    Measured rather than warned about: the closure over that set removes both records, which is
+    over-deletion -- the dual of the failure the pod exists to prevent.
+    """
+    from so.closure import value_keys
+    st = _store()
+    mine = st.write(3, 1, 42, provenance="mine")
+    bystander = st.write(9, 2, 42, provenance="bystander")
+    keys = value_keys(st, 42)
+    assert set(keys) == {(3, 1), (9, 2)}
+    fc = fact_closure(st, keys, obj=42)
+    assert set(fc.records) == {mine, bystander}    # BOTH go, and the bystander is not the fact
+    # the right set for the fact "the object under (3,1) is 42" is that subject's pod alone
+    assert fact_closure(st, pod_keys(st, mine), obj=42).records == (mine,)
+
+
+def test_the_pod_of_a_removed_cell_is_empty_rather_than_wrong():
+    st = _store()
+    target = st.write(3, 1, 7, provenance="t")
+    st.link(10, 1, target, provenance="a")
+    st.evict(target)
+    assert pod_keys(st, target) == ()

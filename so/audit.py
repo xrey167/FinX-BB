@@ -843,6 +843,175 @@ def check_absence(bank_before: Any, bank_after: Any, removed_kids: Sequence[int]
                         still_present=still, note=note)
 
 
+@dataclass
+class StoreAbsence:
+    """Absence proved by a counterfactual IN THE STORE, not by a membership test on the bank.
+
+    ``check_absence`` asks whether the removed cells still hold a bank row. That is necessary and it is
+    not sufficient, and the gap is not hypothetical in this repository: ``MVCCStore.bank()`` builds a
+    LINK row's ``link_subject``/``link_relation`` from the TARGET cell -- its live version while the
+    target is merely EVICTED, its ``tombstone_key`` once the target is DELETED. So after removing a
+    pod's object, a surviving alias row carries fields computed from the removed cell, and a membership
+    test cannot see it.
+
+    This closes that by construction. Set the removed cell's field to every value it could hold, rebuild
+    the bank each time, and compare the SURVIVING rows bit for bit. If nothing moves over the whole
+    domain, no surviving row is a function of that field -- exhaustively, not by sampling -- and the
+    model reads the store only through the bank, so nothing the model computes is either.
+
+    Sweeping ``("obj",)`` asks the question a data subject asks: is the payload gone. Sweeping
+    ``("subject", "relation")`` asks whether the removed cell's ADDRESS is gone, which after EVICT it
+    is not, because an alias keeps pointing at it. Both answers are worth having and they are different
+    claims, so the fields are named in the result rather than assumed.
+    """
+
+    certified: bool
+    fields: Tuple[str, ...]
+    n_values: int
+    n_evaluations: int
+    moved: Tuple[str, ...] = ()
+    note: str = ""
+
+    def summary(self) -> str:
+        what = "/".join(self.fields)
+        if self.certified:
+            return (f"STORE-ABSENT: over all {self.n_values} values of {what} on {self.n_evaluations - 1} "
+                    f"counterfactual stores, no surviving bank row moved")
+        return f"NOT STORE-ABSENT: {what} still reaches the surviving bank through {list(self.moved)}"
+
+
+def _set_version_field(store: Any, kid: int, field: str, value: int) -> None:
+    cell = store.cells[int(kid)]
+    setattr(cell.version_obj(cell.active_version), field, int(value))
+
+
+def certify_store_absence(store: Any, removed_kids: Sequence[int],
+                          bank_of: Callable[[Any], Dict[str, Any]], n_values: int,
+                          fields: Sequence[str] = ("obj",),
+                          set_field: Optional[Callable[[Any, int, str, int], None]] = None,
+                          restore: bool = True) -> StoreAbsence:
+    """Sweep the removed cells' fields in the store; the surviving bank must not move.
+
+    The mutation is a measurement: every original value is put back before returning, so the store is
+    left exactly as it was found. ``bank_of`` is whatever turns the store into the arrays the model
+    reads -- ``MVCCStore.bank`` for the store's own view, or a ``Bank`` builder for the model's.
+    """
+    setter = set_field if set_field is not None else _set_version_field
+    kids = [int(k) for k in removed_kids]
+    fields = tuple(fields)
+    ref = {k: np.asarray(v) for k, v in bank_of(store).items()}
+    originals = {(k, f): int(getattr(store.cells[k].version_obj(store.cells[k].active_version), f))
+                 for k in kids for f in fields}
+    moved: List[str] = []
+    n_eval = 1
+    try:
+        for kid in kids:
+            for f in fields:
+                for value in range(n_values):
+                    if value == originals[(kid, f)]:
+                        continue
+                    setter(store, kid, f, value)
+                    got = {k: np.asarray(v) for k, v in bank_of(store).items()}
+                    n_eval += 1
+                    for name in ref:
+                        if name not in got or ref[name].shape != got[name].shape:
+                            moved.append(f"{name} (shape)")
+                        elif not np.array_equal(ref[name], got[name]):
+                            moved.append(f"{name} at {f}={value}")
+                    if moved:
+                        break
+                setter(store, kid, f, originals[(kid, f)])
+                if moved:
+                    break
+            if moved:
+                break
+    finally:
+        if restore:
+            for (kid, f), value in originals.items():
+                setter(store, kid, f, value)
+    return StoreAbsence(not moved, fields, n_values, n_eval, tuple(dict.fromkeys(moved))[:8],
+                        "" if not moved else "a surviving row is a function of the removed cell")
+
+
+@dataclass
+class RetentionCheck:
+    """Is the payload still IN THE STORE after the removal that made it unreachable?
+
+    Every certificate above is about reachability: the model cannot depend on the payload, no
+    surviving bank row is a function of it, no query yields it. None of them says the payload is gone,
+    and under EVICT it demonstrably is not -- keeping the versions is the whole point of the operation,
+    which is why RESTORE works. The write-ahead log keeps it too.
+
+    A guarantee that says "the fact is gone" when the store still holds it is the exact
+    mis-description this repository set out to avoid, so it gets its own instrument and its own word.
+    The honest statement about EVICT is two-part: **unreachable to the reader, retained in the store.**
+    That is a useful thing to be -- it is reversible, auditable and cheap -- and it is not erasure. Only
+    SHRED-of-the-version-plus-DELETE, or a store that compacts its log, can claim the second part.
+
+    ``in_versions`` is the payload surviving in some cell's version list, the removed cell's own
+    included. ``in_log`` is it surviving in the write-ahead log. Either one true means the store
+    retains it, and a caller that wants erasure rather than unreachability has to act on that.
+    """
+
+    retained: bool
+    in_versions: Tuple[int, ...] = ()
+    in_log: Tuple[int, ...] = ()
+    n_log_entries: int = 0
+    fields: Tuple[str, ...] = ("obj",)
+
+    @property
+    def erased(self) -> bool:
+        return not self.retained
+
+    def summary(self) -> str:
+        if not self.retained:
+            return "ERASED: the payload is in no version and in no log entry"
+        where = []
+        if self.in_versions:
+            where.append(f"{len(self.in_versions)} cell version(s)")
+        if self.in_log:
+            where.append(f"{len(self.in_log)} of {self.n_log_entries} log entries")
+        return ("RETAINED (unreachable, not erased): the payload is still held in "
+                + " and ".join(where))
+
+
+def check_retention(store: Any, removed_kids: Sequence[int],
+                    fields: Sequence[str] = ("obj",)) -> RetentionCheck:
+    """Where the removed cells' payloads still live in the store, if anywhere.
+
+    Reachability and retention are different questions and this repository answers both, so the word
+    "deleted" never has to carry an ambiguity. Call it beside ``certify_store_absence``.
+    """
+    kids = [int(k) for k in removed_kids]
+    fields = tuple(fields)
+    wanted = set()
+    for kid in kids:
+        cell = store.cells.get(kid)
+        if cell is None or not cell.versions:
+            continue
+        for v in cell.versions:
+            for f in fields:
+                if hasattr(v, f):
+                    wanted.add((f, int(getattr(v, f))))
+    if not wanted:
+        return RetentionCheck(False, (), (), len(getattr(store, "log", [])), fields)
+
+    in_versions: List[int] = []
+    for kid, cell in store.cells.items():
+        for v in cell.versions:
+            if any((f, int(getattr(v, f))) in wanted for f in fields if hasattr(v, f)):
+                in_versions.append(int(kid))
+                break
+    in_log: List[int] = []
+    log = list(getattr(store, "log", []))
+    for i, (_op, args) in enumerate(log):
+        if any((f, int(args[f])) in wanted for f in fields
+               if f in args and isinstance(args[f], (int, np.integer))):
+            in_log.append(i)
+    return RetentionCheck(bool(in_versions or in_log), tuple(in_versions), tuple(in_log), len(log),
+                          fields)
+
+
 # --------------------------------------------------- from a record certificate to a fact certificate
 
 @dataclass
@@ -876,6 +1045,12 @@ class FactCertificate:
         before the store existed is outside it -- E-000013 measures that separately -- and
         ``residual_note`` is where a caller records that limit rather than letting the word
         "certificate" swallow it.
+      * REACHABILITY IS NOT ERASURE. Everything here says the model cannot get at the payload. Under
+        EVICT the store still holds it -- that is the operation's purpose -- so ``retention`` is taken
+        and printed, and the verdict reads "unreachable, certified" rather than "the fact is gone".
+      * WHAT COUNTS AS THE FACT is the caller's to state. The default is the (subject, relation,
+        object) triple: canonicalising one subject's pod says nothing about the same VALUE stored under
+        another subject, and ``so.closure.value_keys`` exists for that other question.
       * The closure is the resilience of a QUERY SET, and the certificate is only as wide as that set.
         ``FactClosure.workload`` names it and ``summary`` prints it, because the default workload is
         one single-hop question per key: a fact a multi-hop derivation still reaches is outside the
@@ -912,6 +1087,11 @@ class FactCertificate:
     void_reason: str = ""
     payload_absent: bool = False
     workload: str = ""
+    #: What counts as "the fact". The default guarantee is over the TRIPLE: canonicalising one
+    #: subject's pod says nothing about the same VALUE living under another subject, and a claim that
+    #: does not say which it means is not a claim. Set by the caller, printed by ``summary``.
+    individuation: str = "the (subject, relation, object) triple, not the object's value elsewhere"
+    retained_in_store: Optional[bool] = None
     residual_note: str = ""
 
     def summary(self) -> str:
@@ -920,9 +1100,14 @@ class FactCertificate:
         scope = f" over [{self.workload}]" if self.workload else ""
         if self.valid:
             post = "" if self.post_condition is None else ", post-condition verified"
-            return (f"FACT CERTIFIED{scope}: object {self.obj} unreachable through all {self.n_keys} "
-                    f"key(s); {len(self.removed)} record(s) removed covering a closure of "
-                    f"{self.closure_size}{post}")
+            # UNREACHABLE, not "gone": under EVICT the store still holds the payload, and saying
+            # otherwise is the mis-description the whole programme exists to avoid.
+            held = ("" if self.retained_in_store is None
+                    else (" -- UNREACHABLE, NOT ERASED: the store still holds the payload"
+                          if self.retained_in_store else " -- and erased from the store"))
+            return (f"FACT UNREACHABLE, CERTIFIED{scope}: object {self.obj} unreachable through all "
+                    f"{self.n_keys} key(s) of [{self.individuation}]; {len(self.removed)} record(s) "
+                    f"removed covering a closure of {self.closure_size}{post}{held}")
         return f"NOT A FACT CERTIFICATE{scope}: {self.void_reason}"
 
 
@@ -930,6 +1115,9 @@ def certify_fact(record: "Certificate", closure: "FactClosure", removed: Sequenc
                  store_after: Optional[Any] = None, keys: Optional[Sequence[Tuple[int, int]]] = None,
                  structural: Optional["StructuralResult"] = None,
                  absence: Optional["AbsenceCheck"] = None,
+                 store_absence: Optional["StoreAbsence"] = None,
+                 retention: Optional["RetentionCheck"] = None,
+                 individuation: Optional[str] = None,
                  residual_note: str = "") -> FactCertificate:
     """Compose a record-level certificate with a store-level closure.
 
@@ -944,6 +1132,10 @@ def certify_fact(record: "Certificate", closure: "FactClosure", removed: Sequenc
     ``absence`` optional: a ``check_absence`` result. This is the one that applies when the deletion
                 REMOVED the rows, and one of the two is required then, since a payload sweep over no
                 rows is vacuous.
+    ``store_absence`` optional: a ``certify_store_absence`` result. Strictly stronger than ``absence``
+                -- membership says the row is gone, this says no SURVIVING row is a function of the
+                removed payload -- and it discharges the same requirement. Where both are supplied,
+                both must hold.
 
     Every way this can fail is named in ``void_reason`` rather than folded into a boolean, because a
     certificate whose failure modes are invisible is worse than no certificate.
@@ -954,11 +1146,14 @@ def certify_fact(record: "Certificate", closure: "FactClosure", removed: Sequenc
     swept = record.n_rows > 0
     structural_ok = bool(structural is not None and structural.certified_structurally)
     absent_ok = bool(absence is not None and absence.certified_absent)
+    store_ok = bool(store_absence is not None and store_absence.certified)
     record_ok = (bool(record.output_certified and record.activation_certified)
-                 and (swept or structural_ok or absent_ok))
+                 and (swept or structural_ok or absent_ok or store_ok))
 
     reasons: List[str] = []
-    if not swept and not (structural_ok or absent_ok):
+    if store_absence is not None and not store_absence.certified:
+        reasons.append(f"the store counterfactual moved a surviving row: {store_absence.summary()}")
+    if not swept and not (structural_ok or absent_ok or store_ok):
         why = ""
         if absence is not None:
             why = f" ({absence.summary()})"
@@ -993,5 +1188,7 @@ def certify_fact(record: "Certificate", closure: "FactClosure", removed: Sequenc
         obj=int(closure.obj), n_keys=len(closure.keys), closure_size=closure.size,
         removed=tuple(sorted(removed_set)), covers_closure=covers, record_certified=record_ok,
         post_condition=post, valid=not reasons, void_reason="; ".join(reasons),
-        payload_absent=absent_ok, workload=getattr(closure, "workload", ""),
+        payload_absent=absent_ok or store_ok, workload=getattr(closure, "workload", ""),
+        retained_in_store=(None if retention is None else bool(retention.retained)),
+        **({"individuation": individuation} if individuation else {}),
         residual_note=residual_note)

@@ -20,8 +20,9 @@ The addressing text is identical in both arms. What differs is only whether the 
 
 WHAT IS MEASURED, AND WHY THE SECOND HALF MATTERS MORE THAN THE FIRST.
 
-That deleting one chunk of k leaves the fact retrievable is not news; it is Codd's deletion anomaly in
-a vector index, and any practitioner would predict it. The half that is not obvious is what it costs
+That deleting one chunk of k leaves the fact retrievable is not news; it is redundancy plus a delete
+that reaches one place of many -- Codd's MODIFICATION anomaly, not his DELETION anomaly, which is the
+opposite failure of losing information nobody asked to lose -- and any practitioner would predict it. The half that is not obvious is what it costs
 to FIND the closure, because a duplicated store's defenders will say: search for the fact and delete
 every chunk that matches. So the experiment asks that search to perform, and reports the trade-off it
 cannot escape:
@@ -317,7 +318,8 @@ def main(argv: Optional[List[str]] = None) -> Dict[str, Any]:
           "what a naive erasure does — and then asks all four phrasings again. The two search columns",
           "give the content-based remedy its best shot: the similarity threshold is swept and the best",
           "achievable point reported. They are the half that is not obvious. Deleting one of k copies",
-          "leaving the fact readable is Codd's deletion anomaly and any practitioner would predict it;",
+          "leaving the fact readable is Codd's modification anomaly applied to a delete, and any",
+          "practitioner would predict it;",
           "that the search for the remaining copies cannot be both complete and clean is the reason",
           "canonicalisation is not merely tidier.", "",
           "## Pre-registered criteria", "", ledger.criteria_table(check), ""]

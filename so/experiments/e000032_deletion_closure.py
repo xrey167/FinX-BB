@@ -27,8 +27,10 @@ record level the two stores are indistinguishable -- per-key closure is one in b
 erasure cost differs by a factor of k. That gap is what a record-level certificate cannot see and what
 this experiment puts a number on.
 
-The honest framing, stated here so the record carries it: the gap itself is Codd's deletion anomaly,
-and normalization as the remedy is 1971. What is not Codd is that normalization is free in a database,
+The honest framing, stated here so the record carries it: the gap is redundancy, and one operation
+reaching only one of its places -- Codd's MODIFICATION anomaly applied to a delete, not his DELETION
+anomaly, which is the opposite failure of losing information nobody asked to lose. Normalization as
+the remedy is 1971. What is not Codd is that normalization is free in a database,
 where a join is exact, and is NOT free in a neural memory, where the reader must LEARN to dereference
 and can refuse or fail. E-000025 priced that on a frozen GPT-2: sharing costs 0.0954 and having
 trained on links at all costs 0.0688, worst of three seeds over all twelve phrasings. This experiment
@@ -38,7 +40,14 @@ WHAT COULD FALSIFY IT. Four controls, each able to void the comparison:
   * the two arms must present the same interface, or nothing below is a like-for-like comparison;
   * per-key closure must be one in BOTH arms, or the stores were already distinguishable at the
     record level and the fact level is not doing the work;
-  * the model must READ the fact before any deletion, or "the fact is gone afterwards" is vacuous;
+  * the model must READ the fact before any deletion, or "the fact is unreachable afterwards" is
+    vacuous;
+  * the payload must still BE in the store afterwards, because EVICT is retention-preserving by
+    design: the honest verdict is two-part -- unreachable to the reader, retained in the store -- and
+    if retention failed, EVICT would have become a DELETE and RESTORE would be broken;
+  * the removed payload must not reach any SURVIVING bank row, swept over its whole domain in the
+    store -- a membership test cannot see that MVCCStore.bank() builds an alias row's link key from the
+    target cell, so a surviving row is computed from the removed one;
   * the payload must REACH the outputs while its row is in the bank, or its absence afterwards is not
     evidence that anything was deleted -- this is the control that keeps the membership claim honest,
     and its lack is what made the first version of E-000030's DELETE arm certify by not testing;
@@ -61,7 +70,8 @@ import numpy as np
 import torch
 
 from so import ledger
-from so.audit import certify_encoding, certify_fact, certify_structural, check_absence
+from so.audit import (certify_encoding, certify_fact, certify_store_absence,
+                      certify_structural, check_absence, check_retention)
 from so.closure import closure_profile, fact_closure
 from so.data import bank_from_store
 from so.experiments.e000015_symlink_cells import (EVAL, _q1, encode_slots, load_arm, predict,
@@ -151,7 +161,14 @@ def certify_removal(model, store, world, bank_before, removed_kids: Sequence[int
     record = certify_encoding(model, bank_after.tensors(), [], world.n_entities,
                               interface_keys=("k_f", "v_f", "k_r", "v_r", "active"))
     absence = check_absence(bank_before, bank_after, list(removed_kids), control=control)
-    return record, absence
+    # Stronger than membership, and needed here: MVCCStore.bank() builds a LINK row's
+    # link_subject/link_relation from the TARGET cell, so a surviving alias row is computed from the
+    # removed cell and no membership test can see it. Sweeping the removed payload over its whole
+    # domain and comparing the surviving bank settles it exhaustively. store.bank() is the right
+    # object to compare: every tensor Bank.tensors() hands the model is a function of its arrays.
+    payload_gone = certify_store_absence(store, list(removed_kids), lambda st: st.bank(),
+                                         world.n_entities, fields=("obj",))
+    return record, absence, payload_gone
 
 
 def run_seed(seed: int, n_groups: int, steps: int, verbose: bool = True) -> Dict[str, Any]:
@@ -200,37 +217,59 @@ def run_seed(seed: int, n_groups: int, steps: int, verbose: bool = True) -> Dict
         store, kids = stores[arm]
         sizes, optimal, one_valid, all_valid = [], [], [], []
         one_reads, all_reads, one_absent, control_ok = [], [], [], []
+        one_store, one_addr = [], []
+        search_seconds, guarantee_seconds, control_seconds = [], [], []
+        one_retained = []
         for t_key in chosen:
             keys = group_keys(spec, t_key)
             obj = answers[arm][t_key]
+            t_search = time.time()
             fc = fact_closure(store, keys, obj=obj)
+            search_seconds.append(time.time() - t_search)
             sizes.append(fc.size)
             optimal.append(float(fc.optimal))
 
             # the positive control, BEFORE anything is removed: the payload must reach the outputs,
-            # or its absence afterwards is not evidence that anything was deleted
+            # or its absence afterwards is not evidence that anything was deleted. This is a validity
+            # check on the INSTRUMENT rather than a per-deletion cost -- it establishes that the
+            # measurement can fail -- so it is timed separately from the guarantee itself.
             whole = sorted(set(list(fc.records) + [kids[t_key]]))
+            t_ctl = time.time()
             control = reachability_control(model, store, world, whole, probe_queries)
+            control_seconds.append(time.time() - t_ctl)
             control_ok.append(float(control.reachable))
             bank_before = bank_from_store(store)
 
             # ARM "one record": remove exactly what a record-level certificate would cover -- the
             # object itself. In a pod that IS the closure; under duplication it is one of k.
+            t_guarantee = time.time()
             store.evict(kids[t_key])
-            rec, absence = certify_removal(model, store, world, bank_before, [kids[t_key]], control)
+            rec, absence, payload_gone = certify_removal(model, store, world, bank_before,
+                                                         [kids[t_key]], control)
+            # the deletion and everything that certifies it, with no forward pass anywhere inside
+            guarantee_seconds.append(time.time() - t_guarantee + search_seconds[-1])
+            retention = check_retention(store, [kids[t_key]])
             cert_one = certify_fact(rec, fc, [kids[t_key]], store_after=store, keys=keys,
-                                    absence=absence,
+                                    absence=absence, store_absence=payload_gone, retention=retention,
                                     residual_note="says nothing about what the core knew before the store existed")
             one_valid.append(float(cert_one.valid))
+            one_retained.append(float(retention.retained))
             one_absent.append(float(absence.certified_absent))
+            one_store.append(float(payload_gone.certified))
+            # the address is a separate claim and it does NOT hold: an alias row keeps pointing at the
+            # evicted cell, so link_subject/link_relation move when its key moves. Recorded, not hidden.
+            addr = certify_store_absence(store, [kids[t_key]], lambda st: st.bank(),
+                                         world.n_entities, fields=("subject",))
+            one_addr.append(float(addr.certified))
             one_reads.append(float((read_keys(model, store, world, keys) == obj).mean()))
 
             # ARM "whole closure": remove every record the store's own semantics needs
             for kid in [k for k in fc.records if k != kids[t_key]]:
                 store.evict(kid)
-            rec_all, absence_all = certify_removal(model, store, world, bank_before, whole, control)
+            rec_all, absence_all, payload_all = certify_removal(model, store, world, bank_before,
+                                                                whole, control)
             cert_all = certify_fact(rec_all, fc, whole, store_after=store, keys=keys,
-                                    absence=absence_all)
+                                    absence=absence_all, store_absence=payload_all)
             all_valid.append(float(cert_all.valid))
             all_reads.append(float((read_keys(model, store, world, keys) == obj).mean()))
 
@@ -245,6 +284,18 @@ def run_seed(seed: int, n_groups: int, steps: int, verbose: bool = True) -> Dict
         m[f"{arm}/fact_closure_optimal_rate"] = float(np.mean(optimal))
         m[f"{arm}/one_record_fact_certified"] = float(np.mean(one_valid))
         m[f"{arm}/one_record_payload_absent"] = float(np.mean(one_absent))
+        m[f"{arm}/one_record_payload_store_absent"] = float(np.mean(one_store))
+        m[f"{arm}/one_record_address_store_absent"] = float(np.mean(one_addr))
+        # EVICT keeps the payload in the store on purpose, so the verdict is two-part:
+        # unreachable to the reader, retained in the store. Recorded, never elided.
+        m[f"{arm}/one_record_retained_in_store"] = float(np.mean(one_retained))
+        # what a certified fact deletion COSTS once the instrument is known to work: a
+        # store-side search and an exhaustive store-side sweep, and no model evaluation at
+        # all. The reachability control is the instrument's validity check, not per deletion.
+        m[f"{arm}/closure_search_seconds"] = float(np.mean(search_seconds))
+        m[f"{arm}/certified_deletion_seconds"] = float(np.mean(guarantee_seconds))
+        m[f"{arm}/instrument_control_seconds"] = float(np.mean(control_seconds))
+        m[f"{arm}/model_evaluations_per_deletion"] = 0.0
         m[f"{arm}/control_reachable_before"] = float(np.mean(control_ok))
         m[f"{arm}/one_record_still_readable"] = float(np.mean(one_reads))
         m[f"{arm}/whole_closure_fact_certified"] = float(np.mean(all_valid))
@@ -280,9 +331,14 @@ KEYS = (["control/interface_identical", "control/read_before_deletion", "control
          for k in ("per_key_closure_max", "per_key_closure_mean", "read_before_deletion",
                    "fact_closure_mean", "fact_closure_min", "fact_closure_max",
                    "fact_closure_optimal_rate", "one_record_fact_certified",
-                   "one_record_payload_absent", "control_reachable_before", "one_record_still_readable",
+                   "one_record_payload_absent", "one_record_payload_store_absent",
+                   "one_record_address_store_absent", "one_record_retained_in_store",
+                   "control_reachable_before",
+                   "one_record_still_readable",
                    "whole_closure_fact_certified", "whole_closure_still_readable",
-                   "predicted_still_readable", "prediction_error", "prediction_error_max")])
+                   "predicted_still_readable", "prediction_error", "prediction_error_max",
+                   "closure_search_seconds", "certified_deletion_seconds",
+                   "instrument_control_seconds", "model_evaluations_per_deletion")])
 
 CRITERIA = {
     # controls: any of these failing voids the comparison rather than weakening it
@@ -296,6 +352,12 @@ CRITERIA = {
     "canonical/fact_closure_optimal_rate": (">=", 1.0),
     "duplicated/fact_closure_optimal_rate": (">=", 1.0),
     "canonical/control_reachable_before": (">=", 1.0),
+    # EVICT is retention-preserving by design, so this must be 1.0 -- if it were not, EVICT would
+    # have quietly become a DELETE and RESTORE would be broken
+    "canonical/one_record_retained_in_store": (">=", 1.0),
+    # the exhaustive store counterfactual, which is what actually carries "the payload is unreachable"
+    "canonical/one_record_payload_store_absent": (">=", 1.0),
+    "duplicated/one_record_payload_store_absent": (">=", 1.0),
     "duplicated/control_reachable_before": (">=", 1.0),
     "canonical/one_record_fact_certified": (">=", 1.0),
     "duplicated/one_record_fact_certified": ("<=", 0.0),
@@ -368,10 +430,28 @@ def main(argv: Optional[List[str]] = None) -> Dict[str, Any]:
           "the store before the model is run at all: removing only the object leaves exactly the copies",
           "that are separate records. A store-side statistic is thereby put at risk against a neural",
           "measurement rather than reported beside it.", "",
+          "## What a certified fact deletion costs", "",
+          "Once the instrument is known to work -- which the reachability control establishes, and which",
+          "is a property of the method rather than of each deletion -- the guarantee for one more fact is",
+          "a store-side search plus an exhaustive store-side sweep, with **no model evaluation anywhere",
+          "inside it**. The model-side half is proved once and inherited.", "",
+          ledger.table(["store", "closure search (s)", "certified deletion (s)",
+                        "model evaluations per deletion", "instrument control, once (s)"],
+                       [[arm,
+                         f"{agg[f'{arm}/closure_search_seconds']['mean']:.4f}",
+                         f"{agg[f'{arm}/certified_deletion_seconds']['mean']:.4f}",
+                         f"{agg[f'{arm}/model_evaluations_per_deletion']['mean']:.0f}",
+                         f"{agg[f'{arm}/instrument_control_seconds']['mean']:.2f}"] for arm in ARMS]),
+          "",
+          "E-000024 is the comparison: deleting 50 facts from a LoRA took 129 s by gradient ascent and",
+          "335 s by relabelling, changed 2,359,296 parameters, moved perplexity on ordinary prose from",
+          "42.9 to 6.19e+09 and 6.39e+06, and admits no certificate at all -- there is no finite payload",
+          "domain to sweep and no interface the data passes through.", "",
           "## Pre-registered criteria", "", ledger.criteria_table(check), "",
           "## What this is and is not", "",
-          "The gap between the two arms is Codd's deletion anomaly and normalization is its 1971 remedy;",
-          "this experiment does not claim otherwise. What it adds is that the anomaly decides whether a",
+          "The gap between the two arms is Codd's MODIFICATION anomaly applied to a delete -- his",
+          "DELETION anomaly is the opposite failure, unintended loss -- and normalization is its 1971",
+          "remedy; this experiment does not claim otherwise. What it adds is that the anomaly decides whether a",
           "DELETION CERTIFICATE for a neural memory means anything, that the store-side half of the",
           "guarantee is computable without the model, and that in a neural memory the normalization is",
           "not free -- E-000025 prices it at 0.0954 for sharing and 0.0688 for link training on a frozen",

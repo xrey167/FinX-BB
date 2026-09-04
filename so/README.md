@@ -19,10 +19,12 @@ Code behind the SO documents in `docs/`:
 | `so/evaluation.py` | Test families against the reference: direct, 2-hop, 3-hop, broken paths, provenance, reverse, lifecycle, locality, alternative paths, replay determinism, noise sweep |
 | `so/attacks.py` | Reconstruction attacks: forced choice, logit rank, linear representation probe, routing-mass activation probe |
 | `so/interventions.py` | Causal interventions: disable mask, routed-cell identification |
+| `so/audit.py` | The deletion certificate: exhaustive payload sweeps, the interface certificate that generalises over every query, autograd reachability, `check_absence` and `certify_store_absence` for a row that is gone, `check_retention` for what the store still holds, and `certify_fact`, which composes a record-level certificate with a store-level closure |
+| `so/closure.py` | The store-side half of an erasure guarantee, with no model involved: how many records must go before a key stops answering (`deletion_closure`) and before no query in a declared workload yields an object (`fact_closure`, also exported as `resilience`), with a certified lower bound; `pod_keys` and `value_keys` for the two ways of individuating a fact |
 | `so/ledger.py` | Result recording (JSON + Markdown) with evidence levels E0–E7 and deletion levels F0–F5 |
 | `so/llm_adapter.py` | The knowledge layer attached to a frozen pretrained GPT-2 as a symlink adapter (E-000008) |
 | `so/report.py` | Assembles `docs/so-results-2026-09-02.md` from the recorded results |
-| `so/experiments/` | E-000001-A, E-000001-B, E-000002 … E-000008, `run_all.py` |
+| `so/experiments/` | E-000001-A, E-000001-B, E-000002 … E-000034, `run_all.py` |
 | `so/tests/` | Unit tests |
 
 ## Running it on an Ubuntu server
@@ -81,6 +83,10 @@ python -m so.experiments.e000009_verification_gate                              
 python -m so.experiments.e000009_verification_gate --gate-weight 5 --balanced \
     --name e000010_balanced_gate --experiment E-000010                                       # E-000010: class-balanced
 python -m so.experiments.e000008_gpt2_adapter             # frozen GPT-2 small + adapter (needs transformers; ~20 min per seed on CPU)
+python -m so.experiments.e000030_deletion_certificate --with-gpt2   # the certificate; sweeps the whole payload domain
+python -m so.experiments.e000032_deletion_closure        # the store-side half, composed with it (needs the E-000015 checkpoints)
+python -m so.experiments.e000033_retrieval_closure       # the same measurement in a chunked vector index
+python -m so.experiments.e000034_pointer_separability --phase diagnose   # what the store gives away about a pointer
 python -m so.report                                      # regenerate docs/so-results-2026-09-02.md
 python -m so.experiments.run_all --quick                 # reduced smoke run of the synthetic chain (E-000001 … E-000007, E-000009, E-000010; results get a -quick suffix)
 ```
