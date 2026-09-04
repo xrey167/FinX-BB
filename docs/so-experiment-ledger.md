@@ -1093,6 +1093,64 @@ Section 7 and architecture-document section 10 describe the Symlink in two direc
 
 What is measured in place of the second half is that all *semantic* access paths that reach the same cell are removed by a single operation: after REVOKE of one cell, every paraphrase, every 2-hop route through it and reverse access answer UNKNOWN at 100% in the worst seed, while controls, unrelated cells and bypass paths stay at 100% (E-000003). That supports the deletion claim for one cell with many query forms; it does not support the shared-object claim for several keys. Closing that gap is E-000015, which is now recorded: with link cells the store reaches every access path in ONE operation and, after that one SHRED, the object is unrecoverable through every alias (probe 0.7%, forced choice at chance), while the duplication arm needs one operation per copy and leaves the object fully recoverable through the copies it did not touch (probe 87.3%, forced choice 1.000). The cell-to-cell direction of the Symlink concept is therefore no longer unimplemented; what stays open at LLM scale is that the frozen-GPT-2 chain does not yet carry link cells. E-000016 then showed that the indirection is not a one-step trick: with chains in the training distribution, two dereference slots resolve a two-link chain completely while a one-slot model refuses it rather than inventing an answer, and the number of slots is therefore the honest statement of how deep the mechanism reaches.
 
+### 31.9 A published number that was a property of one phrasing (2026-09-04)
+
+E-000020 recorded that a frozen GPT-2 with link cells reads a base fact at 0.5667 and reads *through*
+an alias at 0.5067, and the roadmap and the summaries were written from those two numbers. Both are
+taken at template 0, because `E20._answers` defaults to it and every call in that experiment's
+battery used the default.
+
+Template 0 is not representative of anything. E-000017-B had already measured the twelve templates on
+the **link-free** adapter and found reading bimodal by phrasing — 0.795, 0.992, 0.792, 1.000, 1.000,
+0.998, 0.785, 0.997 on the trained eight and 0.565, 0.968, 1.000, 0.427 on the held-out four — and
+template 0 is one of the weak ones. E-000020's own record contained the counter-evidence it did not
+act on: `alias_template1_train` 0.785–0.895 and `alias_template9_heldout` 0.870–0.920 on the very
+checkpoints whose headline alias number is 0.5067.
+
+E-000025 re-scores those checkpoints at all twelve templates, trains nothing, and separates two costs
+the single-template number confounded. The world seed matches E-000020's, so the template-0 column is
+that experiment's own condition: on seed 2 — the one checkpoint whose SHA-256 still matches the
+E-000020 record — it returns direct 0.563 and alias 0.500 against the recorded 0.5633 and 0.50, which
+is a reproduction rather than a fresh measurement.
+
+| template | direct | alias, one shared object | alias, duplicated | alias, duplicated (link-free) |
+|---|---|---|---|---|
+| t0 (trained) | 0.6122 | 0.6167 | 0.6233 | 0.7900 |
+| t1 (trained) | 0.9633 | 0.8367 | 0.9817 | 0.9933 |
+| t2 (trained) | 0.6322 | 0.6017 | 0.6217 | 0.7650 |
+| t3 (trained) | 0.9956 | 0.8933 | 0.9983 | 1.0000 |
+| t4 (trained) | 0.9967 | 0.9350 | 0.9967 | 1.0000 |
+| t5 (trained) | 0.9989 | 0.9250 | 0.9967 | 1.0000 |
+| t6 (trained) | 0.6422 | 0.6317 | 0.6317 | 0.7633 |
+| t7 (trained) | 0.9989 | 0.8917 | 0.9967 | 0.9950 |
+| t8 (held out) | 0.4500 | 0.4283 | 0.4133 | 0.5200 |
+| t9 (held out) | 0.9567 | 0.9033 | 0.9817 | 0.9650 |
+| t10 (held out) | 0.9989 | 0.9250 | 1.0000 | 1.0000 |
+| t11 (held out) | 0.3078 | 0.3433 | 0.2883 | 0.4200 |
+
+Read at a phrasing that works, the frozen GPT-2 resolves a symlink at **0.9250 on the held-out
+template 10** and 0.9350 on trained template 4, with direct reading at 0.9989. The two costs, worst
+seed over three seeds and averaged over all twelve templates: **sharing costs 0.0954**
+against duplicated copies read by the same adapter, and **having trained on links at all costs
+0.0688** against the link-free adapter on the same store. Both
+pre-registered bars pass, as do `train/alias_max` ≥ 0.75 (observed 0.8950)
+and `heldout/alias_mean` ≥ 0.55 (observed 0.6013).
+
+Three consequences the programme has to carry:
+
+1. **The E-000020 record's reading numbers stand as produced and are not what the experiment set out
+   to measure.** The record is not edited; this section is the correction, and E-000026 re-runs its
+   whole lifecycle battery — update, rollback, shred, revoke, delete, and the probe and forced-choice
+   attacks — at three phrasings, because every one of those claims was also a statement about
+   template 0. "The alias no longer answers" is cheap when the alias answered half the time.
+2. **Two thirds of the E-000020 record is no longer byte-reproducible.** A forced re-run replaced its
+   seed-0 and seed-1 checkpoints after it was written; only seed 2 still matches the SHA-256 it cites.
+   `guard_recorded_checkpoint` now refuses to overwrite a checkpoint whose digest a saved record
+   names, in all fourteen writers.
+3. **A single-template number is not a measurement of a system whose reading is bimodal.** Every
+   experiment in the twelve-template line reports at least one strong and one weak phrasing from here
+   on, and a headline taken at one template says which.
+
 ### 31.8 Boundary
 
 CPU only, no GPU, no LLM above 124M parameters, synthetic worlds, single-token entities, two surface forms per relation, one session. Nothing here shows unlearning of facts already encoded in pretrained weights. Evidence levels recorded: E3–E4 for the synthetic system (F4 for SHRED with the verified gate, E-000010); E5 as substrate for the frozen-GPT-2 experiment, with reading, composition, update and the copy bound supported and behavioural deletion not yet supported at the pre-registered thresholds.

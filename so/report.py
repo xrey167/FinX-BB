@@ -35,6 +35,18 @@ PROPERTIES = {
 
 # post-hoc interpretation of recorded outcomes (the JSON records are never edited)
 NOTES = {
+    "e000025_template_rescoring": "Trains nothing: it re-reads E-000020's and E-000017-B's checkpoints at every "
+        "one of the twelve templates. E-000020's headline pair -- direct 0.5667, alias 0.5067 -- is template 0, "
+        "because its _answers helper defaults to it. Reading here is bimodal by phrasing and template 0 is one of "
+        "the weak ones: the same checkpoints read a base fact at 0.9989 and resolve a symlink at "
+        "0.9250 on the HELD-OUT template 10, and 0.9350 on trained template 4. "
+        "Separating the two costs the single number confounded, over all twelve templates and on the worst of three "
+        "seeds: sharing costs 0.0954 against duplicated copies read by the same "
+        "adapter, and having trained on links at all costs 0.0688 against the "
+        "link-free adapter on the same store. The world seed matches E-000020's, so on seed 2 -- the one checkpoint "
+        "whose SHA still matches that record -- template 0 returns 0.563 / 0.500 against the recorded 0.5633 / 0.50, "
+        "a reproduction rather than a fresh measurement. Ledger 31.9 carries the correction; the E-000020 record is "
+        "left as produced.",
     "e000002_memorization_control": "Only 'fixed_routing' is an empirical control, and it came out clean: with the "
         "layer available, 2000 steps on a fixed world did not copy any fact into the weights (masked-layer accuracy 0%, "
         "leak 0%). This is a bound for that budget, not a guarantee for longer training. The no-layer model memorised "
