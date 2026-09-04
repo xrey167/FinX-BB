@@ -21,6 +21,10 @@ Forschungsprojekt **SO — Modular Neural Operating System**: adressierbares, ve
 - [Projektstand, Vision und Architektur](docs/so-modular-neural-os.md) (Stand 02.09.2026) — Forschungsfrage, Löschung versus Unterdrückung, Provenienz, Abhängigkeitsgraph, Symlink- und Marker-Konzepte, aktuelle Architektur sowie die Ergebnisse der Experimente E-000001-A und E-000001-B.
 - [Experiment- und Evidenz-Ledger](docs/so-experiment-ledger.md) (Stand 02.09.2026) — Durchbruchskriterien, Evidenzskala E0–E7, Löschmodell F0–F5, Neural-MVCC, Biomarker, Rekonstruktionsangriffe, Kausal- und Ablationstests, Stand der C-Serie; Abschnitt 31 protokolliert die in dieser Sitzung durchgeführten Experimente.
 - [Sitzungsergebnisse 02.09.2026](docs/so-results-2026-09-02.md) — automatisch aus den Ergebnisdateien erzeugt: alle Messwerte, vorregistrierte Kriterien, Evidenz- und Löschstufen, Grenzen der Evidenz.
+- [Was dieses Programm tatsächlich gefunden hat](docs/so-what-was-found-2026-09-04.md) (Stand 04.09.2026) —
+  die Zusammenfassung: warum der Angriffs-Standard hier gebrochen ist, das Zertifikat, das über die gesamte
+  Nutzlast-Domäne und über jede mögliche Anfrage quantifiziert, die drei ersten zertifizierten Löschungen,
+  und was das Halten von Fakten in Zeilen messbar einbringt.
 - [Was hier neu ist und was nicht](docs/so-novelty-2026-09-04.md) (Stand 04.09.2026) — die Kalibrierung
   gegen den Stand der Forschung. Der Mechanismus ist Wiedererfindung (SERAC, GRACE, Larimar, SILO, LMLM,
   MUNKEY); was bleibt, ist die Prüfung: dass ein Gate auf Werten kein Löschprimitiv ist, wenn ein anderer

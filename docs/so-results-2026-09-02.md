@@ -45,7 +45,7 @@
 | e000027_untied_input | - | - | - | not run | - |
 | E-000028 | the channel SHRED does not close | - | - | recorded | 2026-09-04 14:33 |
 | E-000029 | what the marker gate actually certifies | - | - | recorded | 2026-09-04 14:50 |
-| e000030_deletion_certificate | - | - | - | not run | - |
+| E-000030 | a deletion certificate for the recorded checkpoints | - | - | recorded | 2026-09-04 15:22 |
 
 ## The six breakthrough properties (ledger section 3)
 
@@ -2233,6 +2233,38 @@ and every checkpoint stores it verbatim, so shipping a model ships the ability t
 
 **Interpretation (post hoc, record unchanged):** E-000021 put the gate's false-accept rate at 8.49e-04 and the programme called that the bound on the deletion guarantee. The rate is right; the distribution is not the one the guarantee is about. marker_valid deletes everything beyond 0.35 of the centre, but invalid_markers -- E-000021's unsigned class -- rejects every draw within 0.7, and new_invalid_markers, which is what shred() writes, rejects the same band. The annulus between was measured by nothing. Over eleven recorded checkpoints, with markers placed on each shell by construction because rejection sampling cannot reach the near shells in sixteen dimensions: the gate accepts EVERYTHING out to 0.70 at 1.0000, 0.2191 at 0.80, and first reaches zero at 0.90. Its operational radius is 0.90 on every checkpoint against a declared 0.35, and the deleted annulus is accepted at 1.0000 (2,200,000 markers). The rejection-sampled column reproduces E-000021 at 8.550e-04, which is how one knows the re-measurement is faithful before looking at what it missed. The boundary sits at 0.8 because training shows signed markers at 0.194 and unsigned ones at 0.7 and nothing between, so the classifier learned the MARGIN rather than the predicate -- and the recorded false-accept rate is just the tail of the shred sampler crossing it. The centre is not a secret either: the mean of 950 signed markers estimates it to 0.0076, minted markers pass marker_valid at 0.9999 and the gate at 1.0000, make_centre derives it from 10_000 + seed, and every checkpoint stores it verbatim. The gate is an integrity check, not a signature. Ledger 31.12.
 
-## e000030_deletion_certificate
+## E-000030 — a deletion certificate for the recorded checkpoints
 
-_not run in this session_
+Seeds [0, 1, 2], 3 targets, the recorded E-000010 checkpoints, no training.
+For each lifecycle operation, every value the deleted payload could hold is swept and what the
+model computes is compared. The payload domain has 256 values, so the sweep
+is every case rather than a sample.
+
+### What survives the deletion
+
+| operation | certified for every query (interface) | certified on the swept queries | mediation premise | first quantity that moves | encodings swept |
+|---|---|---|---|---|---|
+| revoke | no | yes | consistent | encode_bank[v_f] | 2 |
+| shred | no | no | consistent | encode_bank[v_f] | 2 |
+| delete | yes (structural) | yes (structural) | n/a | the row is not in the bank | 0 |
+| revoke (GPT-2, soft gate) | yes | - | - | - | 782 |
+| shred (GPT-2, soft gate) | no | - | - | encode_bank[values] | 2  (residual 1.39e-02) |
+| revoke (GPT-2, hard gate) | yes | - | - | - | 782 |
+| shred (GPT-2, hard gate) | yes | - | - | - | 782 |
+
+`interface` compares `encode_bank`'s output. The forward reads the bank only there, so an
+invariant encoding means an invariant computation FOR EVERY POSSIBLE QUERY, not just the swept
+ones. `outputs` compares the returned logits over an exhaustive single-hop query domain
+`mediation` is the falsification check on the premise the interface column rests on: it looks
+for an output that moves while the encoding does not, and voids the certificate if it finds one.
+
+### Pre-registered criteria
+
+| criterion (worst seed) | required | observed | result |
+|---|---|---|---|
+| shred/outputs_certified | >= 1.0 | 0.0000 | FAIL |
+| revoke/outputs_certified | >= 1.0 | 1.0000 | PASS |
+| revoke/mediation_consistent | >= 1.0 | 1.0000 | PASS |
+| shred/mediation_consistent | >= 1.0 | 1.0000 | PASS |
+
+**Interpretation (post hoc, record unchanged):** The first deletions here that are not 'no attack recovered it'. For each lifecycle operation it sweeps EVERY value the deleted payload could hold -- an entity id, so 256 values, every case rather than a sample -- and checks whether the model computes anything different. The interface level compares encode_bank, which both models read the store through exactly once (so/model.py:246, so/llm_adapter.py:323), so an invariant encoding means an invariant computation for EVERY POSSIBLE QUERY and not just a swept set, at one cheap encoding per value and without running the core. Synthetic: REVOKE is certified on the 838 swept questions and not at the interface (v_f = v_fwd(o) * g still carries the object, masked downstream); SHRED is certified at neither, which is E-000028 restated as a proof rather than an attack; DELETE is structural, the row being absent from the bank. Frozen GPT-2: REVOKE CERTIFIED under both gate modes, SHRED CERTIFIED under the HARD gate and not under the soft one, where a sigmoid never returns zero and 1.390e-02 of the payload survives in the value -- the first precise statement of what the hard gate buys. Two guards keep the instrument honest and both were needed: check_mediation looks for an output that moves while the encoding holds still, and the first adapter arm compared values_payload, an ungated diagnostic forward never reads, reporting a 3.49 residual through a tensor the model does not look at. Ledger 31.14.

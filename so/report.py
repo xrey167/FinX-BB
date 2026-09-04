@@ -35,6 +35,21 @@ PROPERTIES = {
 
 # post-hoc interpretation of recorded outcomes (the JSON records are never edited)
 NOTES = {
+    "e000030_deletion_certificate": "The first deletions here that are not 'no attack recovered it'. For each "
+        "lifecycle operation it sweeps EVERY value the deleted payload could hold -- an entity id, so 256 values, "
+        "every case rather than a sample -- and checks whether the model computes anything different. The "
+        "interface level compares encode_bank, which both models read the store through exactly once "
+        "(so/model.py:246, so/llm_adapter.py:323), so an invariant encoding means an invariant computation for "
+        "EVERY POSSIBLE QUERY and not just a swept set, at one cheap encoding per value and without running the "
+        "core. Synthetic: REVOKE is certified on the 838 swept questions and not at the "
+        "interface (v_f = v_fwd(o) * g still carries the object, masked downstream); SHRED is certified at "
+        "neither, which is E-000028 restated as a proof rather than an attack; DELETE is structural, the row "
+        "being absent from the bank. Frozen GPT-2: REVOKE CERTIFIED under both gate modes, SHRED CERTIFIED under "
+        "the HARD gate and not under the soft one, where a sigmoid never returns zero and 1.390e-02 "
+        "of the payload survives in the value -- the first precise statement of what the hard gate buys. Two "
+        "guards keep the instrument honest and both were needed: check_mediation looks for an output that moves "
+        "while the encoding holds still, and the first adapter arm compared values_payload, an ungated diagnostic "
+        "forward never reads, reporting a 3.49 residual through a tensor the model does not look at. Ledger 31.14.",
     "e000029_marker_geometry": "E-000021 put the gate's false-accept rate at 8.49e-04 and the programme called "
         "that the bound on the deletion guarantee. The rate is right; the distribution is not the one the "
         "guarantee is about. marker_valid deletes everything beyond 0.35 of the centre, but invalid_markers -- "

@@ -1,0 +1,254 @@
+{
+  "aggregate": {
+    "revoke/interface_certified": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 3
+    },
+    "revoke/interface_evaluations": {
+      "max": 2.0,
+      "mean": 2.0,
+      "min": 2.0,
+      "n": 3
+    },
+    "revoke/interface_joint_certified": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 3
+    },
+    "revoke/mediation_consistent": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "revoke/outputs_certified": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "revoke/outputs_evaluations": {
+      "max": 256.0,
+      "mean": 256.0,
+      "min": 256.0,
+      "n": 3
+    },
+    "shred/interface_certified": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 3
+    },
+    "shred/interface_evaluations": {
+      "max": 2.0,
+      "mean": 2.0,
+      "min": 2.0,
+      "n": 3
+    },
+    "shred/interface_joint_certified": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 3
+    },
+    "shred/mediation_consistent": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "shred/outputs_certified": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 3
+    },
+    "shred/outputs_evaluations": {
+      "max": 2.0,
+      "mean": 2.0,
+      "min": 2.0,
+      "n": 3
+    }
+  },
+  "criteria": {
+    "claim_supported": false,
+    "criteria": {
+      "revoke/mediation_consistent": {
+        "observed": 1.0,
+        "op": ">=",
+        "pass": true,
+        "threshold": 1.0
+      },
+      "revoke/outputs_certified": {
+        "observed": 1.0,
+        "op": ">=",
+        "pass": true,
+        "threshold": 1.0
+      },
+      "shred/mediation_consistent": {
+        "observed": 1.0,
+        "op": ">=",
+        "pass": true,
+        "threshold": 1.0
+      },
+      "shred/outputs_certified": {
+        "observed": 0.0,
+        "op": ">=",
+        "pass": false,
+        "threshold": 1.0
+      }
+    }
+  },
+  "environment": {
+    "device": "cpu",
+    "numpy": "2.2.6",
+    "platform": "Linux-6.18.44-fc-v24-x86_64-with-glibc2.39",
+    "python": "3.11.15",
+    "threads": "2",
+    "torch": "2.14.0+cpu"
+  },
+  "experiment": "E-000030",
+  "gpt2": [
+    {
+      "checkpoint_sha256": "9600eecf2e188897027d81f726c83381fac32fc315b84c17eb5bb025f4b3e63a",
+      "gpt2_hard/revoke/evaluations": 782,
+      "gpt2_hard/revoke/first_violation": "",
+      "gpt2_hard/revoke/interface_certified": true,
+      "gpt2_hard/revoke/mediation_consistent": true,
+      "gpt2_hard/revoke/residual": 0.0,
+      "gpt2_hard/shred/evaluations": 782,
+      "gpt2_hard/shred/first_violation": "",
+      "gpt2_hard/shred/interface_certified": true,
+      "gpt2_hard/shred/mediation_consistent": true,
+      "gpt2_hard/shred/residual": 0.0,
+      "gpt2_soft/revoke/evaluations": 782,
+      "gpt2_soft/revoke/first_violation": "",
+      "gpt2_soft/revoke/interface_certified": true,
+      "gpt2_soft/revoke/mediation_consistent": true,
+      "gpt2_soft/revoke/residual": 0.0,
+      "gpt2_soft/shred/evaluations": 2,
+      "gpt2_soft/shred/first_violation": "encode_bank[values]",
+      "gpt2_soft/shred/interface_certified": false,
+      "gpt2_soft/shred/mediation_consistent": true,
+      "gpt2_soft/shred/residual": 0.013895414769649506,
+      "model": "frozen GPT-2 + E-000012 adapter",
+      "n_cells": 400,
+      "n_entities": 256,
+      "n_targets": 3,
+      "seconds": 126.97474479675293,
+      "seed": 0
+    }
+  ],
+  "n_targets": 3,
+  "operations": [
+    "revoke",
+    "shred",
+    "delete"
+  ],
+  "per_seed": [
+    {
+      "checkpoint_sha256": "f0b181bc52152f26b419f2d096a7419bbbe507307a1c4e6984a4e61c441c864d",
+      "delete/object_absent_from_bank": true,
+      "delete/rows_removed": 3,
+      "delete/structural": true,
+      "n_cells": 1000,
+      "n_entities": 256,
+      "n_queries_full_domain": 2048,
+      "n_queries_swept": 838,
+      "n_targets": 3,
+      "revoke/interface_certified": false,
+      "revoke/interface_evaluations": 2,
+      "revoke/interface_first_violation": "encode_bank[v_f]",
+      "revoke/interface_joint_certified": false,
+      "revoke/mediation_consistent": true,
+      "revoke/mediation_note": "no probe found an output moving while the encoding held still",
+      "revoke/outputs_certified": true,
+      "revoke/outputs_evaluations": 256,
+      "revoke/outputs_first_violation": "",
+      "seconds": 72.10669088363647,
+      "seed": 0,
+      "shred/interface_certified": false,
+      "shred/interface_evaluations": 2,
+      "shred/interface_first_violation": "encode_bank[v_f]",
+      "shred/interface_joint_certified": false,
+      "shred/mediation_consistent": true,
+      "shred/mediation_note": "no probe found an output moving while the encoding held still",
+      "shred/outputs_certified": false,
+      "shred/outputs_evaluations": 2,
+      "shred/outputs_first_violation": "<returned>0"
+    },
+    {
+      "checkpoint_sha256": "e5ebb907e9e4f8a17978d43c0fe1e8f1935fd74377e6768a2424c67f56f67033",
+      "delete/object_absent_from_bank": true,
+      "delete/rows_removed": 3,
+      "delete/structural": true,
+      "n_cells": 1000,
+      "n_entities": 256,
+      "n_queries_full_domain": 2048,
+      "n_queries_swept": 838,
+      "n_targets": 3,
+      "revoke/interface_certified": false,
+      "revoke/interface_evaluations": 2,
+      "revoke/interface_first_violation": "encode_bank[v_f]",
+      "revoke/interface_joint_certified": false,
+      "revoke/mediation_consistent": true,
+      "revoke/mediation_note": "no probe found an output moving while the encoding held still",
+      "revoke/outputs_certified": true,
+      "revoke/outputs_evaluations": 256,
+      "revoke/outputs_first_violation": "",
+      "seconds": 76.4119484424591,
+      "seed": 1,
+      "shred/interface_certified": false,
+      "shred/interface_evaluations": 2,
+      "shred/interface_first_violation": "encode_bank[v_f]",
+      "shred/interface_joint_certified": false,
+      "shred/mediation_consistent": true,
+      "shred/mediation_note": "no probe found an output moving while the encoding held still",
+      "shred/outputs_certified": false,
+      "shred/outputs_evaluations": 2,
+      "shred/outputs_first_violation": "<returned>0"
+    },
+    {
+      "checkpoint_sha256": "18a064916cb19bf84fd32bfc9dc8b47d9cf28e68434c88a3f4dd6a7f7663f6c5",
+      "delete/object_absent_from_bank": true,
+      "delete/rows_removed": 3,
+      "delete/structural": true,
+      "n_cells": 1000,
+      "n_entities": 256,
+      "n_queries_full_domain": 2048,
+      "n_queries_swept": 838,
+      "n_targets": 3,
+      "revoke/interface_certified": false,
+      "revoke/interface_evaluations": 2,
+      "revoke/interface_first_violation": "encode_bank[v_f]",
+      "revoke/interface_joint_certified": false,
+      "revoke/mediation_consistent": true,
+      "revoke/mediation_note": "no probe found an output moving while the encoding held still",
+      "revoke/outputs_certified": true,
+      "revoke/outputs_evaluations": 256,
+      "revoke/outputs_first_violation": "",
+      "seconds": 152.86758041381836,
+      "seed": 2,
+      "shred/interface_certified": false,
+      "shred/interface_evaluations": 2,
+      "shred/interface_first_violation": "encode_bank[v_f]",
+      "shred/interface_joint_certified": false,
+      "shred/mediation_consistent": true,
+      "shred/mediation_note": "no probe found an output moving while the encoding held still",
+      "shred/outputs_certified": false,
+      "shred/outputs_evaluations": 2,
+      "shred/outputs_first_violation": "<returned>0"
+    }
+  ],
+  "recorded_at": "2026-09-04T15:22:50+00:00",
+  "seeds": [
+    0,
+    1,
+    2
+  ],
+  "title": "a deletion certificate for the recorded checkpoints",
+  "trains_nothing": true
+}

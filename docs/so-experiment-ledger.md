@@ -1372,6 +1372,68 @@ What follows:
    phrasings** — only that the gate closes. Getting it would mean measuring after SHRED with the
    status flag left ACTIVE, which no recorded run does.
 
+### 31.14 A deletion certificate, and the first certified deletion in the programme (2026-09-04)
+
+Every deletion result here, the F4 label included, is an attack that failed to recover the fact.
+§31.10 is the bill for that standard: SHRED passed a calibrated probe, forced choice, logit rank and
+top-1 across 750 pooled trials, all at chance, and an attack written afterwards recovered the object
+at 1.0000 through a channel none of the four read. An attack bounds one adversary.
+
+E-000030 reports the other kind of evidence. For each lifecycle operation it sweeps **every value the
+deleted payload could hold** — the domain is an entity id, so 256 values, every case rather than a
+sample — and asks whether the model computes anything different. Two levels:
+
+* **interface.** Both models read the store in exactly one place: `MutableKnowledgeTransformer.forward`
+  computes `enc = encode_bank(bank)` at `so/model.py:246` and thereafter touches only `enc["k_f"]`,
+  `enc["v_f"]`, `enc["k_r"]`, `enc["v_r"]` and `enc["active"]`, and `KnowledgeAdapterLM.forward` takes
+  only `keys`, `values` and the allowed set at `so/llm_adapter.py:323`. An invariant encoding therefore
+  means an invariant computation **for every possible query** — multi-hop, reverse, phrasings nobody
+  has written — not merely for a swept set, at one cheap encoding per payload value and without ever
+  running the core.
+* **outputs.** The returned logits over 838 questions: every candidate object as a
+  reverse question, which is exhaustive over §31.10's attack surface, the targets' own forward
+  questions, and 64 unrelated ones, because a target's key sits in the softmax denominator of
+  questions that are not about it.
+
+Two guards keep it honest, and both were needed. `check_mediation` looks for an output that moves
+while the encoding holds still, which would mean the interface is not the only path and the
+certificate is void; a test builds a runner that reads the bank behind the encoding's back to confirm
+the guard can fail. And the first version of the adapter arm compared `values_payload` — the UNGATED
+payload, which `encode_bank` returns as a diagnostic and `forward` never reads — and reported a
+residual of 3.49 through a tensor the model does not look at. Naming the consumed interface is part of
+the claim, not an implementation detail: too wide is over-strict, too narrow is unsound.
+
+| model | operation | certified for every query | certified on the swept questions | first quantity that moves |
+|---|---|---|---|---|
+| synthetic (E-000010) | REVOKE | no | **yes** | `encode_bank[v_f]` |
+| synthetic (E-000010) | SHRED | no | **no** | `encode_bank[v_f]` |
+| synthetic (E-000010) | DELETE | yes, structurally | yes, structurally | the row is not in the bank |
+| frozen GPT-2, soft gate | REVOKE | **CERTIFIED** | — | — |
+| frozen GPT-2, soft gate | SHRED | no | — | `encode_bank[values]`, residual 1.390e-02 |
+| frozen GPT-2, hard gate | REVOKE | **CERTIFIED** | — | — |
+| frozen GPT-2, hard gate | SHRED | **CERTIFIED** | — | — |
+
+Four things this settles.
+
+1. **The first certified deletions in the programme.** In the frozen GPT-2, REVOKE is independent of
+   the deleted payload under both gate modes, and SHRED is independent under the hard gate. Not "no
+   attack recovered it" — the computation is bit-identical for all 256 values the payload could take,
+   so no attack can.
+2. **What the hard gate buys, exactly.** The soft gate is a sigmoid and never returns zero, so a
+   shredded cell's value keeps 1.390e-02 of its payload and the certificate
+   fails. The hard gate thresholds to exactly zero, the value becomes exactly the ' unknown' direction,
+   and the certificate holds. No recorded experiment had made that statement; it was assumed.
+3. **§31.10 restated as a proof.** SHRED in the synthetic model is certified at neither level, and the
+   first quantity that moves is in the encoding. The attack was not unlucky; the dependence is there.
+4. **REVOKE's two levels are not the same claim.** Its outputs are certified — nothing a user sees can
+   move — while `v_f = v_fwd(o) * g` still carries the object, because REVOKE leaves the marker valid
+   and masks the row instead. An adversary reading activations sees what a user cannot. Only DELETE,
+   which takes the row out of the bank, is independent with nothing left to gate.
+
+The rule the programme should have started from: **a deletion primitive is only as complete as the set
+of payload-derived quantities it removes, and the cheap way to find that set is to sweep the payload
+domain and watch what moves.** `so/audit.py` is that sweep; `make certify` runs it.
+
 ### 31.8 Boundary
 
 CPU only, no GPU, no LLM above 124M parameters, synthetic worlds, single-token entities, two surface forms per relation, one session. Nothing here shows unlearning of facts already encoded in pretrained weights. Evidence levels recorded: E3–E4 for the synthetic system (F4 for SHRED with the verified gate, E-000010 — **on the value channel only**: E-000028 recovers the shredded object at 1.0000 through the ungated reverse key, where REVOKE and DELETE are at chance, so F4 for SHRED is a claim about answers, logits, hidden states and probes and not about routing); E5 as substrate for the frozen-GPT-2 experiment, with reading, composition, update and the copy bound supported and behavioural deletion not yet supported at the pre-registered thresholds.
