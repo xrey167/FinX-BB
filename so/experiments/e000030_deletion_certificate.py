@@ -127,7 +127,7 @@ def run_seed(seed: int, n_targets: int, steps: int, verbose: bool = True) -> Dic
             with torch.no_grad():
                 return model(b, _batch.mode, _batch.start, _batch.rels, _batch.hop_valid)
 
-        # what MutableKnowledgeTransformer.forward reads out of the encoding (so/model.py:245-248):
+        # what MutableKnowledgeTransformer.forward reads out of the encoding (so/model.py:246-248):
         # k_f, v_f, k_r, v_r and the allowed set. "gate" is a diagnostic it does not consume.
         iface = certify_encoding(model, tensors, rows, n_ent, joint_trials=32, seed=seed,
                                  interface_keys=("k_f", "v_f", "k_r", "v_r", "active"))
