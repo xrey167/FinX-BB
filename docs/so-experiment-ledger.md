@@ -2102,6 +2102,69 @@ and **not a test of it**, because that subset is selected by whether the interve
 pre-registered correlation of T/U with broadcast is likewise not evidence: `T = 1 + residue × fan-out`,
 so its sign was fixed by arithmetic before any state was read.
 
+### 31.28 Broadcast counts references DESTROYED: a sign error, retracted (2026-09-04)
+
+E-000045 identified the workspace paper's **broadcast** count with a reference count and predicted
+that the U/T gap widens with it. An adversarial review killed it on the reading of the table, and the
+error is mine and elementary.
+
+**A cell "reaches rank 1" when the reader FOLLOWED the swap** — that is, when it did *not* retain the
+old referent. So the paper's per-category numbers count references successfully **destroyed**, and
+surviving references are the complement:
+
+| category | cells redirected | **surviving references to the old referent** |
+|---|---|---|
+| countries | 42/48 | **6** |
+| number relations | 0/48 | **48** |
+
+The prediction was *"T is expensive when broadcast is high, because every reader is a place a trace can
+survive."* Countries have the highest broadcast and the **fewest** surviving traces. The prediction is
+inverted by a factor of eight against the numbers cited to motivate it. The paper says as much about
+the complement itself: among failures *"the model's top-1 output is typically still the correct answer
+for the original argument"* — a failure **is** a surviving reference.
+
+**Two further breaks, each sufficient alone.** `T` counts removals of rows, and a downstream head is
+not a row — it is weights shared across every fact, so there is no fact-indexed reader to remove and
+`T = k` has no denotation in a representation. And the channel that *generates* `T = k` is
+address-bearing: E-000035's disclosure is that a surviving alias **literally stores the deleted key**,
+and blanking that key closes it at 1.0000. A head holds no key; it responds to a pattern.
+
+**And the disconfirming case argues the other way.** The referent is *not* gone there — the concept
+still appears in all four lens readouts — so it is *deleted-but-open*, the POSIX guarantee **against**
+dangling references, not an instance of one.
+
+A model-free brute force in the review settles the general form: **the U/T gap is exactly
+`k + m_addr`, the number of KEY-BEARING references, and is invariant to fan-out.** Where no reference
+stores an address the gap is **0 at every broadcast count**.
+
+### 31.29 The currency of tracelessness (2026-09-04, E-000046)
+
+E-000041's law carried one caveat, written when it was claimed: that T = k held *for a store which
+exports a link's target key and goes on exporting it after the target is gone*. This tests it, over
+the same grid, mechanically, three semantics — and its result is the same statement the review reached
+by brute force, arrived at independently.
+
+| semantics | T | T = k | T = U | exported view clean | **raw store still discloses** |
+|---|---|---|---|---|---|
+| exporting | 6.00 | 1.0000 | 0.2000 | 1.0000 | 0.0000 |
+| compacting | 6.00 | 1.0000 | 0.2000 | 1.0000 | 0.0000 |
+| opaque | 3.50 | 0.2000 | 1.0000 | 1.0000 | **0.8000** |
+
+All five pre-registered criteria PASS, including the one that decides what OPAQUE means. Under OPAQUE
+the exported view is clean **by construction**, so an experiment stopping at the fourth column would
+have measured its own definition. The fifth column is the experiment: **the raw store still names the
+removed key in 0.8000 of cells.**
+
+**So the refined law: `T > U` is a property of KEY-BEARING references, not of pods and not of sharing.
+The gap is the number of surviving rows that literally store the removed key.** Canonicalisation does
+not impose that cost — it can be paid in three currencies: **deletions** (T = k), **repairs** (T = k
+again, the aliases rewritten rather than removed, the store left functional), or **an interface that
+declines to show the reference** (T = U). The third is not payment. It is access control, and the
+0.8000 says so.
+
+That is narrower than "canonicalisation costs T = k" and more useful, because it names the knob a
+system designer actually holds.
+
 ### 31.8 Boundary
 
 CPU only, no GPU, no LLM above 124M parameters, synthetic worlds, single-token entities, two surface forms per relation, one session. Nothing here shows unlearning of facts already encoded in pretrained weights. Evidence levels recorded: E3–E4 for the synthetic system (F4 for SHRED with the verified gate, E-000010 — **on the value channel only**: E-000028 recovers the shredded object at 1.0000 through the ungated reverse key, where REVOKE and DELETE are at chance, so F4 for SHRED is a claim about answers, logits, hidden states and probes and not about routing); E5 as substrate for the frozen-GPT-2 experiment, with reading, composition, update and the copy bound supported and behavioural deletion not yet supported at the pre-registered thresholds.
