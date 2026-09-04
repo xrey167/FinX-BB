@@ -56,7 +56,8 @@ from so import ledger
 from so.attacks import LinearProbe, forced_choice, object_rank
 from so.data import Bank, bank_from_store
 from so.experiments import e000008_gpt2_adapter as E8
-from so.experiments.e000001b_mini_transformer import CHECKPOINTS, CKPT_SUFFIX, _sha256
+from so.experiments.e000001b_mini_transformer import (CHECKPOINTS, CKPT_SUFFIX, _sha256,
+                                                      guard_recorded_checkpoint)
 from so.llm_adapter import AdapterConfig
 from so.mvcc import MVCCStore
 from so.reference import load_world
@@ -596,7 +597,32 @@ def run_weights_arms(setup: Setup, seed: int, steps: int, unlearn_steps: int, ve
     ppl_base = perplexity(gk)
     generic = generic_prompts(gk, seed)
     base_generic = full_logits(gk, generic)                  # captured BEFORE any LoRA exists
-    out = train_lora(gk, setup, seed, steps, LORA_LR, verbose=verbose, rank=rank)
+    # The LoRA is cached, because it is the only expensive thing here and everything downstream of it
+    # -- the unlearning recipes, the attacks, the collateral measurements -- is cheap and gets edited.
+    ck = CHECKPOINTS / f"e000024_lora_r{rank}{CKPT_SUFFIX}_seed{seed}.pt"
+    if ck.exists():
+        state = torch.load(ck, weights_only=False)
+        if int(state.get("rank", -1)) == rank and int(state.get("n_cells", -1)) == len(setup.facts):
+            params = attach_lora(gk.model.lm, rank)
+            for p in params:
+                p.requires_grad_(True)
+            load_lora_state(gk.model.lm, state["lora"])
+            out = {"history": state["history"], "train_seconds": state["train_seconds"],
+                   "steps_used": state["steps_used"], "n_lora_params": state["n_lora_params"],
+                   "params": params}
+            if verbose:
+                print(f"  loaded the trained LoRA from {ck.name} "
+                      f"({out['steps_used']} steps, {out['train_seconds']:.0f}s)", flush=True)
+        else:
+            ck = None
+    if not ck or not ck.exists():
+        out = train_lora(gk, setup, seed, steps, LORA_LR, verbose=verbose, rank=rank)
+        CHECKPOINTS.mkdir(parents=True, exist_ok=True)
+        path = CHECKPOINTS / f"e000024_lora_r{rank}{CKPT_SUFFIX}_seed{seed}.pt"
+        guard_recorded_checkpoint(path)
+        torch.save({"lora": lora_state(gk.model.lm), "rank": rank, "n_cells": len(setup.facts),
+                    "history": out["history"], "train_seconds": out["train_seconds"],
+                    "steps_used": out["steps_used"], "n_lora_params": out["n_lora_params"]}, path)
     params = out["params"]
     trained = lora_state(gk.model.lm)
     m: Dict[str, float] = {"weights/n_lora_params": float(out["n_lora_params"]),
