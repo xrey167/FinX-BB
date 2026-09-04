@@ -106,6 +106,7 @@ class _Recorder:
         self.model = model
         self.skip = tuple(skip)
         self.captured: Dict[str, torch.Tensor] = {}
+        self._calls: Dict[str, int] = {}
         self._handles: List[Any] = []
         self.n_modules = 0
 
@@ -119,9 +120,15 @@ class _Recorder:
 
     def _make(self, name: str) -> Callable:
         def hook(module, inputs, output):
+            # Keyed by CALL INDEX as well as name. Keying by name alone kept only a module's last
+            # invocation, so "every tensor every submodule emits" was false wherever a module is
+            # called more than once -- ln_key twice in encode_bank, the hop block once per hop -- and
+            # the comparison silently skipped the earlier calls.
+            i = self._calls.get(name, 0)
+            self._calls[name] = i + 1
             for suffix, t in _flatten(output):
                 if t.is_floating_point():
-                    self.captured[f"{name}|{suffix}"] = t.detach().clone()
+                    self.captured[f"{name}#{i}|{suffix}"] = t.detach().clone()
             return None
         return hook
 
@@ -284,9 +291,70 @@ def _compare(ref: List[Tuple[str, torch.Tensor]], got: List[Tuple[str, torch.Ten
     return out
 
 
+# A row's payload is not always one field. A FACT row carries its object in ``obj``; a LINK row's obj
+# is a hardwired placeholder and its payload -- the address it points at -- lives in ``link_subject``
+# and ``link_relation`` (so/mvcc.py bank()). A sweep over ``obj`` alone therefore says nothing about a
+# link row, and a certificate that returned True for such a row would be certifying a payload it never
+# looked at. Both domains are finite, so exhaustiveness survives; what does not survive is guessing.
+FACT_PAYLOAD: Tuple[str, ...] = ("obj",)
+LINK_PAYLOAD: Tuple[str, ...] = ("link_subject", "link_relation")
+
+
+class UnsweepablePayload(RuntimeError):
+    """Raised when a row's payload is not covered by the fields being swept.
+
+    Failing closed is the whole point. A certificate that cannot express what a row holds must refuse
+    to certify it, because the alternative -- returning True -- is the one outcome an audit must never
+    produce for a case it did not examine.
+    """
+
+
+def payload_fields_for(bank: Dict[str, torch.Tensor], rows: Sequence[int],
+                       fields: Sequence[str]) -> Tuple[str, ...]:
+    """Check the named fields cover every deleted row's payload, and refuse if they do not."""
+    fields = tuple(fields)
+    if "is_link" in bank and len(rows):
+        idx = torch.as_tensor([int(r) for r in rows], dtype=torch.long)
+        if bool(bank["is_link"][idx].any()):
+            missing = [f for f in LINK_PAYLOAD if f not in fields]
+            if missing:
+                raise UnsweepablePayload(
+                    f"rows {[int(r) for r in rows]} include LINK cells, whose payload is "
+                    f"{LINK_PAYLOAD} and not {fields}; sweeping {fields} would certify a payload the "
+                    f"sweep never looked at. Pass payload_fields={FACT_PAYLOAD + LINK_PAYLOAD}.")
+    for f in fields:
+        if f not in bank:
+            raise UnsweepablePayload(f"the bank has no field {f!r} to sweep")
+    return fields
+
+
+def _domain(bank: Dict[str, torch.Tensor], field: str, n_values: int) -> int:
+    """How many values a field can take. Relations are a smaller domain than entities."""
+    return 4 if field.endswith("relation") else n_values
+
+
+def _assignments(bank: Dict[str, torch.Tensor], fields: Sequence[str], row: int,
+                 n_values: int) -> List[Dict[str, int]]:
+    """Every assignment of the payload fields for one row, excluding the one it already holds.
+
+    The product stays small because the domains are: 256 for an entity, 4 for a relation. Exhaustive
+    over the product is what makes the result a statement about every case rather than a sample.
+    """
+    import itertools as _it
+    ranges = [range(_domain(bank, f, n_values)) for f in fields]
+    current = tuple(int(bank[f][row].item()) for f in fields)
+    out: List[Dict[str, int]] = []
+    for combo in _it.product(*ranges):
+        if combo == current:
+            continue
+        out.append({f: int(v) for f, v in zip(fields, combo)})
+    return out
+
+
 def certify_deletion(model: nn.Module, bank: Dict[str, torch.Tensor], deleted_rows: Sequence[int],
                      n_values: int, run: Callable[[Dict[str, torch.Tensor]], Any],
-                     payload_field: str = "obj", outputs_of: Optional[Callable[[Any], Any]] = None,
+                     payload_fields: Sequence[str] = FACT_PAYLOAD,
+                     outputs_of: Optional[Callable[[Any], Any]] = None,
                      joint_trials: int = 64, seed: int = 0, atol: float = 0.0,
                      skip: Sequence[str] = (), check_activations: bool = True,
                      stop_early: bool = True) -> Certificate:
@@ -298,6 +366,7 @@ def certify_deletion(model: nn.Module, bank: Dict[str, torch.Tensor], deleted_ro
     is a statement about every case rather than about a sample.
     """
     rows = [int(r) for r in deleted_rows]
+    fields = payload_fields_for(bank, rows, payload_fields)
     rng = np.random.default_rng(seed)
     base = {k: (v.clone() if torch.is_tensor(v) else v) for k, v in bank.items()}
 
@@ -318,12 +387,11 @@ def certify_deletion(model: nn.Module, bank: Dict[str, torch.Tensor], deleted_ro
     n_eval = 1
 
     for row in rows:
-        original = int(base[payload_field][row].item())
-        for value in range(n_values):
-            if value == original:
-                continue
+        for assignment in _assignments(base, fields, row, n_values):
             probe = {k: (v.clone() if torch.is_tensor(v) else v) for k, v in base.items()}
-            probe[payload_field][row] = value
+            for f, value in assignment.items():
+                probe[f][row] = value
+            value = next(iter(assignment.values()))
             got_out, got_act = evaluate(probe)
             n_eval += 1
             for name, d in _compare(ref_out, got_out, atol):
@@ -342,7 +410,8 @@ def certify_deletion(model: nn.Module, bank: Dict[str, torch.Tensor], deleted_ro
         for _ in range(joint_trials):
             probe = {k: (v.clone() if torch.is_tensor(v) else v) for k, v in base.items()}
             for row in rows:
-                probe[payload_field][row] = int(rng.integers(n_values))
+                for f in fields:
+                    probe[f][row] = int(rng.integers(_domain(base, f, n_values)))
             got_out, got_act = evaluate(probe)
             n_eval += 1
             diffs = _compare(ref_out, got_out, atol)
@@ -374,7 +443,7 @@ class MediationCheck:
 
 def certify_encoding(model: nn.Module, bank: Dict[str, torch.Tensor], deleted_rows: Sequence[int],
                      n_values: int, encode: Optional[Callable[[Dict[str, torch.Tensor]], Any]] = None,
-                     payload_field: str = "obj", joint_trials: int = 64, seed: int = 0,
+                     payload_fields: Sequence[str] = FACT_PAYLOAD, joint_trials: int = 64, seed: int = 0,
                      atol: float = 0.0, stop_early: bool = True,
                      interface_keys: Optional[Sequence[str]] = None) -> Certificate:
     """Certify at the interface the bank enters the computation through, not at the outputs.
@@ -414,6 +483,7 @@ def certify_encoding(model: nn.Module, bank: Dict[str, torch.Tensor], deleted_ro
     _enc = encode if encode is not None else (lambda b: model.encode_bank(b))
     enc_fn = lambda b: select(_enc(b))
     rows = [int(r) for r in deleted_rows]
+    fields = payload_fields_for(bank, rows, payload_fields)
     rng = np.random.default_rng(seed)
     base = {k: (v.clone() if torch.is_tensor(v) else v) for k, v in bank.items()}
 
@@ -423,12 +493,11 @@ def certify_encoding(model: nn.Module, bank: Dict[str, torch.Tensor], deleted_ro
     ok = True
     n_eval = 1
     for row in rows:
-        original = int(base[payload_field][row].item())
-        for value in range(n_values):
-            if value == original:
-                continue
+        for assignment in _assignments(base, fields, row, n_values):
             probe = {k: (v.clone() if torch.is_tensor(v) else v) for k, v in base.items()}
-            probe[payload_field][row] = value
+            for f, value in assignment.items():
+                probe[f][row] = value
+            value = next(iter(assignment.values()))
             with torch.no_grad():
                 got = _fingerprint(enc_fn(probe))
             n_eval += 1
@@ -443,7 +512,8 @@ def certify_encoding(model: nn.Module, bank: Dict[str, torch.Tensor], deleted_ro
         for _ in range(joint_trials):
             probe = {k: (v.clone() if torch.is_tensor(v) else v) for k, v in base.items()}
             for row in rows:
-                probe[payload_field][row] = int(rng.integers(n_values))
+                for f in fields:
+                    probe[f][row] = int(rng.integers(_domain(base, f, n_values)))
             with torch.no_grad():
                 got = _fingerprint(enc_fn(probe))
             n_eval += 1
@@ -460,7 +530,7 @@ def certify_encoding(model: nn.Module, bank: Dict[str, torch.Tensor], deleted_ro
 def check_mediation(model: nn.Module, bank: Dict[str, torch.Tensor], deleted_rows: Sequence[int],
                     n_values: int, run: Callable[[Dict[str, torch.Tensor]], Any],
                     encode: Optional[Callable[[Dict[str, torch.Tensor]], Any]] = None,
-                    payload_field: str = "obj", n_probes: int = 8, seed: int = 0,
+                    payload_fields: Sequence[str] = FACT_PAYLOAD, n_probes: int = 8, seed: int = 0,
                     atol: float = 0.0, outputs_of: Optional[Callable[[Any], Any]] = None) -> MediationCheck:
     """Try to falsify the premise: an output that moves while the encoding does not.
 
@@ -473,6 +543,7 @@ def check_mediation(model: nn.Module, bank: Dict[str, torch.Tensor], deleted_row
     """
     enc_fn = encode if encode is not None else (lambda b: model.encode_bank(b))
     rows = [int(r) for r in deleted_rows]
+    fields = payload_fields_for(bank, rows, payload_fields)
     rng = np.random.default_rng(seed + 1)
     base = {k: (v.clone() if torch.is_tensor(v) else v) for k, v in bank.items()}
     with torch.no_grad():
@@ -483,7 +554,8 @@ def check_mediation(model: nn.Module, bank: Dict[str, torch.Tensor], deleted_row
     for _ in range(n_probes):
         probe = {k: (v.clone() if torch.is_tensor(v) else v) for k, v in base.items()}
         for row in rows:
-            probe[payload_field][row] = int(rng.integers(n_values))
+            for f in fields:
+                probe[f][row] = int(rng.integers(_domain(base, f, n_values)))
         with torch.no_grad():
             enc_d = _compare(ref_enc, _fingerprint(enc_fn(probe)), atol)
             out_d = _compare(ref_out, _fingerprint(outputs_of(run(probe)) if outputs_of else run(probe)), atol)
@@ -524,13 +596,14 @@ class LocalityCheck:
 
 def check_row_locality(model: nn.Module, bank: Dict[str, torch.Tensor], probe_rows: Sequence[int],
                        n_values: int, encode: Optional[Callable[[Dict[str, torch.Tensor]], Any]] = None,
-                       payload_field: str = "obj", n_values_probed: int = 8, seed: int = 0,
+                       payload_fields: Sequence[str] = FACT_PAYLOAD, n_values_probed: int = 8, seed: int = 0,
                        atol: float = 0.0) -> LocalityCheck:
     """Perturb one row and check that every OTHER row's encoding is untouched."""
     enc_fn = encode if encode is not None else (lambda b: model.encode_bank(b))
     rng = np.random.default_rng(seed + 7)
     base = {k: (v.clone() if torch.is_tensor(v) else v) for k, v in bank.items()}
-    n_rows = int(base[payload_field].shape[0])
+    fields = payload_fields_for(bank, probe_rows, payload_fields)
+    n_rows = int(base[fields[0]].shape[0])
     with torch.no_grad():
         ref = _fingerprint(enc_fn(base))
     offending: List[int] = []
@@ -540,7 +613,8 @@ def check_row_locality(model: nn.Module, bank: Dict[str, torch.Tensor], probe_ro
         others[row] = False
         for _ in range(n_values_probed):
             probe = {k: (v.clone() if torch.is_tensor(v) else v) for k, v in base.items()}
-            probe[payload_field][row] = int(rng.integers(n_values))
+            for f in fields:
+                probe[f][row] = int(rng.integers(_domain(base, f, n_values)))
             with torch.no_grad():
                 got = _fingerprint(enc_fn(probe))
             for (name, a), (_, b) in zip(ref, got):

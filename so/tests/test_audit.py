@@ -418,3 +418,67 @@ def test_eviction_earns_the_strong_certificate_that_shred_cannot():
     assert t_evict["subject"].shape[0] == len(kids) - 1      # out of the bank
     assert probe(t_evict, []).certified_structurally         # no path, for any payload, any domain
     assert store.cells[kids[0]].versions                     # and the data is still there
+
+
+# --------------------- fail closed: a certificate must refuse a payload its sweep cannot express
+
+from so.audit import UnsweepablePayload, FACT_PAYLOAD, LINK_PAYLOAD, _Recorder  # noqa: E402
+
+
+def _link_bank():
+    """A bank containing one LINK row, whose payload is an address and not an object."""
+    import numpy as np
+    from so.data import bank_from_store
+    from so.mvcc import MVCCStore
+    from so.train import make_centre
+    centre = make_centre(0, 16)
+    st = MVCCStore(marker_dim=16, seed=0, marker_centre=centre)
+    t = st.write(3, 1, 7, provenance="t")
+    st.link(4, 1, t, provenance="a")
+    st.write(5, 2, 11, provenance="w")
+    return st, bank_from_store(st).tensors()
+
+
+def test_sweeping_only_obj_refuses_to_certify_a_link_row():
+    """A LINK row's obj is a hardwired placeholder; its payload is link_subject/link_relation.
+
+    Sweeping obj alone and returning True would certify a payload the sweep never looked at, which is
+    the one outcome an audit must never produce. It raises instead.
+    """
+    m = _model()
+    st, b = _link_bank()
+    link_rows = [i for i in range(b["subject"].shape[0]) if bool(b["is_link"][i])]
+    assert link_rows, "the fixture must contain a link row"
+    with pytest.raises(UnsweepablePayload) as e:
+        certify_encoding(m, b, link_rows, N_ENT, payload_fields=FACT_PAYLOAD)
+    assert "LINK" in str(e.value) and "link_subject" in str(e.value)
+
+
+def test_naming_the_link_fields_lets_the_sweep_proceed():
+    m = _model(use_links=True, n_deref=1)
+    st, b = _link_bank()
+    link_rows = [i for i in range(b["subject"].shape[0]) if bool(b["is_link"][i])]
+    cert = certify_encoding(m, b, link_rows, N_ENT, payload_fields=FACT_PAYLOAD + LINK_PAYLOAD,
+                            joint_trials=0)
+    # a live alias is readable, so it must NOT certify -- the point is that the sweep can now see it
+    assert not cert.output_certified, cert.summary()
+    assert cert.violations
+
+
+def test_a_fact_row_still_sweeps_with_the_default_fields():
+    m = _model()
+    st, b = _link_bank()
+    fact_rows = [i for i in range(b["subject"].shape[0]) if not bool(b["is_link"][i])]
+    cert = certify_encoding(m, b, fact_rows[:1], N_ENT, joint_trials=0)
+    assert cert.n_evaluations > 1
+
+
+def test_the_recorder_keeps_every_call_of_a_module_not_just_the_last():
+    """ln_key is called twice in encode_bank; keying by name alone kept only the second."""
+    m = _model()
+    b = _bank(p_shred=0.2)
+    with _Recorder(m) as rec:
+        with torch.no_grad():
+            m.encode_bank(b)
+        keys = [k for k in rec.captured if k.startswith("ln_key#")]
+    assert len({k.split("|")[0] for k in keys}) >= 2, sorted(keys)

@@ -7,15 +7,15 @@ is every case rather than a sample.
 
 ## What survives the deletion
 
-| operation | certified for every query (interface) | certified on the swept queries | mediation premise | first quantity that moves | encodings swept |
-|---|---|---|---|---|---|
-| revoke | no | yes | consistent | encode_bank[v_f] | 2 |
-| shred | no | no | consistent | encode_bank[v_f] | 2 |
-| delete | yes (structural) | yes (structural) | n/a | the row is not in the bank | 0 |
-| revoke (GPT-2, soft gate) | yes | - | - | - | 782 |
-| shred (GPT-2, soft gate) | no | - | - | encode_bank[values] | 2  (residual 1.39e-02) |
-| revoke (GPT-2, hard gate) | yes | - | - | - | 782 |
-| shred (GPT-2, hard gate) | yes | - | - | - | 782 |
+| operation | reachable from the payload | certified for every query (interface) | certified on the swept queries | mediation premise | first quantity that moves | encodings swept |
+|---|---|---|---|---|---|---|
+| revoke | grad 0 | no | yes | consistent | encode_bank[v_f] | 2 |
+| shred | grad 2.0e+01 | no | no | consistent | encode_bank[v_f] | 2 |
+| delete | no path | yes (structural) | yes (structural) | n/a | the row is not in the bank | 0 |
+| revoke (GPT-2, soft gate) | - | yes | - | - | - | 782 |
+| shred (GPT-2, soft gate) | - | no | - | - | encode_bank[values] | 2  (residual 1.39e-02) |
+| revoke (GPT-2, hard gate) | - | yes | - | - | - | 782 |
+| shred (GPT-2, hard gate) | - | yes | - | - | - | 782 |
 
 `interface` compares `encode_bank`'s output. The forward reads the bank only there, so an
 invariant encoding means an invariant computation FOR EVERY POSSIBLE QUERY, not just the swept
