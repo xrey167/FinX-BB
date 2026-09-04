@@ -91,3 +91,52 @@ def test_unknown_mode_null_value_is_learnable_and_nonzero():
     m = _adapter()
     assert m.null_value.requires_grad and torch.any(m.null_value != 0)
     assert any(p is m.null_value for p in m.adapter_parameters())
+
+
+def _link_bank(seed=0, n_links=8):
+    """A bank whose last ``n_links`` rows are aliases pointing at earlier fact rows."""
+    b = _bank(seed, p_revoked=0.0, p_shred=0.0)
+    n = b["subject"].shape[0]
+    is_link = torch.zeros(n, dtype=torch.bool)
+    is_link[-n_links:] = True
+    b["is_link"] = is_link
+    b["link_subject"] = b["subject"].clone()
+    b["link_relation"] = b["relation"].clone()
+    b["link_subject"][-n_links:] = b["subject"][:n_links]      # point at the first rows
+    b["link_relation"][-n_links:] = b["relation"][:n_links]
+    b["obj"] = torch.where(is_link, torch.zeros_like(b["obj"]), b["obj"])
+    return b
+
+
+@pytest.mark.parametrize("n_deref", [1, 2])
+def test_dereference_slot_is_an_identity_at_initialisation(n_deref):
+    """The whole point of the zero-initialised query and the size-aware passthrough bias.
+
+    A dereference slot that is not an identity at the start injects the average of every cell into
+    the frozen model from the first step; that is what collapsed the first two attempts at E-000020,
+    where a checkpoint reading at 98% dropped to 0% (flat bias) and 14% (size-aware bias alone).
+    """
+    ids, am, last = _prompt()
+    bank = _link_bank()
+    linked = _adapter(use_links=True, n_deref=n_deref)
+    with torch.no_grad():
+        _, _, routing, _ = linked(bank, ids, am, last)
+    # the dereference slots are the odd ones out of each (resolve, deref...) group; their last column
+    # is the passthrough, and it must hold essentially all of the mass before training
+    per_read = 1 + n_deref
+    deref_slots = [r * per_read + 1 + d for r in range(2) for d in range(n_deref)]
+    passthrough = routing[:, deref_slots, -1]
+    assert float(passthrough.min()) > 0.99, f"passthrough only {float(passthrough.min()):.4f} at init"
+
+
+def test_dereference_routing_has_one_slot_per_read_plus_one():
+    ids, am, last = _prompt()
+    _, _, routing, _ = _adapter(use_links=True, n_deref=1)(_link_bank(), ids, am, last)
+    assert routing.shape[1] == 2 * (1 + 1)      # two read layers, one dereference each
+
+
+def test_alias_row_value_differs_from_a_fact_row_value():
+    bank = _link_bank()
+    enc = _adapter(use_links=True, n_deref=1).encode_bank(bank)
+    v = enc["values"]
+    assert not torch.allclose(v[bank["is_link"]].mean(0), v[~bank["is_link"]].mean(0))

@@ -33,6 +33,7 @@ from __future__ import annotations
 from dataclasses import asdict, dataclass
 from typing import Dict, List, Optional, Sequence, Tuple
 
+import numpy as np
 import torch
 import torch.nn as nn
 
@@ -100,13 +101,20 @@ class KnowledgeAdapterLM(nn.Module):
             self.v_link = nn.Linear(cfg.d_key, d, bias=False)      # an alias's value: its TARGET'S KEY, in value space
         if cfg.n_deref > 0:
             self.q_deref = nn.ModuleDict({str(l): nn.Linear(d, cfg.d_key) for l in cfg.read_layers})
+            for q in self.q_deref.values():          # zero-init: every cell scores exactly 0 at the start, so
+                nn.init.zeros_(q.weight)             # the passthrough bias below is the only thing that decides
+                nn.init.zeros_(q.bias)               # and the slot is an identity until training moves it
             self.deref_ln = nn.ModuleDict({str(l): nn.LayerNorm(d) for l in cfg.read_layers})
             self.deref_scale = nn.Parameter(torch.ones(len(cfg.read_layers)))
             # Initialised so the dereference slot starts as a near-perfect PASSTHROUGH. Without it the slot
             # begins with a random query, spreads its mass over every cell and injects the average of all
             # values into the frozen model, which poisons training from the first step: the first attempt at
             # E-000020 collapsed to answering ' unknown' everywhere, direct reading included.
-            self.deref_pass_bias = nn.Parameter(torch.full((len(cfg.read_layers),), 5.0))
+            # The bias competes against the SUM of the cell scores, not against one of them, so log(C) is
+            # added at read time and this number is a log-odds against the whole bank, independent of its size.
+            # A plain +5 leaves only 16% of the mass on the passthrough at 800 cells, which is why the first
+            # fix did not work either.
+            self.deref_pass_bias = nn.Parameter(torch.full((len(cfg.read_layers),), 7.0))
         self.null_key = nn.Parameter(torch.randn(len(cfg.read_layers), cfg.d_key) * 0.02)
         with torch.no_grad():
             unk = lm.transformer.wte.weight[unknown_token_id].detach().clone()
@@ -182,11 +190,19 @@ class KnowledgeAdapterLM(nn.Module):
             p = torch.softmax(scores, dim=-1)
             val = p @ values                                                  # (B, d)
             if self.cfg.n_deref > 0:
+                # the resolve slot is recorded HERE, before its dereferences, so the routing tensor reads
+                # (resolve, deref...) per read layer and lines up with the supervision built by the
+                # experiments. Appending it at the end instead silently swapped the two, which is what
+                # actually collapsed the first attempts at E-000020: the resolve slot was trained on the
+                # dereference target and the dereference slot on the resolve target.
+                ctx["routing"].append(p)
                 for _ in range(self.cfg.n_deref):
                     qd = self.q_deref[str(layer)](self.deref_ln[str(layer)](val))
                     sd = (qd @ keys.t()) * (self.deref_scale[read_index] / self.cfg.d_key ** 0.5)
                     sd = sd.masked_fill(~allowed[None], float("-inf"))
-                    sd = torch.cat([sd[:, :-1], sd[:, -1:] + self.deref_pass_bias[read_index]], dim=-1)
+                    n_cells = max(int(ctx["allowed"].sum().item()), 1)
+                    bias = self.deref_pass_bias[read_index] + float(np.log(n_cells))
+                    sd = torch.cat([sd[:, :-1], sd[:, -1:] + bias], dim=-1)
                     pd = torch.softmax(sd, dim=-1)
                     # the null column carries the incoming value: "what I read was not a pointer"
                     val = pd[:, :-1] @ values[:-1] + pd[:, -1:] * val
@@ -217,7 +233,8 @@ class KnowledgeAdapterLM(nn.Module):
                 read = read * (rms_h / rms_r) * self.inject_gain[read_index]    # RMS-matched injection
             delta = torch.zeros_like(h)
             delta[ar, ctx["last_idx"]] = read
-            ctx["routing"].append(p)
+            if self.cfg.n_deref == 0:
+                ctx["routing"].append(p)
             h2 = h + delta
             return (h2,) + tuple(output[1:]) if isinstance(output, tuple) else h2
         return hook
