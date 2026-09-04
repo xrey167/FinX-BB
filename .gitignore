@@ -2,3 +2,11 @@ __pycache__/
 *.pyc
 .pytest_cache/
 so/results/checkpoints/
+
+# local environment created by setup.sh
+.venv/
+# reduced runs: `make smoke` and the smoke tests write these, they are not records
+so/results/*-quick.json
+so/results/*-quick.md
+so/results/*-smoke.json
+so/results/*-smoke.md
