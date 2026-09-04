@@ -47,6 +47,12 @@ def train_or_load(gk: E8.GPT2Knowledge, arm: str, seed: int, steps: int, force: 
     path = CHECKPOINTS / f"e000027_{arm}{CKPT_SUFFIX}_seed{seed}.pt"
     if path.exists() and not force:
         ck = torch.load(path, weights_only=False)
+        trained_for = int(ck.get("steps", -1))
+        if 0 <= trained_for < steps:
+            # a reduced or smoke run left this behind; silently loading it would record a number the
+            # stated budget never produced. SO_CKPT_SUFFIX is the way to keep such runs apart.
+            raise SystemExit(f"{path} was trained for {trained_for} steps but {steps} were asked for. "
+                             f"Delete it, pass --force, or set SO_CKPT_SUFFIX for the reduced run.")
         gk.model.load_state_dict(ck["adapter"], strict=False)
         gk.model.eval()
         return {"centre": np.asarray(ck["centre"]), "history": ck["history"],
@@ -56,7 +62,7 @@ def train_or_load(gk: E8.GPT2Knowledge, arm: str, seed: int, steps: int, force: 
     guard_recorded_checkpoint(path)
     torch.save({"adapter": E8.adapter_state(gk.model), "centre": out["centre"], "history": out["history"],
                 "train_seconds": out["train_seconds"], "adapter_config": gk.model.cfg.to_dict(),
-                "model_name": MODEL, "arm": arm}, path)
+                "model_name": MODEL, "arm": arm, "steps": steps}, path)
     out["loaded"] = False
     out["checkpoint_sha256"] = _sha256(path)
     return out
