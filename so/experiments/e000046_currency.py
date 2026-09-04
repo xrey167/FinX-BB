@@ -44,6 +44,7 @@ from typing import Any, Dict, List, Optional, Sequence, Tuple
 import numpy as np
 
 from so import ledger
+from so.audit import certify_traceless
 from so.closure import fact_closure
 from so.experiments.e000035_deletion_disclosure import dangling_targets, live_keys
 from so.experiments.e000041_traceless_cost import build, unreachable_cost
@@ -101,8 +102,15 @@ def cost(st: MVCCStore, keys, obj: int, mode: str) -> Dict[str, Any]:
     unreach = _unreachable(st, keys, obj)
     n_live = int(b["kid"].shape[0])
 
-    # THE CONTROL: an adversary reading the RAW store, whatever the exported view shows.
-    raw_named = [k for k in dangling_targets(b) if k not in base]
+    # THE CONTROL: an adversary reading the RAW STORE, whatever the exported view shows. The first
+    # version of this read dangling_targets(bank()) and called it raw -- but bank() IS the exported
+    # view, so it was the same check twice under two names, and it made EVICT look traceless when it
+    # is not. certify_traceless walks store.cells and asks whether the removed key is still held by a
+    # surviving version, which is the question. EVICT retains the row's data on purpose, so an evicted
+    # alias goes on holding the removed key: clean in the view, not in the store.
+    cert = certify_traceless(st, keys, obj, baseline=tuple(base),
+                             ops=len(removed) + len(repaired), n_live_before=0)
+    raw_named = [] if cert.raw_clean else list(cert.dangling)
     st.restore_all() if hasattr(st, "restore_all") else None
     return {"T_ops": len(removed) + len(repaired), "removed": len(removed), "repaired": len(repaired),
             "exported_clean": float(exported_clean), "unreachable": float(unreach),
@@ -153,6 +161,8 @@ CRITERIA = {
     "compacting/T_equals_k": (">=", 1.0),
     # and the point of paying in repairs rather than deletions: the aliases are still there
     "compacting/raw_discloses": ("<=", 0.0),
+    # and the correction the certificate forced: EVICT is clean in the VIEW and not in the STORE
+    "exporting/raw_discloses": (">=", 0.50),
     # THE CONTROL THAT DECIDES WHAT OPAQUE MEANS. If the exported view is clean while the RAW store
     # still names the removed key, then opacity moved the disclosure behind an interface and removed
     # nothing -- and "T = U under OPAQUE" is a statement about who is looking. If raw_discloses comes

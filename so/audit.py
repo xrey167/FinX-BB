@@ -1239,3 +1239,121 @@ def certify_fact(record: "Certificate", closure: "FactClosure", removed: Sequenc
         retained_in_store=(None if retention is None else bool(retention.retained)),
         **({"individuation": individuation} if individuation else {}),
         residual_note=residual_note)
+
+
+# ------------------------------------------------------------------ tracelessness, as a certificate
+@dataclass
+class TracelessCertificate:
+    """Whether a deletion left NOTHING pointing at what was removed -- checked, not asserted.
+
+    THE RUNG THIS LADDER WAS MISSING. Everything above certifies UNREACHABILITY: no access path yields
+    the object, over the whole payload domain, proved without the model. E-000041 measured that a data
+    subject is promised something else. For a fact on k access paths, U = 1 + copies makes it
+    unreachable and T = k makes it unreachable AND leaves no surviving row pointing at anything gone,
+    and E-000035 measured the difference: a pod's surviving aliases name the deleted key at 1.0000,
+    uniquely, against 0.0000 for a duplicated store. A certificate of unreachability is silent about
+    that channel.
+
+    E-000046 then narrowed what the channel is. ``T > U`` is a property of KEY-BEARING references --
+    the gap is the number of surviving rows that literally store the removed key -- and the cost can be
+    paid in three currencies: deletions (``evict``), repairs (``blank``), or an interface that declines
+    to export the target. **The third is not payment**, and the number that says so is the one this
+    certificate exists to check: under the opaque view the exported bank is clean by construction while
+    the raw store still names the removed key in 0.8000 of cells.
+
+    So ``exported_clean`` alone cannot be the certificate. It is true by construction for any store
+    that does not export a target, which would make it the tenth instrument in this programme to
+    certify by not testing. ``raw_clean`` is the one that can fail, and both are reported.
+    """
+
+    unreachable: bool = False
+    exported_clean: bool = False
+    raw_clean: bool = False
+    store_retained: bool = False
+    dangling: Tuple[Tuple[int, int], ...] = ()
+    n_live_before: int = 0
+    n_live_after: int = 0
+    ops: int = 0
+
+    @property
+    def certified(self) -> bool:
+        """All four, and the raw check is the one with teeth."""
+        return bool(self.unreachable and self.exported_clean and self.raw_clean and self.store_retained)
+
+    def summary(self) -> str:
+        if not self.store_retained:
+            return ("NOT TRACELESS: the store was emptied. A search that reaches tracelessness by "
+                    f"removing everything has measured nothing ({self.n_live_before} rows -> "
+                    f"{self.n_live_after}).")
+        if not self.unreachable:
+            return "NOT TRACELESS: the fact is still reachable, so there is no deletion to be traceless about."
+        if not self.raw_clean:
+            return (f"UNREACHABLE, NOT TRACELESS: {len(self.dangling)} surviving row(s) still name a "
+                    f"removed key {list(self.dangling)[:4]}"
+                    + ("" if self.exported_clean else "")
+                    + (" -- and the EXPORTED view is clean, so this is visible only to a reader of the "
+                       "store itself: the interface hid the disclosure rather than removing it."
+                       if self.exported_clean else ""))
+        return (f"TRACELESS, CERTIFIED in {self.ops} operation(s): the fact is unreachable, no "
+                f"surviving row names a removed key in the exported view OR in the store, and "
+                f"{self.n_live_after} of {self.n_live_before} rows were kept.")
+
+
+def certify_traceless(store: Any, keys: Sequence[Tuple[int, int]], obj: int,
+                      baseline: Optional[Sequence[Tuple[int, int]]] = None,
+                      ops: int = 0, n_live_before: int = 0) -> TracelessCertificate:
+    """Check the four things tracelessness needs, on the store as it now stands.
+
+    ``baseline`` is the set of dangling targets the store had BEFORE the deletion -- a store is allowed
+    to have arrived with pre-existing dangling pointers, and counting those would make the certificate
+    fail for reasons that have nothing to do with this deletion.
+
+    Raises when the store has no live rows at all, because every check below then passes vacuously.
+    """
+    from so.experiments.e000035_deletion_disclosure import dangling_targets
+    from so.reference import ReferenceResolver
+    from so.world import Query
+
+    bank = store.bank()
+    n_after = int(bank["kid"].shape[0])
+    if n_after == 0:
+        raise ValueError(
+            "certify_traceless was given a store with no live rows. Unreachable, clean and traceless "
+            "are all vacuously true of an empty store, so the certificate would pass by having "
+            "nothing to check -- the failure this ladder has closed nine times.")
+
+    base = set(baseline or ())
+    dang = tuple(k for k in dangling_targets(bank) if k not in base)
+    exported_clean = not dang
+
+    # THE CHECK WITH TEETH: the store's own link targets, not the exported view of them. An opaque
+    # export makes `exported_clean` true for free; this asks whether the key is actually gone.
+    live = {(int(bank["subject"][i]), int(bank["relation"][i])) for i in range(n_after)}
+    raw: List[Tuple[int, int]] = []
+    for cell in getattr(store, "cells", {}).values():
+        if getattr(cell, "status", None) is not None and str(cell.status) .endswith("DELETED"):
+            continue
+        if not getattr(cell, "versions", None):
+            continue
+        v = cell.version_obj(cell.active_version)
+        if getattr(v, "kind", None) is None or str(v.kind) != "CellKind.LINK":
+            if getattr(v, "target", None) is None:
+                continue
+        tgt = getattr(v, "target", None)
+        if tgt is None:
+            continue
+        t = store.cells.get(tgt)
+        if t is None or not getattr(t, "versions", None):
+            continue
+        tv = t.version_obj(t.active_version)
+        key = (int(tv.subject), int(tv.relation))
+        if key not in live and key not in base:
+            raw.append(key)
+
+    resolver = ReferenceResolver(store)
+    unreachable = all(resolver.resolve(Query("fwd", a, (r,), (0,))).answer != obj for a, r in keys)
+    return TracelessCertificate(
+        unreachable=bool(unreachable), exported_clean=bool(exported_clean), raw_clean=not raw,
+        store_retained=bool(n_live_before == 0 or n_after > 0.5 * n_live_before),
+        dangling=tuple(dang) if dang else tuple(raw), n_live_before=int(n_live_before),
+        n_live_after=n_after, ops=int(ops))

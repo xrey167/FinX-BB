@@ -6,7 +6,7 @@ This is that caveat, tested. Mechanical, no model.
 
 | semantics | T | T = k | T = U | exported view clean | **raw store still discloses** | rows left live |
 |---|---|---|---|---|---|---|
-| exporting | 6.00 | 1.0000 | 0.2000 | 1.0000 | 0.0000 | 40.0 |
+| exporting | 6.00 | 1.0000 | 0.2000 | 1.0000 | 0.8000 | 40.0 |
 | compacting | 6.00 | 1.0000 | 0.2000 | 1.0000 | 0.0000 | 42.5 |
 | opaque | 3.50 | 0.2000 | 1.0000 | 1.0000 | 0.8000 | 42.5 |
 
@@ -27,5 +27,6 @@ T = k under EXPORTING and COMPACTING with T = U under OPAQUE, and the raw store 
 | exporting/unreachable | >= 1.0 | 1.0000 | PASS |
 | compacting/T_equals_k | >= 1.0 | 1.0000 | PASS |
 | compacting/raw_discloses | <= 0.0 | 0.0000 | PASS |
+| exporting/raw_discloses | >= 0.5 | 0.8000 | PASS |
 | opaque/exported_clean | >= 1.0 | 1.0000 | PASS |
 | opaque/raw_discloses | >= 0.5 | 0.8000 | PASS |

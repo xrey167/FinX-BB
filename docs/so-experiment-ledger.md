@@ -2172,6 +2172,12 @@ surviving rows that literally store the removed key — and that the cost can be
 currencies: deletions, repairs, or an interface that declines to show the reference. The third is not
 payment. This turns the second into a primitive.
 
+**`so.audit.certify_traceless`** is the missing rung of the ladder: unreachable, exported-clean,
+**raw-clean**, and the store not emptied. `exported_clean` alone cannot be the certificate — it is
+true by construction for any store that does not export a target, which would have made it the tenth
+instrument here to certify by not testing. `raw_clean` is the one that can fail, and it does: it fails
+for eviction.
+
 **`MVCCStore.blank(kid)`** clears a LINK's target. The row stays live and addressable and points at
 nothing, so `bank()` exports the row's own key in place of the target's and the dangling pointer is
 gone. E-000035 measured that closing the channel *at the key* removes the disclosure at 1.0000; this
@@ -2180,16 +2186,23 @@ that quietly does nothing on the wrong input is how a certificate goes hollow.
 
 E-000046 re-run with the real primitive in place of the eviction stand-in it used first:
 
-| semantics | T | T = k | exported view clean | raw store discloses | **rows left live** |
+| semantics | T | T = k | exported view clean | **raw store discloses** | rows left live |
 |---|---|---|---|---|---|
-| exporting (evict) | 6.00 | 1.0000 | 1.0000 | 0.0000 | **40.0** |
-| compacting (blank) | 6.00 | 1.0000 | 1.0000 | 0.0000 | **42.5** |
+| exporting (evict) | 6.00 | 1.0000 | 1.0000 | **0.8000** | 40.0 |
+| compacting (blank) | 6.00 | 1.0000 | 1.0000 | **0.0000** | **42.5** |
 | opaque | 3.50 | 0.2000 | 1.0000 | **0.8000** | 42.5 |
 
-Six pre-registered criteria, all PASS. **Eviction and blanking reach the same tracelessness at the
-same price `k`; eviction leaves 40.0 rows and blanking 42.5.** The difference is exactly the alias
-rows blanking preserves — every access key still resolves, to UNKNOWN, instead of ceasing to be
-addressable. Same guarantee, strictly less destruction, and the caller keeps the rows.
+Seven pre-registered criteria, all PASS — and a correction the certificate forced. The first version
+of this table read `dangling_targets(bank())` and called it the raw check, but `bank()` **is** the
+exported view, so it was the same check twice under two names. `certify_traceless` walks `store.cells`
+and asks whether a surviving version still holds the removed key, which is the question.
+
+**Under the real check, only REPAIR pays.** `evict` retains the row's data on purpose — that is what
+it is for — so an evicted alias goes on holding the removed key internally: clean in the view, not in
+the store, which is the same shape as the opaque case. Blanking clears the key in the version itself
+and is the only one of the three that reaches raw tracelessness — **and it keeps the most rows**
+(42.5 against 40.0), because every access key still resolves, to UNKNOWN, instead of ceasing to be
+addressable. Strictly stronger guarantee *and* strictly less destruction; the two do not trade off.
 
 **Two semantics the tests pin down rather than assume.** Blanking an EVICTED row is *allowed*, because
 `_alive` deliberately admits EVICTED so RESTORE and ROLLBACK can reach it — and it is not a no-op: it
