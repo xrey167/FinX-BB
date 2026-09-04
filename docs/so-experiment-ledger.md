@@ -1921,6 +1921,59 @@ checkpoint found a closure of 1.00 at collateral 0.0044 whose ablated states sti
 to a **freshly fitted linear probe at 0.9300 held out**. So `probe_after` is a pre-registered criterion
 in E-000042 and not a diagnostic: a closure a probe walks through removed a readout path, not a fact.
 
+### 31.25 Superposition buys representation capacity and not deletion capacity — and GPT-2 is nowhere near the bound (2026-09-04, E-000043)
+
+**The argument.** A clean deletion of fact *i* is an orthogonal projection removing a minimal subspace
+`A_i` such that no access path of fact *i* still yields the object and every access path of every other
+fact still does. Minimality makes every direction of `A_i` load-bearing for one of fact *i*'s paths;
+zero collateral requires the projection to fix every other fact's readout subspace `V_j`. So `A_i ⊥ V_j`
+for all *j ≠ i*, mutually orthogonal subspaces satisfy `Σ dim A_i ≤ d`, and **n ≤ d/s**. Representation
+capacity is not linear in *d* — Johnson–Lindenstrauss gives exponentially many almost-orthogonal
+directions and superposition is the observation that models use them.
+
+**The caveat, stated because it changes the reading and strengthens it.** That bound is for *exactly*
+zero damage. If collateral is judged by whether another fact's argmax flips, `A_i` need only be
+orthogonal to `V_j` within each fact's margin, and almost-orthogonal sets are exponentially large
+again. So the sharp bound is a limiting case and not a practical limit — which means an observed
+failure to delete cleanly **cannot** be a capacity effect at this scale, and the allocation reading is
+the only one left.
+
+**The measurement**, frozen GPT-2 small, *d* = 768, 17 capital facts × 8 phrasings, all five
+pre-registered criteria PASS:
+
+| measure | value |
+|---|---|
+| facts a subspace of their own basis silences | 12 of 17 (0.7059), to 0.0312 |
+| directions demanded in total | **58 of 768** |
+| `pressure` (demand / d), bound 159 facts | **0.0755** |
+| headroom unused | **0.9245** |
+| `orthogonality` (σ_min of the stacked bases) | **0.2393** |
+| overlap `A_i` vs `A_j` | 0.5566 mean, 0.8559 max |
+| overlap `A_i` vs `V_j` — what the theorem needs | 0.5842 mean, 0.8575 max |
+| bystander facts under the same ablation | 0.3897 from 1.0000 |
+
+**ALLOCATION, NOT CAPACITY.** The model had 92% of its dimension budget free and still gave twelve
+facts deletion subspaces at principal cosine 0.86. Allocation is a training objective; capacity would
+have been a law of dimension. That is the difference between a limit and a defect, and it is why the
+pod objective — access paths of one fact sharing a core, cores of different facts disjoint — is worth
+training rather than merely wishing for.
+
+**The instrument found its own bug, because the two numbers it was built to report disagreed.** The
+first run measured `rank(union) / Σ dim A_i` and called it efficiency. That is **linear independence**;
+the theorem needs **orthogonality**. It reported **1.0000** — twelve subspaces totalling 58 directions
+with rank exactly 58, a direct sum, "perfectly allocated" — in the very run whose pairwise principal
+cosines were 0.5566 and 0.8559. Quoting it alone would have concluded the opposite of the truth.
+`σ_min` of the stacked bases is now primary, the rank is kept beside it as the contrast, and a test
+reproduces the failure with two subspaces at cosine 0.9 that rank scores at 1.00. A second fault in
+the same run was also real: `answer_after` was averaging over facts the deletion never silenced, and is
+now computed over the silenced ones with `silenced_rate` as its own criterion.
+
+**E-000042 completes as a clean negative.** A J-lens ablation that respects the workspace paper's own
+guard — never ablating a token in the clean top-10 output — silences **0 of 6** facts across all 256
+subsets at pool 8, and 0 of 1 so far across all 1024 at pool 10. The earlier eight-direction ablation
+that *did* take the answer to 0.0000 removed the unembedding rows of the candidate answers, which
+blinds the readout rather than deleting anything.
+
 ### 31.8 Boundary
 
 CPU only, no GPU, no LLM above 124M parameters, synthetic worlds, single-token entities, two surface forms per relation, one session. Nothing here shows unlearning of facts already encoded in pretrained weights. Evidence levels recorded: E3–E4 for the synthetic system (F4 for SHRED with the verified gate, E-000010 — **on the value channel only**: E-000028 recovers the shredded object at 1.0000 through the ungated reverse key, where REVOKE and DELETE are at chance, so F4 for SHRED is a claim about answers, logits, hidden states and probes and not about routing); E5 as substrate for the frozen-GPT-2 experiment, with reading, composition, update and the copy bound supported and behavioural deletion not yet supported at the pre-registered thresholds.

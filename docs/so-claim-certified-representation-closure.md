@@ -1,4 +1,66 @@
-# The J-lens support as a must-hit set — what is claimed, at the size it survives
+# Deletion capacity, allocation, and the pod — what is claimed, at the size it survives
+
+## The claim
+
+**Superposition buys representation capacity and does not buy deletion capacity.** A
+*d*-dimensional residual stream can *represent* exponentially many features with small interference —
+Johnson–Lindenstrauss gives exponentially many almost-orthogonal directions, and superposition is the
+observation that models use them. But a **clean deletion** of one fact — an orthogonal projection
+removing a minimal subspace `A_i` such that no access path of fact *i* still yields the object and
+every access path of every other fact still does — requires `A_i` to be orthogonal to every other
+fact's readout subspace `V_j`. Mutually orthogonal subspaces satisfy `Σ dim A_i ≤ d`, so with each of
+size *s*:
+
+> **n ≤ d / s.  Clean-deletion capacity is linear in the dimension; representation capacity is not.**
+
+**And the honest caveat, which strengthens rather than weakens what follows.** That bound holds for
+*exactly* zero damage. If collateral is measured by whether the other fact's argmax flips, then `A_i`
+need only be orthogonal to `V_j` to within each fact's logit margin, and almost-orthogonal sets in
+`R^d` are exponentially large again. So the sharp bound is a limiting case and **not** a practical
+limit — which means an observed failure to delete cleanly *cannot* be blamed on capacity at any
+plausible scale.
+
+**Measured (E-000043, frozen GPT-2 small, d = 768, 17 capital facts × 8 phrasings):**
+
+| | |
+|---|---|
+| facts a subspace of their own basis silences | 12 of 17 (0.7059), to 0.0312 |
+| directions demanded in total | **58 of 768** — `pressure` 0.0755, bound 159 facts |
+| headroom left unused | **0.9245** |
+| orthogonality (σ_min of the stacked bases) | **0.2393** |
+| overlap `A_i` vs `A_j` | 0.5566 mean, 0.8559 max |
+| overlap `A_i` vs `V_j` — what the theorem needs | 0.5842 mean, 0.8575 max |
+| bystander facts under the same ablation | 0.3897 from 1.0000 |
+
+> **The failure is allocation, not capacity.** The model had 92% of its dimension budget free and
+> still gave twelve facts deletion subspaces at principal cosine 0.86. Allocation is a training
+> objective; capacity would have been a law of dimension. All five pre-registered criteria pass.
+
+**And the store is the limit case, which is where the symlink comes in.** An addressable memory's
+addresses are *records*, not directions in a fixed-dimensional space, so it has no dimension bound at
+all: clean-deletion capacity equals the record count. That is the precise, quantitative sense in which
+giving a model an inode is a capacity property and not a convenience. Measured on the store side:
+fact closure 1 for a canonical pod against *k* for *k* copies, `proved optimal` 1.00 in every arm
+(E-000032), the store-side statistic `(closure − 1)/k` predicting the neural reader with error
+**0.0000**, and the law `U = 1 + copies, T = k` holding in **105 of 105** cells (E-000041).
+
+**The pod is the objective that closes the gap.** Within one fact, its access paths should share a
+core — that is a symlink in activation space, and it makes the closure 1. Across facts, cores should
+be disjoint — that is privacy, and it makes the collateral 0. E-000043 says there is room for both and
+that GPT-2 took neither.
+
+## An instrument bug worth recording, because it reversed the answer
+
+E-000043's first run measured `rank(union) / Σ dim A_i` and called it efficiency. That is **linear
+independence**; the theorem needs **orthogonality**. It reported **1.0000** — twelve subspaces
+totalling 58 directions with rank exactly 58, a direct sum, "perfectly allocated" — in the same run
+whose pairwise principal cosines were 0.5566 and 0.8559. Quoting that number alone would have
+concluded the opposite of the truth. `σ_min` of the stacked bases is now primary; the rank is kept
+beside it; and a test reproduces the failure with two subspaces at cosine 0.9 that rank scores 1.00.
+
+---
+
+# The earlier claim, and what became of it
 
 This document exists to state a claim narrowly enough to be worth making, and to hand back the parts
 of it that turn out to belong to other people. The research pass behind it found more prior art than
