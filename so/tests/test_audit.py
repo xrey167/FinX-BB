@@ -626,7 +626,9 @@ def test_a_pod_turns_one_record_certificate_into_a_fact_certificate():
     cert = certify_fact(_clean(), fc, [target], store_after=st, keys=keys, structural=_no_path())
     assert cert.valid, cert.summary()
     assert cert.covers_closure and cert.record_certified and cert.post_condition is True
-    assert "FACT CERTIFIED" in cert.summary()
+    # "unreachable", not "gone": the store still holds the payload after an EVICT, on purpose
+    assert "FACT UNREACHABLE, CERTIFIED" in cert.summary()
+    assert "triple" in cert.summary()
     for key in keys:                                   # and the store agrees, independently
         assert ReferenceResolver(st).resolve(Query("fwd", key[0], (key[1],), (0,))).answer != 7
 

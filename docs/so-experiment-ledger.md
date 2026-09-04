@@ -1593,6 +1593,45 @@ disjoint pair exists, the certified lower bound is 1 while the true closure is 2
 correctly False. That is the case where the greedy search does non-trivial work and where saying
 "proved optimal" without checking would have been wrong.
 
+### 31.19 What canonicalisation costs the subject, not the reader (2026-09-04, E-000035)
+
+E-000032 measures what a pod buys: the fact closure falls from k to one, so a record-level certificate
+composes into a fact-level one. E-000025 prices what it costs the READER: 0.0954 for sharing, 0.0688
+for training the dereference. Neither asks what it costs the SUBJECT of the deleted fact, and there is
+a cost, because the two arrangements do not leave the same trace behind.
+
+Delete one of k duplicated copies and the store is a store with k−1 copies: nothing in it says a
+deletion happened, and nothing says where. Delete a pod's object and every one of its k−1 aliases is
+still a LINK row still carrying the removed cell's key in `bank["link_subject"]` and
+`bank["link_relation"]` — kept deliberately, because E-000015's design makes the model discover the
+miss rather than being handed it by the control plane. Each surviving alias is a signpost reading *a
+record stood at (s, r) and is gone.*
+
+No model, no checkpoint, no training. The adversary reads `MVCCStore.bank()` and names every key a
+LINK row points at that no row holds. Three seeds, 100 pods each:
+
+| store | deleted key disclosed | uniquely identified | candidate keys left | false positives | dangling before any deletion |
+|---|---|---|---|---|---|
+| canonical | **1.0000** | **1.0000** | **1.0** of 1,536 | 0.00 | 0.0 |
+| duplicated | 0.0000 | 0.0000 | 1,536 of 1,536 | 0.00 | 0.0 |
+
+Every pre-registered criterion passes, including the mitigation's: blanking a dangling pointer's key
+closes the channel at 1.0000 and makes every such pointer identical at 1.0000. And that is the trade,
+recorded as a number rather than argued — with the key blanked, an alias to a removed target is
+indistinguishable from an alias to key (0, 0), so E-000015's `delete_target/alias_unknown` stops being
+a discovery about the model and becomes a tautology about the bank.
+
+**The claim this changes.** "Canonicalisation makes erasure a single certifiable operation" is now
+paired with "and it turns every alias into a deletion oracle". Both are properties of the same design
+decision. An erasure guarantee that does not mention the second is describing half its own system —
+"was there a record about this person, and was it deleted" is exactly the question the guarantee is
+supposed to make unanswerable, and here it is legible to anyone who can read the bank, without
+touching the model.
+
+Two limits, stated because the number invites over-reading. It is a property of THIS store's bank: one
+that compacts its aliases on deletion, or never exports the target key, has no such channel. And it
+measures what a reader of the bank can see, not what the model exposes to someone who cannot.
+
 ### 31.8 Boundary
 
 CPU only, no GPU, no LLM above 124M parameters, synthetic worlds, single-token entities, two surface forms per relation, one session. Nothing here shows unlearning of facts already encoded in pretrained weights. Evidence levels recorded: E3–E4 for the synthetic system (F4 for SHRED with the verified gate, E-000010 — **on the value channel only**: E-000028 recovers the shredded object at 1.0000 through the ungated reverse key, where REVOKE and DELETE are at chance, so F4 for SHRED is a claim about answers, logits, hidden states and probes and not about routing); E5 as substrate for the frozen-GPT-2 experiment, with reading, composition, update and the copy bound supported and behavioural deletion not yet supported at the pre-registered thresholds.
