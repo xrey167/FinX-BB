@@ -355,18 +355,83 @@ def test_a_hard_gate_does_annihilate_the_path_exactly():
     assert not res.certified_structurally      # a path is still there; only the derivative vanishes
 
 
-def test_a_row_taken_out_of_the_bank_has_no_path_at_all():
-    """The strong outcome, and the only one that is a theorem about every value over any domain."""
+def test_reachability_refuses_an_empty_row_set_instead_of_certifying_it():
+    """This assertion used to read the other way, and it was wrong.
+
+    With no row selected there is nothing for autograd to find a path FROM, so the test returned the
+    strongest label in the ladder -- "no path, for any value over any domain" -- and returned it just
+    as confidently on a bank whose rows are all present and live. A certificate produced by not
+    testing anything. It is refused at the source now, and the second half of this test is the proof
+    that the old form was unsound: the same call on a LIVE bank would have certified it.
+    """
     m = _model()
     a = _bank(p_shred=0.0)
+    q = _queries(a)
+    live = certify_structural(m, a, [0], _run_grad(m, a, q), D_MODEL, outputs_of=LOGITS)
+    assert live.reachable and live.grad_max > 0.0        # row 0 is live and its payload reaches out
+    with pytest.raises(ValueError, match="no rows to perturb"):
+        certify_structural(m, a, [], _run_grad(m, a, q), D_MODEL, outputs_of=LOGITS)
+
+
+def test_a_row_taken_out_of_the_bank_is_certified_by_absence_and_a_positive_control():
+    """The strong outcome, stated as what actually carries it: membership, not reachability.
+
+    The model reads the store only through the bank, so a payload with no row in the bank is not an
+    input and nothing the model computes can depend on it -- over any domain, for every query. The
+    control is what makes that a deletion claim rather than a tautology: the same payload WAS
+    reachable while its row was there.
+    """
+    from so.audit import check_absence
+    m = _model()
+    a = _bank(p_shred=0.0)
+    a["kid"] = torch.arange(a["subject"].shape[0])
+    q = _queries(a)
+    control = certify_structural(m, a, [0], _run_grad(m, a, q), D_MODEL, outputs_of=LOGITS)
+    assert control.reachable
+
     keep = torch.ones(a["subject"].shape[0], dtype=torch.bool)
     keep[0] = False
     kept = {k: (v[keep] if torch.is_tensor(v) and v.shape[:1] == keep.shape else v) for k, v in a.items()}
-    q = _queries(kept)
-    # no deleted row remains to perturb: the payload is not an input to this computation
-    res = certify_structural(m, kept, [], _run_grad(m, kept, q), D_MODEL, outputs_of=LOGITS)
-    assert res.certified_structurally, res.summary()
-    assert "no path" in res.summary().lower()
+    chk = check_absence(a, kept, [0], control=control)
+    assert chk.certified_absent, chk.summary()
+    assert chk.rows_before == chk.rows_after + 1 and chk.still_present == ()
+    assert "ABSENT" in chk.summary()
+
+
+def test_absence_without_a_positive_control_is_void():
+    """"The row is not there" is evidence of a deletion only if the row was there and mattered."""
+    from so.audit import check_absence
+    m = _model()
+    a = _bank(p_shred=0.0)
+    a["kid"] = torch.arange(a["subject"].shape[0])
+    keep = torch.ones(a["subject"].shape[0], dtype=torch.bool)
+    keep[0] = False
+    kept = {k: (v[keep] if torch.is_tensor(v) and v.shape[:1] == keep.shape else v) for k, v in a.items()}
+    assert not check_absence(a, kept, [0]).certified_absent
+    from so.audit import StructuralResult
+    unreachable = StructuralResult(False, 0.0, 4, "no path")
+    chk = check_absence(a, kept, [0], control=unreachable)
+    assert not chk.certified_absent and "NOT reachable before" in chk.summary()
+
+
+def test_absence_notices_a_row_that_is_still_there():
+    from so.audit import check_absence, StructuralResult
+    m = _model()
+    a = _bank(p_shred=0.0)
+    a["kid"] = torch.arange(a["subject"].shape[0])
+    chk = check_absence(a, a, [0, 1], control=StructuralResult(True, 1.0, 4, "a path exists"))
+    assert not chk.absent and chk.still_present == (0, 1)
+    assert "NOT ABSENT" in chk.summary()
+
+
+def test_absence_refuses_a_cell_that_was_never_in_the_bank():
+    """The same failure one level along: never-present is not deleted."""
+    from so.audit import check_absence, StructuralResult
+    m = _model()
+    a = _bank(p_shred=0.0)
+    a["kid"] = torch.arange(a["subject"].shape[0])
+    chk = check_absence(a, a, [9999], control=StructuralResult(True, 1.0, 4, "a path exists"))
+    assert not chk.absent and "not in the bank before" in chk.note
 
 
 def test_the_delta_is_numerically_a_no_op():
@@ -407,16 +472,24 @@ def test_eviction_earns_the_strong_certificate_that_shred_cannot():
         return certify_structural(m, bank_tensors, rows, _run_grad(m, bank_tensors, q), D_MODEL,
                                   outputs_of=LOGITS)
 
+    from so.audit import check_absence
     store.shred(kids[0])
-    t_shred = bank_from_store(store).tensors()
+    b_shred = bank_from_store(store)
+    t_shred = b_shred.tensors()
     assert t_shred["subject"].shape[0] == len(kids)          # still addressable
-    assert probe(t_shred, [0]).reachable                     # and therefore still an input
+    control = probe(t_shred, [0])
+    assert control.reachable                                 # and therefore still an input
     store.resign(kids[0])
 
+    b_before = bank_from_store(store)
     store.evict(kids[0])
-    t_evict = bank_from_store(store).tensors()
-    assert t_evict["subject"].shape[0] == len(kids) - 1      # out of the bank
-    assert probe(t_evict, []).certified_structurally         # no path, for any payload, any domain
+    b_evict = bank_from_store(store)
+    assert b_evict.tensors()["subject"].shape[0] == len(kids) - 1     # out of the bank
+    # NOT probe(bank, []) -- that answers "no path" on any bank at all, this one included before the
+    # eviction. What EVICT earns is the membership property, tied to a payload that demonstrably
+    # reached the outputs while its row was there.
+    absence = check_absence(b_before, b_evict, [kids[0]], control=control)
+    assert absence.certified_absent, absence.summary()
     assert store.cells[kids[0]].versions                     # and the data is still there
 
 
@@ -511,6 +584,13 @@ def _no_path():
     return StructuralResult(False, 0.0, 4, "autograd found no path from the deleted payload to any output")
 
 
+def _gone(n=1):
+    """A membership result as ``check_absence`` would return one: rows gone, control found a path."""
+    from so.audit import AbsenceCheck
+    return AbsenceCheck(absent=True, control_reachable=True, n_removed=n, rows_before=10 + n,
+                        rows_after=10)
+
+
 def _pod_store(n_aliases=4, obj=7):
     st = MVCCStore(marker_dim=16, seed=0)
     target = st.write(3, 1, obj, provenance="target")
@@ -603,20 +683,23 @@ def test_a_sweep_over_no_rows_is_refused_as_vacuous():
     vacuous = _clean(n_rows=0, n_eval=1)
     cert = certify_fact(vacuous, fc, [target], store_after=st, keys=keys)
     assert not cert.valid
-    assert "vacuously" in cert.void_reason
-    # the same empty sweep, with a structural result that says there is no path, IS the theorem
-    assert certify_fact(vacuous, fc, [target], store_after=st, keys=keys, structural=_no_path()).valid
+    assert "vacuously" in cert.void_reason and "membership property" in cert.void_reason
+    # the same empty sweep, with the membership property and its control, IS the theorem
+    ok = certify_fact(vacuous, fc, [target], store_after=st, keys=keys, absence=_gone())
+    assert ok.valid and ok.payload_absent
 
 
-def test_a_structural_result_that_finds_a_path_does_not_repair_the_vacuous_sweep():
-    from so.audit import StructuralResult
+def test_an_absence_without_its_control_does_not_repair_the_vacuous_sweep():
+    """The void has to propagate: a membership check that proves nothing cannot discharge anything."""
+    from so.audit import AbsenceCheck
     st, target = _pod_store(n_aliases=1)
     keys = pod_keys(st, target)
     fc = fact_closure(st, keys, obj=7)
     st.evict(target)
-    reachable = StructuralResult(True, 19.74, 4, "a path exists")
-    assert not certify_fact(_clean(n_rows=0), fc, [target], store_after=st, keys=keys,
-                            structural=reachable).valid
+    uncontrolled = AbsenceCheck(absent=True, control_reachable=False, n_removed=1, rows_before=3,
+                                rows_after=2)
+    cert = certify_fact(_clean(n_rows=0), fc, [target], store_after=st, keys=keys, absence=uncontrolled)
+    assert not cert.valid and "NOT reachable before" in cert.void_reason
 
 
 def test_an_exhausted_closure_search_cannot_be_covered_by_anything():
@@ -675,15 +758,25 @@ def test_the_composition_runs_on_a_real_certificate_and_a_real_bank():
     fc = fact_closure(st, keys, obj=7)
     assert fc.size == 1 and fc.optimal
 
+    from so.audit import check_absence
+    from so.experiments.common import position_of_kid
     m = _model()
-    st.evict(target)
-    bank = bank_from_store(st).tensors()
-    q = _queries(bank)
-    record = certify_encoding(m, bank, [], N_ENT)        # nothing left to sweep: vacuous on its own
-    struct = certify_structural(m, bank, [], _run_grad(m, bank, q), D_MODEL, outputs_of=LOGITS)
-    assert struct.certified_structurally, struct.summary()
 
-    cert = certify_fact(record, fc, [target], store_after=st, keys=keys, structural=struct,
+    bank_before = bank_from_store(st)
+    before = bank_before.tensors()
+    q = _queries(before)
+    control = certify_structural(m, before, [position_of_kid(st, target)], _run_grad(m, before, q),
+                                 D_MODEL, outputs_of=LOGITS)
+    assert control.reachable, "the payload must matter BEFORE, or its absence after proves nothing"
+
+    st.evict(target)
+    bank_after = bank_from_store(st)
+    bank = bank_after.tensors()
+    record = certify_encoding(m, bank, [], N_ENT)        # nothing left to sweep: vacuous on its own
+    absence = check_absence(bank_before, bank_after, [target], control=control)
+    assert absence.certified_absent, absence.summary()
+
+    cert = certify_fact(record, fc, [target], store_after=st, keys=keys, absence=absence,
                         residual_note="says nothing about what the core knew before the store existed")
     assert cert.valid, cert.summary()
-    assert cert.n_keys == 5 and cert.closure_size == 1
+    assert cert.n_keys == 5 and cert.closure_size == 1 and cert.payload_absent

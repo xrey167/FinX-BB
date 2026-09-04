@@ -29,8 +29,12 @@ Two levels, at two costs:
 
 DELETE is not swept, and the record says why rather than reporting a number the sweep did not
 produce: `store.delete` removes the row, so the post-deletion bank has no field holding the object
-and there is nothing to perturb. Its independence is structural, and stating that is more honest than
-sweeping a row that is not there.
+and there is nothing to perturb. Its independence is a MEMBERSHIP property -- the model reads the
+store only through the bank, so a payload with no bank row is not an input, over any domain and for
+every query -- and `so.audit.check_absence` states it with a mandatory positive control. The first
+version of this arm asked `certify_structural` with an empty row list instead and recorded its answer
+as `delete/structurally_certified`; that answer is "no path" whatever the bank contains, including a
+bank whose rows are all present and live, so the flag certified the deletion by not testing it.
 
 Trains nothing.
 
@@ -48,7 +52,8 @@ import numpy as np
 import torch
 
 from so import ledger
-from so.audit import certify_deletion, certify_encoding, certify_structural, check_mediation
+from so.audit import (certify_deletion, certify_encoding, certify_structural, check_absence,
+                      check_mediation)
 from so.data import bank_from_store, encode_queries
 from so.experiments.common import fresh_world, position_of_kid
 from so.experiments.e000001b_mini_transformer import _sha256, checkpoint_path, train_or_load
@@ -166,25 +171,40 @@ def run_seed(seed: int, n_targets: int, steps: int, verbose: bool = True) -> Dic
             store.resign(kids[f.key]) if op == "shred" else store.restore(kids[f.key])
 
     # DELETE: the row leaves the bank, so no field holds the object and nothing can depend on it.
-    before = bank_from_store(store).subject.shape[0]
+    #
+    # This arm used to ask certify_structural with an EMPTY row list and record the answer as
+    # `delete/structurally_certified`. That answer is "no path" whatever the bank contains -- there is
+    # nothing to perturb, so autograd has nothing to trace -- and it is "no path" on a bank whose rows
+    # are all present and live. The flag was true before the deletion as well as after. What actually
+    # carries the claim is MEMBERSHIP: the model reads the store only through the bank, so a payload
+    # with no bank row is not an input. `check_absence` states that, and takes a positive control --
+    # the same reachability test run on the rows while they were still there -- because "the row is
+    # not there" is evidence of a deletion only if the row was there and mattered.
+    before_bank = bank_from_store(store)
+    before_rows = [position_of_kid(store, kids[f.key]) for f in targets]
+    before_batch = encode_queries(out_queries, before_bank, world, model.cfg.max_hops)
+    control = certify_structural(
+        model, before_bank.tensors(), before_rows,
+        lambda b: model(b, before_batch.mode, before_batch.start, before_batch.rels, before_batch.hop_valid),
+        model.cfg.d_model, outputs_of=lambda o: o[0])
     for f in targets:
         store.delete(kids[f.key])
     after_bank = bank_from_store(store)
-    del_tensors = after_bank.tensors()
-    del_batch = encode_queries(out_queries, after_bank, world, model.cfg.max_hops)
-    st_del = certify_structural(model, del_tensors, [], lambda b: model(b, del_batch.mode, del_batch.start,
-                                                                        del_batch.rels, del_batch.hop_valid),
-                                model.cfg.d_model, outputs_of=lambda o: o[0])
-    m["delete/structurally_certified"] = bool(st_del.certified_structurally)
-    m["delete/structural_note"] = st_del.summary()
-    m["delete/rows_removed"] = int(before - after_bank.subject.shape[0])
+    absence = check_absence(before_bank, after_bank, [kids[f.key] for f in targets], control=control)
+    m["delete/control_reachable_before"] = bool(control.reachable)
+    m["delete/control_gradient_max"] = float(control.grad_max)
+    m["delete/payload_absent"] = bool(absence.certified_absent)
+    m["delete/absence_note"] = absence.summary()
+    m["delete/rows_removed"] = int(before_bank.subject.shape[0] - after_bank.subject.shape[0])
     m["delete/object_absent_from_bank"] = bool(m["delete/rows_removed"] == len(targets))
     m["delete/structural"] = True
     m["seconds"] = time.time() - t0
     return m
 
 
-KEYS = [f"{op}/{k}" for op in OPS
+KEYS = ["delete/control_reachable_before", "delete/control_gradient_max", "delete/payload_absent",
+        "delete/rows_removed", "delete/object_absent_from_bank"] + \
+       [f"{op}/{k}" for op in OPS
         for k in ("interface_certified", "interface_joint_certified", "outputs_certified",
                   "mediation_consistent", "interface_evaluations", "outputs_evaluations",
                   "structurally_certified", "gradient_max")]
@@ -196,6 +216,9 @@ CRITERIA = {
     # the premise the interface certificate rests on must survive every falsification attempt
     "revoke/mediation_consistent": (">=", 1.0),
     "shred/mediation_consistent": (">=", 1.0),
+    # DELETE by membership, with the control that makes the absence mean something
+    "delete/control_reachable_before": (">=", 1.0),
+    "delete/payload_absent": (">=", 1.0),
 }
 
 
@@ -307,7 +330,12 @@ def main(argv: List[str] | None = None) -> Dict[str, Any]:
                      "consistent" if agg[f"{op}/mediation_consistent"]["min"] == 1.0 else "VOID",
                      per_seed[0].get(f"{op}/interface_first_violation") or "-",
                      f"{int(agg[f'{op}/interface_evaluations']['mean'])}"])
-    rows.append(["delete", "no path", "yes (structural)", "yes (structural)", "n/a",
+    delete_ok = all(s.get("delete/payload_absent") for s in per_seed)
+    rows.append(["delete",
+                 ("payload absent from the bank; control |grad| "
+                  f"{max(s.get('delete/control_gradient_max', 0.0) for s in per_seed):.1e} before"),
+                 "yes (membership)" if delete_ok else "NOT SHOWN",
+                 "yes (membership)" if delete_ok else "NOT SHOWN", "n/a",
                  "the row is not in the bank", "0"])
     for gate_mode in ("soft", "hard"):
         for op in OPS:

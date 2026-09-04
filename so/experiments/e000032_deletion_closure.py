@@ -39,6 +39,9 @@ WHAT COULD FALSIFY IT. Four controls, each able to void the comparison:
   * per-key closure must be one in BOTH arms, or the stores were already distinguishable at the
     record level and the fact level is not doing the work;
   * the model must READ the fact before any deletion, or "the fact is gone afterwards" is vacuous;
+  * the payload must REACH the outputs while its row is in the bank, or its absence afterwards is not
+    evidence that anything was deleted -- this is the control that keeps the membership claim honest,
+    and its lack is what made the first version of E-000030's DELETE arm certify by not testing;
   * removing the whole closure must certify in BOTH arms, or the instrument reports "canonical" where
     it should report "enough records removed".
 
@@ -58,11 +61,12 @@ import numpy as np
 import torch
 
 from so import ledger
-from so.audit import certify_encoding, certify_fact, certify_structural
+from so.audit import certify_encoding, certify_fact, certify_structural, check_absence
 from so.closure import closure_profile, fact_closure
 from so.data import bank_from_store
 from so.experiments.e000015_symlink_cells import (EVAL, _q1, encode_slots, load_arm, predict,
                                                   sample_alias_world, train_or_load)
+from so.experiments.common import position_of_kid
 from so.experiments.e000001b_mini_transformer import _sha256, CHECKPOINTS, CKPT_SUFFIX
 from so.reference import ReferenceResolver
 from so.world import UNKNOWN, World
@@ -87,25 +91,39 @@ def read_keys(model, store, world, keys: Sequence[Tuple[int, int]]) -> np.ndarra
     return predict(model, bank_from_store(store), world, [_q1(world, k) for k in keys]).answers
 
 
-def certify_removal(model, store, world, kids_removed: Sequence[int], batch_queries) -> Tuple[Any, Any]:
-    """The record-level half, on the bank as it stands after the removal.
+def reachability_control(model, store, world, kids: Sequence[int], batch_queries) -> Any:
+    """Does the payload reach the outputs WHILE its rows are still in the bank?
 
-    EVICT takes the row out of the bank, so there is no payload left to perturb and the payload sweep
-    has nothing to say -- `certify_encoding` over an empty row set certifies with one evaluation, and
-    that is vacuous rather than strong. The structural result is what actually carries the claim here:
-    autograd is asked whether any output is reachable from the removed payload at all, which is a
-    theorem over any domain rather than over a swept one. `certify_fact` refuses the vacuous sweep
-    unless that structural result is supplied, so both are returned and both are recorded.
+    This is the positive control, and without it the whole arm is empty: "the row is not in the bank
+    afterwards" is evidence of a deletion only if the row was there and mattered. It is run before any
+    eviction, at the bank positions the cells occupy.
     """
     bank = bank_from_store(store)
-    tensors = bank.tensors()
+    rows = [position_of_kid(store, k) for k in kids]
     batch = encode_slots(list(batch_queries), bank, world, model.cfg.max_hops, model.cfg.n_deref)
-    record = certify_encoding(model, tensors, [], world.n_entities,
+    return certify_structural(model, bank.tensors(), rows,
+                              lambda b: model(b, batch.mode, batch.start, batch.rels, batch.hop_valid),
+                              model.cfg.d_model, outputs_of=lambda o: o[0])
+
+
+def certify_removal(model, store, world, bank_before, removed_kids: Sequence[int], control) -> Tuple[Any, Any]:
+    """The record-level half, on the bank as it stands after the removal.
+
+    EVICT takes the row out of the bank, so nothing is left to perturb -- and BOTH sweep instruments
+    then answer vacuously. `certify_encoding` over an empty row set certifies with one evaluation, and
+    `certify_structural` over an empty row set answers "no path", the strongest label in the ladder,
+    on any bank at all including one whose rows are live. Neither is evidence.
+
+    What carries the claim after an eviction is membership: the model reads the store only through the
+    bank (`so/model.py:246`), so a payload with no bank row is not an input, over any domain and for
+    every query. `check_absence` states that and requires the reachability CONTROL above, so the
+    absence is tied to a payload that demonstrably mattered while it was there.
+    """
+    bank_after = bank_from_store(store)
+    record = certify_encoding(model, bank_after.tensors(), [], world.n_entities,
                               interface_keys=("k_f", "v_f", "k_r", "v_r", "active"))
-    struct = certify_structural(model, tensors, [], 
-                                lambda b: model(b, batch.mode, batch.start, batch.rels, batch.hop_valid),
-                                model.cfg.d_model, outputs_of=lambda o: o[0])
-    return record, struct
+    absence = check_absence(bank_before, bank_after, list(removed_kids), control=control)
+    return record, absence
 
 
 def run_seed(seed: int, n_groups: int, steps: int, verbose: bool = True) -> Dict[str, Any]:
@@ -150,7 +168,8 @@ def run_seed(seed: int, n_groups: int, steps: int, verbose: bool = True) -> Dict
     per_arm: Dict[str, Dict[str, List[float]]] = {a: {} for a in ARMS}
     for arm in ARMS:
         store, kids = stores[arm]
-        sizes, optimal, one_valid, all_valid, one_reads, all_reads, one_struct = [], [], [], [], [], [], []
+        sizes, optimal, one_valid, all_valid = [], [], [], []
+        one_reads, all_reads, one_absent, control_ok = [], [], [], []
         for t_key in chosen:
             keys = group_keys(spec, t_key)
             obj = answers[arm][t_key]
@@ -158,37 +177,45 @@ def run_seed(seed: int, n_groups: int, steps: int, verbose: bool = True) -> Dict
             sizes.append(fc.size)
             optimal.append(float(fc.optimal))
 
+            # the positive control, BEFORE anything is removed: the payload must reach the outputs,
+            # or its absence afterwards is not evidence that anything was deleted
+            whole = sorted(set(list(fc.records) + [kids[t_key]]))
+            control = reachability_control(model, store, world, whole, probe_queries)
+            control_ok.append(float(control.reachable))
+            bank_before = bank_from_store(store)
+
             # ARM "one record": remove exactly what a record-level certificate would cover -- the
             # object itself. In a pod that IS the closure; under duplication it is one of k.
             store.evict(kids[t_key])
-            rec, st_res = certify_removal(model, store, world, [kids[t_key]], probe_queries)
+            rec, absence = certify_removal(model, store, world, bank_before, [kids[t_key]], control)
             cert_one = certify_fact(rec, fc, [kids[t_key]], store_after=store, keys=keys,
-                                    structural=st_res,
+                                    absence=absence,
                                     residual_note="says nothing about what the core knew before the store existed")
             one_valid.append(float(cert_one.valid))
-            one_struct.append(float(st_res.certified_structurally))
+            one_absent.append(float(absence.certified_absent))
             one_reads.append(float((read_keys(model, store, world, keys) == obj).mean()))
 
             # ARM "whole closure": remove every record the store's own semantics needs
-            rest = [k for k in fc.records if k != kids[t_key]]
-            for kid in rest:
+            for kid in [k for k in fc.records if k != kids[t_key]]:
                 store.evict(kid)
-            rec_all, st_all = certify_removal(model, store, world, list(fc.records), probe_queries)
-            cert_all = certify_fact(rec_all, fc, list(fc.records) + [kids[t_key]], store_after=store,
-                                    keys=keys, structural=st_all)
+            rec_all, absence_all = certify_removal(model, store, world, bank_before, whole, control)
+            cert_all = certify_fact(rec_all, fc, whole, store_after=store, keys=keys,
+                                    absence=absence_all)
             all_valid.append(float(cert_all.valid))
             all_reads.append(float((read_keys(model, store, world, keys) == obj).mean()))
 
-            for kid in list(fc.records) + [kids[t_key]]:
+            for kid in whole:
                 store.restore(kid)
         per_arm[arm] = dict(sizes=sizes, optimal=optimal, one_valid=one_valid, all_valid=all_valid,
-                            one_reads=one_reads, all_reads=all_reads, one_struct=one_struct)
+                            one_reads=one_reads, all_reads=all_reads, one_absent=one_absent,
+                            control_ok=control_ok)
         m[f"{arm}/fact_closure_mean"] = float(np.mean(sizes))
         m[f"{arm}/fact_closure_min"] = float(np.min(sizes))
         m[f"{arm}/fact_closure_max"] = float(np.max(sizes))
         m[f"{arm}/fact_closure_optimal_rate"] = float(np.mean(optimal))
         m[f"{arm}/one_record_fact_certified"] = float(np.mean(one_valid))
-        m[f"{arm}/one_record_structurally_certified"] = float(np.mean(one_struct))
+        m[f"{arm}/one_record_payload_absent"] = float(np.mean(one_absent))
+        m[f"{arm}/control_reachable_before"] = float(np.mean(control_ok))
         m[f"{arm}/one_record_still_readable"] = float(np.mean(one_reads))
         m[f"{arm}/whole_closure_fact_certified"] = float(np.mean(all_valid))
         m[f"{arm}/whole_closure_still_readable"] = float(np.mean(all_reads))
@@ -212,7 +239,7 @@ KEYS = (["control/interface_identical", "control/read_before_deletion", "control
          for k in ("per_key_closure_max", "per_key_closure_mean", "read_before_deletion",
                    "fact_closure_mean", "fact_closure_min", "fact_closure_max",
                    "fact_closure_optimal_rate", "one_record_fact_certified",
-                   "one_record_structurally_certified", "one_record_still_readable",
+                   "one_record_payload_absent", "control_reachable_before", "one_record_still_readable",
                    "whole_closure_fact_certified", "whole_closure_still_readable")])
 
 CRITERIA = {
@@ -226,6 +253,8 @@ CRITERIA = {
     "duplicated/fact_closure_min": (">=", 3.0),
     "canonical/fact_closure_optimal_rate": (">=", 1.0),
     "duplicated/fact_closure_optimal_rate": (">=", 1.0),
+    "canonical/control_reachable_before": (">=", 1.0),
+    "duplicated/control_reachable_before": (">=", 1.0),
     "canonical/one_record_fact_certified": (">=", 1.0),
     "duplicated/one_record_fact_certified": ("<=", 0.0),
     # the model confirms the verdict rather than the verdict standing alone

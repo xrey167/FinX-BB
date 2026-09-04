@@ -1434,6 +1434,58 @@ The rule the programme should have started from: **a deletion primitive is only 
 of payload-derived quantities it removes, and the cheap way to find that set is to sweep the payload
 domain and watch what moves.** `so/audit.py` is that sweep; `make certify` runs it.
 
+### 31.15 The strongest label in the certificate ladder fired on a live row (2026-09-04)
+
+§31.14 records DELETE as "yes, structurally" at both levels, and `so/results/e000030_deletion_certificate.json`
+carries `delete/structurally_certified = true` in every seed. Reading `so/audit.py` while building the
+fact-level composition showed what produced that flag:
+
+```python
+if not len(list(deleted_rows)):
+    return StructuralResult(False, 0.0, 0, "no deleted row remains in the bank, ...")
+```
+
+`certify_structural` was called with an EMPTY row list, because after DELETE there is no row to
+perturb. With no row selected autograd has nothing to trace a path FROM, so it answers "no path" —
+the strongest label in the ladder, the one whose docstring calls it "a theorem about every value the
+payload could take, over any domain". Run on a bank whose rows are **all present and live**, the same
+call returns the same label:
+
+| call | bank | answer |
+|---|---|---|
+| `certify_structural(m, bank, [0], ...)` | row 0 live | REACHABLE, \|grad\| 2.219e-02 |
+| `certify_structural(m, bank, [], ...)` | row 0 live | **NO PATH, certified** |
+
+The flag certified the deletion by not testing it. It is the same failure as the `no_grad` runner the
+same function already refuses, one step along, and the audit's own test asserted it as the desired
+behaviour.
+
+**What actually carries the claim.** Not reachability — membership. The model reads the store in
+exactly one place (`so/model.py:246`, `so/llm_adapter.py:323`, and `check_mediation` is the standing
+falsification of that premise), so a payload with no row in the bank is **not an input**, and no
+function of the model can depend on it: over any payload domain, finite or not, for every query. That
+is stronger than the sweep and stronger than the gradient, and it costs a set difference.
+
+`so.audit.check_absence` states it, and its positive control is mandatory rather than optional:
+"the row is not there" is evidence of a deletion only if the row **was** there and **mattered**, so
+the same reachability test must be run on the pre-removal bank at the rows about to go and must find
+a path. Without the control the check would pass on a cell that was never in the bank, which is the
+identical failure one level further along; `check_absence` refuses that too, by name.
+
+Three changes, and one correction to the record:
+
+* `certify_structural` now raises on an empty row set instead of certifying it, naming
+  `check_absence` as the instrument for a row that is gone.
+* E-000030's DELETE arm reports `delete/control_reachable_before` and `delete/payload_absent`, both
+  pre-registered at 1.0, in place of `delete/structurally_certified`. The DELETE verdict is unchanged
+  — the row genuinely leaves the bank, `delete/rows_removed` always equalled the number of targets —
+  but it now rests on evidence that could have come out the other way.
+* E-000032 (§31.16) uses the same control before every eviction it certifies.
+
+The general rule, which is the third time this programme has paid for it after §31.10 and §31.13: **an
+instrument that cannot fail is not evidence.** A certificate needs a case where it says no, and the
+cheapest way to find whether it has one is to run it on the state the deletion was supposed to change.
+
 ### 31.8 Boundary
 
 CPU only, no GPU, no LLM above 124M parameters, synthetic worlds, single-token entities, two surface forms per relation, one session. Nothing here shows unlearning of facts already encoded in pretrained weights. Evidence levels recorded: E3–E4 for the synthetic system (F4 for SHRED with the verified gate, E-000010 — **on the value channel only**: E-000028 recovers the shredded object at 1.0000 through the ungated reverse key, where REVOKE and DELETE are at chance, so F4 for SHRED is a claim about answers, logits, hidden states and probes and not about routing); E5 as substrate for the frozen-GPT-2 experiment, with reading, composition, update and the copy bound supported and behavioural deletion not yet supported at the pre-registered thresholds.

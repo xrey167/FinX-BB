@@ -709,10 +709,18 @@ def certify_structural(model: nn.Module, bank: Dict[str, torch.Tensor], deleted_
     """
     n_rows = int(next(v for v in bank.values() if torch.is_tensor(v)).shape[0])
     if not len(list(deleted_rows)):
-        # Nothing to perturb: the payload is not an input to this computation at all. That is the
-        # DELETE case, and it is the strong outcome rather than a degenerate one.
-        return StructuralResult(False, 0.0, 0,
-                                "no deleted row remains in the bank, so its payload is not an input")
+        # This branch used to return the strongest outcome in the ladder -- "no path, for any value
+        # over any domain" -- and it fires on a bank whose rows are all present and live, because
+        # with no row selected there is nothing for autograd to find a path FROM. It certified the
+        # deletion by not testing it. Refused, for the same reason a gradient-free runner is refused.
+        # When the row is genuinely gone, the claim is a MEMBERSHIP property and ``check_absence`` is
+        # the instrument for it; reachability is for a row that is still in the bank.
+        raise ValueError(
+            "certify_structural was given no rows to perturb, so autograd would report 'no path' "
+            "whatever the bank contains -- including a bank where the row is still live. If the row "
+            "was removed, its independence is a membership property: use check_absence, which takes "
+            "the bank before and after and requires a positive control showing the payload WAS "
+            "reachable while the row was there.")
     eps = torch.zeros(len(deleted_rows), d_payload, requires_grad=True)
     delta = torch.zeros(n_rows, d_payload)
     probe = {k: (v.clone() if torch.is_tensor(v) else v) for k, v in bank.items()}
@@ -741,6 +749,98 @@ def certify_structural(model: nn.Module, bank: Dict[str, torch.Tensor], deleted_
     g = float(grad.abs().max().item())
     return StructuralResult(True, g, len(tensors),
                             "a path exists" + (" but the derivative is exactly zero" if g == 0.0 else ""))
+
+
+# ------------------------------------------------- a row that is gone: membership, not reachability
+
+@dataclass
+class AbsenceCheck:
+    """Independence by ABSENCE: the payload is not in the bank the model reads.
+
+    This exists because the reachability instrument cannot state it. Ask autograd for a path from a
+    row that is no longer in the bank and there is no row to perturb, so it answers "no path" -- and
+    it answers "no path" just as confidently on a bank where the row is present and live, because the
+    absence of a perturbation is not the absence of a dependence. That is a certificate produced by
+    not testing anything, and it is refused at the source.
+
+    What actually carries the claim after EVICT or DELETE is a membership property, and it is worth
+    stating exactly because it is not a technicality: the model reads the store only through the bank
+    -- ``MutableKnowledgeTransformer.forward`` at ``so/model.py:246``, ``KnowledgeAdapterLM.forward``
+    at ``so/llm_adapter.py:323``, and ``check_mediation`` is the standing falsification of that premise
+    -- so a payload with no row in the bank is not an input, and no function of the model can depend
+    on it. Over any payload domain, finite or not, for every query. That is stronger than the sweep
+    and stronger than the gradient, and it costs a set difference.
+
+    The positive control is mandatory rather than optional. "The row is not there" is only evidence of
+    a deletion if the row was there before and MATTERED: ``control_reachable`` records that the same
+    reachability test, run on the bank BEFORE the removal at the rows that were removed, found a path.
+    Without it the check would pass on a row that was never in the bank to begin with, which is the
+    same failure one level along.
+    """
+
+    absent: bool
+    control_reachable: bool
+    n_removed: int
+    rows_before: int
+    rows_after: int
+    still_present: Tuple[int, ...] = ()
+    note: str = ""
+
+    @property
+    def certified_absent(self) -> bool:
+        return bool(self.absent and self.control_reachable)
+
+    def summary(self) -> str:
+        if not self.control_reachable:
+            return ("VOID: the payload was NOT reachable before the removal either, so its absence "
+                    "afterwards is not evidence that anything was deleted")
+        if not self.absent:
+            return f"NOT ABSENT: {len(self.still_present)} removed cell(s) still hold a bank row"
+        return (f"ABSENT: {self.n_removed} cell(s) hold no row in the bank the model reads "
+                f"({self.rows_before} rows before, {self.rows_after} after), and the same payload was "
+                f"reachable while they were there")
+
+
+def _kids_of(b: Any, kid_key: str) -> List[int]:
+    """The cell ids a bank holds, from whichever of the three shapes the caller has.
+
+    ``Bank.tensors()`` drops the ``kid`` column -- the model has no use for it -- so a caller working
+    with tensors must pass the ``Bank`` itself or the id list. Guessing is worse than asking.
+    """
+    if hasattr(b, kid_key) and not isinstance(b, dict):
+        return [int(x) for x in getattr(b, kid_key)]
+    if isinstance(b, dict):
+        if kid_key not in b:
+            raise KeyError(
+                f"the bank has no {kid_key!r} column, so membership cannot be decided. Bank.tensors() "
+                f"drops it; pass the Bank object or the list of cell ids instead.")
+        return [int(x) for x in b[kid_key]]
+    return [int(x) for x in b]
+
+
+def check_absence(bank_before: Any, bank_after: Any, removed_kids: Sequence[int],
+                  control: Optional["StructuralResult"] = None,
+                  kid_key: str = "kid") -> AbsenceCheck:
+    """Did the removal actually take the rows out of the bank, and did they matter while they were in?
+
+    ``bank_before`` and ``bank_after`` may each be a ``Bank``, a dict carrying a ``kid`` column, or a
+    plain sequence of cell ids.
+
+    ``control`` is a ``certify_structural`` result computed on ``bank_before`` at the rows about to be
+    removed. It must find a path -- ``reachable`` true -- or the absence proves nothing.
+    """
+    before, after = _kids_of(bank_before, kid_key), _kids_of(bank_after, kid_key)
+    want = [int(k) for k in removed_kids]
+    missing_before = [k for k in want if k not in set(before)]
+    still = tuple(k for k in want if k in set(after))
+    control_ok = bool(control is not None and control.reachable)
+    note = ""
+    if missing_before:
+        note = (f"{len(missing_before)} of the cells named were not in the bank before the removal "
+                f"either, so their absence afterwards is not evidence of anything")
+    return AbsenceCheck(absent=not still and not missing_before, control_reachable=control_ok,
+                        n_removed=len(want), rows_before=len(before), rows_after=len(after),
+                        still_present=still, note=note)
 
 
 # --------------------------------------------------- from a record certificate to a fact certificate
@@ -780,13 +880,19 @@ class FactCertificate:
         supplies the store, because a closure argument that disagrees with the store it describes is
         the one failure mode that would make all of this decorative.
 
-    One trap is closed explicitly, because the machinery walks straight into it. When a deletion takes
-    the row OUT of the bank -- which is what EVICT and DELETE do, and is the only deletion that earns
-    the domain-free claim -- there is no row left to perturb, and a payload sweep over an empty row set
-    certifies with a single evaluation and no violations. That is vacuous, not strong. So a record
-    certificate covering no rows is refused unless a ``StructuralResult`` is supplied that says
-    autograd finds no path at all; the vacuous sweep and the theorem look identical in a boolean and
-    are opposites in fact.
+    One trap is closed explicitly, because the machinery walks straight into it -- twice. When a
+    deletion takes the row OUT of the bank -- which is what EVICT and DELETE do, and is the only
+    deletion that earns the domain-free claim -- there is no row left to perturb. A payload sweep over
+    an empty row set then certifies with a single evaluation and no violations, and a reachability
+    test over an empty row set answers "no path", the strongest label in the ladder. BOTH are vacuous:
+    each fires unchanged on a bank whose rows are all present and live, because the absence of a
+    perturbation is not the absence of a dependence.
+
+    So a record certificate covering no rows is refused unless an ``AbsenceCheck`` is supplied -- the
+    membership property, with its mandatory positive control showing the payload WAS reachable while
+    the row was in the bank. A ``StructuralResult`` discharges the same requirement only when it was
+    computed over rows that exist; ``certify_structural`` now refuses an empty row set outright, so a
+    result that reaches here was obtained by perturbing something.
     """
 
     obj: int
@@ -798,6 +904,7 @@ class FactCertificate:
     post_condition: Optional[bool] = None
     valid: bool = False
     void_reason: str = ""
+    payload_absent: bool = False
     residual_note: str = ""
 
     def summary(self) -> str:
@@ -812,6 +919,7 @@ class FactCertificate:
 def certify_fact(record: "Certificate", closure: "FactClosure", removed: Sequence[int],
                  store_after: Optional[Any] = None, keys: Optional[Sequence[Tuple[int, int]]] = None,
                  structural: Optional["StructuralResult"] = None,
+                 absence: Optional["AbsenceCheck"] = None,
                  residual_note: str = "") -> FactCertificate:
     """Compose a record-level certificate with a store-level closure.
 
@@ -822,8 +930,10 @@ def certify_fact(record: "Certificate", closure: "FactClosure", removed: Sequenc
     ``removed`` the cells actually removed. Must cover ``closure.records``.
     ``store_after`` optional: the store after the deletion, used to VERIFY rather than infer that no
                 key still yields the object.
-    ``structural`` optional: a ``certify_structural`` result. Required when the deletion removed the
-                rows from the bank, since a payload sweep over no rows is vacuous.
+    ``structural`` optional: a ``certify_structural`` result over rows that are still in the bank.
+    ``absence`` optional: a ``check_absence`` result. This is the one that applies when the deletion
+                REMOVED the rows, and one of the two is required then, since a payload sweep over no
+                rows is vacuous.
 
     Every way this can fail is named in ``void_reason`` rather than folded into a boolean, because a
     certificate whose failure modes are invisible is worse than no certificate.
@@ -833,13 +943,18 @@ def certify_fact(record: "Certificate", closure: "FactClosure", removed: Sequenc
     covers = needed.issubset(removed_set)
     swept = record.n_rows > 0
     structural_ok = bool(structural is not None and structural.certified_structurally)
-    record_ok = bool(record.output_certified and record.activation_certified) and (swept or structural_ok)
+    absent_ok = bool(absence is not None and absence.certified_absent)
+    record_ok = (bool(record.output_certified and record.activation_certified)
+                 and (swept or structural_ok or absent_ok))
 
     reasons: List[str] = []
-    if not swept and not structural_ok:
-        reasons.append("the record-level sweep covered no rows, which certifies vacuously; a "
-                       "structural result showing no path is required when the deletion removes the "
-                       "row from the bank")
+    if not swept and not (structural_ok or absent_ok):
+        why = ""
+        if absence is not None:
+            why = f" ({absence.summary()})"
+        reasons.append("the record-level sweep covered no rows, which certifies vacuously; when the "
+                       "deletion removes the row from the bank the claim is a membership property and "
+                       "needs a check_absence result with its positive control" + why)
     if closure.exhausted:
         reasons.append("the closure search was cut short, so the closure is unknown and no set can be "
                        "shown to cover it")
@@ -868,4 +983,4 @@ def certify_fact(record: "Certificate", closure: "FactClosure", removed: Sequenc
         obj=int(closure.obj), n_keys=len(closure.keys), closure_size=closure.size,
         removed=tuple(sorted(removed_set)), covers_closure=covers, record_certified=record_ok,
         post_condition=post, valid=not reasons, void_reason="; ".join(reasons),
-        residual_note=residual_note)
+        payload_absent=absent_ok, residual_note=residual_note)
