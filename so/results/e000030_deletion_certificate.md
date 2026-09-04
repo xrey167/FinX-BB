@@ -11,7 +11,7 @@ is every case rather than a sample.
 |---|---|---|---|---|---|---|
 | revoke | grad 0 | no | yes | consistent | encode_bank[v_f] | 2 |
 | shred | grad 2.0e+01 | no | no | consistent | encode_bank[v_f] | 2 |
-| delete | no path | yes (structural) | yes (structural) | n/a | the row is not in the bank | 0 |
+| delete | payload absent from the bank; control |grad| 3.3e+01 before | yes (membership) | yes (membership) | n/a | the row is not in the bank | 0 |
 | revoke (GPT-2, soft gate) | - | yes | - | - | - | 782 |
 | shred (GPT-2, soft gate) | - | no | - | - | encode_bank[values] | 2  (residual 1.39e-02) |
 | revoke (GPT-2, hard gate) | - | yes | - | - | - | 782 |
@@ -31,3 +31,5 @@ for an output that moves while the encoding does not, and voids the certificate 
 | revoke/outputs_certified | >= 1.0 | 1.0000 | PASS |
 | revoke/mediation_consistent | >= 1.0 | 1.0000 | PASS |
 | shred/mediation_consistent | >= 1.0 | 1.0000 | PASS |
+| delete/control_reachable_before | >= 1.0 | 1.0000 | PASS |
+| delete/payload_absent | >= 1.0 | 1.0000 | PASS |

@@ -1,5 +1,35 @@
 {
   "aggregate": {
+    "delete/control_gradient_max": {
+      "max": 33.19061279296875,
+      "mean": 22.916703542073567,
+      "min": 16.11020278930664,
+      "n": 3
+    },
+    "delete/control_reachable_before": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "delete/object_absent_from_bank": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "delete/payload_absent": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "delete/rows_removed": {
+      "max": 3.0,
+      "mean": 3.0,
+      "min": 3.0,
+      "n": 3
+    },
     "revoke/gradient_max": {
       "max": 0.0,
       "mean": 0.0,
@@ -49,9 +79,9 @@
       "n": 3
     },
     "shred/gradient_max": {
-      "max": 19.73952293395996,
-      "mean": 15.883968989054361,
-      "min": 10.088150024414062,
+      "max": 19.739517211914062,
+      "mean": 15.883966128031412,
+      "min": 10.088143348693848,
       "n": 3
     },
     "shred/interface_certified": {
@@ -100,6 +130,18 @@
   "criteria": {
     "claim_supported": false,
     "criteria": {
+      "delete/control_reachable_before": {
+        "observed": 1.0,
+        "op": ">=",
+        "pass": true,
+        "threshold": 1.0
+      },
+      "delete/payload_absent": {
+        "observed": 1.0,
+        "op": ">=",
+        "pass": true,
+        "threshold": 1.0
+      },
       "revoke/mediation_consistent": {
         "observed": 1.0,
         "op": ">=",
@@ -128,10 +170,10 @@
   },
   "environment": {
     "device": "cpu",
-    "numpy": "2.2.6",
+    "numpy": "2.4.6",
     "platform": "Linux-6.18.44-fc-v24-x86_64-with-glibc2.39",
     "python": "3.11.15",
-    "threads": "1",
+    "threads": "2",
     "torch": "2.14.0+cpu"
   },
   "experiment": "E-000030",
@@ -162,7 +204,7 @@
       "n_cells": 400,
       "n_entities": 256,
       "n_targets": 3,
-      "seconds": 54.5074417591095,
+      "seconds": 208.23013043403625,
       "seed": 0
     }
   ],
@@ -175,11 +217,13 @@
   "per_seed": [
     {
       "checkpoint_sha256": "f0b181bc52152f26b419f2d096a7419bbbe507307a1c4e6984a4e61c441c864d",
+      "delete/absence_note": "ABSENT: 3 cell(s) hold no row in the bank the model reads (1000 rows before, 997 after), and the same payload was reachable while they were there",
+      "delete/control_gradient_max": 16.11020278930664,
+      "delete/control_reachable_before": true,
       "delete/object_absent_from_bank": true,
+      "delete/payload_absent": true,
       "delete/rows_removed": 3,
       "delete/structural": true,
-      "delete/structural_note": "NO PATH: the payload is not in the output's graph, for any value over any domain",
-      "delete/structurally_certified": true,
       "n_cells": 1000,
       "n_entities": 256,
       "n_queries_full_domain": 2048,
@@ -197,9 +241,9 @@
       "revoke/outputs_first_violation": "",
       "revoke/structural_note": "path exists, gradient exactly zero: annihilated here, and only as global as the argument that the annihilating factor does not move",
       "revoke/structurally_certified": false,
-      "seconds": 56.22056221961975,
+      "seconds": 112.75517916679382,
       "seed": 0,
-      "shred/gradient_max": 17.824234008789062,
+      "shred/gradient_max": 17.824237823486328,
       "shred/interface_certified": false,
       "shred/interface_evaluations": 2,
       "shred/interface_first_violation": "encode_bank[v_f]",
@@ -214,11 +258,13 @@
     },
     {
       "checkpoint_sha256": "e5ebb907e9e4f8a17978d43c0fe1e8f1935fd74377e6768a2424c67f56f67033",
+      "delete/absence_note": "ABSENT: 3 cell(s) hold no row in the bank the model reads (1000 rows before, 997 after), and the same payload was reachable while they were there",
+      "delete/control_gradient_max": 33.19061279296875,
+      "delete/control_reachable_before": true,
       "delete/object_absent_from_bank": true,
+      "delete/payload_absent": true,
       "delete/rows_removed": 3,
       "delete/structural": true,
-      "delete/structural_note": "NO PATH: the payload is not in the output's graph, for any value over any domain",
-      "delete/structurally_certified": true,
       "n_cells": 1000,
       "n_entities": 256,
       "n_queries_full_domain": 2048,
@@ -236,9 +282,9 @@
       "revoke/outputs_first_violation": "",
       "revoke/structural_note": "path exists, gradient exactly zero: annihilated here, and only as global as the argument that the annihilating factor does not move",
       "revoke/structurally_certified": false,
-      "seconds": 66.5148823261261,
+      "seconds": 109.73399090766907,
       "seed": 1,
-      "shred/gradient_max": 10.088150024414062,
+      "shred/gradient_max": 10.088143348693848,
       "shred/interface_certified": false,
       "shred/interface_evaluations": 2,
       "shred/interface_first_violation": "encode_bank[v_f]",
@@ -253,11 +299,13 @@
     },
     {
       "checkpoint_sha256": "18a064916cb19bf84fd32bfc9dc8b47d9cf28e68434c88a3f4dd6a7f7663f6c5",
+      "delete/absence_note": "ABSENT: 3 cell(s) hold no row in the bank the model reads (1000 rows before, 997 after), and the same payload was reachable while they were there",
+      "delete/control_gradient_max": 19.449295043945312,
+      "delete/control_reachable_before": true,
       "delete/object_absent_from_bank": true,
+      "delete/payload_absent": true,
       "delete/rows_removed": 3,
       "delete/structural": true,
-      "delete/structural_note": "NO PATH: the payload is not in the output's graph, for any value over any domain",
-      "delete/structurally_certified": true,
       "n_cells": 1000,
       "n_entities": 256,
       "n_queries_full_domain": 2048,
@@ -275,9 +323,9 @@
       "revoke/outputs_first_violation": "",
       "revoke/structural_note": "path exists, gradient exactly zero: annihilated here, and only as global as the argument that the annihilating factor does not move",
       "revoke/structurally_certified": false,
-      "seconds": 58.028982400894165,
+      "seconds": 106.79114937782288,
       "seed": 2,
-      "shred/gradient_max": 19.73952293395996,
+      "shred/gradient_max": 19.739517211914062,
       "shred/interface_certified": false,
       "shred/interface_evaluations": 2,
       "shred/interface_first_violation": "encode_bank[v_f]",
@@ -291,7 +339,7 @@
       "shred/structurally_certified": false
     }
   ],
-  "recorded_at": "2026-09-04T15:42:03+00:00",
+  "recorded_at": "2026-09-04T17:43:07+00:00",
   "seeds": [
     0,
     1,

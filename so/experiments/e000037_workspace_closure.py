@@ -1,4 +1,4 @@
-"""Experiment E-000036 — a carrier is a pod for the readers that go through it, and a duplicate for
+"""Experiment E-000037 — a carrier is a pod for the readers that go through it, and a duplicate for
 the rest.
 
 E-000032 measures the STORE closure: how many records must go before no query yields a fact. A
@@ -27,24 +27,33 @@ exactly the number that says how partial it is.
 
 This experiment measures that number on a public model, on facts the model demonstrably holds.
 
-  produce   eight phrasings, answered by restricted top-1 over the candidate capitals -- E-000013's
-            protocol, which records true_capital_restricted_top1 = 0.96 for this model.
-  verify    the same fact asked as a judgement: is this city the capital of that country. A reader
-            that reaches the fact must say yes to the true city AND no to a distractor, so a model
-            that has learned to say yes cannot pass.
+  produce    eight direct question phrasings, answered by restricted top-1 over the candidate
+             capitals -- E-000013's protocol, which records true_capital_restricted_top1 = 0.96 here.
+  continue   four narrative frames in which the capital is never asked for, only continued into.
+             THIS IS THE PAPER'S OWN DISCONFIRMING READER: continuation is one of the two classes its
+             concept swap left unmoved, so if the carrier is reader-incomplete, this is where it
+             shows.
+  reverse    the association read backwards, capital to country, over the candidate countries. A
+             different computation on the same fact.
 
-The prediction that would make the claim, and the one that would break it. If the fact has one
-carrier for every reader, the closure over produce alone equals the closure over produce and verify
-together. If the carriers are partly separate, the union costs more -- and the size of the difference
-is the partialness. A null result here (the union costs the same) says the workspace is a complete pod
-for these readers, which would be a cleaner world and a shorter paper.
+A judgement reader was tried first -- yes to the true city and no to a distractor -- and DROPPED
+rather than shipped: GPT-2 small scores 0.031 on it, so it holds no fact for an ablation to remove
+and every number computed from it would have been noise. The three readers above were each measured
+before being written in: produce 0.914, continue 0.938 to 1.000, reverse 0.562 to 0.875.
+
+The prediction that would make the claim, and the one that would break it. If the fact has one carrier
+for every reader, the closure over produce alone equals the closure over all three together, and
+ablating what silences produce silences continuation too. If the carriers are partly separate, the
+union costs more and continuation survives -- which is what the paper reports for its own case, on a
+different model and a different lens. A null result here says the workspace is a COMPLETE pod for
+these readers, which would be a cleaner world and a shorter paper.
 
 COLLATERAL IS REPORTED WITH EVERY CLOSURE. A closure of one is worthless if the direction removed was
 carrying every capital in the model, and the pair is the finding.
 
 Trains nothing. Downloads GPT-2 only.
 
-Run:  python -m so.experiments.e000036_workspace_closure [--layer 7] [--n-facts 16]
+Run:  python -m so.experiments.e000037_workspace_closure [--layer 7] [--n-facts 16]
 """
 
 from __future__ import annotations
@@ -72,7 +81,12 @@ PRODUCE = ["The capital of {s} is", "{s}'s capital city is", "Q: What is the cap
            "The city that serves as the capital of {s} is", "People say the capital of {s} is",
            "In {s}, the capital is", "The seat of government of {s} is located in",
            "Everyone knows that the capital of {s} is"]
-VERIFY = ["Q: Is{c} the capital of {s}? A:", "True or false:{c} is the capital of {s}. Answer:"]
+# never asks for the capital, only continues into it -- the reader class the workspace paper's own
+# concept swap left unmoved, measured here at 0.938 to 1.000 before anything is ablated
+CONTINUE = ["I landed in the capital of {s}, which is", "She moved to the capital of {s},",
+            "Walking through the capital of {s}, called", "The flight to the capital of {s} lands in"]
+# the same association read backwards, over the candidate countries: a different computation
+REVERSE = ["The country whose capital is{c} is", "{c} is the capital of", "{c} is the capital city of"]
 
 
 class Probe:
@@ -92,8 +106,7 @@ class Probe:
             self.blocks[l].register_forward_hook(self._hook)
         self.layer = layer
         self.caps = [self.tok.encode(o)[0] for _, o in PAIRS]
-        self.yes = self.tok.encode(" Yes")[0]
-        self.no = self.tok.encode(" No")[0]
+        self.countries = [self.tok.encode(" " + s)[0] for s, _ in PAIRS]
 
     def _hook(self, module, inputs, output):
         if self.dirs is None or self.dirs.numel() == 0:
@@ -112,24 +125,25 @@ class Probe:
         out = self.lm(**e)
         return out.logits[torch.arange(len(prompts)), last]
 
+    def _restricted(self, prompts: Sequence[str], cand: Sequence[int]) -> List[int]:
+        lg = self._logits(prompts)[:, torch.as_tensor(list(cand))]
+        return [cand[i] for i in lg.argmax(-1).tolist()]
+
     def produce(self, subj: str) -> List[int]:
         """Restricted top-1 over the candidate capitals: E-000013's readout."""
-        lg = self._logits([t.format(s=subj) for t in PRODUCE])[:, torch.as_tensor(self.caps)]
-        return [self.caps[i] for i in lg.argmax(-1).tolist()]
+        return self._restricted([t.format(s=subj) for t in PRODUCE], self.caps)
 
-    def verify(self, subj: str, true_cap: str, distractor: str) -> List[int]:
-        """Yes to the true city AND no to a distractor. A model that always says yes fails.
+    def continue_(self, subj: str) -> List[int]:
+        """The capital is never asked for, only continued into. The paper's disconfirming reader."""
+        return self._restricted([t.format(s=subj) for t in CONTINUE], self.caps)
 
-        Returned as the object token when the reader reaches the fact and -1 when it does not, so the
-        closure sees the same interface as the produce reader.
-        """
-        obj_id = self.tok.encode(true_cap)[0]
-        prompts = ([t.format(s=subj, c=true_cap) for t in VERIFY]
-                   + [t.format(s=subj, c=distractor) for t in VERIFY])
-        lg = self._logits(prompts)
-        yes = (lg[:, self.yes] > lg[:, self.no]).tolist()
-        n = len(VERIFY)
-        return [obj_id if (yes[i] and not yes[n + i]) else -1 for i in range(n)]
+    def reverse(self, subj: str, cap: str) -> List[int]:
+        """Capital to country. Returned as the OBJECT token when it lands on the right country, so
+        every reader hands the closure the same interface."""
+        obj_id = self.tok.encode(cap)[0]
+        want = self.tok.encode(" " + subj)[0]
+        got = self._restricted([t.format(c=cap) for t in REVERSE], self.countries)
+        return [obj_id if g == want else -1 for g in got]
 
     @torch.no_grad()
     def residual(self, prompts: Sequence[str]) -> torch.Tensor:
@@ -161,34 +175,36 @@ def run(layer: int, n_facts: int, n_dirs: int, threads: int, verbose: bool = Tru
     pairs = PAIRS[:n_facts]
     t0 = time.time()
 
-    # attack validity first: the model must hold these facts, per reader, before anything is ablated
+    # attack validity first, per reader: a fact a reader does not hold cannot be evidence that an
+    # ablation removed anything. A judgement reader was dropped at this step, at 0.031.
     p.dirs = None
-    prod_ok, ver_ok = {}, {}
-    for i, (subj, obj) in enumerate(pairs):
+    prod, cont, rev = {}, {}, {}
+    for subj, obj in pairs:
         obj_id = p.tok.encode(obj)[0]
-        dis = pairs[(i + 1) % len(pairs)][1]
-        prod_ok[subj] = sum(g == obj_id for g in p.produce(subj)) / len(PRODUCE)
-        ver_ok[subj] = sum(g == obj_id for g in p.verify(subj, obj, dis)) / len(VERIFY)
+        prod[subj] = sum(g == obj_id for g in p.produce(subj)) / len(PRODUCE)
+        cont[subj] = sum(g == obj_id for g in p.continue_(subj)) / len(CONTINUE)
+        rev[subj] = sum(g == obj_id for g in p.reverse(subj, obj)) / len(REVERSE)
     m: Dict[str, Any] = {"layer": layer, "n_facts": len(pairs), "n_dirs": n_dirs,
-                         "n_produce": len(PRODUCE), "n_verify": len(VERIFY), "model": MODEL,
-                         "control/produce_before": float(np.mean(list(prod_ok.values()))),
-                         "control/verify_before": float(np.mean(list(ver_ok.values())))}
+                         "n_produce": len(PRODUCE), "n_continue": len(CONTINUE),
+                         "n_reverse": len(REVERSE), "model": MODEL,
+                         "control/produce_before": float(np.mean(list(prod.values()))),
+                         "control/continue_before": float(np.mean(list(cont.values()))),
+                         "control/reverse_before": float(np.mean(list(rev.values())))}
     if verbose:
-        print(f"  attack validity: produce {m['control/produce_before']:.4f}  "
-              f"verify {m['control/verify_before']:.4f}  ({time.time() - t0:.0f}s)", flush=True)
+        print(f"  attack validity: produce {m['control/produce_before']:.4f}  continue "
+              f"{m['control/continue_before']:.4f}  reverse {m['control/reverse_before']:.4f}  "
+              f"({time.time() - t0:.0f}s)", flush=True)
 
     all_res = {s: p.residual([t.format(s=s) for t in PRODUCE]) for s, _ in pairs}
-    # only facts BOTH readers hold can separate the two workloads; anything else is uninterpretable
-    strong = [(s, o) for i, (s, o) in enumerate(pairs)
-              if prod_ok[s] >= 0.75 and ver_ok[s] >= 0.5]
+    strong = [(s, o) for s, o in pairs if prod[s] >= 0.75 and cont[s] >= 0.75]
     m["n_measured"] = len(strong)
     if verbose:
-        print(f"  {len(strong)} of {len(pairs)} facts held by BOTH readers; measuring those", flush=True)
+        print(f"  {len(strong)} of {len(pairs)} facts held by BOTH produce and continue; measuring those",
+              flush=True)
 
     rows: List[Dict[str, Any]] = []
-    for i, (subj, obj) in enumerate(strong):
+    for subj, obj in strong:
         obj_id = p.tok.encode(obj)[0]
-        dis = strong[(i + 1) % len(strong)][1]
         basis = carriers_of(p, subj, all_res, n_dirs)
         bys = [(s, o) for s, o in strong if s != subj][:8]
 
@@ -202,43 +218,47 @@ def run(layer: int, n_facts: int, n_dirs: int, threads: int, verbose: bool = Tru
         def ans_produce(idx):
             set_dirs(list(idx)); return p.produce(subj)
 
-        def ans_verify(idx):
-            set_dirs(list(idx)); return p.verify(subj, obj, dis)
-
-        def ans_both(idx):
-            set_dirs(list(idx)); return list(p.produce(subj)) + list(p.verify(subj, obj, dis))
+        def ans_all(idx):
+            set_dirs(list(idx))
+            return list(p.produce(subj)) + list(p.continue_(subj)) + list(p.reverse(subj, obj))
 
         cand = list(range(len(basis)))
         wp = workspace_closure(ans_produce, cand, obj_id, len(PRODUCE), max_dirs=len(basis),
                                workload="produce: %d phrasings" % len(PRODUCE),
                                lens=f"fact-specific PCA at layer {layer}", collateral_with=coll)
-        wv = workspace_closure(ans_verify, cand, obj_id, len(VERIFY), max_dirs=len(basis),
-                               workload="verify: %d judgements" % len(VERIFY),
+        wu = workspace_closure(ans_all, cand, obj_id, len(PRODUCE) + len(CONTINUE) + len(REVERSE),
+                               max_dirs=len(basis), workload="produce, continue and reverse together",
                                lens=f"fact-specific PCA at layer {layer}", collateral_with=coll)
-        wb = workspace_closure(ans_both, cand, obj_id, len(PRODUCE) + len(VERIFY), max_dirs=len(basis),
-                               workload="produce and verify together",
-                               lens=f"fact-specific PCA at layer {layer}", collateral_with=coll)
+
+        # THE REPLICATION NUMBER. Ablate exactly what silences the produce reader, then ask the other
+        # two. The workspace paper reports continuation unmoved by the swap that flips report; if the
+        # carrier here is reader-incomplete the same way, continuation survives.
+        set_dirs(list(wp.directions))
+        surv_c = float(np.mean([g == obj_id for g in p.continue_(subj)])) if wp.size else float("nan")
+        surv_r = float(np.mean([g == obj_id for g in p.reverse(subj, obj)])) if wp.size else float("nan")
         p.dirs = None
-        rows.append({"subject": subj, "produce": wp.size, "verify": wv.size, "both": wb.size,
-                     "produce_exhausted": wp.exhausted, "verify_exhausted": wv.exhausted,
-                     "both_exhausted": wb.exhausted, "produce_optimal": wp.optimal,
-                     "collateral_after": wb.collateral, "collateral_before": wb.collateral_before,
-                     "produce_lower": wp.lower_bound, "both_lower": wb.lower_bound})
+        rows.append({"subject": subj, "produce": wp.size, "union": wu.size,
+                     "produce_exhausted": wp.exhausted, "union_exhausted": wu.exhausted,
+                     "continue_survives": surv_c, "reverse_survives": surv_r,
+                     "collateral_after": wu.collateral, "collateral_before": wu.collateral_before,
+                     "produce_lower": wp.lower_bound, "union_lower": wu.lower_bound})
         if verbose:
-            print(f"  {subj:8s} produce {wp.size:2d}  verify {wv.size:2d}  union {wb.size:2d}  "
-                  f"collateral {wb.collateral_before:.2f} -> {wb.collateral:.2f}  "
-                  f"({time.time() - t0:.0f}s)", flush=True)
+            print(f"  {subj:8s} produce {wp.size:2d}  union {wu.size:2d}  after the produce ablation: "
+                  f"continue {surv_c:.2f} reverse {surv_r:.2f}  collateral "
+                  f"{wu.collateral_before:.2f} -> {wu.collateral:.2f}  ({time.time() - t0:.0f}s)",
+                  flush=True)
 
     def agg(key):
-        vals = [r[key] for r in rows]
+        vals = [r[key] for r in rows if not (isinstance(r[key], float) and np.isnan(r[key]))]
         return float(np.mean(vals)) if vals else float("nan")
 
     m["produce/closure_mean"] = agg("produce")
-    m["verify/closure_mean"] = agg("verify")
-    m["union/closure_mean"] = agg("both")
+    m["union/closure_mean"] = agg("union")
     m["union/minus_produce"] = m["union/closure_mean"] - m["produce/closure_mean"]
     m["produce/exhausted_rate"] = agg("produce_exhausted")
-    m["union/exhausted_rate"] = agg("both_exhausted")
+    m["union/exhausted_rate"] = agg("union_exhausted")
+    m["continue/survives_produce_ablation"] = agg("continue_survives")
+    m["reverse/survives_produce_ablation"] = agg("reverse_survives")
     m["collateral_before"] = agg("collateral_before")
     m["collateral_after"] = agg("collateral_after")
     m["collateral_cost"] = m["collateral_before"] - m["collateral_after"]
@@ -247,20 +267,25 @@ def run(layer: int, n_facts: int, n_dirs: int, threads: int, verbose: bool = Tru
     return m
 
 
-KEYS = ["control/produce_before", "control/verify_before", "n_measured", "produce/closure_mean",
-        "verify/closure_mean", "union/closure_mean", "union/minus_produce", "produce/exhausted_rate",
-        "union/exhausted_rate", "collateral_before", "collateral_after", "collateral_cost"]
+KEYS = ["control/produce_before", "control/continue_before", "control/reverse_before", "n_measured",
+        "produce/closure_mean", "union/closure_mean", "union/minus_produce",
+        "continue/survives_produce_ablation", "reverse/survives_produce_ablation",
+        "produce/exhausted_rate", "union/exhausted_rate", "collateral_before", "collateral_after",
+        "collateral_cost"]
 
 CRITERIA = {
-    # the floors: a fact neither reader holds cannot be evidence that an ablation removed anything
+    # the floors: a fact a reader does not hold cannot be evidence that an ablation removed anything
     "control/produce_before": (">=", 0.80),
-    "control/verify_before": (">=", 0.50),
+    "control/continue_before": (">=", 0.80),
+    "control/reverse_before": (">=", 0.40),
     "n_measured": (">=", 6.0),
     # the search has to terminate, or the numbers are budget rather than closure
     "union/exhausted_rate": ("<=", 0.25),
-    # the claim, and the direction that would break it: if the union costs no more than produce alone,
-    # the carrier is a COMPLETE pod for these readers and the partialness claim is wrong
+    # THE CLAIM, and the direction that breaks it. If the union costs no more than produce alone and
+    # continuation does not survive, the carrier is a COMPLETE pod for these readers and the
+    # partialness claim is wrong. Both are pre-registered so either can fail.
     "union/minus_produce": (">=", 0.5),
+    "continue/survives_produce_ablation": (">=", 0.30),
     # and the closure must not be bought by destroying everything else
     "collateral_cost": ("<=", 0.50),
 }
@@ -280,24 +305,39 @@ def main(argv: Optional[List[str]] = None) -> Dict[str, Any]:
     aggd = ledger.aggregate(numeric, keys)
     check = ledger.check_criteria(aggd, {k: v for k, v in CRITERIA.items() if k in aggd})
 
-    tbl = ledger.table(["reader workload", "directions to remove the fact", "search exhausted"],
-                       [["produce (8 phrasings)", f"{m['produce/closure_mean']:.2f}",
-                         f"{m['produce/exhausted_rate']:.2f}"],
-                        ["verify (2 judgements)", f"{m['verify/closure_mean']:.2f}", "-"],
-                        ["both together", f"{m['union/closure_mean']:.2f}",
+    tbl = ledger.table(["reader workload", "held before ablation", "directions to remove the fact",
+                        "search exhausted"],
+                       [["produce (8 phrasings)", f"{m['control/produce_before']:.4f}",
+                         f"{m['produce/closure_mean']:.2f}", f"{m['produce/exhausted_rate']:.2f}"],
+                        ["continue (4 narrative frames)", f"{m['control/continue_before']:.4f}", "-", "-"],
+                        ["reverse (3 backward frames)", f"{m['control/reverse_before']:.4f}", "-", "-"],
+                        ["all three together", "-", f"{m['union/closure_mean']:.2f}",
                          f"{m['union/exhausted_rate']:.2f}"]])
+    rep = ledger.table(["after ablating exactly what silences PRODUCE", "still answers"],
+                       [["continue (the paper's disconfirming reader)",
+                         f"{m['continue/survives_produce_ablation']:.4f}"],
+                        ["reverse", f"{m['reverse/survives_produce_ablation']:.4f}"]])
 
-    record = {"experiment": "E-000036",
+    record = {"experiment": "E-000037",
               "title": "a carrier is a pod for the readers that go through it",
               "trains_nothing": True, "model": MODEL, "layer": args.layer,
               "measures": m, "aggregate": aggd, "criteria": check}
-    md = [f"# E-000036 — {record['title']}", "",
+    md = [f"# E-000037 — {record['title']}", "",
           f"Frozen {MODEL}, layer {args.layer}, {m['n_measured']} facts the model demonstrably holds",
-          f"(produce {m['control/produce_before']:.4f}, verify {m['control/verify_before']:.4f} before",
-          "any ablation). No training. Carriers are the fact-specific component of the residual and the",
+          f"(produce {m['control/produce_before']:.4f}, continue {m['control/continue_before']:.4f},",
+          f"reverse {m['control/reverse_before']:.4f} before any ablation; a judgement reader was tried",
+          "and DROPPED at 0.031 rather than shipped). No training. Carriers are the fact-specific",
+          "component of the residual and the",
           "principal directions of its spread across phrasings; ablation projects the residual out of",
           "their span at every layer from the read site on.", "",
           "## How many directions carry the fact, by who is reading", "", tbl, "",
+          "## The replication number", "", rep, "",
+          "The workspace paper reports that swapping the one J-lens vector for a passage's language",
+          "flips explicit report and all three flexible-inference predicates and leaves CONTINUATION",
+          "and anomaly detection unmoved, while the concept still appears in the lens readouts of all",
+          "four tasks. This is that finding asked of a different model, a different lens and a",
+          "different concept class: ablate exactly the directions that silence the direct question,",
+          "then ask the narrative frames.", "",
           f"Collateral on facts nobody asked to delete: {m['collateral_before']:.4f} before the",
           f"ablation, {m['collateral_after']:.4f} after. A closure without that number can always be",
           "made to look good by removing more.", "",
@@ -312,7 +352,7 @@ def main(argv: Optional[List[str]] = None) -> Dict[str, Any]:
           "predictors is rank of the cross-covariance. What is measured here is the closure over the",
           "model's own generative readout across a DECLARED workload of readers, reported with its",
           "collateral -- which is the form the store-side certificate of E-000032 can compose with.", ""]
-    path = ledger.save("e000036_workspace_closure", record, "\n".join(md))
+    path = ledger.save("e000037_workspace_closure", record, "\n".join(md))
     print(f"\nwritten: {path}")
     print(tbl)
     print(ledger.criteria_table(check))
