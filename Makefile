@@ -13,16 +13,17 @@ THREADS ?= $(shell nproc)
 SEEDS ?= 0 1 2
 RUN = OMP_NUM_THREADS=$(THREADS) SO_THREADS=$(THREADS) $(PY) -m
 
-.PHONY: help test smoke synthetic gpt2 demo compare rescore keychannel untied report clean-results env
+.PHONY: help test smoke synthetic gpt2 demo compare rescore certify keychannel untied report clean-results env
 
 help:
-	@echo "make test        unit tests, ~10 s"
+	@echo "make test        unit tests, ~3 min (the deletion certificate sweeps its whole payload domain)"
 	@echo "make smoke       reduced synthetic chain from scratch, ~35 min on 4 cores, writes *-quick records"
 	@echo "make synthetic   recorded synthetic chain, ~3 h on 4 cores"
 	@echo "make gpt2        frozen-GPT-2 chain, ~20 h on 4 cores, downloads GPT-2 once"
 	@echo "make demo        watch one fact get deleted from a frozen GPT-2, ~3 min (needs a checkpoint)"
 	@echo "make compare     deletion from weights vs from cells, head to head (needs a checkpoint)"
 	@echo "make rescore     read the symlink checkpoints at all twelve templates, no training"
+	@echo "make certify     prove the model cannot depend on a deleted payload, over its whole domain"
 	@echo "make keychannel  the channel SHRED does not close: recover a shredded object from the keys"
 	@echo "make untied      the layer on a model that does not tie its embeddings (downloads Pythia-160m)"
 	@echo "make report      rebuild docs/so-results-2026-09-02.md from so/results/"
@@ -78,6 +79,11 @@ compare:
 # no training at all: re-read the recorded symlink checkpoints at every template, ~7 min per seed
 rescore:
 	$(RUN) so.experiments.e000025_template_rescoring --seeds $(SEEDS)
+
+# no training: prove the computation does not depend on the deleted payload, by sweeping every value
+# it could hold. ~10 min; add --with-gpt2 for the frozen-LM arm.
+certify:
+	$(RUN) so.experiments.e000030_deletion_certificate --seeds $(SEEDS) --with-gpt2
 
 # no training: the channel SHRED does not close, against the recorded E-000010 checkpoints, ~3 min per seed
 keychannel:

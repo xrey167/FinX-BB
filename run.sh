@@ -4,6 +4,7 @@
 #   ./run.sh                 set up, run the unit tests, then the smoke chain (~35 min)
 #   ./run.sh test            set up and run the unit tests only
 #   ./run.sh demo            watch one fact get deleted from a frozen GPT-2 (~3 min, needs a checkpoint)
+#   ./run.sh certify         prove the model cannot depend on a deleted payload  (~10 min)
 #   ./run.sh keychannel      recover a shredded object from the routing keys (~15 min, needs checkpoints)
 #   ./run.sh rescore         read the symlink checkpoints at all twelve phrasings (~20 min)
 #   ./run.sh compare         deleting a fact from weights vs from cells    (~1 h per seed)
@@ -21,7 +22,7 @@ cd "$HERE"
 STAGE="${1:-smoke}"
 [ $# -gt 0 ] && shift || true
 case "$STAGE" in
-    test|smoke|synthetic|gpt2|demo|compare|rescore|keychannel|untied|report|all) ;;
+    test|smoke|synthetic|gpt2|demo|compare|rescore|certify|keychannel|untied|report|all) ;;
     -h|--help|help) sed -n '2,12p' "$0" | sed 's/^# \{0,1\}//'; exit 0 ;;
     *) echo "unknown stage '$STAGE' — try: test smoke synthetic gpt2 demo compare rescore keychannel untied report all"; exit 2 ;;
 esac
@@ -50,6 +51,7 @@ else
         demo)      "$PY" -m so.demo ;;
         compare)   "$PY" -m so.experiments.e000024_weights_vs_cells --seeds 0 1 2 ;;
         rescore)   "$PY" -m so.experiments.e000025_template_rescoring --seeds 0 1 2 ;;
+        certify)   "$PY" -m so.experiments.e000030_deletion_certificate --seeds 0 1 2 --with-gpt2 ;;
         keychannel) "$PY" -m so.experiments.e000028_key_channel --seeds 0 1 2 3 4 ;;
         untied)    "$PY" -m so.experiments.e000027_untied_model --arm output --seeds 0 1 2 \
                      && "$PY" -m so.experiments.e000027_untied_model --arm input --seeds 0 1 2 ;;

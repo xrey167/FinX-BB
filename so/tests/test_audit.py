@@ -138,3 +138,131 @@ def test_a_difference_report_names_the_module_and_the_size():
     res = audit_independence(m, _run(m, a, q), _run(m, b, q))
     d = res.differences[0]
     assert d.max_abs > 0 and d.shape and "differs by" in str(d)
+
+
+# ---------------------------------------------------- the exhaustive certificate over the payload domain
+
+from so.audit import certify_deletion  # noqa: E402
+
+
+def _certify(m, bank, rows, q, **kw):
+    return certify_deletion(m, bank, rows, N_ENT, lambda b: _run(m, b, q)(), outputs_of=LOGITS, **kw)
+
+
+def test_a_masked_row_is_certified_over_every_value_its_payload_could_hold():
+    """REVOKE takes the row out of routing, so the answer cannot move for ANY payload -- all 32 of them."""
+    m = _model()
+    a = _bank(p_shred=0.0, p_revoked=1.0)
+    q = _queries(a)
+    cert = _certify(m, a, [0], q, check_activations=False)
+    assert cert.output_certified, cert.summary()
+    assert cert.n_values == N_ENT
+    assert cert.n_evaluations == N_ENT           # the reference plus every other value
+
+
+def test_the_shred_key_leak_is_caught_by_the_sweep():
+    m = _model()
+    _shut_gate(m)
+    a = _bank(p_shred=1.0)
+    q = _queries(a)
+    cert = _certify(m, a, [0], q, check_activations=False)
+    assert not cert.output_certified, cert.summary()
+    assert cert.violations and cert.violations[0].row == 0
+
+
+def test_gating_the_reverse_key_earns_the_certificate():
+    m = _model(gate_reverse_key=True)
+    _shut_gate(m)
+    a = _bank(p_shred=1.0)
+    q = _queries(a)
+    cert = _certify(m, a, [0, 1, 2], q, check_activations=False, joint_trials=16)
+    assert cert.output_certified, cert.summary()
+    assert cert.joint_certified, cert.summary()
+    assert cert.joint_trials == 16
+
+
+def test_a_live_row_is_never_certified():
+    """The control: if the sweep certifies a readable cell, it is not measuring anything."""
+    m = _model()
+    _shut_gate(m, 20.0)
+    a = _bank(p_shred=0.0)
+    q = _queries(a)
+    cert = _certify(m, a, [0], q, check_activations=False)
+    assert not cert.output_certified
+    assert "NOT CERTIFIED" in cert.summary()
+
+
+def test_the_certificate_reports_the_activation_level_separately():
+    m = _model()
+    a = _bank(p_shred=0.0, p_revoked=1.0)
+    q = _queries(a)
+    cert = _certify(m, a, [0], q, check_activations=True, stop_early=False)
+    assert cert.output_certified                  # nothing a user sees moves
+    assert not cert.activation_certified          # but the deleted object is still embedded
+
+
+# ------------------------------------- the interface certificate: universal over queries, not just swept ones
+
+from so.audit import certify_encoding, check_mediation  # noqa: E402
+
+
+def test_the_interface_certificate_agrees_with_the_output_sweep_on_a_masked_row():
+    m = _model()
+    a = _bank(p_shred=0.0, p_revoked=1.0)
+    q = _queries(a)
+    at_interface = certify_encoding(m, a, [0], N_ENT)
+    at_outputs = _certify(m, a, [0], q, check_activations=False)
+    assert at_outputs.output_certified
+    # the interface is STRICTER: a revoked row is masked downstream but its object is still encoded,
+    # so encode_bank moves even though nothing a user sees does. The certificate says so rather than
+    # rounding the two together.
+    assert not at_interface.output_certified
+    assert at_interface.violations[0].module.startswith("encode_bank[")
+
+
+def test_gating_the_reverse_key_is_still_not_enough_at_the_interface():
+    """v_fwd(o) is computed before the gate multiplies it, so the encoding still moves."""
+    m = _model(gate_reverse_key=True)
+    _shut_gate(m)
+    a = _bank(p_shred=1.0)
+    cert = certify_encoding(m, a, [0], N_ENT)
+    assert not cert.output_certified, cert.summary()
+
+
+def test_removing_the_row_is_certified_at_the_interface():
+    """The only deletion that earns it: the payload is not in the bank to be a function of."""
+    m = _model()
+    a = _bank(p_shred=0.0)
+    keep = torch.ones(a["subject"].shape[0], dtype=torch.bool)
+    keep[:4] = False
+    kept = {k: (v[keep] if torch.is_tensor(v) and v.shape[:1] == keep.shape else v) for k, v in a.items()}
+    cert = certify_encoding(m, kept, [], N_ENT)     # no rows to sweep: nothing depends on what is gone
+    assert cert.output_certified, cert.summary()
+    assert cert.n_evaluations == 1
+
+
+def test_the_mediation_premise_is_checked_not_assumed():
+    m = _model()
+    a = _bank(p_shred=0.0, p_revoked=1.0)
+    q = _queries(a)
+    chk = check_mediation(m, a, [0], N_ENT, lambda b: _run(m, b, q)(), outputs_of=LOGITS, n_probes=4)
+    assert chk.consistent, chk.note
+    assert chk.n_probes == 4
+    # a revoked row moves the encoding and not the logits, which is consistent with mediation
+    assert not chk.encoding_invariant and chk.output_invariant
+
+
+def test_the_mediation_check_can_fail():
+    """A runner that reads the bank behind the encoding's back must be caught, or the check is decoration."""
+    m = _model()
+    a = _bank(p_shred=0.0, p_revoked=1.0)
+    q = _queries(a)
+
+    def sneaky(b):
+        base = _run(m, b, q)()
+        return (base[0] + b["obj"][:1].float().sum(), base[1], base[2])   # an output that sees the payload
+
+    chk = check_mediation(m, a, [0], N_ENT, sneaky, encode=lambda b: {"const": torch.zeros(1)},
+                          outputs_of=LOGITS, n_probes=4)
+    assert not chk.consistent
+    assert "VOID" in chk.note

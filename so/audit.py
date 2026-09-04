@@ -202,3 +202,279 @@ def perturbed_objects(bank: Dict[str, torch.Tensor], rows: np.ndarray, n_entitie
     out["obj"] = out["obj"].clone()
     out["obj"][idx] = (out["obj"][idx] + shift) % n_entities
     return out
+
+
+# --------------------------------------------------------------------------- an exhaustive certificate
+
+@dataclass
+class Violation:
+    row: int
+    value: int
+    module: str
+    max_abs: float
+
+    def __str__(self) -> str:
+        return f"row {self.row} at payload {self.value}: {self.module} differs by {self.max_abs:.3e}"
+
+
+@dataclass
+class Certificate:
+    """What a completed sweep licenses, and what it does not.
+
+    ``output_certified`` states: for every deleted row, and for EVERY value that row's payload field
+    could hold, the model returns bit-identical tensors on the query set swept. Over a finite payload
+    domain that is not a sample -- it is every case -- so within the swept query set no function of the
+    model's outputs can depend on the deleted payload. That is the strongest form the black-box claim
+    can take, and it is stronger than any number of failed attacks.
+
+    ``activation_certified`` says the same of every tensor every submodule emitted, which is the claim
+    against an adversary who reads activations.
+
+    Three limits, stated because a certificate that hides them is worse than none:
+      * It is exhaustive over the payload domain and over whatever query set the caller sweeps. Make
+        the query set exhaustive too and the statement becomes exhaustive in both; a sampled query set
+        gives an exhaustive statement about a sampled set of questions.
+      * Rows are swept ONE AT A TIME with the others held at their stored values, so it certifies each
+        deletion marginally. Joint dependence across several deleted rows is covered only by the
+        ``joint_trials`` random assignments, which ARE a sample. ``joint_certified`` says so honestly.
+      * It certifies the model, not the system. The store still holds the payload after SHRED or
+        REVOKE, and anyone who can read the store does not need the model.
+    """
+
+    output_certified: bool
+    activation_certified: bool
+    joint_certified: bool
+    n_rows: int
+    n_values: int
+    n_evaluations: int
+    joint_trials: int
+    violations: List[Violation] = field(default_factory=list)
+
+    def summary(self) -> str:
+        head = (f"{self.n_evaluations} evaluations: {self.n_rows} rows x {self.n_values} payload values"
+                f" + {self.joint_trials} joint trials")
+        if self.output_certified and self.activation_certified:
+            return f"CERTIFIED at both levels ({head})"
+        if self.output_certified:
+            return (f"outputs certified, activations NOT ({len(self.violations)} violations, "
+                    f"first {self.violations[0]}) ({head})")
+        return f"NOT CERTIFIED ({len(self.violations)} violations, first {self.violations[0]}) ({head})"
+
+
+def _fingerprint(x: Any) -> List[Tuple[str, torch.Tensor]]:
+    return [(k, v.detach().clone()) for k, v in _flatten(x) if torch.is_tensor(v)]
+
+
+def _compare(ref: List[Tuple[str, torch.Tensor]], got: List[Tuple[str, torch.Tensor]],
+             atol: float) -> List[Tuple[str, float]]:
+    out: List[Tuple[str, float]] = []
+    gd = dict(got)
+    for name, a in ref:
+        b = gd.get(name)
+        if b is None or a.shape != b.shape:
+            out.append((name, float("inf")))
+            continue
+        if not a.is_floating_point():
+            if not torch.equal(a, b):
+                out.append((name, float("inf")))
+            continue
+        d = float((a - b).abs().max().item()) if a.numel() else 0.0
+        if d > atol:
+            out.append((name, d))
+    return out
+
+
+def certify_deletion(model: nn.Module, bank: Dict[str, torch.Tensor], deleted_rows: Sequence[int],
+                     n_values: int, run: Callable[[Dict[str, torch.Tensor]], Any],
+                     payload_field: str = "obj", outputs_of: Optional[Callable[[Any], Any]] = None,
+                     joint_trials: int = 64, seed: int = 0, atol: float = 0.0,
+                     skip: Sequence[str] = (), check_activations: bool = True,
+                     stop_early: bool = True) -> Certificate:
+    """Sweep every value the deleted payload could hold and check the computation does not move.
+
+    ``run(bank) -> outputs`` must hold the QUESTIONS fixed and vary only the bank, or the sweep will
+    report a difference it created itself. ``n_values`` is the size of the payload domain -- for this
+    repository, the entity count -- and the sweep is over ``range(n_values)``, which is why the result
+    is a statement about every case rather than about a sample.
+    """
+    rows = [int(r) for r in deleted_rows]
+    rng = np.random.default_rng(seed)
+    base = {k: (v.clone() if torch.is_tensor(v) else v) for k, v in bank.items()}
+
+    def evaluate(b: Dict[str, torch.Tensor]) -> Tuple[List, List]:
+        if check_activations:
+            with _Recorder(model, skip) as rec:
+                out = run(b)
+                acts = sorted(rec.captured.items())
+        else:
+            out = run(b)
+            acts = []
+        picked = outputs_of(out) if outputs_of is not None else out
+        return _fingerprint(picked), [(k, v) for k, v in acts]
+
+    ref_out, ref_act = evaluate(base)
+    violations: List[Violation] = []
+    out_ok = act_ok = True
+    n_eval = 1
+
+    for row in rows:
+        original = int(base[payload_field][row].item())
+        for value in range(n_values):
+            if value == original:
+                continue
+            probe = {k: (v.clone() if torch.is_tensor(v) else v) for k, v in base.items()}
+            probe[payload_field][row] = value
+            got_out, got_act = evaluate(probe)
+            n_eval += 1
+            for name, d in _compare(ref_out, got_out, atol):
+                out_ok = False
+                violations.append(Violation(row, value, f"<returned>{name}", d))
+            if check_activations:
+                for name, d in _compare(ref_act, got_act, atol):
+                    act_ok = False
+                    violations.append(Violation(row, value, name.split("|")[0], d))
+            if violations and stop_early:
+                # the sweep has already answered the question; finishing it would only enumerate
+                return Certificate(False, False, False, len(rows), n_values, n_eval, 0, violations)
+
+    joint_ok = True
+    if len(rows) > 1 and joint_trials > 0:
+        for _ in range(joint_trials):
+            probe = {k: (v.clone() if torch.is_tensor(v) else v) for k, v in base.items()}
+            for row in rows:
+                probe[payload_field][row] = int(rng.integers(n_values))
+            got_out, got_act = evaluate(probe)
+            n_eval += 1
+            diffs = _compare(ref_out, got_out, atol)
+            if check_activations:
+                diffs += _compare(ref_act, got_act, atol)
+            if diffs:
+                joint_ok = False
+                violations.append(Violation(-1, -1, diffs[0][0].split("|")[0], diffs[0][1]))
+                if stop_early:
+                    break
+    elif len(rows) <= 1:
+        joint_ok = out_ok and act_ok           # nothing to interact with
+
+    return Certificate(out_ok, act_ok and check_activations, joint_ok, len(rows), n_values, n_eval,
+                       joint_trials if len(rows) > 1 else 0, violations)
+
+
+# ------------------------------------------------- the certificate at the interface the bank enters through
+
+@dataclass
+class MediationCheck:
+    """Evidence for the premise the interface certificate rests on, or against it."""
+    consistent: bool
+    n_probes: int
+    encoding_invariant: bool
+    output_invariant: bool
+    note: str = ""
+
+
+def certify_encoding(model: nn.Module, bank: Dict[str, torch.Tensor], deleted_rows: Sequence[int],
+                     n_values: int, encode: Optional[Callable[[Dict[str, torch.Tensor]], Any]] = None,
+                     payload_field: str = "obj", joint_trials: int = 64, seed: int = 0,
+                     atol: float = 0.0, stop_early: bool = True) -> Certificate:
+    """Certify at the interface the bank enters the computation through, not at the outputs.
+
+    Both models here read the store in exactly one place. ``MutableKnowledgeTransformer.forward``
+    computes ``enc = self.encode_bank(bank)`` and from then on touches only ``enc["k_f"]``,
+    ``enc["v_f"]``, ``enc["k_r"]``, ``enc["v_r"]`` and ``enc["active"]``, the query tensors and its own
+    parameters; ``KnowledgeAdapterLM.forward`` does the same with ``enc["keys"]``, ``enc["values"]``
+    and ``enc["active"]``. The forward is therefore a deterministic function of (encoding, query).
+
+    That buys something the output sweep cannot. If the encoding is bit-identical for every value the
+    deleted payload could take, then every downstream quantity is identical **for every possible
+    query** -- multi-hop, reverse, unseen phrasings, questions nobody has written yet -- and not merely
+    for the queries somebody thought to sweep. The cost is one cheap encoding per payload value
+    instead of a full forward over a query set.
+
+    The premise is a claim about the model, so it is checked rather than assumed: pass the result to
+    ``check_mediation`` with a runner, which falsifies it if an output ever moves while the encoding
+    does not.
+    """
+    enc_fn = encode if encode is not None else (lambda b: model.encode_bank(b))
+    rows = [int(r) for r in deleted_rows]
+    rng = np.random.default_rng(seed)
+    base = {k: (v.clone() if torch.is_tensor(v) else v) for k, v in bank.items()}
+
+    with torch.no_grad():
+        ref = _fingerprint(enc_fn(base))
+    violations: List[Violation] = []
+    ok = True
+    n_eval = 1
+    for row in rows:
+        original = int(base[payload_field][row].item())
+        for value in range(n_values):
+            if value == original:
+                continue
+            probe = {k: (v.clone() if torch.is_tensor(v) else v) for k, v in base.items()}
+            probe[payload_field][row] = value
+            with torch.no_grad():
+                got = _fingerprint(enc_fn(probe))
+            n_eval += 1
+            for name, d in _compare(ref, got, atol):
+                ok = False
+                violations.append(Violation(row, value, f"encode_bank[{name}]", d))
+            if violations and stop_early:
+                return Certificate(False, False, False, len(rows), n_values, n_eval, 0, violations)
+
+    joint_ok = ok
+    if len(rows) > 1 and joint_trials > 0 and ok:
+        for _ in range(joint_trials):
+            probe = {k: (v.clone() if torch.is_tensor(v) else v) for k, v in base.items()}
+            for row in rows:
+                probe[payload_field][row] = int(rng.integers(n_values))
+            with torch.no_grad():
+                got = _fingerprint(enc_fn(probe))
+            n_eval += 1
+            diffs = _compare(ref, got, atol)
+            if diffs:
+                joint_ok = False
+                violations.append(Violation(-1, -1, f"encode_bank[{diffs[0][0]}]", diffs[0][1]))
+                if stop_early:
+                    break
+    return Certificate(ok, ok, joint_ok, len(rows), n_values, n_eval,
+                       joint_trials if len(rows) > 1 else 0, violations)
+
+
+def check_mediation(model: nn.Module, bank: Dict[str, torch.Tensor], deleted_rows: Sequence[int],
+                    n_values: int, run: Callable[[Dict[str, torch.Tensor]], Any],
+                    encode: Optional[Callable[[Dict[str, torch.Tensor]], Any]] = None,
+                    payload_field: str = "obj", n_probes: int = 8, seed: int = 0,
+                    atol: float = 0.0, outputs_of: Optional[Callable[[Any], Any]] = None) -> MediationCheck:
+    """Try to falsify the premise: an output that moves while the encoding does not.
+
+    ``certify_encoding`` is sound only if the bank reaches the computation through the encoding alone.
+    That is read off the source, and reading source is how the two defects of E-000028 and E-000029 got
+    into the record in the first place. So it is also measured: run the full forward at ``n_probes``
+    sampled payload values and compare both levels. Encoding invariant and outputs invariant is
+    consistent; encoding invariant and an output moving falsifies the premise and voids the
+    certificate. The check samples -- it can refute the premise, not establish it.
+    """
+    enc_fn = encode if encode is not None else (lambda b: model.encode_bank(b))
+    rows = [int(r) for r in deleted_rows]
+    rng = np.random.default_rng(seed + 1)
+    base = {k: (v.clone() if torch.is_tensor(v) else v) for k, v in bank.items()}
+    with torch.no_grad():
+        ref_enc = _fingerprint(enc_fn(base))
+        ref_out = _fingerprint(outputs_of(run(base)) if outputs_of else run(base))
+
+    enc_moved = out_moved = False
+    for _ in range(n_probes):
+        probe = {k: (v.clone() if torch.is_tensor(v) else v) for k, v in base.items()}
+        for row in rows:
+            probe[payload_field][row] = int(rng.integers(n_values))
+        with torch.no_grad():
+            enc_d = _compare(ref_enc, _fingerprint(enc_fn(probe)), atol)
+            out_d = _compare(ref_out, _fingerprint(outputs_of(run(probe)) if outputs_of else run(probe)), atol)
+        enc_moved = enc_moved or bool(enc_d)
+        out_moved = out_moved or bool(out_d)
+
+    consistent = not (out_moved and not enc_moved)
+    note = ("an output moved while the encoding did not: the bank reaches the computation somewhere else "
+            "and the interface certificate is VOID for this model"
+            if not consistent else
+            "no probe found an output moving while the encoding held still")
+    return MediationCheck(consistent, n_probes, not enc_moved, not out_moved, note)
