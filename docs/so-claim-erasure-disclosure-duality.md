@@ -155,6 +155,16 @@ Privacy without tying is MemSinks. Tying without privacy is what this repository
 deletion primitive for a fact needs both**, and the pod is what supplies the tying: many access paths,
 one object.
 
+**The three ingredients are each owned, and none of them is the fact.** *Tying* an access path to a
+carrier is Backpack LMs (Hewitt, Thickstun, Manning & Potts, ACL 2023, arXiv:2305.16765), whose sense
+vectors are built so interventions are predictable — and whose strongest published carrier removal,
+dropping sense 10 from profession words, moves a gender-bias ratio from **4.34 to 2.88** against an
+unbiased 1.0, **with nothing measured on anything it did not target**. *Allocating* a private unit so a
+later deletion is one removal is MemSinks and MUNKEY. *Privacy* between concept directions is Concept
+Whitening. What none of them does is allocate a carrier for a **fact** — a thing reachable through many
+phrasings and many aliases, each of which is a different sequence with a different identifier and so a
+different sink — and none reports what removing a carrier costs the facts it did not target.
+
 **And the metric is the part nobody reports.** Every published deletion cost is wall-clock, percentage
 of parameters changed, or number of deletions tolerated. The cost that matters is a **pair**:
 
