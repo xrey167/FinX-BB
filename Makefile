@@ -2,7 +2,7 @@
 # with no GPU; the per-model figures come from the 'train_seconds' field of the
 # recorded results, so they are what this code actually took, not an estimate.
 #
-#   make test | smoke | synthetic | gpt2 | demo | compare | rescore | report | clean-results
+#   make test | smoke | synthetic | gpt2 | demo | compare | rescore | keychannel | untied | report
 #
 # PY       which interpreter to use          (default: python3, or .venv/bin/python if present)
 # THREADS  torch threads per experiment      (default: all cores)
@@ -13,7 +13,7 @@ THREADS ?= $(shell nproc)
 SEEDS ?= 0 1 2
 RUN = OMP_NUM_THREADS=$(THREADS) SO_THREADS=$(THREADS) $(PY) -m
 
-.PHONY: help test smoke synthetic gpt2 demo compare rescore report clean-results env
+.PHONY: help test smoke synthetic gpt2 demo compare rescore keychannel untied report clean-results env
 
 help:
 	@echo "make test        unit tests, ~10 s"
@@ -23,6 +23,8 @@ help:
 	@echo "make demo        watch one fact get deleted from a frozen GPT-2, ~3 min (needs a checkpoint)"
 	@echo "make compare     deletion from weights vs from cells, head to head (needs a checkpoint)"
 	@echo "make rescore     read the symlink checkpoints at all twelve templates, no training"
+	@echo "make keychannel  the channel SHRED does not close: recover a shredded object from the keys"
+	@echo "make untied      the layer on a model that does not tie its embeddings (downloads Pythia-160m)"
 	@echo "make report      rebuild docs/so-results-2026-09-02.md from so/results/"
 	@echo "make env         print what will be used"
 	@echo ""
@@ -60,6 +62,7 @@ gpt2:
 	$(RUN) so.experiments.e000017_paraphrase_gap --phase diagnose --seeds $(SEEDS)
 	$(RUN) so.experiments.e000020_symlink_gpt2 --seeds $(SEEDS)
 	$(RUN) so.experiments.e000025_template_rescoring --seeds $(SEEDS)
+	$(RUN) so.experiments.e000026_lifecycle_at_a_readable_template --seeds $(SEEDS)
 	$(RUN) so.experiments.e000024_weights_vs_cells --seeds $(SEEDS)
 	$(MAKE) report
 
@@ -75,6 +78,15 @@ compare:
 # no training at all: re-read the recorded symlink checkpoints at every template, ~7 min per seed
 rescore:
 	$(RUN) so.experiments.e000025_template_rescoring --seeds $(SEEDS)
+
+# no training: the channel SHRED does not close, against the recorded E-000010 checkpoints, ~3 min per seed
+keychannel:
+	$(RUN) so.experiments.e000028_key_channel --seeds 0 1 2 3 4
+
+# the layer on a model that does NOT tie its embeddings; downloads Pythia-160m once, ~40 min per seed per arm
+untied:
+	$(RUN) so.experiments.e000027_untied_model --arm output --seeds $(SEEDS)
+	$(RUN) so.experiments.e000027_untied_model --arm input  --seeds $(SEEDS)
 
 report:
 	$(PY) -m so.report
