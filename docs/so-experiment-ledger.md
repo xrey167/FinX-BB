@@ -2394,10 +2394,14 @@ counts what the model is asked to do inside the certification window; the per-fa
 with the control inside it; `check_mediation` on this configuration is a pre-registered control in
 all three arms (a VOID voids every certificate below it); `certify_fact` treats every supplied check
 as a conjunct, with two tests; the chain counterexample is a test; the report names the reader. The
-re-run's counted table is in `so/results/e000032_deletion_closure.md`; on the two-group smoke run the
-window held 0 forwards and 1 standalone encode per certification, the control 1 forward, and the
-mediation check moved both the encoding and the outputs on every arm — a real test, not a vacuous
-pass.
+re-run's counted table is in `so/results/e000032_deletion_closure.md`. Three seeds, 25 groups, all
+29 registered criteria PASS including the three new mediation controls, and the counts are what the
+code predicts: **0 forward passes and 1 standalone `encode_bank` per certification, 1 forward per
+fact for the reachability control**, in every arm and every seed; the mediation check moved both the
+encoding and the outputs on every arm, so it was a real test and not a vacuous pass. Per fact, all
+in: 0.58 s canonical, 0.51 s mixed, 0.51 s duplicated on an idle machine (the recorded 1.45–1.80 s
+was measured while E-000044 trained beside it). The window is not model-free; the store-side parts
+of it are.
 
 **What the sweep reports as owned by others** (recorded as reported; the citations were read by the
 sweep's agents, not re-read for this entry). The closure object is query *resilience* — the minimum

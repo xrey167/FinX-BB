@@ -1,8 +1,12 @@
 # E-000032 — the deletion closure of a store, and the certificate that composes with it
 
 Seeds [0, 1, 2], 25 alias groups per seed, the recorded E-000015 one-slot
-checkpoints, no training. Both arms are built from the SAME world with the same ground truth,
-so they present an identical interface: every key resolves to the same object in both.
+checkpoints, no training. The reader is the E-000015 `MutableKnowledgeTransformer` -- trained
+from scratch on a 256-entity world with an explicit UNKNOWN head, worlds resampled every
+training step so no evaluation fact is in its weights -- and NOT the frozen GPT-2 adapter; an
+earlier version of this report said GPT-2 and was wrong (ledger §31.33). Both arms are built
+from the SAME world with the same ground truth, so they present an identical interface: every
+key resolves to the same object in both.
 
 ## The gap a record-level certificate cannot see
 
@@ -24,21 +28,36 @@ covers today -- and asks whether that licenses a fact-level statement. `still re
 the model's own answer afterwards, so the verdict is confirmed by behaviour and not only by
 bookkeeping. `predicted from the closure` is `(closure - 1) / keys_per_group`, computed from
 the store before the model is run at all: removing only the object leaves exactly the copies
-that are separate records. A store-side statistic is thereby put at risk against a neural
-measurement rather than reported beside it.
+that are separate records.
 
-## What a certified fact deletion costs
+What that agreement IS, stated after a review rather than before it (ledger §31.33): on the
+star topologies these arms are built from, every non-target closure member backs exactly one
+key, so the formula is that invariant restated and the 0.0000 measures the reader's FIDELITY
+to the store's own resolver, which E-000015 had already recorded at 1.0000 on these
+checkpoints. It is not a forecast. On a chain -- an alias pointing at a copy rather than at
+the object -- the formula is wrong by a full grid step against the mechanical resolver with no
+model in the loop (`test_closure_minus_one_over_keys_is_star_arithmetic_and_not_a_store_law`);
+the quantity that IS a function of the store is the post-deletion resolver count, and
+`certify_fact` already checks that one through `store_after`.
 
-Once the instrument is known to work -- which the reachability control establishes, and which
-is a property of the method rather than of each deletion -- the guarantee for one more fact is
-a store-side search plus an exhaustive store-side sweep, with **no model evaluation anywhere
-inside it**. The model-side half is proved once and inherited.
+## What a certified fact deletion costs, counted
 
-| store | closure search (s) | certified deletion (s) | model evaluations per deletion | instrument control, once (s) |
-|---|---|---|---|---|
-| canonical | 0.0783 | 1.8035 | 0 | 4.50 |
-| mixed | 0.0917 | 1.7041 | 0 | 4.27 |
-| duplicated | 0.0859 | 1.4509 | 0 | 3.71 |
+The model calls inside the certification window are COUNTED by wrapping `forward` and
+`encode_bank` -- the first version of this report wrote `0` as a literal, while
+`certify_encoding`'s reference fingerprint runs `encode_bank` once even over an empty row set.
+The reachability control is the positive control for each fact's payload and runs once PER
+FACT, so it belongs inside the per-fact cost; the first version timed it apart and called it
+once per instrument. `all in` is search + certification + control.
+
+| store | closure search (s) | certification (s) | forwards inside | standalone encodes inside | control (s) | control forwards | per fact, all in (s) |
+|---|---|---|---|---|---|---|---|
+| canonical | 0.0273 | 0.4803 | 0.0 | 1.0 | 0.10 | 1.0 | 0.58 |
+| mixed | 0.0331 | 0.4679 | 0.0 | 1.0 | 0.04 | 1.0 | 0.51 |
+| duplicated | 0.0390 | 0.4670 | 0.0 | 1.0 | 0.05 | 1.0 | 0.51 |
+
+The store-side parts -- the closure search and the exhaustive store counterfactual -- run
+no forward pass; the certification window as a whole is not model-free, and the number in
+the table is what it costs.
 
 E-000024 is the comparison: deleting 50 facts from a LoRA took 129 s by gradient ascent and
 335 s by relabelling, changed 2,359,296 parameters, moved perplexity on ordinary prose from
@@ -58,6 +77,9 @@ domain to sweep and no interface the data passes through.
 | canonical/fact_closure_optimal_rate | >= 1.0 | 1.0000 | PASS |
 | duplicated/fact_closure_optimal_rate | >= 1.0 | 1.0000 | PASS |
 | canonical/control_reachable_before | >= 1.0 | 1.0000 | PASS |
+| canonical/mediation_consistent | >= 1.0 | 1.0000 | PASS |
+| mixed/mediation_consistent | >= 1.0 | 1.0000 | PASS |
+| duplicated/mediation_consistent | >= 1.0 | 1.0000 | PASS |
 | canonical/one_record_retained_in_store | >= 1.0 | 1.0000 | PASS |
 | canonical/one_record_payload_store_absent | >= 1.0 | 1.0000 | PASS |
 | duplicated/one_record_payload_store_absent | >= 1.0 | 1.0000 | PASS |
@@ -82,6 +104,6 @@ The gap between the two arms is Codd's MODIFICATION anomaly applied to a delete 
 DELETION anomaly is the opposite failure, unintended loss -- and normalization is its 1971
 remedy; this experiment does not claim otherwise. What it adds is that the anomaly decides whether a
 DELETION CERTIFICATE for a neural memory means anything, that the store-side half of the
-guarantee is computable without the model, and that in a neural memory the normalization is
+guarantee (closure search and store counterfactual) is computable without the model, and that in a neural memory the normalization is
 not free -- E-000025 prices it at 0.0954 for sharing and 0.0688 for link training on a frozen
 GPT-2, worst of three seeds across all twelve phrasings.
