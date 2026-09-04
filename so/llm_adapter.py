@@ -251,6 +251,13 @@ class KnowledgeAdapterLM(nn.Module):
             ar = torch.arange(B, device=h.device)
             hl = h[ar, ctx["last_idx"]]                                    # (B, d)
             q = self.q_proj[str(layer)](self.q_ln[str(layer)](hl))
+            # E-000037: the ROUTING QUERY is recorded (with its graph, not detached). It is the only
+            # tensor in the read path that depends on the phrasing: keys and values are built from the
+            # bank alone (encode_bank), o_proj and inject_gain are shared, and everything after the
+            # injection is the frozen core. Unlike the routing distribution p below, q does not depend
+            # on which cells happen to be in this step's bank, so an invariance trained on it holds for
+            # every bank.
+            ctx.setdefault("query", []).append(q)
             keys = torch.cat([ctx["keys"], self.null_key[read_index][None]])
             values = torch.cat([ctx["values"], self.null_value[read_index][None]])
             allowed = torch.cat([ctx["allowed"], torch.ones(1, dtype=torch.bool, device=h.device)])
@@ -334,5 +341,9 @@ class KnowledgeAdapterLM(nn.Module):
         hidden = out.hidden_states[-1][ar, last_idx]
         cand = full[:, self.candidate_ids]
         routing = torch.stack(self._ctx["routing"], dim=1) if self._ctx is not None and self._ctx["routing"] else None
+        # (B, len(read_layers), d_key), read-layer order. Kept as an attribute rather than a fifth
+        # return value so that every existing call site keeps its four-tuple.
+        self.last_query = (torch.stack(self._ctx["query"], dim=1)
+                           if self._ctx is not None and self._ctx.get("query") else None)
         self._ctx = None
         return cand, full, routing, hidden
