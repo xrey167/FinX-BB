@@ -251,6 +251,36 @@ class MVCCStore:
         self._record("shred", kid=kid)
         cell.version_obj(cell.active_version).marker = self.new_invalid_marker()
 
+    def blank(self, kid: int) -> None:
+        """Clear a LINK's target: the row stays live and addressable, and points at nothing.
+
+        THE OPERATION THE LAW ASKS FOR. E-000041 measured that a fact on k access paths costs U =
+        1 + copies to make unreachable and T = k to leave nothing pointing at what was removed;
+        E-000046 then found that the T-side cost is the number of KEY-BEARING references, and that it
+        can be paid in three currencies -- deletions, repairs, or an interface that declines to show
+        the reference. The third is not payment: with the target hidden rather than cleared, the raw
+        store still names the removed key in 0.8000 of cells.
+
+        ``blank`` is the second currency, as a primitive. ``evict`` also closes the channel, but by
+        removing the alias: every key that reached the fact stops being addressable at all, which is a
+        visible change of a different kind and destroys rows a caller may still need. Blanking leaves
+        the row live, so the key still resolves -- to UNKNOWN, which is what a caller asking for a
+        deleted fact should get -- while ``bank()`` exports the row's own key in place of the target's
+        and the dangling pointer is gone.
+
+        E-000035 measured that closing this channel at the key is what removes the disclosure, at
+        1.0000. This is that closure made into an operation rather than an analysis.
+        """
+        cell = self._alive(kid)
+        v = cell.version_obj(cell.active_version)
+        if v.kind is not CellKind.LINK:
+            raise ValueError(
+                f"blank is for LINK cells and cell {kid} is a {v.kind.value}. Blanking a FACT would "
+                "clear a target it does not have, and would quietly do nothing -- which is how an "
+                "operation that cannot fail gets into a certificate.")
+        self._record("blank", kid=kid)
+        v.target = None
+
     def resign(self, kid: int) -> None:
         """Give the active version a fresh valid marker (undo of shred, for restore tests)."""
         cell = self._alive(kid)

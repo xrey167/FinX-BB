@@ -2165,6 +2165,38 @@ declines to show the reference** (T = U). The third is not payment. It is access
 That is narrower than "canonicalisation costs T = k" and more useful, because it names the knob a
 system designer actually holds.
 
+### 31.30 BLANK: the law made into an operation (2026-09-04)
+
+§31.29 established that `T > U` is a property of **key-bearing references** — the gap is the number of
+surviving rows that literally store the removed key — and that the cost can be paid in three
+currencies: deletions, repairs, or an interface that declines to show the reference. The third is not
+payment. This turns the second into a primitive.
+
+**`MVCCStore.blank(kid)`** clears a LINK's target. The row stays live and addressable and points at
+nothing, so `bank()` exports the row's own key in place of the target's and the dangling pointer is
+gone. E-000035 measured that closing the channel *at the key* removes the disclosure at 1.0000; this
+is that closure as an operation rather than an analysis. It refuses a FACT cell loudly — an operation
+that quietly does nothing on the wrong input is how a certificate goes hollow.
+
+E-000046 re-run with the real primitive in place of the eviction stand-in it used first:
+
+| semantics | T | T = k | exported view clean | raw store discloses | **rows left live** |
+|---|---|---|---|---|---|
+| exporting (evict) | 6.00 | 1.0000 | 1.0000 | 0.0000 | **40.0** |
+| compacting (blank) | 6.00 | 1.0000 | 1.0000 | 0.0000 | **42.5** |
+| opaque | 3.50 | 0.2000 | 1.0000 | **0.8000** | 42.5 |
+
+Six pre-registered criteria, all PASS. **Eviction and blanking reach the same tracelessness at the
+same price `k`; eviction leaves 40.0 rows and blanking 42.5.** The difference is exactly the alias
+rows blanking preserves — every access key still resolves, to UNKNOWN, instead of ceasing to be
+addressable. Same guarantee, strictly less destruction, and the caller keeps the rows.
+
+**Two semantics the tests pin down rather than assume.** Blanking an EVICTED row is *allowed*, because
+`_alive` deliberately admits EVICTED so RESTORE and ROLLBACK can reach it — and it is not a no-op: it
+clears the target the row would come back with, which the test checks by restoring. And a test asserted
+a refusal that the store does not owe; the assertion was wrong, not the store, and it was corrected to
+the documented behaviour rather than the behaviour being changed to fit it.
+
 ### 31.8 Boundary
 
 CPU only, no GPU, no LLM above 124M parameters, synthetic worlds, single-token entities, two surface forms per relation, one session. Nothing here shows unlearning of facts already encoded in pretrained weights. Evidence levels recorded: E3–E4 for the synthetic system (F4 for SHRED with the verified gate, E-000010 — **on the value channel only**: E-000028 recovers the shredded object at 1.0000 through the ungated reverse key, where REVOKE and DELETE are at chance, so F4 for SHRED is a claim about answers, logits, hidden states and probes and not about routing); E5 as substrate for the frozen-GPT-2 experiment, with reading, composition, update and the copy bound supported and behavioural deletion not yet supported at the pre-registered thresholds.

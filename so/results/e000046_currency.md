@@ -4,11 +4,11 @@ E-000041 measured T = k over 105 of 105 cells and carried one caveat: that it he
 store which exports a link's target key and goes on exporting it after the target is gone.
 This is that caveat, tested. Mechanical, no model.
 
-| semantics | T | T = k | T = U | exported view clean | **raw store still discloses** |
-|---|---|---|---|---|---|
-| exporting | 6.00 | 1.0000 | 0.2000 | 1.0000 | 0.0000 |
-| compacting | 6.00 | 1.0000 | 0.2000 | 1.0000 | 0.0000 |
-| opaque | 3.50 | 0.2000 | 1.0000 | 1.0000 | 0.8000 |
+| semantics | T | T = k | T = U | exported view clean | **raw store still discloses** | rows left live |
+|---|---|---|---|---|---|---|
+| exporting | 6.00 | 1.0000 | 0.2000 | 1.0000 | 0.0000 | 40.0 |
+| compacting | 6.00 | 1.0000 | 0.2000 | 1.0000 | 0.0000 | 42.5 |
+| opaque | 3.50 | 0.2000 | 1.0000 | 1.0000 | 0.8000 | 42.5 |
 
 The last column is the experiment. Under OPAQUE the exported view is clean by construction,
 so an experiment that stopped at the fourth column would have measured its own definition.
@@ -26,5 +26,6 @@ T = k under EXPORTING and COMPACTING with T = U under OPAQUE, and the raw store 
 | exporting/T_equals_k | >= 1.0 | 1.0000 | PASS |
 | exporting/unreachable | >= 1.0 | 1.0000 | PASS |
 | compacting/T_equals_k | >= 1.0 | 1.0000 | PASS |
+| compacting/raw_discloses | <= 0.0 | 0.0000 | PASS |
 | opaque/exported_clean | >= 1.0 | 1.0000 | PASS |
 | opaque/raw_discloses | >= 0.5 | 0.8000 | PASS |

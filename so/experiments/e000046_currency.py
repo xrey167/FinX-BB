@@ -90,9 +90,8 @@ def cost(st: MVCCStore, keys, obj: int, mode: str) -> Dict[str, Any]:
             if not orph:
                 break
             for kid in orph:
-                st.evict(kid)          # this store has no in-place rewrite; an eviction plus a
-                repaired.append(kid)   # cleared re-insert is the same operation count, so count it
-            break
+                st.blank(kid)
+                repaired.append(kid)
     # OPAQUE: nothing to do -- the exported view never showed a target, so it is clean already
 
     b = st.bank()
@@ -131,6 +130,7 @@ def run(kmax: int, seeds: Sequence[int], verbose: bool = True) -> Dict[str, Any]
     m: Dict[str, Any] = {"n_cells": len(rows), "seconds": time.time() - t0}
     for mode in ("exporting", "compacting", "opaque"):
         sel = [r for r in rows if r["mode"] == mode]
+        m[f"{mode}/rows_kept"] = float(np.mean([r["n_live"] for r in sel]))
         m[f"{mode}/T_mean"] = float(np.mean([r["T"] for r in sel]))
         m[f"{mode}/T_equals_k"] = float(np.mean([r["T_equals_k"] for r in sel]))
         m[f"{mode}/T_equals_U"] = float(np.mean([r["T_equals_U"] for r in sel]))
@@ -143,7 +143,7 @@ def run(kmax: int, seeds: Sequence[int], verbose: bool = True) -> Dict[str, Any]
 
 KEYS = [f"{m}/{q}" for m in ("exporting", "compacting", "opaque")
         for q in ("T_mean", "T_equals_k", "T_equals_U", "unreachable", "exported_clean",
-                  "raw_discloses")] + ["n_cells"]
+                  "raw_discloses", "rows_kept")] + ["n_cells"]
 
 CRITERIA = {
     # E-000041 reproduced: under the semantics it was measured on, T = k everywhere
@@ -151,6 +151,8 @@ CRITERIA = {
     "exporting/unreachable": (">=", 1.0),
     # the same k, paid as repairs instead of deletions
     "compacting/T_equals_k": (">=", 1.0),
+    # and the point of paying in repairs rather than deletions: the aliases are still there
+    "compacting/raw_discloses": ("<=", 0.0),
     # THE CONTROL THAT DECIDES WHAT OPAQUE MEANS. If the exported view is clean while the RAW store
     # still names the removed key, then opacity moved the disclosure behind an interface and removed
     # nothing -- and "T = U under OPAQUE" is a statement about who is looking. If raw_discloses comes
@@ -186,14 +188,14 @@ def main(argv: Optional[List[str]] = None) -> Dict[str, Any]:
     rows = [[mode,
              f"{m[mode + '/T_mean']:.2f}", f"{m[mode + '/T_equals_k']:.4f}",
              f"{m[mode + '/T_equals_U']:.4f}", f"{m[mode + '/exported_clean']:.4f}",
-             f"{m[mode + '/raw_discloses']:.4f}"]
+             f"{m[mode + '/raw_discloses']:.4f}", f"{m[mode + '/rows_kept']:.1f}"]
             for mode in ("exporting", "compacting", "opaque")]
     md = [f"# E-000046 — {record['title']}", "",
           "E-000041 measured T = k over 105 of 105 cells and carried one caveat: that it held for a",
           "store which exports a link's target key and goes on exporting it after the target is gone.",
           "This is that caveat, tested. Mechanical, no model.", "",
           ledger.table(["semantics", "T", "T = k", "T = U", "exported view clean",
-                        "**raw store still discloses**"], rows), "",
+                        "**raw store still discloses**", "rows left live"], rows), "",
           "The last column is the experiment. Under OPAQUE the exported view is clean by construction,",
           "so an experiment that stopped at the fourth column would have measured its own definition.",
           "What decides whether opacity is erasure or access control is whether the removed key is",
