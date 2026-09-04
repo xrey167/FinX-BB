@@ -65,8 +65,12 @@ from so.world import Query, UNKNOWN, World, fill_random
 N_CELLS = 400
 N_TARGETS = 50
 N_BYSTANDERS = 50
-LORA_RANK = 8
-LORA_STEPS = 1200
+# Rank 16 over the four projections of all twelve blocks is 2,359,296 trainable parameters against the
+# SO adapter's 2,370,692 -- a 1.00x match, so neither arm is given more capacity than the other. Rank 8
+# was half the adapter's budget and could not learn the world at all: after 400 steps it was still
+# emitting one entity for every question.
+LORA_RANK = 16
+LORA_STEPS = 6000
 LORA_LR = 3e-4
 UNLEARN_STEPS = 400
 UNLEARN_LR = 1e-4
@@ -255,7 +259,7 @@ def lm_nll(gk: E8.GPT2Knowledge, items: Sequence[Tuple[Query, int]]) -> torch.Te
 
 def train_lora(gk: E8.GPT2Knowledge, setup: Setup, seed: int, steps: int, lr: float,
                batch_size: int = 16, verbose: bool = True, target_acc: float = 0.95,
-               eval_every: int = 200) -> Dict[str, Any]:
+               eval_every: int = 200, rank: int = LORA_RANK) -> Dict[str, Any]:
     """Fine-tune the facts into the pretrained weights, plus the ' unknown' convention for absent pairs.
 
     Training stops as soon as the model answers ``target_acc`` of the deletion targets, so the arm is
@@ -264,7 +268,7 @@ def train_lora(gk: E8.GPT2Knowledge, setup: Setup, seed: int, steps: int, lr: fl
     """
     torch.manual_seed(seed)
     rng = np.random.default_rng(9000 + seed)
-    params = attach_lora(gk.model.lm, LORA_RANK)
+    params = attach_lora(gk.model.lm, rank)
     for p in params:
         p.requires_grad_(True)
     opt = torch.optim.AdamW(params, lr=lr, weight_decay=0.0)
@@ -562,13 +566,14 @@ def run_cells_arm(seed: int, n_targets: int, n_cells: int = N_CELLS, verbose: bo
     return m, setup, gk
 
 
-def run_weights_arms(setup: Setup, seed: int, steps: int, unlearn_steps: int, verbose: bool = True) -> Dict[str, float]:
+def run_weights_arms(setup: Setup, seed: int, steps: int, unlearn_steps: int, verbose: bool = True,
+                     rank: int = LORA_RANK) -> Dict[str, float]:
     """A second, independent GPT-2 whose weights DO carry the facts, unlearned two ways."""
     gk = E8.GPT2Knowledge(AdapterConfig(status_gated=True))   # config unused: the adapter is bypassed
     ppl_base = perplexity(gk)
     generic = generic_prompts(gk, seed)
     base_generic = full_logits(gk, generic)                  # captured BEFORE any LoRA exists
-    out = train_lora(gk, setup, seed, steps, LORA_LR, verbose=verbose)
+    out = train_lora(gk, setup, seed, steps, LORA_LR, verbose=verbose, rank=rank)
     params = out["params"]
     trained = lora_state(gk.model.lm)
     m: Dict[str, float] = {"weights/n_lora_params": float(out["n_lora_params"]),
@@ -661,6 +666,7 @@ def main(argv: List[str] | None = None) -> Dict[str, Any]:
     ap.add_argument("--unlearn-steps", type=int, default=UNLEARN_STEPS)
     ap.add_argument("--n-targets", type=int, default=N_TARGETS)
     ap.add_argument("--n-cells", type=int, default=N_CELLS)
+    ap.add_argument("--lora-rank", type=int, default=LORA_RANK)
     ap.add_argument("--threads", type=int, default=int(os.environ.get("SO_THREADS", "0")))
     ap.add_argument("--tag", default="", help="suffix for the record name, so parallel seed runs do not "
                                               "overwrite each other; combine them later with --combine")
@@ -677,12 +683,13 @@ def main(argv: List[str] | None = None) -> Dict[str, Any]:
         print(f"=== seed {seed}: cells arm (E-000012 checkpoint, SHRED) ===", flush=True)
         m, setup, _ = run_cells_arm(seed, args.n_targets, args.n_cells)
         print(f"=== seed {seed}: weights arms (LoRA fine-tune, then unlearning) ===", flush=True)
-        m.update(run_weights_arms(setup, seed, args.lora_steps, args.unlearn_steps))
+        m.update(run_weights_arms(setup, seed, args.lora_steps, args.unlearn_steps,
+                                  rank=args.lora_rank))
         m["seed"] = seed
         per_seed.append(m)
 
     return report(per_seed, args.seeds, args.n_targets, args.n_cells, args.lora_steps,
-                  args.unlearn_steps, args.tag)
+                  args.unlearn_steps, args.tag, args.lora_rank)
 
 
 def combine(tags: Sequence[str], n_targets: int, n_cells: int, lora_steps: int, unlearn_steps: int) -> Dict[str, Any]:
@@ -702,7 +709,7 @@ def combine(tags: Sequence[str], n_targets: int, n_cells: int, lora_steps: int, 
 
 
 def report(per_seed: List[Dict[str, float]], seeds: Sequence[int], n_targets: int, n_cells: int,
-           lora_steps: int, unlearn_steps: int, tag: str) -> Dict[str, Any]:
+           lora_steps: int, unlearn_steps: int, tag: str, rank: int = LORA_RANK) -> Dict[str, Any]:
     keys = [k for k in REPORT_KEYS if all(k in s for s in per_seed)]
     agg = ledger.aggregate(per_seed, keys)
     check = ledger.check_criteria(agg, {k: v for k, v in CRITERIA.items() if k in agg})
@@ -763,7 +770,7 @@ def report(per_seed: List[Dict[str, float]], seeds: Sequence[int], n_targets: in
 
     record = {"experiment": "E-000024", "title": "deleting a fact from weights versus deleting it from cells",
               "seeds": list(seeds), "n_cells": n_cells, "n_targets": n_targets,
-              "n_bystanders": N_BYSTANDERS, "lora_rank": LORA_RANK, "lora_steps": lora_steps,
+              "n_bystanders": N_BYSTANDERS, "lora_rank": rank, "lora_steps": lora_steps,
               "unlearn_steps_budget": unlearn_steps, "relearn_steps": RELEARN_STEPS,
               "chance_top1": CHANCE_TOP1, "chance_mean_rank": CHANCE_RANK,
               "per_seed": per_seed, "aggregate": agg, "criteria": check}
@@ -771,7 +778,7 @@ def report(per_seed: List[Dict[str, float]], seeds: Sequence[int], n_targets: in
     md = [f"# E-000024 — {record['title']}", "",
           f"Seeds {list(seeds)}; {n_cells} facts, {n_targets} deletion targets, {N_BYSTANDERS} bystanders.",
           "The cells arm is the frozen GPT-2 of E-000012 with its trained adapter; the weights arms are the same",
-          f"frozen GPT-2 with a rank-{LORA_RANK} LoRA fine-tuned on the identical facts and then unlearned two ways.",
+          f"frozen GPT-2 with a rank-{rank} LoRA fine-tuned on the identical facts and then unlearned two ways.",
           "All three arms are driven to the same surface criterion and attacked identically.", "",
           "## The comparison (worst seed)", "", compare, "",
           "## Pre-registered criteria", "", ledger.criteria_table(check), "",
