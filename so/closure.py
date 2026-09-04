@@ -40,8 +40,9 @@ correctness is reconstituted from retrieval, so "the unlearning boundary is draw
 database administrator rather than by the model". Their section 9 proposes the remedy measured here,
 in these words: "A second direction is canonicalization at write time, in which aliases and
 paraphrastic forms are stored as pointers into a single canonical record rather than as independent
-triplets." It is proposed and not built, and they report post-deletion correctness rather than any
-contingency-set size. So the pod is not a new idea; what is new here is the measurement -- a fact
+triplets." Their next sentence is "Both approaches are directly testable within our framework": the
+remedy is named, called testable, and not tested, and they report post-deletion correctness rather
+than any contingency-set size. So the pod is not a new idea; what is new here is the measurement -- a fact
 closure with a certified lower bound, its composition with a record-level certificate (so.audit), and
 the price a neural reader charges for the indirection (E-000025: 0.0954 for sharing, 0.0688 for link
 training, alias resolution 0.9250 on a held-out phrasing).

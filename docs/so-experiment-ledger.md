@@ -1537,8 +1537,10 @@ deletions and conclude that parametric leakage is near zero while post-deletion 
 reconstituted from retrieval, so "the unlearning boundary is drawn primarily by the database
 administrator rather than by the model". Their §9 proposes the pod verbatim: *"A second direction is
 canonicalization at write time, in which aliases and paraphrastic forms are stored as pointers into a
-single canonical record rather than as independent triplets."* Their §8 asks for "a closure procedure".
-They report post-deletion correctness and no contingency-set size.
+single canonical record rather than as independent triplets."* The next sentence is *"Both approaches
+are directly testable within our framework"* — so the closest work names the remedy, says it is
+testable, and does not test it. Their §8 asks for "a closure procedure". They report post-deletion
+correctness and no contingency-set size.
 
 So the pod is not this programme's idea, and the ledger should stop implying it is. What remains, stated
 as narrowly as the evidence allows:
