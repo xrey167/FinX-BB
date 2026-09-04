@@ -121,6 +121,59 @@ could have failed: `delete/control_reachable_before` 1.0000 at |grad| 3.3e+01 be
 **The rule, for the third time in this programme after §31.10 and §31.13: an instrument that cannot
 fail is not evidence.**
 
+## The second claim, and the work that constrains it
+
+The first claim is about a store. A store has a record — something whose removal is the fact and only
+the fact — and the pod makes it canonical. **A representation has no such thing**, and this is
+measured rather than argued: on frozen GPT-2, removing the directions that carry France → Paris takes
+bystander accuracy from **1.0000 to 0.0000** before the target falls (E-000037). Facts are superposed
+and the model rebuilds what is projected away.
+
+So the second claim is about giving a representation an inode, and the honest version of it is narrow,
+because the mechanism is already published.
+
+**What is owned.** Ghosal, Maini et al., *Memorization Sinks: Isolating Memorization during LLM
+Training* (ICML 2025, arXiv:2507.09937) do exactly this: a per-sequence identifier activates a unique
+set of memorization neurons, and *"memorized sequences can be removed by simply dropping out the sink
+neurons. No finetuning needed."* Isolation by design, at billion-parameter scale. Sinitsin et al.,
+*Editable Neural Networks* (ICLR 2020), make later editability a training objective. Allocating a
+private carrier so that a later deletion is cheap is **their idea, not ours**, and any write-up says
+so in its first paragraph.
+
+**What that leaves, and it is exactly the pod.** MemSinks isolates a **sequence**. A fact is not a
+sequence: it is reachable through many phrasings and many aliases, and each of those is a *different*
+sequence with a *different* identifier and therefore a *different* sink. Isolation by design as
+published gives a fact a closure equal to the number of ways it was written down — not one. The pod is
+the missing half:
+
+| | not tied to one carrier | tied |
+|---|---|---|
+| **carriers not private** | closure k, collateral high | closure 1, collateral high — *measured, GPT-2, 1.0000 → 0.0000* |
+| **carriers private** | closure k, collateral low — *isolation by design* | **closure 1, collateral low** |
+
+Privacy without tying is MemSinks. Tying without privacy is what this repository already had. **A
+deletion primitive for a fact needs both**, and the pod is what supplies the tying: many access paths,
+one object.
+
+**And the metric is the part nobody reports.** Every published deletion cost is wall-clock, percentage
+of parameters changed, or number of deletions tolerated. The cost that matters is a **pair**:
+
+> **(closure, collateral)** — how many things must be removed, and what is removed with them.
+
+It is the same pair at both levels. At the store level the things are records, the closure has a
+*certified lower bound* from disjoint derivation traces, and canonicalisation drives it to one. At the
+representation level the things are directions, and the collateral is bounded by a **theorem** rather
+than a hope: n carriers in d dimensions cannot have maximum coherence below the Welch bound
+√((n−d)/(d(n−1))) — 0.0626 for 256 objects in 128 dimensions — and a carrier set at coherence c leaves
+a fraction c² of any other carrier removed with it, about 0.4 %. `so/carrier.py` hinges its privacy
+loss at that bound so it is never asked to beat a theorem.
+
+E-000038 trains the four cells of that table identically apart from one loss term each and reads the
+pair off every one. Its criterion that can answer the question in the negative is pre-registered as
+such: if the untouched model **already** has private carriers, `neither/collateral_cost` comes in below
+0.15 and there was nothing to shape — which would itself be a result, because it would say that
+holding facts in rows gives private carriers for free and holding them in weights does not.
+
 ## Reproduce
 
 ```bash
