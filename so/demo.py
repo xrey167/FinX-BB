@@ -186,6 +186,13 @@ def main(argv: List[str] | None = None) -> Dict[str, Any]:
     print("  this guarantee, and it is a measured rate, not a proof.")
     print("  NOT shown: anything above 124M parameters, multi-token answers, unlearning of knowledge that")
     print("  was already in the weights, or an adversary who gets to choose the marker.")
+    print("  A caveat that belongs next to any deletion claim in this repository, though not to this one:")
+    print("  in the SYNTHETIC model, SHRED closes the value channel and leaves the routing keys untouched,")
+    print("  and because a reverse key there is built from the object, a candidate sweep recovers the")
+    print("  shredded object at 100% (E-000028). The adapter shown above is not exposed to that: its keys")
+    print("  are built from the subject and the relation and carry no object at all, which is asserted as a")
+    print("  property in so/tests/test_llm_adapter.py, not just observed. REVOKE and DELETE close the")
+    print("  synthetic model's key channel completely.")
     print(f"\n  Full records: so/results/  •  the ledger: docs/so-experiment-ledger.md section 31\n")
     return {"probe": probe_hit, "probe_calibration": cal, "forced_choice": fc, "mean_rank": rk["mean_rank"],
             "chance_mean_rank": rk["chance_mean_rank"], "n_targets": len(targets)}
