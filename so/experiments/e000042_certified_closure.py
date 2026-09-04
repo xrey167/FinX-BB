@@ -245,16 +245,36 @@ def run(layer: int, pool_size: int, max_facts: int, seeds: Sequence[int], thread
                                workload=f"{len(answering)} phrasings")
 
         # ---------------------------------------------------------------- the control that can kill it
-        rand_hold, rand_bound = [], []
+        # TWO CONTROLS, and the second is the one that can actually kill the claim.
+        #
+        # The first is a random support of the same size. If it is must-hit as often as the J-lens
+        # support, this pool is one where nearly everything is must-hit and the bound is about
+        # counting rather than about the decomposition.
+        #
+        # The second is sharper, and is the honest test of what the decomposition CONTRIBUTES. The
+        # object's own lens direction is atom 0 of the pool by construction, and a support containing
+        # it is must-hit for a nearly trivial reason: every ablation disjoint from that support leaves
+        # the direction that reads the answer untouched. So the second control draws a random support
+        # of the same size that ALSO contains atom 0. If that passes as often as the J-lens support,
+        # the decomposition has added nothing beyond "include the object direction", and this
+        # experiment should say so rather than report a tautology wearing a certificate.
+        obj_atom = ids[0]
+        rest_idx = list(range(1, len(ids)))
+        rand_hold, rand_bound, rand_obj_hold = [], [], []
         for seed in seeds:
             rng = np.random.default_rng(seed * 1000 + obj_id)
-            rcerts = []
+            rcerts, ocerts = [], []
             for sup, q in zip(supports, answering):
-                k = max(1, sup.size)
-                pick = tuple(sorted((int(ids[i]) for i in rng.choice(len(ids), size=min(k, len(ids) - 1),
-                                                                    replace=False)), key=ids.index))
+                k = max(1, min(sup.size, len(ids) - 1))
+                pick = tuple(sorted((int(ids[i]) for i in rng.choice(len(ids), size=k, replace=False)),
+                                    key=ids.index))
                 rcerts.append(certify_must_hit(silences_for(q), pick, ids))
+                extra = rng.choice(len(rest_idx), size=min(k - 1, len(rest_idx) - 1), replace=False)
+                opick = tuple(sorted([obj_atom] + [int(ids[rest_idx[i]]) for i in extra],
+                                     key=ids.index))
+                ocerts.append(certify_must_hit(silences_for(q), opick, ids))
             rand_hold.append(float(np.mean([c.holds and not c.vacuous for c in rcerts])))
+            rand_obj_hold.append(float(np.mean([c.holds and not c.vacuous for c in ocerts])))
             rand_bound.append(float(disjoint_lower_bound(rcerts).lower_bound))
 
         row = {
@@ -275,6 +295,8 @@ def run(layer: int, pool_size: int, max_facts: int, seeds: Sequence[int], thread
             "tightness": float(bound.lower_bound / max(len(star), 1)),
             "greedy_excess": float(len(greedy_key) - len(star)),
             "musthit_rate_random": float(np.mean(rand_hold)),
+            "musthit_rate_random_with_object": float(np.mean(rand_obj_hold)),
+            "object_atom_in_support": float(np.mean([obj_atom in x.directions for x in supports])),
             "lower_bound_random": float(np.mean(rand_bound)),
             "summary": cc.summary(),
         }
@@ -300,10 +322,12 @@ def run(layer: int, pool_size: int, max_facts: int, seeds: Sequence[int], thread
               "collateral_before", "support_size", "support_residual", "musthit_rate",
               "musthit_exhaustive", "musthit_vacuous", "musthit_subsets_tested",
               "lower_bound", "bound_certified", "shared_atoms", "bound_sound",
-              "tightness", "musthit_rate_random", "lower_bound_random"):
+              "tightness", "musthit_rate_random", "musthit_rate_random_with_object",
+              "object_atom_in_support", "lower_bound_random"):
         m[k] = float(np.mean([r[k] for r in good]))
     m["bound_sound_min"] = float(np.min([r["bound_sound"] for r in good]))
     m["musthit_advantage"] = m["musthit_rate"] - m["musthit_rate_random"]
+    m["musthit_advantage_over_object"] = m["musthit_rate"] - m["musthit_rate_random_with_object"]
 
     # ------------------------------------------------------------------ the pod, both ways round
     # WITHIN a fact, the core is the atoms every access path runs through: non-empty means the fact is
@@ -330,7 +354,8 @@ KEYS = ["n_held", "n_attempted", "n_measured", "control_bound_can_exceed_one", "
         "support_size", "support_residual", "musthit_rate", "musthit_exhaustive", "musthit_vacuous",
         "musthit_subsets_tested", "lower_bound",
         "bound_certified", "shared_atoms", "bound_sound", "bound_sound_min", "tightness",
-        "musthit_rate_random", "lower_bound_random", "musthit_advantage",
+        "musthit_rate_random", "musthit_rate_random_with_object", "object_atom_in_support",
+        "lower_bound_random", "musthit_advantage", "musthit_advantage_over_object",
         "pod_rate", "core_size", "cross_fact_core_overlap", "support_jaccard_all"]
 
 CRITERIA = {
@@ -351,6 +376,9 @@ CRITERIA = {
     # one where everything is must-hit and the decomposition is doing no work
     "musthit_rate_random": ("<=", 0.40),
     "musthit_advantage": (">=", 0.30),
+    # and the sharper one: the support must beat a random set that ALSO contains the object's own
+    # direction, or the certificate's content is "include the object direction" and nothing else
+    "musthit_advantage_over_object": (">=", 0.15),
 }
 
 
@@ -407,15 +435,27 @@ def main(argv: Optional[List[str]] = None) -> Dict[str, Any]:
                              ["certificates that had nothing to test (vacuous)",
                               f"{m['musthit_vacuous']:.4f}"],
                              ["support passes the exhaustive must-hit test", f"{m['musthit_rate']:.4f}"],
-                             ["a RANDOM support of the same size does (control)",
+                             ["a RANDOM support of the same size does (control 1)",
                               f"{m['musthit_rate_random']:.4f}"],
-                             ["the advantage", f"{m['musthit_advantage']:+.4f}"],
+                             ["a random support that ALSO holds the object direction (control 2)",
+                              f"{m['musthit_rate_random_with_object']:.4f}"],
+                             ["the J-lens support holds the object direction",
+                              f"{m['object_atom_in_support']:.4f}"],
+                             ["advantage over control 1", f"{m['musthit_advantage']:+.4f}"],
+                             ["**advantage over control 2**",
+                              f"**{m['musthit_advantage_over_object']:+.4f}**"],
                              ["atoms every phrasing runs through (the pod core)",
                               f"{m['shared_atoms']:.2f}"]]), "",
-               "The second row of that table is the control that can kill the claim. Both supports are",
-               "put through the identical exhaustive test on the identical table; if a random set of",
-               "the same size is must-hit just as often, the pool is one where everything is must-hit,",
-               "the decomposition is doing no work, and the bound is about counting.", "",
+               "Control 2 is the one that can really kill the claim. The object's own lens direction is",
+               "atom 0 of the pool by construction, and any support containing it is must-hit for a",
+               "nearly trivial reason: every ablation disjoint from that support leaves the direction",
+               "that reads the answer untouched. So control 2 draws a random support of the same size",
+               "that ALSO contains atom 0. If it passes as often as the J-lens support, the",
+               "decomposition has added nothing beyond 'include the object direction', and what is",
+               "reported here is a tautology wearing a certificate. The bolded row is that difference.",
+               "", "Control 1 is the weaker form of the same question: if any random set of the same",
+               "size is must-hit just as often, this pool is one where everything is, and the bound is",
+               "about counting.", "",
                "## The pod, both ways round", "",
                "WITHIN a fact, the core is the set of atoms every access path runs through. Non-empty",
                "means the fact is stored as one object with several keys -- a symlink detected in",
