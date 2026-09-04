@@ -1,5 +1,11 @@
 {
   "aggregate": {
+    "address_over_content": {
+      "max": 0.24301510627093892,
+      "mean": 0.24301510627093892,
+      "min": 0.24301510627093892,
+      "n": 1
+    },
     "answer_after": {
       "max": 0.03125,
       "mean": 0.03125,
@@ -42,6 +48,30 @@
       "min": 5.764705882352941,
       "n": 1
     },
+    "excess_address": {
+      "max": 0.4024050942457774,
+      "mean": 0.4024050942457774,
+      "min": 0.4024050942457774,
+      "n": 1
+    },
+    "excess_content": {
+      "max": 0.1593899879748385,
+      "mean": 0.1593899879748385,
+      "min": 0.1593899879748385,
+      "n": 1
+    },
+    "excess_full": {
+      "max": 0.4109426895704339,
+      "mean": 0.4109426895704339,
+      "min": 0.4109426895704339,
+      "n": 1
+    },
+    "excess_overlap": {
+      "max": 0.41180139971953456,
+      "mean": 0.41180139971953456,
+      "min": 0.41180139971953456,
+      "n": 1
+    },
     "headroom": {
       "max": 0.9244791666666666,
       "mean": 0.9244791666666666,
@@ -58,6 +88,30 @@
       "max": 12.0,
       "mean": 12.0,
       "min": 12.0,
+      "n": 1
+    },
+    "null_address": {
+      "max": 0.19295479674987934,
+      "mean": 0.19295479674987934,
+      "min": 0.19295479674987934,
+      "n": 1
+    },
+    "null_content": {
+      "max": 0.06382318191154969,
+      "mean": 0.06382318191154969,
+      "min": 0.06382318191154969,
+      "n": 1
+    },
+    "null_full": {
+      "max": 0.20475593921454513,
+      "mean": 0.20475593921454513,
+      "min": 0.20475593921454513,
+      "n": 1
+    },
+    "null_overlap": {
+      "max": 0.1447664157233455,
+      "mean": 0.1447664157233455,
+      "min": 0.1447664157233455,
       "n": 1
     },
     "orthogonality": {
@@ -88,6 +142,24 @@
       "max": 0.5841656612077107,
       "mean": 0.5841656612077107,
       "min": 0.5841656612077107,
+      "n": 1
+    },
+    "overlap_address": {
+      "max": 0.5953598909956568,
+      "mean": 0.5953598909956568,
+      "min": 0.5953598909956568,
+      "n": 1
+    },
+    "overlap_content": {
+      "max": 0.2232131698863882,
+      "mean": 0.2232131698863882,
+      "min": 0.2232131698863882,
+      "n": 1
+    },
+    "overlap_full": {
+      "max": 0.615698628784979,
+      "mean": 0.615698628784979,
+      "min": 0.615698628784979,
       "n": 1
     },
     "pressure": {
@@ -124,6 +196,12 @@
   "criteria": {
     "claim_supported": true,
     "criteria": {
+      "address_over_content": {
+        "observed": 0.24301510627093892,
+        "op": ">=",
+        "pass": true,
+        "threshold": 0.1
+      },
       "answer_after": {
         "observed": 0.03125,
         "op": "<=",
@@ -136,11 +214,11 @@
         "pass": true,
         "threshold": 0.75
       },
-      "orthogonality": {
-        "observed": 0.23934827744960785,
-        "op": "<=",
+      "excess_overlap": {
+        "observed": 0.41180139971953456,
+        "op": ">=",
         "pass": true,
-        "threshold": 0.95
+        "threshold": 0.1
       },
       "pressure": {
         "observed": 0.07552083333333333,
@@ -170,8 +248,9 @@
   "experiment": "E-000043",
   "layer": 7,
   "model": "gpt2",
-  "recorded_at": "2026-09-04T20:43:06+00:00",
+  "recorded_at": "2026-09-04T20:51:41+00:00",
   "result": {
+    "address_over_content": 0.24301510627093892,
     "answer_after": 0.03125,
     "answer_after_all": 0.3088235294117647,
     "answer_before": 0.9338235294117647,
@@ -179,15 +258,26 @@
     "collateral": 0.3897058823529412,
     "d": 768,
     "dim_A_mean": 5.764705882352941,
+    "excess_address": 0.4024050942457774,
+    "excess_content": 0.1593899879748385,
+    "excess_full": 0.4109426895704339,
+    "excess_overlap": 0.41180139971953456,
     "headroom": 0.9244791666666666,
     "layer": 7,
     "n_held": 17,
     "n_silenced": 12,
+    "null_address": 0.19295479674987934,
+    "null_content": 0.06382318191154969,
+    "null_full": 0.20475593921454513,
+    "null_overlap": 0.1447664157233455,
     "orthogonality": 0.23934827744960785,
     "overlap_AA_max": 0.8558856248855591,
     "overlap_AA_mean": 0.55656781544288,
     "overlap_AV_max": 0.8574918508529663,
     "overlap_AV_mean": 0.5841656612077107,
+    "overlap_address": 0.5953598909956568,
+    "overlap_content": 0.2232131698863882,
+    "overlap_full": 0.615698628784979,
     "per_fact": [
       {
         "answer_after": 0.125,
@@ -328,11 +418,11 @@
     ],
     "pressure": 0.07552083333333333,
     "rank_efficiency": 1.0,
-    "seconds": 58.34061908721924,
+    "seconds": 71.87852382659912,
     "silenced_rate": 0.7058823529411765,
     "sum_dims": 58.0,
     "union_rank": 58.0,
-    "verdict": "12 fact(s), 58 direction(s) in d=768: pressure 0.0755 against a bound of 159 facts, orthogonality 0.2393 (rank-independence 1.0000), largest pairwise overlap 0.8559 -- ALLOCATION, NOT CAPACITY: the subspaces are far from orthogonal while 92% of the budget is unused -- the model had room to give each fact a private subspace and did not, which is a training objective and not a law of dimension"
+    "verdict": "12 fact(s), 58 direction(s) in d=768: pressure 0.0755 against a bound of 159 facts, mean pairwise overlap 0.5566 against a matched null of 0.1448 (max 0.8559) -- ALLOCATION, NOT CAPACITY: the subspaces overlap 0.4118 more than a matched null while 92% of the budget is unused -- the model had room to give each fact a private subspace and did not, which is a training objective and not a law of dimension"
   },
   "title": "clean-deletion capacity, and whether GPT-2 is against the bound or below it",
   "trains_nothing": true

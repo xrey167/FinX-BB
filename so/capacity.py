@@ -19,9 +19,24 @@ WHY THE MODULE MEASURES RATHER THAN ASSERTS. The bound says what is POSSIBLE. It
 what a particular model did, and the difference is the whole question. Two numbers separate them:
 
     pressure      = sum_i dim A_i / d   -- how much of the budget the deletion subspaces demand
-    orthogonality = sigma_min of the stacked orthonormal bases
-                                        -- 1.0 exactly when the subspaces are mutually ORTHOGONAL,
-                                           falling to 0 as they become linearly dependent
+    mean_overlap  = mean pairwise principal cosine, WHICH MUST BE READ AGAINST A MATCHED NULL
+    orthogonality = sigma_min of the stacked orthonormal bases -- reported, but see the warning below
+
+TWO WARNINGS, both found by running the instrument rather than by reading it.
+
+FIRST, ``sigma_min`` IS FRAGILE AND IS NOT THE PRIMARY. It is a minimum over the whole collection, so
+one linear dependency zeroes it however well the rest is allocated -- and a dependency is easy to
+manufacture by accident. A basis built as "this fact's state minus the mean over the others" is a
+CENTRED vector, and n centred vectors span at most n-1 dimensions, so their sigma_min is exactly 0
+whatever the angles are. Measured: 0.0000 for seventeen real facts AND 0.0000 for seventeen random
+ones. A number that cannot distinguish the data from noise is not a summary. Use ``mean_overlap`` and
+``max_overlap``, and read ``orthogonality`` only as a dependency check.
+
+SECOND, OVERLAP HAS A NON-ZERO NULL AND MUST BE REPORTED AGAINST IT. Putting random states through
+the identical basis construction gives a mean pairwise overlap of 0.2048 on seventeen subspaces in
+768 dimensions, not 0. Any overlap quoted against a baseline of zero overstates the effect by that
+much; the quantity that means something is the EXCESS over a matched null built by the same code path
+on states with no shared structure.
 
 A NOTE ON WHY THE SECOND IS NOT A RANK. The first version of this module used
 ``rank(union) / sum_i dim A_i``, which measures LINEAR INDEPENDENCE, and the theorem needs
@@ -97,6 +112,12 @@ class Allocation:
     max_overlap: float = 0.0
     mean_overlap: float = 0.0
     bound: float = 0.0
+    null_overlap: Optional[float] = None    # the same construction on states with no shared structure
+
+    @property
+    def excess(self) -> Optional[float]:
+        """Overlap above a matched null. This is the effect; the raw overlap is not."""
+        return None if self.null_overlap is None else self.mean_overlap - self.null_overlap
 
     @property
     def headroom(self) -> float:
@@ -110,21 +131,25 @@ class Allocation:
         if self.pressure > 0.8:
             why = ("AGAINST THE BOUND: the deletion subspaces demand most of the dimension budget, so "
                    "overlap is forced and no training objective removes it without more dimensions")
-        elif self.orthogonality > 0.95:
-            why = ("ALLOCATED: the subspaces are nearly orthogonal and there is budget to spare, so "
-                   "clean deletion is available here")
+        elif self.excess is not None and self.excess <= 0.10:
+            why = ("ALLOCATED: the subspaces are no more overlapping than a matched null and there is "
+                   "budget to spare, so clean deletion is available here")
+        elif self.excess is not None:
+            why = (f"ALLOCATION, NOT CAPACITY: the subspaces overlap {self.excess:.4f} more than a "
+                   f"matched null while {100 * self.headroom:.0f}% of the budget is unused -- the "
+                   "model had room to give each fact a private subspace and did not, which is a "
+                   "training objective and not a law of dimension")
         else:
-            why = ("ALLOCATION, NOT CAPACITY: the subspaces are far from orthogonal while "
-                   f"{100 * self.headroom:.0f}% of the budget is unused -- the model had room to give "
-                   "each fact a private subspace and did not, which is a training objective and not a "
-                   "law of dimension")
+            why = ("NO NULL SUPPLIED: overlap has a non-zero null under this construction, so the "
+                   "raw number below cannot be read as an effect")
+        null = "" if self.null_overlap is None else f" against a matched null of {self.null_overlap:.4f}"
         return (f"{self.n_facts} fact(s), {sum(self.dims)} direction(s) in d={self.d}: pressure "
-                f"{self.pressure:.4f} against a bound of {self.bound:.0f} facts, orthogonality "
-                f"{self.orthogonality:.4f} (rank-independence {self.rank_efficiency:.4f}), largest "
-                f"pairwise overlap {self.max_overlap:.4f} -- {why}")
+                f"{self.pressure:.4f} against a bound of {self.bound:.0f} facts, mean pairwise overlap "
+                f"{self.mean_overlap:.4f}{null} (max {self.max_overlap:.4f}) -- {why}")
 
 
-def allocation(subspaces: Sequence[torch.Tensor], d: Optional[int] = None) -> Allocation:
+def allocation(subspaces: Sequence[torch.Tensor], d: Optional[int] = None,
+               null_overlap: Optional[float] = None) -> Allocation:
     """Read pressure and efficiency off a set of per-fact deletion subspaces.
 
     ``subspaces[i]`` is (k_i, d): the directions whose removal deletes fact i. Efficiency is the rank
@@ -151,4 +176,4 @@ def allocation(subspaces: Sequence[torch.Tensor], d: Optional[int] = None) -> Al
                       rank_efficiency=rank / max(total, 1),
                       max_overlap=max(pairs) if pairs else 0.0,
                       mean_overlap=float(sum(pairs) / len(pairs)) if pairs else 0.0,
-                      bound=capacity_bound(dim, s_mean))
+                      bound=capacity_bound(dim, s_mean), null_overlap=null_overlap)

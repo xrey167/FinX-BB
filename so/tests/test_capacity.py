@@ -38,19 +38,20 @@ def test_a_rank_deficient_input_is_not_counted_as_two_dimensions():
 def test_disjoint_allocation_is_efficient_and_low_pressure():
     d = 64
     subs = [_basis(d, [2 * i, 2 * i + 1]) for i in range(4)]
-    a = allocation(subs, d)
+    a = allocation(subs, d, null_overlap=0.0)
     assert a.orthogonality > 0.99
     assert a.rank_efficiency > 0.99
     assert a.pressure == 8 / 64
     assert a.max_overlap < 1e-5
+    assert abs(a.excess) < 1e-5
     assert "ALLOCATED" in a.verdict()
 
 
 def test_overlapping_subspaces_with_budget_to_spare_read_as_an_allocation_failure():
     d = 64
     subs = [_basis(d, [0, 1]), _basis(d, [1, 2]), _basis(d, [2, 3])]
-    a = allocation(subs, d)
-    assert a.orthogonality < 0.95
+    a = allocation(subs, d, null_overlap=0.05)
+    assert a.excess > 0.10
     assert a.headroom > 0.8
     assert "ALLOCATION, NOT CAPACITY" in a.verdict()
 
@@ -87,8 +88,27 @@ def test_independent_but_non_orthogonal_is_caught_by_orthogonality_and_missed_by
     a1 = torch.tensor([[1.0] + [0.0] * (d - 1)])
     v = torch.zeros(1, d)
     v[0, 0], v[0, 1] = 0.9, (1 - 0.81) ** 0.5            # 0.9 cosine with a1, still independent
-    a = allocation([a1, v], d)
+    a = allocation([a1, v], d, null_overlap=0.05)
     assert a.rank_efficiency > 0.99                       # rank says "perfectly allocated"
     assert a.max_overlap > 0.85                           # the angle says otherwise
     assert a.orthogonality < 0.5
     assert "ALLOCATION, NOT CAPACITY" in a.verdict()
+
+
+def test_without_a_null_the_verdict_refuses_to_call_the_overlap_an_effect():
+    """Overlap has a non-zero null under this construction; unqualified it is not a measurement."""
+    d = 64
+    a = allocation([_basis(d, [0, 1]), _basis(d, [1, 2])], d)
+    assert a.excess is None
+    assert "NO NULL SUPPLIED" in a.verdict()
+
+
+def test_centred_vectors_zero_sigma_min_whatever_their_angles_are():
+    """Why sigma_min was demoted: n centred vectors span n-1 dimensions, on data and on noise alike."""
+    g = torch.Generator().manual_seed(0)
+    x = torch.randn(6, 64, generator=g)
+    c = x - x.mean(0, keepdim=True)
+    subs = [(r / r.norm()).reshape(1, -1) for r in c]
+    a = allocation(subs, 64)
+    assert a.orthogonality < 1e-5           # the artefact, with no shared structure at all
+    assert a.mean_overlap < 0.5             # while the angles say the vectors are nearly unrelated

@@ -13,8 +13,28 @@ silences every phrasing is found, and the set of those subspaces is read two way
 | directions demanded in total | 58 of 768 |
 | **pressure** (demand / d) | **0.0755** |
 | headroom left unused | 0.9245 |
-| **orthogonality** (sigma_min of the stacked bases) | **0.2393** |
-| rank-independence (rank / total), for contrast | 1.0000 |
+| mean pairwise overlap of the deletion subspaces | 0.5566 |
+| the same on a MATCHED NULL (random states, identical construction) | 0.1448 |
+| **excess over the null** | **+0.4118** |
+| sigma_min of the stacked bases (a dependency check, not a summary) | 0.2393 |
+
+## Where the sharing is: content or addressing
+
+Row 0 of a fact's basis is what all its phrasings share -- its CONTENT direction. Rows 1 and
+up are the phrasing spread, which is how the fact is ADDRESSED. Both are compared against
+the same matched null.
+
+| subspace | overlap | matched null | excess |
+|---|---|---|---|
+| content direction only | 0.2232 | 0.0638 | +0.1594 |
+| addressing rows only | 0.5954 | 0.1930 | +0.4024 |
+| the whole basis | 0.6157 | 0.2048 | +0.4109 |
+| **addressing minus content** |  |  | **+0.2430** |
+
+A fact's own content direction being near the null while its addressing rows are far above
+it is the symlink result stated in activation space: what a store keeps in separate records
+-- the object and the keys that reach it -- a representation keeps in one subspace, so a
+deletion aimed at the content pays its collateral to the addressing.
 
 ## What the deletion costs, and where the overlap actually is
 
@@ -40,7 +60,7 @@ The instrument had a bug this run found. The first version measured `rank(union)
 
 ## Verdict
 
-12 fact(s), 58 direction(s) in d=768: pressure 0.0755 against a bound of 159 facts, orthogonality 0.2393 (rank-independence 1.0000), largest pairwise overlap 0.8559 -- ALLOCATION, NOT CAPACITY: the subspaces are far from orthogonal while 92% of the budget is unused -- the model had room to give each fact a private subspace and did not, which is a training objective and not a law of dimension
+12 fact(s), 58 direction(s) in d=768: pressure 0.0755 against a bound of 159 facts, mean pairwise overlap 0.5566 against a matched null of 0.1448 (max 0.8559) -- ALLOCATION, NOT CAPACITY: the subspaces overlap 0.4118 more than a matched null while 92% of the budget is unused -- the model had room to give each fact a private subspace and did not, which is a training objective and not a law of dimension
 
 ## The rule, fixed before the numbers
 
@@ -54,4 +74,5 @@ pressure <= 0.5 and orthogonality <= 0.95 -> ALLOCATION, not capacity: the model
 | answer_after | <= 0.25 | 0.0312 | PASS |
 | silenced_rate | >= 0.5 | 0.7059 | PASS |
 | pressure | <= 0.5 | 0.0755 | PASS |
-| orthogonality | <= 0.95 | 0.2393 | PASS |
+| excess_overlap | >= 0.1 | 0.4118 | PASS |
+| address_over_content | >= 0.1 | 0.2430 | PASS |

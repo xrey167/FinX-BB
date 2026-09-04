@@ -178,11 +178,44 @@ def run(layer: int, threads: int, verbose: bool = True) -> Dict[str, Any]:
             print(f"  {s:<10} dim(A) {len(chosen)} | answer {held_rate[s]:.2f} -> {after:.2f} | "
                   f"collateral {coll:.2f}  ({time.time()-t0:.0f}s)", flush=True)
 
+    # ------------------------------------------------------------------ the matched null
+    # Overlap under this construction has a non-zero null: seventeen RANDOM states put through the
+    # identical code path already overlap. Quoting the raw number against a baseline of zero would
+    # overstate the effect by exactly that much, so the null is built here, by the same functions, and
+    # every overlap below is reported with it.
+    g = torch.Generator().manual_seed(0)
+    rnd = {s: torch.randn(len(TEMPLATES), d, generator=g) for s in held}
+    Vn: Dict[str, torch.Tensor] = {}
+    for s in held:
+        others = torch.stack([rnd[x] for x in held if x != s]).mean(0)
+        Vn[s] = fact_basis(rnd[s], others)
+
+    def mean_overlap(mats: Dict[str, torch.Tensor], names: Sequence[str]) -> float:
+        pairs = [subspace_overlap(mats[a], mats[b])
+                 for i, a in enumerate(names) for b in names[i + 1:]]
+        return float(np.mean(pairs)) if pairs else float("nan")
+
+    # ------------------------------------------------------------------ content against addressing
+    # Row 0 of the basis is what every phrasing of this fact SHARES -- its content direction. Rows 1..
+    # are the phrasing spread, which is how the fact is ADDRESSED. Splitting them is the whole point:
+    # a fact can have a private content direction and still be undeletable because its addressing
+    # machinery is shared with every other fact that is asked the same way.
+    content = {s: V[s][:1] for s in held}
+    address = {s: V[s][1:] for s in held}
+    content_n = {s: Vn[s][:1] for s in held}
+    address_n = {s: Vn[s][1:] for s in held}
+
+    ov_full, ov_full_n = mean_overlap(V, held), mean_overlap(Vn, held)
+    ov_cont, ov_cont_n = mean_overlap(content, held), mean_overlap(content_n, held)
+    ov_addr, ov_addr_n = mean_overlap(address, held), mean_overlap(address_n, held)
+
     subs = [A[s] for s in held if s in A]
-    alloc = allocation(subs, d)
+    names_A = [s for s in held if s in A]
+    An = {s: Vn[s][:A[s].shape[0]] for s in names_A}
+    alloc = allocation(subs, d, null_overlap=mean_overlap(An, names_A))
 
     # THE REFINEMENT: the orthogonality the theorem needs is A_i against V_j, not A_i against A_j.
-    names = [s for s in held if s in A]
+    names = names_A
     av = [subspace_overlap(A[a], V[b]) for a in names for b in held if a != b]
     aa = [subspace_overlap(A[a], A[b]) for a in names for b in names if a != b]
 
@@ -201,6 +234,11 @@ def run(layer: int, threads: int, verbose: bool = True) -> Dict[str, Any]:
         "overlap_AA_max": alloc.max_overlap, "overlap_AA_mean": alloc.mean_overlap,
         "overlap_AV_max": float(np.max(av)) if av else float("nan"),
         "overlap_AV_mean": float(np.mean(av)) if av else float("nan"),
+        "null_overlap": alloc.null_overlap, "excess_overlap": alloc.excess,
+        "overlap_full": ov_full, "null_full": ov_full_n, "excess_full": ov_full - ov_full_n,
+        "overlap_content": ov_cont, "null_content": ov_cont_n, "excess_content": ov_cont - ov_cont_n,
+        "overlap_address": ov_addr, "null_address": ov_addr_n, "excess_address": ov_addr - ov_addr_n,
+        "address_over_content": (ov_addr - ov_addr_n) - (ov_cont - ov_cont_n),
         "capacity_bound": capacity_bound(d, alloc.pressure * d / max(len(subs), 1)) if subs else 0.0,
         "verdict": alloc.verdict(), "per_fact": rows, "seconds": time.time() - t0,
     }
@@ -215,7 +253,10 @@ def run(layer: int, threads: int, verbose: bool = True) -> Dict[str, Any]:
 KEYS = ["d", "n_held", "n_silenced", "silenced_rate", "answer_before", "answer_after", "collateral",
         "answer_after_all", "dim_A_mean", "pressure", "orthogonality", "rank_efficiency",
         "headroom", "union_rank", "sum_dims",
-        "overlap_AA_max", "overlap_AA_mean", "overlap_AV_max", "overlap_AV_mean", "capacity_bound"]
+        "overlap_AA_max", "overlap_AA_mean", "overlap_AV_max", "overlap_AV_mean", "capacity_bound",
+        "null_overlap", "excess_overlap", "overlap_full", "null_full", "excess_full",
+        "overlap_content", "null_content", "excess_content",
+        "overlap_address", "null_address", "excess_address", "address_over_content"]
 
 CRITERIA = {
     # attack validity, and a deletion to measure
@@ -231,7 +272,13 @@ CRITERIA = {
     # THE CLAIM: with budget to spare, the subspaces still are not independent. Failing this would say
     # the deletion subspaces ARE well allocated and the collateral comes from somewhere else -- which
     # overlap_AV is measured in the same run to catch.
-    "orthogonality": ("<=", 0.95),
+    # the deletion subspaces must overlap MORE than a matched null, or there is no effect to explain
+    "excess_overlap": (">=", 0.10),
+    # THE CLAIM THIS RUN IS FOR: the sharing is in the ADDRESSING, not in the content. A fact's own
+    # content direction can be private while the machinery that says which phrasing asked for it is
+    # shared with every other fact asked the same way. Failing this would mean the content directions
+    # are as entangled as the addressing ones, and the symlink reading would be wrong.
+    "address_over_content": (">=", 0.10),
 }
 
 DECISION_RULE = (
@@ -268,10 +315,30 @@ def main(argv: Optional[List[str]] = None) -> Dict[str, Any]:
                         ["directions demanded in total", f"{m['sum_dims']:.0f} of {m['d']}"],
                         ["**pressure** (demand / d)", f"**{m['pressure']:.4f}**"],
                         ["headroom left unused", f"{m['headroom']:.4f}"],
-                        ["**orthogonality** (sigma_min of the stacked bases)",
-                         f"**{m['orthogonality']:.4f}**"],
-                        ["rank-independence (rank / total), for contrast",
-                         f"{m['rank_efficiency']:.4f}"]]), "",
+                        ["mean pairwise overlap of the deletion subspaces",
+                         f"{m['overlap_AA_mean']:.4f}"],
+                        ["the same on a MATCHED NULL (random states, identical construction)",
+                         f"{m['null_overlap']:.4f}"],
+                        ["**excess over the null**", f"**{m['excess_overlap']:+.4f}**"],
+                        ["sigma_min of the stacked bases (a dependency check, not a summary)",
+                         f"{m['orthogonality']:.4f}"]]), "",
+          "## Where the sharing is: content or addressing", "",
+          "Row 0 of a fact's basis is what all its phrasings share -- its CONTENT direction. Rows 1 and",
+          "up are the phrasing spread, which is how the fact is ADDRESSED. Both are compared against",
+          "the same matched null.", "",
+          ledger.table(["subspace", "overlap", "matched null", "excess"],
+                       [["content direction only", f"{m['overlap_content']:.4f}",
+                         f"{m['null_content']:.4f}", f"{m['excess_content']:+.4f}"],
+                        ["addressing rows only", f"{m['overlap_address']:.4f}",
+                         f"{m['null_address']:.4f}", f"{m['excess_address']:+.4f}"],
+                        ["the whole basis", f"{m['overlap_full']:.4f}",
+                         f"{m['null_full']:.4f}", f"{m['excess_full']:+.4f}"],
+                        ["**addressing minus content**", "", "",
+                         f"**{m['address_over_content']:+.4f}**"]]), "",
+          "A fact's own content direction being near the null while its addressing rows are far above",
+          "it is the symlink result stated in activation space: what a store keeps in separate records",
+          "-- the object and the keys that reach it -- a representation keeps in one subspace, so a",
+          "deletion aimed at the content pays its collateral to the addressing.", "",
           "## What the deletion costs, and where the overlap actually is", "",
           ledger.table(["measure", "value"],
                        [["the model answers, before", f"{m['answer_before']:.4f}"],

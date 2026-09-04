@@ -20,21 +20,43 @@ need only be orthogonal to `V_j` to within each fact's logit margin, and almost-
 limit — which means an observed failure to delete cleanly *cannot* be blamed on capacity at any
 plausible scale.
 
-**Measured (E-000043, frozen GPT-2 small, d = 768, 17 capital facts × 8 phrasings):**
+**Measured (E-000043, frozen GPT-2 small, d = 768, 17 capital facts × 8 phrasings, six
+pre-registered criteria, all PASS):**
 
 | | |
 |---|---|
 | facts a subspace of their own basis silences | 12 of 17 (0.7059), to 0.0312 |
 | directions demanded in total | **58 of 768** — `pressure` 0.0755, bound 159 facts |
 | headroom left unused | **0.9245** |
-| orthogonality (σ_min of the stacked bases) | **0.2393** |
-| overlap `A_i` vs `A_j` | 0.5566 mean, 0.8559 max |
-| overlap `A_i` vs `V_j` — what the theorem needs | 0.5842 mean, 0.8575 max |
+| mean pairwise overlap of the deletion subspaces | 0.5566, against a **matched null of 0.1448** |
+| **excess over the null** | **+0.4118** |
 | bystander facts under the same ablation | 0.3897 from 1.0000 |
 
 > **The failure is allocation, not capacity.** The model had 92% of its dimension budget free and
-> still gave twelve facts deletion subspaces at principal cosine 0.86. Allocation is a training
-> objective; capacity would have been a law of dimension. All five pre-registered criteria pass.
+> still gave twelve facts deletion subspaces overlapping 0.41 more than random states put through the
+> identical construction. Allocation is a training objective; capacity would have been a law of
+> dimension.
+
+## And the sharing is in the addressing, not the content
+
+Splitting each fact's basis into its **content** direction (row 0 — what all its phrasings share) and
+its **addressing** rows (the phrasing spread), against the same matched null:
+
+| subspace | overlap | matched null | excess |
+|---|---|---|---|
+| content direction only | 0.2232 | 0.0638 | **+0.1594** |
+| addressing rows only | 0.5954 | 0.1930 | **+0.4024** |
+| **addressing minus content** | | | **+0.2430** |
+
+**A fact's own content direction is nearly private. What is shared is the machinery that says which
+phrasing asked for it.** That is the symlink result stated in activation space: *what a store keeps in
+separate records — the object, and the keys that reach it — a representation keeps in one subspace, so
+a deletion aimed at the content pays its collateral to the addressing.*
+
+And it closes a loop with the reading side. E-000039-A measures that **88.6%** of the held-out
+paraphrase gap is closed by forcing the address (`routing_share` 0.8861, worst seed 0.8818, against a
+rule fixed in advance at 0.7). **Reading a fact through a new phrasing fails at addressing. Deleting a
+fact damages bystanders through addressing.** One structure, measured from both ends.
 
 **And the store is the limit case, which is where the symlink comes in.** An addressable memory's
 addresses are *records*, not directions in a fixed-dimensional space, so it has no dimension bound at

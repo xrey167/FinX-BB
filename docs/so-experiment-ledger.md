@@ -1952,8 +1952,31 @@ pre-registered criteria PASS:
 | overlap `A_i` vs `V_j` — what the theorem needs | 0.5842 mean, 0.8575 max |
 | bystander facts under the same ablation | 0.3897 from 1.0000 |
 
+**Two corrections the run itself forced, before the verdict is quotable.** First, overlap under this
+construction has a **non-zero null**: seventeen *random* states through the identical code path
+overlap at 0.1448. Quoting 0.5566 against a baseline of zero overstates the effect, and the number
+that means something is the **excess, +0.4118**. Second, `σ_min` was demoted from primary — a basis
+built as "this fact minus the mean of the others" is a *centred* vector, n centred vectors span n−1
+dimensions, and σ_min is therefore 0.0000 on real facts and on noise alike. A number that cannot
+distinguish data from noise is not a summary.
+
+**And the sharing is in the ADDRESSING, not the content**, which is the result:
+
+| subspace | overlap | matched null | excess |
+|---|---|---|---|
+| content direction only (row 0) | 0.2232 | 0.0638 | **+0.1594** |
+| addressing rows only (phrasing spread) | 0.5954 | 0.1930 | **+0.4024** |
+| **addressing minus content** | | | **+0.2430** |
+
+A fact's own content direction is nearly private; what is shared is the machinery that says which
+phrasing asked for it. **What a store keeps in separate records — the object, and the keys that reach
+it — a representation keeps in one subspace, so a deletion aimed at the content pays its collateral to
+the addressing.** This closes a loop with §31.24: reading a fact through a new phrasing fails at
+addressing (`routing_share` 0.8861), and deleting one damages bystanders through addressing. One
+structure, measured from both ends.
+
 **ALLOCATION, NOT CAPACITY.** The model had 92% of its dimension budget free and still gave twelve
-facts deletion subspaces at principal cosine 0.86. Allocation is a training objective; capacity would
+facts deletion subspaces overlapping 0.41 more than the matched null. Allocation is a training objective; capacity would
 have been a law of dimension. That is the difference between a limit and a defect, and it is why the
 pod objective — access paths of one fact sharing a core, cores of different facts disjoint — is worth
 training rather than merely wishing for.
