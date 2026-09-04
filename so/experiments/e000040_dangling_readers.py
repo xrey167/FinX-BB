@@ -238,10 +238,17 @@ def run(layer: int, seed: int, threads: int, max_facts: int, verbose: bool = Tru
     res = {s: p.residual(prompts_of[s]) for s, _ in pool}          # basis frame: E-000037's layer
     snap = {s: p.snapshot(prompts_of[s], caps) for s, _ in pool}   # adversary frame: the ablated state
     mu = torch.cat([snap[s] for s, _ in pool]).mean(0)             # the population common mode
+    # WHAT THE SEED ACTUALLY VARIES, and why it had to be made to vary something. The model is frozen
+    # and every state above is deterministic, so with the whole pool as targets a seed that only
+    # shuffled the target order would produce three identical runs reported as "mean over seeds" and a
+    # "worst seed" -- an interval with no sampling behind it. The seed now resamples the BYSTANDER
+    # PANEL, which is the noise source the two load-bearing quantities actually have: collateral is an
+    # average over that panel, and the admission rule is a threshold on it.
     rng = np.random.default_rng(seed)
     order = list(held)
     rng.shuffle(order)
     targets = order[:max_facts] if max_facts else order
+    n_bys = 6
 
     rows: List[Dict[str, Any]] = []
     for s in targets:
@@ -249,7 +256,9 @@ def run(layer: int, seed: int, threads: int, max_facts: int, verbose: bool = Tru
         others = torch.stack([res[x] for x, _ in pool if x != s]).mean(0)
         basis = fact_basis(res[s], others)
         prompts = prompts_of[s]
-        bys = [b for b in held if b != s][:6]
+        pool_bys = [b for b in held if b != s]
+        bys = [pool_bys[i] for i in rng.choice(len(pool_bys), size=min(n_bys, len(pool_bys)),
+                                               replace=False)]
 
         def ans(idx: Sequence[int], _b=basis, _pr=prompts) -> List[int]:
             p.set_span(torch.stack([_b[i] for i in idx]) if len(idx) else None, 0.0)
