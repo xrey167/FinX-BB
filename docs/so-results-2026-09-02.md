@@ -29,12 +29,13 @@
 | E-000016 | Alias chains: two dereference slots resolve a two-link chain, one slot must refuse it | E4 | F3 | criteria met | 2026-09-03 09:41 |
 | E-000017-A | Diagnosis: reading versus refusal on held-out phrasings | E5 | - | recorded | 2026-09-03 12:00 |
 | E-000017-B | Stage-2 template budget: 8 trained, 4 held out, no consistency loss | E5 | F3 | **criteria NOT met** | 2026-09-03 14:11 |
-| e000018_both | - | - | - | not run | - |
-| e000018_gate | - | - | - | not run | - |
-| e000018_generic | - | - | - | not run | - |
+| E-000018 | No key, no injection — arm 'both' (match gate True, generic text share 0.25) | E5 | F1 | **criteria NOT met** | 2026-09-03 18:35 |
+| E-000018 | No key, no injection — arm 'gate' (match gate True, generic text share 0) | E5 | F1 | **criteria NOT met** | 2026-09-03 20:49 |
+| E-000018 | No key, no injection — arm 'generic' (match gate False, generic text share 0.25) | E5 | F1 | **criteria NOT met** | 2026-09-03 23:48 |
 | E-000019 | Fresh-seed confirmation of the verified gate, with the SHRED residual tested against chance | E4 | F4 (F4) | criteria met | 2026-09-03 16:31 |
 | e000020_symlink_gpt2 | - | - | - | not run | - |
 | E-000021 | The verification gate as a classifier: false accepts and false rejects over fresh markers | E4 | - | criteria met | 2026-09-03 17:58 |
+| e000022_two_channel_null | - | - | - | not run | - |
 
 ## The six breakthrough properties (ledger section 3)
 
@@ -1482,17 +1483,133 @@ Pre-registered criteria (worst seed):
 
 **Interpretation (post hoc, record unchanged):** The remedy run for the fired kill criterion, and it works for the part the criterion is about: at the prescribed budget of eight trained templates, refusal after REVOKE and SHRED on unseen phrasings reaches 89.8% (worst seed 86.5%) against 52% at two templates, the conditional figure reaches 99.3%, and the deleted object returns in exactly 0.0000 of cases. The criterion's own 95% bar is still not met, so it stays fired, but it is no longer evidence against the deletion mechanism. The run also surfaces a worse problem than the one it fixed: injection where there is no key degraded rather than improved (generic text 3.27 nats against a 0.05 bar, above E-000013's 2.27), so more prompt shapes in training mean more shapes that trigger a spurious read. That is the next thing to fix, because it means the layer perturbs the frozen model on unrelated text.
 
-## e000018_both
+## E-000018 — No key, no injection — arm 'both' (match gate True, generic text share 0.25)
 
-_not run in this session_
+The routing softmax always sums to one, so some cell always wins and the layer injects into text it has no key for. E-000017-B measured 3.27 nats on generic sentences against a 0.05 bar, worse than E-000013's 2.27 with fewer templates.
 
-## e000018_gate
+| claim group | supported |
+|---|---|
+| no_key_no_injection | **no** |
+| reading_not_traded_away | **no** |
+| refusal_not_traded_away | **no** |
+| deleted_object_never_returns | yes |
 
-_not run in this session_
+| measure | mean over seeds | worst seed | E-000017-B baseline |
+|---|---|---|---|
+| generic/kl_to_base | 0.6736 | 0.4951 | 3.2741 |
+| broken1_unknown | 0.7017 | 0.6650 | 0.7183 |
+| train/active_correct | 0.9019 | 0.8869 | 0.9198 |
+| heldout/active_correct | 0.6917 | 0.6837 | 0.7400 |
+| train/refusal_given_active_correct | 0.9960 | 0.9922 | - |
+| heldout/refusal_given_active_correct | 0.9882 | 0.9829 | 0.9928 |
+| heldout/revoked_deleted_object | 0.0004 | 0.0000 | 0.0000 |
+| heldout/deleted_object_given_active_correct | 0.0000 | 0.0000 | - |
+| revoke_train_min | 0.9533 | 0.9300 | - |
+| revoke_heldout_min | 0.8550 | 0.8100 | 0.8983 |
+| shred_train_min | 0.9533 | 0.9300 | - |
+| shred_heldout_min | 0.8550 | 0.8100 | 0.8983 |
 
-## e000018_generic
+Pre-registered criteria (worst seed):
 
-_not run in this session_
+| criterion (worst seed) | required | observed | result |
+|---|---|---|---|
+| generic/kl_to_base | <= 0.05 | 0.9326 | FAIL |
+| broken1_unknown | >= 0.9 | 0.6650 | FAIL |
+| train/active_correct | >= 0.9 | 0.8869 | FAIL |
+| heldout/active_correct | >= 0.7 | 0.6837 | FAIL |
+| revoke_train_min | >= 0.95 | 0.9300 | FAIL |
+| revoke_heldout_min | >= 0.85 | 0.8100 | FAIL |
+| shred_heldout_min | >= 0.85 | 0.8100 | FAIL |
+| heldout/revoked_deleted_object | <= 0.02 | 0.0013 | PASS |
+| heldout/deleted_object_given_active_correct | <= 0.02 | 0.0000 | PASS |
+
+By construction: the match gate adds the CAPACITY to inject nothing (an absolute cosine threshold against the best real cell key); whether the model uses it is learned from the losses; the generic arm trains the behaviour on eight sentence shapes that are disjoint from the five the evaluation uses, so passing by memorising a shape is not available.
+
+**Interpretation (post hoc, record unchanged):** Read the three arms together rather than one at a time. The match gate alone leaves injection into unrelated text exactly where it was (3.2681 against a baseline of 3.2741); generic text in training alone brings it to 0.6035; both together to 0.6736. All of the improvement is the behavioural training and none is the added capacity, and no arm gets within a factor of twelve of the bar. The reason is that refusing a question and ignoring prose are routed through one null column and pull in opposite directions, which is a design fault rather than a tuning failure.
+
+## E-000018 — No key, no injection — arm 'gate' (match gate True, generic text share 0)
+
+The routing softmax always sums to one, so some cell always wins and the layer injects into text it has no key for. E-000017-B measured 3.27 nats on generic sentences against a 0.05 bar, worse than E-000013's 2.27 with fewer templates.
+
+| claim group | supported |
+|---|---|
+| no_key_no_injection | **no** |
+| reading_not_traded_away | yes |
+| refusal_not_traded_away | **no** |
+| deleted_object_never_returns | yes |
+
+| measure | mean over seeds | worst seed | E-000017-B baseline |
+|---|---|---|---|
+| generic/kl_to_base | 3.2681 | 3.0802 | 3.2741 |
+| broken1_unknown | 0.7117 | 0.6300 | 0.7183 |
+| train/active_correct | 0.9165 | 0.9062 | 0.9198 |
+| heldout/active_correct | 0.7379 | 0.7288 | 0.7400 |
+| train/refusal_given_active_correct | 0.9964 | 0.9950 | - |
+| heldout/refusal_given_active_correct | 0.9908 | 0.9865 | 0.9928 |
+| heldout/revoked_deleted_object | 0.0013 | 0.0000 | 0.0000 |
+| heldout/deleted_object_given_active_correct | 0.0025 | 0.0000 | - |
+| revoke_train_min | 0.9483 | 0.9350 | - |
+| revoke_heldout_min | 0.8667 | 0.8250 | 0.8983 |
+| shred_train_min | 0.9483 | 0.9350 | - |
+| shred_heldout_min | 0.8667 | 0.8250 | 0.8983 |
+
+Pre-registered criteria (worst seed):
+
+| criterion (worst seed) | required | observed | result |
+|---|---|---|---|
+| generic/kl_to_base | <= 0.05 | 3.3764 | FAIL |
+| broken1_unknown | >= 0.9 | 0.6300 | FAIL |
+| train/active_correct | >= 0.9 | 0.9062 | PASS |
+| heldout/active_correct | >= 0.7 | 0.7288 | PASS |
+| revoke_train_min | >= 0.95 | 0.9350 | FAIL |
+| revoke_heldout_min | >= 0.85 | 0.8250 | FAIL |
+| shred_heldout_min | >= 0.85 | 0.8250 | FAIL |
+| heldout/revoked_deleted_object | <= 0.02 | 0.0025 | PASS |
+| heldout/deleted_object_given_active_correct | <= 0.02 | 0.0053 | PASS |
+
+By construction: the match gate adds the CAPACITY to inject nothing (an absolute cosine threshold against the best real cell key); whether the model uses it is learned from the losses; the generic arm trains the behaviour on eight sentence shapes that are disjoint from the five the evaluation uses, so passing by memorising a shape is not available.
+
+## E-000018 — No key, no injection — arm 'generic' (match gate False, generic text share 0.25)
+
+The routing softmax always sums to one, so some cell always wins and the layer injects into text it has no key for. E-000017-B measured 3.27 nats on generic sentences against a 0.05 bar, worse than E-000013's 2.27 with fewer templates.
+
+| claim group | supported |
+|---|---|
+| no_key_no_injection | **no** |
+| reading_not_traded_away | **no** |
+| refusal_not_traded_away | **no** |
+| deleted_object_never_returns | yes |
+
+| measure | mean over seeds | worst seed | E-000017-B baseline |
+|---|---|---|---|
+| generic/kl_to_base | 0.6035 | 0.3622 | 3.2741 |
+| broken1_unknown | 0.6783 | 0.6250 | 0.7183 |
+| train/active_correct | 0.9079 | 0.9019 | 0.9198 |
+| heldout/active_correct | 0.6888 | 0.6813 | 0.7400 |
+| train/refusal_given_active_correct | 0.9943 | 0.9934 | - |
+| heldout/refusal_given_active_correct | 0.9844 | 0.9773 | 0.9928 |
+| heldout/revoked_deleted_object | 0.0008 | 0.0000 | 0.0000 |
+| heldout/deleted_object_given_active_correct | 0.0016 | 0.0000 | - |
+| revoke_train_min | 0.9500 | 0.9400 | - |
+| revoke_heldout_min | 0.8800 | 0.8600 | 0.8983 |
+| shred_train_min | 0.9500 | 0.9400 | - |
+| shred_heldout_min | 0.8800 | 0.8600 | 0.8983 |
+
+Pre-registered criteria (worst seed):
+
+| criterion (worst seed) | required | observed | result |
+|---|---|---|---|
+| generic/kl_to_base | <= 0.05 | 0.8008 | FAIL |
+| broken1_unknown | >= 0.9 | 0.6250 | FAIL |
+| train/active_correct | >= 0.9 | 0.9019 | PASS |
+| heldout/active_correct | >= 0.7 | 0.6813 | FAIL |
+| revoke_train_min | >= 0.95 | 0.9400 | FAIL |
+| revoke_heldout_min | >= 0.85 | 0.8600 | PASS |
+| shred_heldout_min | >= 0.85 | 0.8600 | PASS |
+| heldout/revoked_deleted_object | <= 0.02 | 0.0013 | PASS |
+| heldout/deleted_object_given_active_correct | <= 0.02 | 0.0026 | PASS |
+
+By construction: the match gate adds the CAPACITY to inject nothing (an absolute cosine threshold against the best real cell key); whether the model uses it is learned from the losses; the generic arm trains the behaviour on eight sentence shapes that are disjoint from the five the evaluation uses, so passing by memorising a shape is not available.
 
 ## E-000019 — Fresh seeds, and the SHRED residual tested against chance
 
@@ -1587,3 +1704,7 @@ Pre-registered criteria:
 This is the gate's error rate on markers drawn from the same two distributions the programme uses. It is not a security claim: an adversary who can choose the marker is not modelled here, and a gate that separates two fixed distributions says nothing about one that must resist a search for a passing vector.
 
 **Interpretation (post hoc, record unchanged):** The number the deletion claim needed and did not have. Across 2.2 million fresh unsigned markers and eleven checkpoints the gate admits one in about 1,180, with a tight interval and no false rejects at all. That is the bound on every SHRED result in this programme: behavioural deletion is complete and the residual sits at chance, but roughly one payload per thousand would pass verification. It just clears the pre-registered bar of one in a thousand, and it is a limit rather than a guarantee.
+
+## e000022_two_channel_null
+
+_not run in this session_

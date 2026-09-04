@@ -83,6 +83,12 @@ NOTES = {
         "control: with the slot disabled, alias reading is 0% and fact reading is 100%. Two results are withheld and "
         "recorded as failures: shredding the alias rather than the payload reaches only 93% on the worst seed, and the "
         "two-slot control does not resolve two-link chains because chains never occur in the training distribution.",
+    "e000018_both": "Read the three arms together rather than one at a time. The match gate alone leaves injection "
+        "into unrelated text exactly where it was (3.2681 against a baseline of 3.2741); generic text in training "
+        "alone brings it to 0.6035; both together to 0.6736. All of the improvement is the behavioural training and "
+        "none is the added capacity, and no arm gets within a factor of twelve of the bar. The reason is that "
+        "refusing a question and ignoring prose are routed through one null column and pull in opposite directions, "
+        "which is a design fault rather than a tuning failure.",
     "e000021_gate_error_rates": "The number the deletion claim needed and did not have. Across 2.2 million fresh "
         "unsigned markers and eleven checkpoints the gate admits one in about 1,180, with a tight interval and no "
         "false rejects at all. That is the bound on every SHRED result in this programme: behavioural deletion is "
