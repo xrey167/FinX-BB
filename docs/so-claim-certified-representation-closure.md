@@ -30,6 +30,20 @@ plausible scale.
 | bystander facts under the same ablation | **0.3897** from 1.0000 |
 | deletion-subspace overlap vs a **design-matched null** | 0.5566 vs 0.6872 — **−0.1306** |
 
+## What the store side actually establishes, stated at its real size
+
+`(closure − 1)/k` matching the neural reader at error **0.0000** in all three arms is the number this
+programme quotes most, and it is worth less than it looks. Remove the object record and the keys still
+answering are exactly those whose own record survives — the store's arithmetic, not a discovery about
+the model. **It is reader fidelity, not forecasting**, and describing it as "a store-side statistic
+predicts the model" over-reads it.
+
+Fidelity is not nothing: this is a frozen GPT-2 with a strong prior over capitals, so a key whose
+record is gone could have kept answering from that prior, and E-000013 measures that fallback existing.
+It does not fire here. But the value is **compositional, not predictive** — because fidelity is
+established once as a property of the method, a fact-level guarantee reduces to a store-side search
+plus a store-side sweep, at 1.45–1.80 s and zero model evaluations per deletion.
+
 ## The retraction, and what replaced it
 
 I claimed "allocation, not capacity" — that the model had room for private subspaces and did not take

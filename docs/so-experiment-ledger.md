@@ -1805,10 +1805,20 @@ Two experiments that had been running since the session opened finished, one con
 refusing to.
 
 **E-000032, three seeds, twenty-six pre-registered criteria, all PASS.** This is the experiment
-§31.22's law was extracted from, and it now stands at full strength. Its sharpest number is the one
-that puts a store-side statistic at risk against a neural measurement rather than reporting it
-alongside: `(closure − 1) / keys_per_group`, computed from the store **before the model is run at
-all**, predicts what the frozen GPT-2 still reads back after only the object record is removed.
+§31.22's law was extracted from. Its most-quoted number needs a correction that is recorded here
+rather than left standing: `(closure − 1) / keys_per_group`, computed from the store **before the
+model is run at all**, matches what the frozen GPT-2 reads back after only the object record is
+removed, with error 0.0000 in all three arms.
+
+**That is not a forecast of a neural behaviour, and calling it one over-reads it.** Remove the object
+record and the keys that still answer are exactly the ones whose own record survives — which is the
+store's arithmetic, not a discovery about the model. Given a faithful reader the number cannot come
+out otherwise. What the 0.0000 *does* establish is READER FIDELITY, and that is not empty: this is a
+frozen GPT-2 with a strong pretrained prior over capitals, so a key whose record is gone could have
+gone on answering from the prior (E-000013 measures exactly that fallback), and it does not. The value
+of the result is therefore COMPOSITIONAL rather than predictive — because fidelity is established once
+as a property of the method, a fact-level guarantee reduces to a store-side search plus a store-side
+sweep.
 
 | store | fact closure | predicted still readable | measured still readable | prediction error |
 |---|---|---|---|---|
