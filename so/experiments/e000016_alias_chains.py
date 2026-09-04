@@ -29,7 +29,7 @@ import torch
 
 from so import ledger
 from so.experiments import e000015_symlink_cells as E15
-from so.experiments.e000001b_mini_transformer import CHECKPOINTS, CKPT_SUFFIX, _sha256
+from so.experiments.e000001b_mini_transformer import CHECKPOINTS, CKPT_SUFFIX, guard_recorded_checkpoint, _sha256
 from so.model import ModelConfig, MutableKnowledgeTransformer
 
 P_CHAIN = 0.30
@@ -47,6 +47,7 @@ def train_or_load(seed: int, steps: int, n_deref: int, force: bool = False) -> D
                 "train_seconds": ck["train_seconds"], "checkpoint_sha256": _sha256(path)}
     out = E15.train_symlink(cfg_m, cfg_t, p_chain=P_CHAIN)
     CHECKPOINTS.mkdir(parents=True, exist_ok=True)
+    guard_recorded_checkpoint(path)
     torch.save({"model": out["model"].state_dict(), "model_cfg": cfg_m.to_dict(), "train_cfg": cfg_t.to_dict(),
                 "centre": out["centre"], "history": out["history"], "train_seconds": out["train_seconds"],
                 "p_chain": P_CHAIN}, path)

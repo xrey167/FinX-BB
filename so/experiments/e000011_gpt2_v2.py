@@ -29,7 +29,7 @@ from so import ledger
 from so.attacks import LinearProbe, forced_choice, object_rank
 from so.data import Bank, bank_from_store, bank_from_world, sample_training_queries
 from so.experiments import e000008_gpt2_adapter as E8
-from so.experiments.e000001b_mini_transformer import CHECKPOINTS, CKPT_SUFFIX, _sha256
+from so.experiments.e000001b_mini_transformer import CHECKPOINTS, CKPT_SUFFIX, guard_recorded_checkpoint, _sha256
 from so.llm_adapter import AdapterConfig
 from so.mvcc import MVCCStore
 from so.reference import ReferenceResolver, load_world
@@ -114,6 +114,7 @@ def train_or_load(gk: E8.GPT2Knowledge, seed: int, steps: int, force: bool = Fal
                 "checkpoint_sha256": _sha256(path)}
     out = train_adapter_v2(gk, seed, steps)
     CHECKPOINTS.mkdir(parents=True, exist_ok=True)
+    guard_recorded_checkpoint(path)
     torch.save({"adapter": E8.adapter_state(gk.model), "centre": out["centre"], "history": out["history"],
                 "train_seconds": out["train_seconds"], "adapter_config": gk.model.cfg.to_dict()}, path)
     out["loaded"] = False

@@ -55,6 +55,31 @@ def _sha256(path: Path) -> str:
     return h.hexdigest()
 
 
+def guard_recorded_checkpoint(path: Path) -> None:
+    """Refuse to overwrite a checkpoint whose SHA-256 a saved record cites.
+
+    A record is only reproducible while the checkpoint it names is still on disk.  A forced re-run of
+    E-000020 silently replaced the seed-0 and seed-1 checkpoints of its own published record, so two
+    thirds of it can no longer be re-scored; nothing in the code noticed.  This does.  Set
+    ``SO_ALLOW_OVERWRITE=1`` to proceed anyway, or write under a different name (``SO_CKPT_SUFFIX``).
+    """
+    if not path.exists() or os.environ.get("SO_ALLOW_OVERWRITE") == "1":
+        return
+    import json
+    digest = _sha256(path)
+    for record in sorted(ledger.RESULTS_DIR.glob("*.json")):
+        try:
+            text = record.read_text()
+        except OSError:
+            continue
+        if digest in text:
+            raise SystemExit(
+                f"refusing to overwrite {path}: its SHA-256 is cited by {record.name}, which would stop that "
+                f"record from being reproducible.\n"
+                f"Re-score it instead, or set SO_CKPT_SUFFIX to write under another name, or "
+                f"SO_ALLOW_OVERWRITE=1 to overwrite on purpose.")
+
+
 def train_or_load(name: str, seed: int, model_cfg: ModelConfig, train_cfg: TrainConfig, force: bool = False):
     path = checkpoint_path(name, seed)
     if path.exists() and not force:
@@ -67,6 +92,7 @@ def train_or_load(name: str, seed: int, model_cfg: ModelConfig, train_cfg: Train
                 "checkpoint": str(path), "checkpoint_sha256": _sha256(path)}
     out = train(model_cfg, train_cfg)
     CHECKPOINTS.mkdir(parents=True, exist_ok=True)
+    guard_recorded_checkpoint(path)
     torch.save({"state_dict": out["model"].state_dict(), "centre": out["centre"], "history": out["history"],
                 "train_config": out["train_config"], "model_config": out["model_config"],
                 "train_seconds": out["train_seconds"]}, path)

@@ -27,7 +27,7 @@ import torch
 from so import ledger
 from so.evaluation import run_suite
 from so.experiments.common import answers, fresh_world, load_base_model
-from so.experiments.e000001b_mini_transformer import CHECKPOINTS, CKPT_SUFFIX, EVAL_CONFIG
+from so.experiments.e000001b_mini_transformer import CHECKPOINTS, CKPT_SUFFIX, EVAL_CONFIG, guard_recorded_checkpoint
 from so.interventions import disable_mask
 from so.model import ModelConfig, MutableKnowledgeTransformer
 from so.train import TrainConfig, train
@@ -56,6 +56,7 @@ def train_variant(name: str, seed: int, steps: int, force: bool = False):
         return model, ck["centre"], ck["train_seconds"]
     out = train(mc, TrainConfig(seed=seed, n_steps=steps, **v["train"]))
     CHECKPOINTS.mkdir(parents=True, exist_ok=True)
+    guard_recorded_checkpoint(path)
     torch.save({"state_dict": out["model"].state_dict(), "centre": out["centre"], "model_config": mc.to_dict(),
                 "train_seconds": out["train_seconds"]}, path)
     return out["model"], out["centre"], out["train_seconds"]

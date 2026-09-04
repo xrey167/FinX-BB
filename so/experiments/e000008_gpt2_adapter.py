@@ -31,7 +31,7 @@ import torch.nn.functional as F
 from so import ledger
 from so.attacks import LinearProbe, forced_choice, object_rank
 from so.data import Bank, bank_from_store, bank_from_world, failing_hop_target, sample_training_queries
-from so.experiments.e000001b_mini_transformer import CHECKPOINTS, CKPT_SUFFIX
+from so.experiments.e000001b_mini_transformer import CHECKPOINTS, CKPT_SUFFIX, guard_recorded_checkpoint
 from so.llm_adapter import AdapterConfig, KnowledgeAdapterLM
 from so.mvcc import MVCCStore
 from so.reference import ReferenceResolver, load_world
@@ -212,6 +212,7 @@ def train_or_load(gk: GPT2Knowledge, seed: int, steps: int, force: bool = False,
         return {"centre": ck["centre"], "history": ck["history"], "train_seconds": ck["train_seconds"], "loaded": True}
     out = train_adapter(gk, seed, steps, batch_size=batch_size)
     CHECKPOINTS.mkdir(parents=True, exist_ok=True)
+    guard_recorded_checkpoint(path)
     torch.save({"adapter": adapter_state(gk.model), "centre": out["centre"], "history": out["history"],
                 "train_seconds": out["train_seconds"], "adapter_config": gk.model.cfg.to_dict()}, path)
     out["loaded"] = False

@@ -51,7 +51,7 @@ import torch.nn.functional as F
 from so import ledger
 from so.attacks import LinearProbe, forced_choice, object_rank
 from so.data import Bank, Batch, bank_from_store, failing_hop_target, reverse_target, sample_training_queries
-from so.experiments.e000001b_mini_transformer import CHECKPOINTS, CKPT_SUFFIX, _sha256
+from so.experiments.e000001b_mini_transformer import CHECKPOINTS, CKPT_SUFFIX, guard_recorded_checkpoint, _sha256
 from so.model import ModelConfig, MutableKnowledgeTransformer
 from so.mvcc import MVCCStore
 from so.reference import ReferenceResolver
@@ -625,6 +625,7 @@ def train_or_load(seed: int, steps: int, n_deref: int = 1, force: bool = False) 
                 "train_seconds": ck["train_seconds"], "checkpoint_sha256": _sha256(path)}
     out = train_symlink(cfg_m, cfg_t)
     CHECKPOINTS.mkdir(parents=True, exist_ok=True)
+    guard_recorded_checkpoint(path)
     torch.save({"model": out["model"].state_dict(), "model_cfg": cfg_m.to_dict(), "train_cfg": cfg_t.to_dict(),
                 "centre": out["centre"], "history": out["history"], "train_seconds": out["train_seconds"]}, path)
     out["checkpoint_sha256"] = _sha256(path)

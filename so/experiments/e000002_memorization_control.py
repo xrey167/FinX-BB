@@ -27,7 +27,7 @@ import torch
 
 from so import ledger
 from so.experiments.common import accuracy, answers, load_base_model, unknown_rate
-from so.experiments.e000001b_mini_transformer import CHECKPOINTS
+from so.experiments.e000001b_mini_transformer import CHECKPOINTS, guard_recorded_checkpoint
 from so.model import ModelConfig, MutableKnowledgeTransformer
 from so.mvcc import MVCCStore
 from so.reference import load_world
@@ -48,6 +48,7 @@ def train_fixed(seed: int, steps: int, use_routing: bool, world: World, force: b
         return model, ck["centre"], ck["train_seconds"]
     out = train(mc, TrainConfig(seed=seed, n_steps=steps, fixed_world=True), world_override=world)
     CHECKPOINTS.mkdir(parents=True, exist_ok=True)
+    guard_recorded_checkpoint(path)
     torch.save({"state_dict": out["model"].state_dict(), "centre": out["centre"], "model_config": mc.to_dict(),
                 "train_seconds": out["train_seconds"]}, path)
     return out["model"], out["centre"], out["train_seconds"]
