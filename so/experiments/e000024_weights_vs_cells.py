@@ -642,6 +642,11 @@ CRITERIA = {
     "cells/after/forced_choice": ("<=", 0.60),
     "cells/after/true_obj_top1": ("<=", 0.02),
     "cells/relearn/heldout_acc": ("<=", 0.05),
+    # validity: the relearning attack must demonstrably work on the facts the attacker supplied,
+    # or "the others did not come back" is a statement about a weak attacker, not about the system
+    "cells/relearn/supplied_acc": (">=", 0.50),
+    "ga/relearn/supplied_acc": (">=", 0.50),
+    "relabel/relearn/supplied_acc": (">=", 0.50),
     # the frozen core is untouched, bit for bit
     "cells/weight_delta_l2": ("<=", 0.0),
     "cells/ppl_delta": ("<=", 0.0),          # and the frozen core reads ordinary prose exactly as before
@@ -657,9 +662,15 @@ def main(argv: List[str] | None = None) -> Dict[str, Any]:
     ap.add_argument("--n-targets", type=int, default=N_TARGETS)
     ap.add_argument("--n-cells", type=int, default=N_CELLS)
     ap.add_argument("--threads", type=int, default=int(os.environ.get("SO_THREADS", "0")))
+    ap.add_argument("--tag", default="", help="suffix for the record name, so parallel seed runs do not "
+                                              "overwrite each other; combine them later with --combine")
+    ap.add_argument("--combine", nargs="*", default=None,
+                    help="do not run anything: merge these tagged records into the canonical one")
     args = ap.parse_args(argv)
     if args.threads:
         torch.set_num_threads(args.threads)
+    if args.combine is not None:
+        return combine(args.combine, args.n_targets, args.n_cells, args.lora_steps, args.unlearn_steps)
 
     per_seed: List[Dict[str, float]] = []
     for seed in args.seeds:
@@ -670,6 +681,28 @@ def main(argv: List[str] | None = None) -> Dict[str, Any]:
         m["seed"] = seed
         per_seed.append(m)
 
+    return report(per_seed, args.seeds, args.n_targets, args.n_cells, args.lora_steps,
+                  args.unlearn_steps, args.tag)
+
+
+def combine(tags: Sequence[str], n_targets: int, n_cells: int, lora_steps: int, unlearn_steps: int) -> Dict[str, Any]:
+    """Merge the per-seed records written by parallel runs into the canonical record."""
+    import json
+    per_seed: List[Dict[str, float]] = []
+    for tag in tags:
+        path = ledger.RESULTS_DIR / f"e000024_weights_vs_cells{tag}.json"
+        if not path.exists():
+            raise SystemExit(f"missing {path}")
+        per_seed += json.loads(path.read_text())["per_seed"]
+    per_seed.sort(key=lambda s: s["seed"])
+    seeds = [int(s["seed"]) for s in per_seed]
+    if len(set(seeds)) != len(seeds):
+        raise SystemExit(f"the records overlap on seeds {sorted(seeds)}; each seed may appear once")
+    return report(per_seed, seeds, n_targets, n_cells, lora_steps, unlearn_steps, "")
+
+
+def report(per_seed: List[Dict[str, float]], seeds: Sequence[int], n_targets: int, n_cells: int,
+           lora_steps: int, unlearn_steps: int, tag: str) -> Dict[str, Any]:
     keys = [k for k in REPORT_KEYS if all(k in s for s in per_seed)]
     agg = ledger.aggregate(per_seed, keys)
     check = ledger.check_criteria(agg, {k: v for k, v in CRITERIA.items() if k in agg})
@@ -685,12 +718,12 @@ def main(argv: List[str] | None = None) -> Dict[str, Any]:
              "cells/delete_seconds", "ga/delete_seconds", "relabel/delete_seconds",
              "cells/ppl_after", "ga/ppl_after", "relabel/ppl_after",
              "cells/after/generic_kl_mean", "ga/after/generic_kl_mean", "relabel/after/generic_kl_mean"}
-    sizes = {k: args.n_targets for k in keys if k.endswith(("direct_acc", "paraphrase_acc", "forced_choice",
+    sizes = {k: n_targets for k in keys if k.endswith(("direct_acc", "paraphrase_acc", "forced_choice",
                                                             "true_obj_top1", "probe_top1", "probe_top5",
                                                             "bystander_acc"))}
     for k in list(sizes):
         if "relearn/" in k:
-            sizes[k] = args.n_targets // 2
+            sizes[k] = n_targets // 2
     rows = ledger.ci_rows(per_seed, keys, sizes, lower_is_better=sorted(lower))
 
     head = ["measure", "cells (SHRED)", "weights, ascent", "weights, relabel", "chance"]
@@ -729,21 +762,21 @@ def main(argv: List[str] | None = None) -> Dict[str, Any]:
     ])
 
     record = {"experiment": "E-000024", "title": "deleting a fact from weights versus deleting it from cells",
-              "seeds": args.seeds, "n_cells": args.n_cells, "n_targets": args.n_targets,
-              "n_bystanders": N_BYSTANDERS, "lora_rank": LORA_RANK, "lora_steps": args.lora_steps,
-              "unlearn_steps_budget": args.unlearn_steps, "relearn_steps": RELEARN_STEPS,
+              "seeds": list(seeds), "n_cells": n_cells, "n_targets": n_targets,
+              "n_bystanders": N_BYSTANDERS, "lora_rank": LORA_RANK, "lora_steps": lora_steps,
+              "unlearn_steps_budget": unlearn_steps, "relearn_steps": RELEARN_STEPS,
               "chance_top1": CHANCE_TOP1, "chance_mean_rank": CHANCE_RANK,
               "per_seed": per_seed, "aggregate": agg, "criteria": check}
 
     md = [f"# E-000024 — {record['title']}", "",
-          f"Seeds {args.seeds}; {args.n_cells} facts, {args.n_targets} deletion targets, {N_BYSTANDERS} bystanders.",
+          f"Seeds {list(seeds)}; {n_cells} facts, {n_targets} deletion targets, {N_BYSTANDERS} bystanders.",
           "The cells arm is the frozen GPT-2 of E-000012 with its trained adapter; the weights arms are the same",
           f"frozen GPT-2 with a rank-{LORA_RANK} LoRA fine-tuned on the identical facts and then unlearned two ways.",
           "All three arms are driven to the same surface criterion and attacked identically.", "",
           "## The comparison (worst seed)", "", compare, "",
           "## Pre-registered criteria", "", ledger.criteria_table(check), "",
           "## All measures", "", ledger.table(ledger.CI_HEADERS, rows), ""]
-    path = ledger.save("e000024_weights_vs_cells", record, "\n".join(md))
+    path = ledger.save(f"e000024_weights_vs_cells{tag}", record, "\n".join(md))
     print(f"\nwritten: {path}")
     print(compare)
     print(ledger.criteria_table(check))
