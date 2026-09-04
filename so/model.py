@@ -185,6 +185,12 @@ class MutableKnowledgeTransformer(nn.Module):
     def encode_bank(self, bank: Dict[str, torch.Tensor], noise: float = 0.0,
                     generator: Optional[torch.Generator] = None) -> Dict[str, torch.Tensor]:
         s, r, o = self.ent_emb(bank["subject"]), self.cell_rel_emb(bank["relation"]), self.ent_emb(bank["obj"])
+        if "payload_delta" in bank:
+            # Zero by default and therefore numerically a no-op. It exists so the payload can be a
+            # DIFFERENTIABLE input: a quantity that is only ever an integer index cannot be asked
+            # whether it influences the output, and so.audit.certify_structural needs to ask exactly
+            # that. See its docstring for why reachability is the domain-free form of the claim.
+            o = o + bank["payload_delta"]
         g = self.gate(bank["marker"])
         k_f = self.k_fwd(self.ln_key(s + r))
         v_f = self.v_fwd(o)

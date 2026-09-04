@@ -564,3 +564,98 @@ def check_row_locality(model: nn.Module, bank: Dict[str, torch.Tensor], probe_ro
                          "NOT row-local: one row's payload moves another row's encoding, so the joint "
                          "claim stays a sample. so/model.py jitter() takes its rms over all rows, which "
                          "is the known cause at noise > 0.")
+
+
+# ------------------------------------------------- independence without a finite domain to sweep
+
+@dataclass
+class StructuralResult:
+    """Independence as a property of the computation graph rather than of a swept domain.
+
+    ``certify_encoding`` and ``certify_deletion`` sweep every value the payload could hold. That is
+    exact, but it needs the domain to be small and finite -- here an entity id with 256 values. Real
+    stores hold text, embeddings, images: domains no sweep can exhaust. So the sharpest objection to
+    the whole instrument is that it works only on a toy payload.
+
+    Reachability answers the same question without the domain. Make the payload a differentiable input
+    and ask autograd whether any output is reachable from it. Three outcomes, in decreasing strength:
+
+      no path        ``grad`` comes back None: the payload is not in the output's computation graph at
+                     all. This is a THEOREM about every value the payload could take, over any domain,
+                     finite or not, and it costs one backward pass. It is what DELETE achieves and what
+                     a gate never can.
+      zero gradient  A path exists and the derivative is exactly zero here. That is what multiplying by
+                     a gate of exactly zero gives, and it holds wherever the gate stays zero -- but the
+                     gate is a function of the marker, so the claim is only as good as the argument that
+                     the marker does not move. Weaker than no path, stronger than a sample.
+      nonzero        The output moves with the payload. Dependent, and the size says how much.
+
+    The three compose: reachability makes the domain-free claim, the sweep makes the exact claim on a
+    finite domain, and where both are available they must agree -- a disagreement means one of them is
+    wrong, which is worth knowing.
+    """
+
+    reachable: bool
+    grad_max: float
+    n_outputs: int
+    note: str = ""
+
+    @property
+    def certified_structurally(self) -> bool:
+        return not self.reachable
+
+    def summary(self) -> str:
+        if not self.reachable:
+            return "NO PATH: the payload is not in the output's graph, for any value over any domain"
+        if self.grad_max == 0.0:
+            return ("path exists, gradient exactly zero: annihilated here, and only as global as the "
+                    "argument that the annihilating factor does not move")
+        return f"REACHABLE: the output moves with the payload, |grad| up to {self.grad_max:.3e}"
+
+
+def certify_structural(model: nn.Module, bank: Dict[str, torch.Tensor], deleted_rows: Sequence[int],
+                       run: Callable[[Dict[str, torch.Tensor]], Any], d_payload: int,
+                       outputs_of: Optional[Callable[[Any], Any]] = None,
+                       delta_key: str = "payload_delta") -> StructuralResult:
+    """Ask autograd whether any output is reachable from the deleted rows' payload.
+
+    Both ``encode_bank`` implementations add ``bank[delta_key]`` to the payload embedding when the key
+    is present. It is zeros, so nothing changes numerically; it exists so that the payload -- otherwise
+    an integer index, which autograd cannot differentiate -- becomes a leaf the graph can be questioned
+    about. Rows outside ``deleted_rows`` get a delta too, and it is detached, so only the deleted rows'
+    payloads are under test.
+    """
+    n_rows = int(next(v for v in bank.values() if torch.is_tensor(v)).shape[0])
+    if not len(list(deleted_rows)):
+        # Nothing to perturb: the payload is not an input to this computation at all. That is the
+        # DELETE case, and it is the strong outcome rather than a degenerate one.
+        return StructuralResult(False, 0.0, 0,
+                                "no deleted row remains in the bank, so its payload is not an input")
+    eps = torch.zeros(len(deleted_rows), d_payload, requires_grad=True)
+    delta = torch.zeros(n_rows, d_payload)
+    probe = {k: (v.clone() if torch.is_tensor(v) else v) for k, v in bank.items()}
+    rows = torch.as_tensor([int(r) for r in deleted_rows], dtype=torch.long)
+    probe[delta_key] = delta.index_put((rows,), eps)
+
+    with torch.enable_grad():
+        out = run(probe)
+    picked = outputs_of(out) if outputs_of is not None else out
+    tensors = [t for _, t in _flatten(picked) if torch.is_tensor(t) and t.is_floating_point()]
+    if not tensors:
+        return StructuralResult(False, 0.0, 0, "no floating-point output to differentiate")
+    if not any(t.requires_grad for t in tensors):
+        # Distinguish "no path" from "no graph". A runner that wraps its forward in torch.no_grad()
+        # produces outputs with no grad_fn at all, and reading that as independence would certify
+        # every deletion trivially -- the most dangerous failure this instrument could have.
+        raise RuntimeError(
+            "the outputs carry no autograd graph, so reachability cannot be decided. The runner passed "
+            "to certify_structural must NOT wrap its forward in torch.no_grad(); certifying on a "
+            "gradient-free run would report 'no path' for everything.")
+    total = sum(t.sum() for t in tensors)
+    grad = torch.autograd.grad(total, eps, allow_unused=True, retain_graph=False)[0]
+    if grad is None:
+        return StructuralResult(False, 0.0, len(tensors),
+                                "autograd found no path from the deleted payload to any output")
+    g = float(grad.abs().max().item())
+    return StructuralResult(True, g, len(tensors),
+                            "a path exists" + (" but the derivative is exactly zero" if g == 0.0 else ""))

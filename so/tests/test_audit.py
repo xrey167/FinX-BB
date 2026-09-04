@@ -291,3 +291,92 @@ def test_noise_breaks_row_locality_because_the_jitter_rms_is_global():
                                                             generator=torch.Generator().manual_seed(0)))
     assert not chk.row_local, chk.note
     assert "NOT row-local" in chk.note
+
+
+# ------------------------------- reachability: the domain-free form, and the three outcomes it can give
+
+from so.audit import certify_structural  # noqa: E402
+
+D_MODEL = 32
+
+
+def _run_grad(model, bank, q):
+    """Reachability needs the graph, so this runner must not disable it."""
+    mode, start, rels, hop_valid = q
+    return lambda b: model(b, mode, start, rels, hop_valid)
+
+
+def test_a_live_cell_is_reachable_from_its_payload():
+    """The validity control. If a readable cell is not reachable, the instrument measures nothing."""
+    m = _model()
+    _shut_gate(m, 20.0)
+    a = _bank(p_shred=0.0)
+    q = _queries(a)
+    res = certify_structural(m, a, [0], _run_grad(m, a, q), D_MODEL, outputs_of=LOGITS)
+    assert res.reachable and res.grad_max > 0, res.summary()
+
+
+def test_a_shut_gate_annihilates_the_value_path_but_leaves_it_reachable():
+    """The middle outcome, and why it is not the strong claim: v_f = v_fwd(o) * g with g == 0."""
+    m = _model()
+    _shut_gate(m)
+    a = _bank(p_shred=1.0)
+    q = _queries(a)
+    res = certify_structural(m, a, [0], _run_grad(m, a, q), D_MODEL, outputs_of=LOGITS)
+    # the reverse key is ungated, so in THIS model the payload still reaches the output
+    assert res.reachable, res.summary()
+
+
+def test_a_sigmoid_gate_never_annihilates_the_path_exactly():
+    """The same finding as the frozen-GPT-2 residual, seen as a derivative instead of a difference.
+
+    A soft gate is a sigmoid, so it is never exactly zero, so the derivative of the output with respect
+    to a shredded payload is never exactly zero either -- here 1e-10, in the adapter 1.39e-02 of the
+    payload surviving in the value. A gate cannot deliver even the middle outcome, let alone the strong
+    one; that takes a hard threshold or removing the row.
+    """
+    m = _model(gate_reverse_key=True)
+    _shut_gate(m)
+    a = _bank(p_shred=1.0)
+    q = _queries(a)
+    res = certify_structural(m, a, [0], _run_grad(m, a, q), D_MODEL, outputs_of=LOGITS)
+    assert res.reachable and 0.0 < res.grad_max < 1e-6, res.summary()
+    assert not res.certified_structurally
+
+
+def test_a_hard_gate_does_annihilate_the_path_exactly():
+    m = _model(gate_reverse_key=True)
+    _shut_gate(m)
+    m.cfg.hard_gate = True                     # thresholded to exactly 0 or 1
+    a = _bank(p_shred=1.0)
+    q = _queries(a)
+    res = certify_structural(m, a, [0], _run_grad(m, a, q), D_MODEL, outputs_of=LOGITS)
+    assert res.grad_max == 0.0, res.summary()
+    assert not res.certified_structurally      # a path is still there; only the derivative vanishes
+
+
+def test_a_row_taken_out_of_the_bank_has_no_path_at_all():
+    """The strong outcome, and the only one that is a theorem about every value over any domain."""
+    m = _model()
+    a = _bank(p_shred=0.0)
+    keep = torch.ones(a["subject"].shape[0], dtype=torch.bool)
+    keep[0] = False
+    kept = {k: (v[keep] if torch.is_tensor(v) and v.shape[:1] == keep.shape else v) for k, v in a.items()}
+    q = _queries(kept)
+    # no deleted row remains to perturb: the payload is not an input to this computation
+    res = certify_structural(m, kept, [], _run_grad(m, kept, q), D_MODEL, outputs_of=LOGITS)
+    assert res.certified_structurally, res.summary()
+    assert "no path" in res.summary().lower()
+
+
+def test_the_delta_is_numerically_a_no_op():
+    """The instrumentation must not change what the model computes, or every recorded result moves."""
+    m = _model()
+    a = _bank(p_shred=0.3)
+    q = _queries(a)
+    with torch.no_grad():
+        without = _run(m, a, q)()[0]
+        b = {k: (v.clone() if torch.is_tensor(v) else v) for k, v in a.items()}
+        b["payload_delta"] = torch.zeros(a["subject"].shape[0], D_MODEL)
+        with_delta = _run(m, b, q)()[0]
+    assert torch.equal(without, with_delta)

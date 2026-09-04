@@ -212,6 +212,8 @@ class KnowledgeAdapterLM(nn.Module):
         subj = self.w_in[self.entity_token_ids[bank["subject"]]]     # a key, not a logit direction
         w_val = self.w_in if self.cfg.payload_from == "input" else self.w_out
         obj = w_val[self.entity_token_ids[bank["obj"]]]
+        if "payload_delta" in bank:
+            obj = obj + bank["payload_delta"]      # zero by default; see so.audit.certify_structural
         keys = self.k_proj(self.ln_key(subj + self.rel_emb(bank["relation"])))
         g = self.gate(bank["marker"])
         payload = self.v_proj(obj)
