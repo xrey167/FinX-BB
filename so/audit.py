@@ -1184,6 +1184,12 @@ def certify_fact(record: "Certificate", closure: "FactClosure", removed: Sequenc
                 removed payload -- and it discharges the same requirement. Where both are supplied,
                 both must hold.
 
+    EVERY CHECK THAT IS SUPPLIED MUST HOLD. The anti-vacuity requirement is discharged by ANY one of
+    the structural, membership or store checks, but a check that was run and FAILED voids the
+    certificate whether or not another one passed: a certificate that validates while its own
+    ``AbsenceCheck`` reads VOID is the disjunction this function used to compute, and a review caught
+    it (ledger §31.33). Supplying a check is a statement that it is part of the claim.
+
     Every way this can fail is named in ``void_reason`` rather than folded into a boolean, because a
     certificate whose failure modes are invisible is worse than no certificate.
     """
@@ -1200,6 +1206,11 @@ def certify_fact(record: "Certificate", closure: "FactClosure", removed: Sequenc
     reasons: List[str] = []
     if store_absence is not None and not store_absence.certified:
         reasons.append(f"the store counterfactual moved a surviving row: {store_absence.summary()}")
+    if absence is not None and not absent_ok:
+        reasons.append(f"the membership check that was supplied does not hold: {absence.summary()}")
+    if structural is not None and not structural_ok:
+        reasons.append("the structural check that was supplied found a path from the payload to an "
+                       f"output: {structural.summary()}")
     if not swept and not (structural_ok or absent_ok or store_ok):
         why = ""
         if absence is not None:

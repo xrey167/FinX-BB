@@ -1807,18 +1807,23 @@ refusing to.
 **E-000032, three seeds, twenty-six pre-registered criteria, all PASS.** This is the experiment
 §31.22's law was extracted from. Its most-quoted number needs a correction that is recorded here
 rather than left standing: `(closure − 1) / keys_per_group`, computed from the store **before the
-model is run at all**, matches what the frozen GPT-2 reads back after only the object record is
-removed, with error 0.0000 in all three arms.
+model is run at all**, matches what the reader reads back after only the object record is
+removed, with error 0.0000 in all three arms. **[Corrected in §31.33: the reader in E-000032 is the
+E-000015 `MutableKnowledgeTransformer`, not the frozen GPT-2 as this section first said; and the
+agreement is star arithmetic — on a chain the formula is wrong by a grid step against the store's
+own resolver, with no model in the loop.]**
 
 **That is not a forecast of a neural behaviour, and calling it one over-reads it.** Remove the object
 record and the keys that still answer are exactly the ones whose own record survives — which is the
 store's arithmetic, not a discovery about the model. Given a faithful reader the number cannot come
-out otherwise. What the 0.0000 *does* establish is READER FIDELITY, and that is not empty: this is a
-frozen GPT-2 with a strong pretrained prior over capitals, so a key whose record is gone could have
-gone on answering from the prior (E-000013 measures exactly that fallback), and it does not. The value
-of the result is therefore COMPOSITIONAL rather than predictive — because fidelity is established once
-as a property of the method, a fact-level guarantee reduces to a store-side search plus a store-side
-sweep.
+out otherwise. What the 0.0000 *does* establish is READER FIDELITY. **[The defence that followed here
+— that a frozen GPT-2 with a pretrained prior over capitals could have gone on answering from the
+prior and did not — is withdrawn in §31.33: the model that ran is trained from scratch on worlds
+resampled every step and has no prior to answer from; on the actual GPT-2 adapter the same read is a
+recorded FAIL (E-000020, direct 0.5700 / alias 0.5067 / dup 0.5483) and the test was not run there.]**
+The value of the result is therefore COMPOSITIONAL rather than predictive — because fidelity is
+established once as a property of the method, a fact-level guarantee reduces to a store-side search
+plus a store-side sweep.
 
 | store | fact closure | predicted still readable | measured still readable | prediction error |
 |---|---|---|---|---|
@@ -1832,8 +1837,11 @@ fact-level statement: at the record level the three stores are indistinguishable
 1.00 everywhere — the greedy search met a certified lower bound from pairwise-disjoint derivations,
 so the numbers are minima and not merely the best found.
 
-And the cost, now that the instrument control is a property of the method rather than of each
-deletion: **1.45–1.80 s per certified fact deletion and zero model evaluations inside it.** E-000024
+And the cost, as this section first stated it: **1.45–1.80 s per certified fact deletion and zero
+model evaluations inside it.** **[Corrected in §31.33: the zero was a literal in the code, not a
+count; the certification window holds one standalone `encode_bank`, and the reachability control
+runs the model once per fact inside the loop and was timed apart. The counted table is in the
+re-run's report.]** E-000024
 is the comparison — 129 s by gradient ascent, 335 s by relabelling, 2,359,296 parameters changed,
 perplexity on ordinary prose from 42.9 to 6.19e+09, and no certificate available at all, because
 there is no finite payload domain to sweep and no interface the data passes through.
@@ -2309,6 +2317,166 @@ clean substrate. The constructive half of E-000043 remains untested, and the tes
 specified by this failure: the same two arms on the E-000020 symlink checkpoints — the frozen GPT-2
 adapter, where arm A exhibits the collateral loss — with the criteria unchanged. That experiment is
 E-000047 and has not been run.
+
+### 31.33 The zero-evaluation forecast: a literal, a misattributed reader, and star arithmetic (2026-09-04, E-000032 re-run)
+
+The claim under test, stated so it could be killed: *a store-side statistic computed without the
+model forecasts what the neural reader answers after a deletion, and the fact-level certificate is
+discharged with zero model evaluations.* A fourteen-agent sweep — prior art first, then three
+independent refuters per limb, then a landing — returned "surviving: none". Every code citation in
+its verdict was checked by hand against this repository before this entry was written, and every one
+holds. This is the eighth retraction of the session and it reaches the result that survived the
+previous seven reviews.
+
+**Defect 1 — the formula is not a function of the store.** `(closure − 1) / keys_per_group`
+reproduces 0 / ⅓ / ⅔ on the three star arms and fails on a chain by a full grid step, with the
+mechanical resolver and no model anywhere:
+
+```
+star_link    closure=1  predicted 0.0000  measured 0.0000  err 0.0000
+star_mixed   closure=2  predicted 0.3333  measured 0.3333  err 0.0000
+star_copy    closure=3  predicted 0.6667  measured 0.6667  err 0.0000
+chain        closure=2  predicted 0.3333  measured 0.6667  err 0.3333
+```
+
+A chain is an alias that LINKs to a *copy* rather than to the object; evict the object and both the
+copy and the alias still answer. The formula holds only under an invariant `load_arm` and
+`load_mixed` impose by construction — every non-target closure member backs exactly one key — and
+`MVCCStore.link` does not require it; chains are the subject of E-000016 and have a training-time
+knob (`bank_with_links(..., p_chain)`, left at 0.0). The quantity that IS a function of the store is
+the post-deletion resolver count, which `certify_fact` already computes through `store_after`; put
+that in the formula's place and the "prediction" becomes, explicitly, *the adapter agrees with the
+mechanical resolver* — the adapter's job description, recorded at 1.0000 in E-000015 on the same
+checkpoints. §31.23 had already said the number is not a forecast; what it kept — "given a faithful
+reader the number cannot come out otherwise" — is exact on stars and false off them. The test is on
+record: `test_closure_minus_one_over_keys_is_star_arithmetic_and_not_a_store_law`.
+
+**Defect 2 — the reader is not GPT-2.** `e000032_deletion_closure.py:176` loads
+`train_or_load(seed, steps, n_deref=1)`, the `e000015_deref1_seed{0,1,2}.pt` checkpoints of a
+`MutableKnowledgeTransformer` trained from scratch on a 256-entity world resampled at every training
+step, with an explicit UNKNOWN head trained on broken queries. No GPT-2 forward pass occurs in
+E-000032; `gpt` appears in that file twice, both times in prose about E-000025. §31.23's defence of
+the 0.0000 — a pretrained prior over capitals *could* have gone on answering and did not — is
+therefore void: the model that ran has nothing to answer from. On the frozen GPT-2 adapter the
+corresponding reads are a recorded FAIL at template 0 (E-000020: direct 0.5700, alias 0.5067, dup
+0.5483), so the same test there would show prediction errors several times the 0.05 bar; it was not
+run there. Power, for the record: a reader guessing uniformly over 256 entities reproduces the
+canonical arm's exact 0.0000 over its 225 destroyed-route keys with probability (255/256)^225 ≈ 0.41.
+An exact zero is what a design with no residual variance looks like, not a calibrated forecast.
+
+**Defect 3 — the accounting.** `model_evaluations_per_deletion = 0.0` at `e000032:298` was a
+literal, not a count. `certify_encoding` over an empty row set computes its reference fingerprint
+through `encode_bank` — one standalone encode per certification, which the code's own docstring
+called vacuous while the table called it zero. The reachability control runs once per fact inside the
+loop (3.71–4.50 s per fact in the recorded run) and was timed apart from the 1.45–1.80 s "per
+certified deletion" and described as once per instrument. `check_mediation` — the falsification test
+of the interface certificate's premise — was never called on the configuration in use
+(`use_links=True, n_deref=1`); E-000030 ran it on the bare configuration and E-000032 inherited the
+result. And `certify_fact` discharged anti-vacuity as `swept or structural_ok or absent_ok or
+store_ok`, so a certificate could validate while its own `AbsenceCheck` read VOID; it did not happen
+in the recorded run (`one_record_payload_absent` 1.0000 in all arms) but the instrument allowed it.
+
+**What changed in code, all of it tested.** A `ModelCalls` wrapper over `forward` and `encode_bank`
+counts what the model is asked to do inside the certification window; the per-fact cost is reported
+with the control inside it; `check_mediation` on this configuration is a pre-registered control in
+all three arms (a VOID voids every certificate below it); `certify_fact` treats every supplied check
+as a conjunct, with two tests; the chain counterexample is a test; the report names the reader. The
+re-run's counted table is in `so/results/e000032_deletion_closure.md`; on the two-group smoke run the
+window held 0 forwards and 1 standalone encode per certification, the control 1 forward, and the
+mediation check moved both the encoding and the outputs on every arm — a real test, not a vacuous
+pass.
+
+**What the sweep reports as owned by others** (recorded as reported; the citations were read by the
+sweep's agents, not re-read for this entry). The closure object is query *resilience* — the minimum
+contingency set — Freire, Gatterbauer, Immerman and Meliou (PVLDB 2015), upstream Buneman, Khanna and
+Tan (PODS 2002); the pairwise-disjoint-witness lower bound is the standard packing bound there, and
+Makhija and Gatterbauer (SIGMOD 2024) give an ILP whose LP relaxation is provably tight for
+self-join-free conjunctive queries, strictly stronger than a greedy-plus-disjoint-family. The
+architectural premise — "data removed from the datastore is guaranteed not to contribute to any model
+predictions" — is SILO (Min et al., ICLR 2024), on right-to-erasure grounds, and "forgetting reduces to
+deleting entries" is LMLM (Zhao et al., NeurIPS 2025). Hold the model fixed, vary the store, delete an
+alias closure, use topology arms: Raeesi and Roed (arXiv:2607.00605, July 2026), 12,228 deletions,
+Base/Alias/Collision/Noise, residual 0.7–13.6%, parametric leakage 0.11% — and their §9 names
+canonicalisation at write time, aliases as pointers into one canonical record, as untested future
+work. **This repository must not claim the store design.** Store-derived answerability checked
+against a neural reader is GrailQAbility (Patidar et al., ACL 2023), where it fails. Zero computation
+at deletion time is Sekhari et al. (NeurIPS 2021, Lemma 1) and SISA; "no statistic of a trained
+network certifies deletion even in principle" is Thudi et al. (USENIX Security 2022) — the citation
+that makes the case *a certificate versus none*, not *1.8 s versus 129 s*. Deletion-compliance
+certificates are Garg, Goldwasser and Vasudevan (Eurocrypt 2020). The word "closure" is taken twice
+in this literature (alias-closure; dependency-closure), both meaning syntactic expansion sets.
+
+**What is left, stated small.** (1) `certify_store_absence` is a decision procedure for SILO's
+asserted premise, and its value is that it returns NO on a field: `one_record_address_store_absent`
+0.0000 in the canonical and mixed arms, because `bank()` builds a surviving alias row's address from
+the removed cell. That is a counterexample to the blanket phrasing, on a store. (2) Per-key closure
+1.00 in every arm while per-fact closure separates 1 / 2 / 3: three stores with identical interfaces
+that a record-level certificate cannot tell apart. (3) The negative half (§31.24–31.27), which has
+real variance. "Zero model evaluations" is not an axis this repository can claim, and the E-000032
+result is an instrument control on reader fidelity — worth reporting as one, with its power.
+
+### 31.34 The capacity slogan is assembled from print, and its s is the number of phrasings (2026-09-04)
+
+§31.26 retracted the theorem `n ≤ d/s` on a counterexample and showed that `pressure` and
+`headroom` are identities. A second sweep, fifteen agents on the slogan *superposition buys
+representation capacity and not deletion capacity* ("surviving: none"), adds what §31.26 did not
+have: where the parts come from, and why the measured `s` was never a property of GPT-2.
+
+**Owned, as the sweep reports it** (citations read by the sweep's agents, not re-read here). The
+linear budget is Elhage et al. (Toy Models, 2022) — per-feature dimensionalities sum to the embedding
+dimension when packed efficiently — made a theorem by Scherlis et al. (arXiv:2210.01892): capacity
+`C_i ≤ 1`, `Σ C_i ≤ d`, `C_i = 1` exactly when the feature is orthogonal to every other; that is the
+theorem at `s = 1`, in a paper with no mention of deletion. The deletion framing is Yang et al.,
+"Knowledge in Superposition" (AAAI-25, arXiv:2408.07413): without superposition the interference term
+vanishes and editing is lossless, and superposition is the reason lifelong editing fails — with no
+dimension count. Both halves together are Guo, "The Deterministic Horizon" (arXiv:2605.23024, §3.5,
+Theorem 3.14), whose proof carries the boundary *an exact solution exists iff n − 1 ≤ d − 1* and whose
+scope note reads "superposition is not merely a description of what LLMs do but a constraint on what
+post-hoc editing can do" — weight-space, unrefereed, headline `K* ~ √d`, no `s`. The template
+"superposition buys representation and not X" is Adler and Shavit (arXiv:2409.15318, ICLR 2026) for
+computation. The term *deletion capacity* is Sekhari et al. (NeurIPS 2021). The subspace-exhaustion
+argument is GPM (Saha et al., ICLR 2021) and its successors. Unclaimed: `n ≤ d/s` with a measured
+`s`, the residual-stream projection setting, and the observation that the bound is slack by two orders
+of magnitude while deletion fails anyway. The third is the only new thing, and the point below is
+that it is not a finding either.
+
+**Two structural points from the refuters, verified against the code where they touch it.**
+
+*(a) Two rulers.* Representation capacity was counted at tolerance `ε > 0` — almost-orthogonal
+families — and deletion capacity at tolerance `0`, by requiring the projection to fix every other
+fact's subspace pointwise. Fixing `V_j` is sufficient for zero collateral; the derivation used it as
+necessary, and the behavioural predicate ("every other fact still answers") is an argmax condition
+with a margin. At equal tolerance the gap does not exist: at `τ = 0` representation capacity is `d`
+too; at `τ > 0` the almost-orthogonal family itself gives `exp(cτ²d)` cleanly deletable facts. The
+"price of superposition paid at deletion time" was introduced by the derivation. And a rank-one shear
+`I + u wᵀ` silences a fact while leaving every bystander exactly fixed, with `n ≤ d` and no `s` — an
+invertible map, destroying nothing, that satisfies the behavioural definition of UNREACHABLE. A
+predicate an invertible map satisfies cannot ground a subspace count.
+
+*(b) `s` is the number of phrasings.* `e000040_dangling_readers.py:186–198`: `fact_basis` returns the
+mean of `res_self − res_others` plus the principal components of its centred spread — for eight
+phrasings, exactly eight vectors. The search for a fact's closure never leaves that slice of `R^768`,
+so `s ≤ 8` by protocol, and "`n ≤ d/s = 230`" reads "`n ≤ 768 / (how many paraphrases were
+typed)`". Three further conditionings in the same run: `n_no_closure` 8.33 of 17 (no closure exists in
+the fact's own basis — `s = ∞` under the protocol); closure and collateral are averaged over `spec`
+only (lines 366–392), the facts that survived a 0.60 gate (lines 278 and 345) which admits as "the
+fact's own" any direction whose solo removal costs bystanders up to 40%; and the readout is
+`restricted()` (line 158), an argmax over the 17 candidate capitals — the coarsest predicate and the
+largest margin. E-000040's numbers are statements about a search procedure over an eight-vector basis
+with survivor-conditioned averaging, not about GPT-2's allocation. §31.25's "allocation, not
+capacity" and the capacity reading it replaced both presuppose that the bound is the operative
+constraint. The operative constraint was the search.
+
+**The experiment that would settle the frontier's shape** is specified by the sweep's landing and
+recorded here as **E-000048, not run**: three arms with one architecture (facts in weights; facts in
+cells; the cell architecture with routing unsupervised, as the control that separates substrate from
+architecture), nested worlds so the same sixteen probe facts appear at every `n`, four search classes
+(basis prefix as E-000040 did it; minimal within the basis; free collateral-aware rank-`k` in `R^d`;
+a LEACE-style oblique eraser at matched rank) with the headline taken from whichever gives the
+highest clean rate, a per-bystander damage rate on a fixed window as the primary quantity, training
+to criterion rather than to a step count, and `pressure`/`headroom` banned from every criterion. The
+mini-transformer applies `hidden_edit` immediately before `readout`, so the whole search is
+closed-form on cached states there. About seven hours on this machine.
 
 ### 31.8 Boundary
 

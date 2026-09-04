@@ -714,6 +714,42 @@ def test_an_absence_without_its_control_does_not_repair_the_vacuous_sweep():
     assert not cert.valid and "NOT reachable before" in cert.void_reason
 
 
+def test_a_supplied_membership_check_that_fails_voids_the_certificate_even_when_the_store_check_passes():
+    """The disjunction a review caught (ledger §31.33): anti-vacuity was discharged by ANY of the
+    structural, membership or store checks, so a certificate validated while its own AbsenceCheck read
+    VOID. A check that was run is part of the claim; if it fails, the certificate fails."""
+    from so.audit import AbsenceCheck, StoreAbsence
+    st, target = _pod_store(n_aliases=2)
+    keys = pod_keys(st, target)
+    fc = fact_closure(st, keys, obj=7)
+    st.evict(target)
+    store_ok = StoreAbsence(certified=True, fields=("obj",), n_values=256, n_evaluations=256)
+    # the membership check says the row is still there: absent=False
+    still_there = AbsenceCheck(absent=False, control_reachable=True, n_removed=1, rows_before=3,
+                               rows_after=3)
+    cert = certify_fact(_clean(n_rows=0), fc, [target], store_after=st, keys=keys,
+                        absence=still_there, store_absence=store_ok)
+    assert not cert.valid
+    assert "membership check that was supplied does not hold" in cert.void_reason
+    # and the same certificate with the membership check holding is valid: the store check was never
+    # the problem, the masking was
+    ok = certify_fact(_clean(n_rows=0), fc, [target], store_after=st, keys=keys,
+                      absence=_gone(), store_absence=store_ok)
+    assert ok.valid
+
+
+def test_a_supplied_structural_check_that_found_a_path_voids_the_certificate():
+    """Same rule, other instrument: ``structural`` is the autograd search for a path from the payload
+    to an output. Supplying one that FOUND a path and expecting the certificate to stand is the same
+    masking."""
+    st, target = _pod_store(n_aliases=2)
+    keys = pod_keys(st, target)
+    fc = fact_closure(st, keys, obj=7)
+    cert = certify_fact(_clean(), fc, [target], store_after=st, keys=keys, structural=_was_reachable())
+    assert not cert.valid
+    assert "structural check that was supplied found a path" in cert.void_reason
+
+
 def test_an_exhausted_closure_search_cannot_be_covered_by_anything():
     """If the closure is unknown, no removal set can be shown to contain it, and saying so is the
     only honest answer -- a search that ran out of budget is not a small closure."""

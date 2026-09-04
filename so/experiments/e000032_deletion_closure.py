@@ -54,6 +54,18 @@ WHAT COULD FALSIFY IT. Four controls, each able to void the comparison:
   * removing the whole closure must certify in BOTH arms, or the instrument reports "canonical" where
     it should report "enough records removed".
 
+WHAT A REVIEW CORRECTED, AND THIS VERSION DOES DIFFERENTLY (ledger §31.33). The first version
+reported `model_evaluations_per_deletion = 0.0` as a literal, timed the reachability control outside
+the per-deletion cost although it runs once per fact, inherited E-000030's mediation check from a
+configuration without links, and described the reader as the frozen GPT-2 when it is the E-000015
+`MutableKnowledgeTransformer` trained from scratch. Now: what the model is asked to do inside the
+certification window is COUNTED by wrapping `forward` and `encode_bank`, the per-fact cost is
+reported with the control inside it, `check_mediation` is run on THIS configuration
+(`use_links=True, n_deref=1`) in every arm as a pre-registered control, and the prose names the
+reader. The `(closure - 1) / keys_per_group` comparison is kept and re-described: on a star it is
+the store's arithmetic, on a chain it is wrong (`test_closure_minus_one_over_keys_is_star_arithmetic
+_and_not_a_store_law`), and what the 0.0000 measures is the reader's fidelity to the resolver.
+
 Trains nothing when the E-000015 checkpoints are present.
 
 Run:  python -m so.experiments.e000032_deletion_closure [--seeds 0 1 2] [--n-groups 25]
@@ -71,7 +83,7 @@ import torch
 
 from so import ledger
 from so.audit import (certify_encoding, certify_fact, certify_store_absence,
-                      certify_structural, check_absence, check_retention)
+                      certify_structural, check_absence, check_mediation, check_retention)
 from so.closure import closure_profile, fact_closure
 from so.data import bank_from_store
 from so.experiments.e000015_symlink_cells import (EVAL, _q1, encode_slots, load_arm, predict,
@@ -127,6 +139,49 @@ def group_keys(spec, target_key) -> Tuple[Tuple[int, int], ...]:
 
 def read_keys(model, store, world, keys: Sequence[Tuple[int, int]]) -> np.ndarray:
     return predict(model, bank_from_store(store), world, [_q1(world, k) for k in keys]).answers
+
+
+class ModelCalls:
+    """Count what the model is asked to do inside a window, instead of asserting it.
+
+    Wraps the instance's ``forward`` and ``encode_bank``. An ``encode_bank`` reached from inside a
+    ``forward`` is that forward's own work and is not counted twice; ``encodes`` counts the standalone
+    calls (``certify_encoding`` makes them). ``evaluations`` is forwards plus standalone encodes -- a
+    standalone encode is a partial evaluation and is counted as one, which over-counts rather than
+    under-counts. The wrappers are removed on exit so the model is as it was.
+    """
+
+    def __init__(self, model):
+        self.model, self.forwards, self.encodes, self._depth = model, 0, 0, 0
+
+    def __enter__(self):
+        m = self.model
+        self._forward, self._encode = m.forward, m.encode_bank
+
+        def forward(*a, **k):
+            self.forwards += 1
+            self._depth += 1
+            try:
+                return self._forward(*a, **k)
+            finally:
+                self._depth -= 1
+
+        def encode_bank(*a, **k):
+            if self._depth == 0:
+                self.encodes += 1
+            return self._encode(*a, **k)
+
+        m.forward, m.encode_bank = forward, encode_bank
+        return self
+
+    def __exit__(self, *exc):
+        del self.model.forward
+        del self.model.encode_bank
+        return False
+
+    @property
+    def evaluations(self) -> int:
+        return self.forwards + self.encodes
 
 
 def reachability_control(model, store, world, kids: Sequence[int], batch_queries) -> Any:
@@ -212,6 +267,31 @@ def run_seed(seed: int, n_groups: int, steps: int, verbose: bool = True) -> Dict
 
     # ---- the closure itself, and the composition
     probe_queries = [_q1(world, k) for k in all_keys[: min(64, len(all_keys))]]
+
+    # ---- control 4: the premise of the interface certificate, falsification-tested ON THIS
+    # configuration (use_links=True, n_deref=1). E-000030 tested it on the bare configuration only,
+    # and the first version of this experiment inherited it without re-checking (ledger §31.33). The
+    # rows are the OBJECT cells of the first groups -- FACT cells in every arm, dereferenced by their
+    # aliases in the canonical and mixed arms -- so the forward that is probed runs through the link
+    # path the certificate is later used on. The check samples: it can refute, not establish.
+    for arm, (store, kids) in stores.items():
+        bank = bank_from_store(store)
+        rows = [position_of_kid(store, kids[t]) for t in chosen[:4]]
+        batch = encode_slots(list(probe_queries), bank, world, model.cfg.max_hops, model.cfg.n_deref)
+
+        def run(b, _batch=batch):
+            with torch.no_grad():
+                return model(b, _batch.mode, _batch.start, _batch.rels, _batch.hop_valid)
+
+        med = check_mediation(model, bank.tensors(), rows, world.n_entities, run,
+                              outputs_of=lambda o: o[0], n_probes=8, seed=seed)
+        m[f"{arm}/mediation_consistent"] = float(med.consistent)
+        m[f"{arm}/mediation_encoding_invariant"] = float(med.encoding_invariant)
+        m[f"{arm}/mediation_output_invariant"] = float(med.output_invariant)
+        if verbose:
+            print(f"  seed {seed} {arm:<11} mediation on use_links/n_deref=1: "
+                  f"{'consistent' if med.consistent else 'VOID'} -- {med.note}", flush=True)
+
     per_arm: Dict[str, Dict[str, List[float]]] = {a: {} for a in ARMS}
     for arm in ARMS:
         store, kids = stores[arm]
@@ -220,6 +300,7 @@ def run_seed(seed: int, n_groups: int, steps: int, verbose: bool = True) -> Dict
         one_store, one_addr = [], []
         search_seconds, guarantee_seconds, control_seconds = [], [], []
         one_retained = []
+        one_forwards, one_encodes, all_forwards, all_encodes, control_forwards = [], [], [], [], []
         for t_key in chosen:
             keys = group_keys(spec, t_key)
             obj = answers[arm][t_key]
@@ -235,23 +316,30 @@ def run_seed(seed: int, n_groups: int, steps: int, verbose: bool = True) -> Dict
             # measurement can fail -- so it is timed separately from the guarantee itself.
             whole = sorted(set(list(fc.records) + [kids[t_key]]))
             t_ctl = time.time()
-            control = reachability_control(model, store, world, whole, probe_queries)
+            with ModelCalls(model) as ctl_calls:
+                control = reachability_control(model, store, world, whole, probe_queries)
             control_seconds.append(time.time() - t_ctl)
+            control_forwards.append(float(ctl_calls.forwards))
             control_ok.append(float(control.reachable))
             bank_before = bank_from_store(store)
 
             # ARM "one record": remove exactly what a record-level certificate would cover -- the
             # object itself. In a pod that IS the closure; under duplication it is one of k.
+            # the deletion and everything that certifies it. What the model is asked to do inside
+            # this window is COUNTED by the wrapper, not asserted: the first version wrote 0.0 here as
+            # a literal while certify_encoding's reference fingerprint runs encode_bank once.
             t_guarantee = time.time()
-            store.evict(kids[t_key])
-            rec, absence, payload_gone = certify_removal(model, store, world, bank_before,
-                                                         [kids[t_key]], control)
-            # the deletion and everything that certifies it, with no forward pass anywhere inside
+            with ModelCalls(model) as calls:
+                store.evict(kids[t_key])
+                rec, absence, payload_gone = certify_removal(model, store, world, bank_before,
+                                                             [kids[t_key]], control)
+                retention = check_retention(store, [kids[t_key]])
+                cert_one = certify_fact(rec, fc, [kids[t_key]], store_after=store, keys=keys,
+                                        absence=absence, store_absence=payload_gone, retention=retention,
+                                        residual_note="says nothing about what the core knew before the store existed")
             guarantee_seconds.append(time.time() - t_guarantee + search_seconds[-1])
-            retention = check_retention(store, [kids[t_key]])
-            cert_one = certify_fact(rec, fc, [kids[t_key]], store_after=store, keys=keys,
-                                    absence=absence, store_absence=payload_gone, retention=retention,
-                                    residual_note="says nothing about what the core knew before the store existed")
+            one_forwards.append(float(calls.forwards))
+            one_encodes.append(float(calls.encodes))
             one_valid.append(float(cert_one.valid))
             one_retained.append(float(retention.retained))
             one_absent.append(float(absence.certified_absent))
@@ -264,12 +352,15 @@ def run_seed(seed: int, n_groups: int, steps: int, verbose: bool = True) -> Dict
             one_reads.append(float((read_keys(model, store, world, keys) == obj).mean()))
 
             # ARM "whole closure": remove every record the store's own semantics needs
-            for kid in [k for k in fc.records if k != kids[t_key]]:
-                store.evict(kid)
-            rec_all, absence_all, payload_all = certify_removal(model, store, world, bank_before,
-                                                                whole, control)
-            cert_all = certify_fact(rec_all, fc, whole, store_after=store, keys=keys,
-                                    absence=absence_all, store_absence=payload_all)
+            with ModelCalls(model) as calls_all:
+                for kid in [k for k in fc.records if k != kids[t_key]]:
+                    store.evict(kid)
+                rec_all, absence_all, payload_all = certify_removal(model, store, world, bank_before,
+                                                                    whole, control)
+                cert_all = certify_fact(rec_all, fc, whole, store_after=store, keys=keys,
+                                        absence=absence_all, store_absence=payload_all)
+            all_forwards.append(float(calls_all.forwards))
+            all_encodes.append(float(calls_all.encodes))
             all_valid.append(float(cert_all.valid))
             all_reads.append(float((read_keys(model, store, world, keys) == obj).mean()))
 
@@ -289,13 +380,19 @@ def run_seed(seed: int, n_groups: int, steps: int, verbose: bool = True) -> Dict
         # EVICT keeps the payload in the store on purpose, so the verdict is two-part:
         # unreachable to the reader, retained in the store. Recorded, never elided.
         m[f"{arm}/one_record_retained_in_store"] = float(np.mean(one_retained))
-        # what a certified fact deletion COSTS once the instrument is known to work: a
-        # store-side search and an exhaustive store-side sweep, and no model evaluation at
-        # all. The reachability control is the instrument's validity check, not per deletion.
+        # what a certified fact deletion COSTS, as measured and not as asserted. The reachability
+        # control runs once PER FACT in this design (it is the positive control for that fact's
+        # payload), so it is inside the per-fact cost; the first version timed it separately and
+        # described it as once per instrument. The evaluation counts come from the wrapper.
         m[f"{arm}/closure_search_seconds"] = float(np.mean(search_seconds))
         m[f"{arm}/certified_deletion_seconds"] = float(np.mean(guarantee_seconds))
         m[f"{arm}/instrument_control_seconds"] = float(np.mean(control_seconds))
-        m[f"{arm}/model_evaluations_per_deletion"] = 0.0
+        m[f"{arm}/per_fact_seconds"] = float(np.mean(np.array(guarantee_seconds) + np.array(control_seconds)))
+        m[f"{arm}/model_forwards_per_deletion"] = float(np.mean(one_forwards))
+        m[f"{arm}/model_encodes_per_deletion"] = float(np.mean(one_encodes))
+        m[f"{arm}/model_evaluations_per_deletion"] = float(np.mean(np.array(one_forwards) + np.array(one_encodes)))
+        m[f"{arm}/model_evaluations_whole_closure"] = float(np.mean(np.array(all_forwards) + np.array(all_encodes)))
+        m[f"{arm}/control_model_forwards"] = float(np.mean(control_forwards))
         m[f"{arm}/control_reachable_before"] = float(np.mean(control_ok))
         m[f"{arm}/one_record_still_readable"] = float(np.mean(one_reads))
         m[f"{arm}/whole_closure_fact_certified"] = float(np.mean(all_valid))
@@ -338,7 +435,11 @@ KEYS = (["control/interface_identical", "control/read_before_deletion", "control
                    "whole_closure_fact_certified", "whole_closure_still_readable",
                    "predicted_still_readable", "prediction_error", "prediction_error_max",
                    "closure_search_seconds", "certified_deletion_seconds",
-                   "instrument_control_seconds", "model_evaluations_per_deletion")])
+                   "instrument_control_seconds", "per_fact_seconds",
+                   "model_forwards_per_deletion", "model_encodes_per_deletion",
+                   "model_evaluations_per_deletion", "model_evaluations_whole_closure",
+                   "control_model_forwards", "mediation_consistent",
+                   "mediation_encoding_invariant", "mediation_output_invariant")])
 
 CRITERIA = {
     # controls: any of these failing voids the comparison rather than weakening it
@@ -352,6 +453,11 @@ CRITERIA = {
     "canonical/fact_closure_optimal_rate": (">=", 1.0),
     "duplicated/fact_closure_optimal_rate": (">=", 1.0),
     "canonical/control_reachable_before": (">=", 1.0),
+    # the interface certificate's premise, falsification-tested on the configuration in use; a
+    # VOID here voids every certificate below it (added for the re-run, ledger §31.33)
+    "canonical/mediation_consistent": (">=", 1.0),
+    "mixed/mediation_consistent": (">=", 1.0),
+    "duplicated/mediation_consistent": (">=", 1.0),
     # EVICT is retention-preserving by design, so this must be 1.0 -- if it were not, EVICT would
     # have quietly become a DELETE and RESTORE would be broken
     "canonical/one_record_retained_in_store": (">=", 1.0),
@@ -414,8 +520,12 @@ def main(argv: Optional[List[str]] = None) -> Dict[str, Any]:
               "arms": list(ARMS), "per_seed": per_seed, "aggregate": agg, "criteria": check}
     md = [f"# E-000032 — {record['title']}", "",
           f"Seeds {args.seeds}, {args.n_groups} alias groups per seed, the recorded E-000015 one-slot",
-          "checkpoints, no training. Both arms are built from the SAME world with the same ground truth,",
-          "so they present an identical interface: every key resolves to the same object in both.", "",
+          "checkpoints, no training. The reader is the E-000015 `MutableKnowledgeTransformer` -- trained",
+          "from scratch on a 256-entity world with an explicit UNKNOWN head, worlds resampled every",
+          "training step so no evaluation fact is in its weights -- and NOT the frozen GPT-2 adapter; an",
+          "earlier version of this report said GPT-2 and was wrong (ledger §31.33). Both arms are built",
+          "from the SAME world with the same ground truth, so they present an identical interface: every",
+          "key resolves to the same object in both.", "",
           "## The gap a record-level certificate cannot see", "", tbl, "",
           "`closure per KEY` is how many records must go before THAT KEY stops answering. It is one in",
           "both arms, which is the point: at the record level the two stores are indistinguishable.",
@@ -428,21 +538,38 @@ def main(argv: Optional[List[str]] = None) -> Dict[str, Any]:
           "the model's own answer afterwards, so the verdict is confirmed by behaviour and not only by",
           "bookkeeping. `predicted from the closure` is `(closure - 1) / keys_per_group`, computed from",
           "the store before the model is run at all: removing only the object leaves exactly the copies",
-          "that are separate records. A store-side statistic is thereby put at risk against a neural",
-          "measurement rather than reported beside it.", "",
-          "## What a certified fact deletion costs", "",
-          "Once the instrument is known to work -- which the reachability control establishes, and which",
-          "is a property of the method rather than of each deletion -- the guarantee for one more fact is",
-          "a store-side search plus an exhaustive store-side sweep, with **no model evaluation anywhere",
-          "inside it**. The model-side half is proved once and inherited.", "",
-          ledger.table(["store", "closure search (s)", "certified deletion (s)",
-                        "model evaluations per deletion", "instrument control, once (s)"],
+          "that are separate records.", "",
+          "What that agreement IS, stated after a review rather than before it (ledger §31.33): on the",
+          "star topologies these arms are built from, every non-target closure member backs exactly one",
+          "key, so the formula is that invariant restated and the 0.0000 measures the reader's FIDELITY",
+          "to the store's own resolver, which E-000015 had already recorded at 1.0000 on these",
+          "checkpoints. It is not a forecast. On a chain -- an alias pointing at a copy rather than at",
+          "the object -- the formula is wrong by a full grid step against the mechanical resolver with no",
+          "model in the loop (`test_closure_minus_one_over_keys_is_star_arithmetic_and_not_a_store_law`);",
+          "the quantity that IS a function of the store is the post-deletion resolver count, and",
+          "`certify_fact` already checks that one through `store_after`.", "",
+          "## What a certified fact deletion costs, counted", "",
+          "The model calls inside the certification window are COUNTED by wrapping `forward` and",
+          "`encode_bank` -- the first version of this report wrote `0` as a literal, while",
+          "`certify_encoding`'s reference fingerprint runs `encode_bank` once even over an empty row set.",
+          "The reachability control is the positive control for each fact's payload and runs once PER",
+          "FACT, so it belongs inside the per-fact cost; the first version timed it apart and called it",
+          "once per instrument. `all in` is search + certification + control.", "",
+          ledger.table(["store", "closure search (s)", "certification (s)", "forwards inside",
+                        "standalone encodes inside", "control (s)", "control forwards",
+                        "per fact, all in (s)"],
                        [[arm,
                          f"{agg[f'{arm}/closure_search_seconds']['mean']:.4f}",
                          f"{agg[f'{arm}/certified_deletion_seconds']['mean']:.4f}",
-                         f"{agg[f'{arm}/model_evaluations_per_deletion']['mean']:.0f}",
-                         f"{agg[f'{arm}/instrument_control_seconds']['mean']:.2f}"] for arm in ARMS]),
+                         f"{agg[f'{arm}/model_forwards_per_deletion']['mean']:.1f}",
+                         f"{agg[f'{arm}/model_encodes_per_deletion']['mean']:.1f}",
+                         f"{agg[f'{arm}/instrument_control_seconds']['mean']:.2f}",
+                         f"{agg[f'{arm}/control_model_forwards']['mean']:.1f}",
+                         f"{agg[f'{arm}/per_fact_seconds']['mean']:.2f}"] for arm in ARMS]),
           "",
+          "The store-side parts -- the closure search and the exhaustive store counterfactual -- run",
+          "no forward pass; the certification window as a whole is not model-free, and the number in",
+          "the table is what it costs.", "",
           "E-000024 is the comparison: deleting 50 facts from a LoRA took 129 s by gradient ascent and",
           "335 s by relabelling, changed 2,359,296 parameters, moved perplexity on ordinary prose from",
           "42.9 to 6.19e+09 and 6.39e+06, and admits no certificate at all -- there is no finite payload",
@@ -453,7 +580,7 @@ def main(argv: Optional[List[str]] = None) -> Dict[str, Any]:
           "DELETION anomaly is the opposite failure, unintended loss -- and normalization is its 1971",
           "remedy; this experiment does not claim otherwise. What it adds is that the anomaly decides whether a",
           "DELETION CERTIFICATE for a neural memory means anything, that the store-side half of the",
-          "guarantee is computable without the model, and that in a neural memory the normalization is",
+          "guarantee (closure search and store counterfactual) is computable without the model, and that in a neural memory the normalization is",
           "not free -- E-000025 prices it at 0.0954 for sharing and 0.0688 for link training on a frozen",
           "GPT-2, worst of three seeds across all twelve phrasings.", ""]
     path = ledger.save("e000032_deletion_closure", record, "\n".join(md))

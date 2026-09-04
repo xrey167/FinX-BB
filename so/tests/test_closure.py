@@ -201,6 +201,56 @@ def test_a_mixed_store_costs_the_pod_plus_one_per_stray_copy():
     assert target in fc.records
 
 
+def _survival_after_evicting_the_object(st, keys, obj, target):
+    """Run the store's OWN resolver on the post-deletion store and count. No model anywhere."""
+    from so.closure import _query
+    st.evict(target)
+    n = sum(1 for k in keys if ReferenceResolver(st).resolve(_query(k)).answer == obj)
+    st.restore(target)
+    return n / len(keys)
+
+
+def test_closure_minus_one_over_keys_is_star_arithmetic_and_not_a_store_law():
+    """E-000032 reported `(closure - 1) / keys_per_group` as a store-side forecast of what still reads
+    after only the object is removed, and it matched at error 0.0000 in three arms. A review
+    (ledger §31.33) showed why: on a STAR every non-target closure member backs exactly one key, so the
+    formula is that invariant restated. On a CHAIN -- an alias pointing at a COPY rather than at the
+    target -- the store's own resolver refutes it by a full grid step, with no model in the loop.
+    The quantity that is a function of the store is the post-deletion resolver count, and against
+    that the formula is redundant on stars and wrong off them."""
+    obj, keys = 7, [(1, 0), (10, 0), (11, 0)]
+    stars = {}
+    for kind in ("link", "mixed", "copy"):
+        st = _store()
+        t = st.write(1, 0, obj, provenance="t")
+        if kind == "link":
+            st.link(10, 0, t, provenance="a"); st.link(11, 0, t, provenance="b")
+        elif kind == "mixed":
+            st.link(10, 0, t, provenance="a"); st.write(11, 0, obj, provenance="b")
+        else:
+            st.write(10, 0, obj, provenance="a"); st.write(11, 0, obj, provenance="b")
+        fc = fact_closure(st, keys, obj=obj)
+        stars[kind] = ((fc.size - 1) / len(keys), _survival_after_evicting_the_object(st, keys, obj, t))
+    # the three published arms: the formula and the resolver agree exactly
+    assert stars["link"] == (0.0, 0.0)
+    assert stars["mixed"] == pytest.approx((1 / 3, 1 / 3))
+    assert stars["copy"] == pytest.approx((2 / 3, 2 / 3))
+
+    # the chain: closure 2 (object + copy), but evicting the object leaves BOTH the copy and the
+    # alias that points at the copy answering
+    st = _store()
+    t = st.write(1, 0, obj, provenance="t")
+    copy = st.write(10, 0, obj, provenance="copy")
+    st.link(11, 0, copy, provenance="alias-of-copy")
+    fc = fact_closure(st, keys, obj=obj)
+    assert fc.size == 2 and fc.optimal
+    predicted = (fc.size - 1) / len(keys)
+    measured = _survival_after_evicting_the_object(st, keys, obj, t)
+    assert predicted == pytest.approx(1 / 3)
+    assert measured == pytest.approx(2 / 3)
+    assert abs(predicted - measured) == pytest.approx(1 / 3)
+
+
 def test_a_chain_of_aliases_still_costs_one_because_the_object_is_still_shared():
     """Dereference depth does not change the closure; sharing does."""
     st = _store()

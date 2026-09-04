@@ -95,11 +95,17 @@ answering are exactly those whose own record survives — the store's arithmetic
 the model. **It is reader fidelity, not forecasting**, and describing it as "a store-side statistic
 predicts the model" over-reads it.
 
-Fidelity is not nothing: this is a frozen GPT-2 with a strong prior over capitals, so a key whose
-record is gone could have kept answering from that prior, and E-000013 measures that fallback existing.
-It does not fire here. But the value is **compositional, not predictive** — because fidelity is
-established once as a property of the method, a fact-level guarantee reduces to a store-side search
-plus a store-side sweep, at 1.45–1.80 s and zero model evaluations per deletion.
+Two corrections to how this document first put that (ledger §31.33). The reader in E-000032 is the
+E-000015 `MutableKnowledgeTransformer` trained from scratch — not a frozen GPT-2 — so the defence that
+"a pretrained prior could have kept answering and did not" is void: there is no prior. And "zero model
+evaluations per deletion" was a literal in the code, not a count: the certification window holds one
+standalone `encode_bank`, the per-fact reachability control runs the model once, and the counted cost
+is in the re-run's report. What survives is smaller and exact: on a star topology the agreement is the
+store's arithmetic restated; on a chain the formula is wrong against the store's own resolver with no
+model in the loop (`test_closure_minus_one_over_keys_is_star_arithmetic_and_not_a_store_law`); the
+quantity that is a function of the store is the post-deletion resolver count, and the certificate
+already checks it. The value is **compositional, not predictive**, and the composition is not
+model-free.
 
 ## The retraction, and what replaced it
 
