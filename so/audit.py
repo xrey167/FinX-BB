@@ -741,3 +741,131 @@ def certify_structural(model: nn.Module, bank: Dict[str, torch.Tensor], deleted_
     g = float(grad.abs().max().item())
     return StructuralResult(True, g, len(tensors),
                             "a path exists" + (" but the derivative is exactly zero" if g == 0.0 else ""))
+
+
+# --------------------------------------------------- from a record certificate to a fact certificate
+
+@dataclass
+class FactCertificate:
+    """What a record-level certificate plus a store-level closure jointly license.
+
+    Everything above certifies independence from a RECORD: the model computes the same thing for every
+    value the deleted row's payload could hold. That is exactly what a data subject does NOT ask for.
+    They ask whether the FACT is gone, and the two statements come apart the moment the fact is
+    reachable another way -- through a duplicate row, through an alias, through a derivation. This
+    repository has the extreme case on record: ``dependency/derivable_recovery_after_revoke_K3 = 1.0``
+    in every seed of E-000019, a certified record deletion under which every derivable fact survives.
+
+    The composition closes that gap, and it is the point of the pod:
+
+        record-level certificate over R  +  R covers the fact closure of the fact
+        ------------------------------------------------------------------------
+                          fact-level certificate
+
+    The second premise is a property of the STORE, computed by ``so.closure.fact_closure`` with the
+    mechanical resolver and no model at all. So the guarantee factorises into one expensive model-side
+    proof and one cheap store-side search -- and the search is what canonicalisation makes trivial. In
+    a pod the closure is a single record for any number of access keys, so ONE record certificate is
+    already a fact certificate. Under duplication the closure is k, so certifying one record licenses
+    nothing at the fact level, however exhaustive that certificate was.
+
+    Three things this deliberately does NOT require, each for a reason:
+      * ``closure.optimal`` is not required. An oversized removal set is wasteful, never unsound: what
+        matters is that R COVERS the closure, not that it is minimal.
+      * The closure is a statement about the store's own semantics. A frozen core that knew the fact
+        before the store existed is outside it -- E-000013 measures that separately -- and
+        ``residual_note`` is where a caller records that limit rather than letting the word
+        "certificate" swallow it.
+      * A verified post-condition (no key resolves to the object afterwards) is checked when the caller
+        supplies the store, because a closure argument that disagrees with the store it describes is
+        the one failure mode that would make all of this decorative.
+
+    One trap is closed explicitly, because the machinery walks straight into it. When a deletion takes
+    the row OUT of the bank -- which is what EVICT and DELETE do, and is the only deletion that earns
+    the domain-free claim -- there is no row left to perturb, and a payload sweep over an empty row set
+    certifies with a single evaluation and no violations. That is vacuous, not strong. So a record
+    certificate covering no rows is refused unless a ``StructuralResult`` is supplied that says
+    autograd finds no path at all; the vacuous sweep and the theorem look identical in a boolean and
+    are opposites in fact.
+    """
+
+    obj: int
+    n_keys: int
+    closure_size: int
+    removed: Tuple[int, ...]
+    covers_closure: bool
+    record_certified: bool
+    post_condition: Optional[bool] = None
+    valid: bool = False
+    void_reason: str = ""
+    residual_note: str = ""
+
+    def summary(self) -> str:
+        if self.valid:
+            post = "" if self.post_condition is None else ", post-condition verified"
+            return (f"FACT CERTIFIED: object {self.obj} unreachable through all {self.n_keys} key(s); "
+                    f"{len(self.removed)} record(s) removed covering a closure of {self.closure_size}"
+                    f"{post}")
+        return f"NOT A FACT CERTIFICATE: {self.void_reason}"
+
+
+def certify_fact(record: "Certificate", closure: "FactClosure", removed: Sequence[int],
+                 store_after: Optional[Any] = None, keys: Optional[Sequence[Tuple[int, int]]] = None,
+                 structural: Optional["StructuralResult"] = None,
+                 residual_note: str = "") -> FactCertificate:
+    """Compose a record-level certificate with a store-level closure.
+
+    ``record``  the certificate obtained over the rows that were removed (``certify_deletion`` or
+                ``certify_encoding``; the interface certificate is the one that generalises over
+                queries, so prefer it).
+    ``closure`` the fact closure measured on the store BEFORE the deletion.
+    ``removed`` the cells actually removed. Must cover ``closure.records``.
+    ``store_after`` optional: the store after the deletion, used to VERIFY rather than infer that no
+                key still yields the object.
+    ``structural`` optional: a ``certify_structural`` result. Required when the deletion removed the
+                rows from the bank, since a payload sweep over no rows is vacuous.
+
+    Every way this can fail is named in ``void_reason`` rather than folded into a boolean, because a
+    certificate whose failure modes are invisible is worse than no certificate.
+    """
+    removed_set = {int(x) for x in removed}
+    needed = {int(x) for x in closure.records}
+    covers = needed.issubset(removed_set)
+    swept = record.n_rows > 0
+    structural_ok = bool(structural is not None and structural.certified_structurally)
+    record_ok = bool(record.output_certified and record.activation_certified) and (swept or structural_ok)
+
+    reasons: List[str] = []
+    if not swept and not structural_ok:
+        reasons.append("the record-level sweep covered no rows, which certifies vacuously; a "
+                       "structural result showing no path is required when the deletion removes the "
+                       "row from the bank")
+    if closure.exhausted:
+        reasons.append("the closure search was cut short, so the closure is unknown and no set can be "
+                       "shown to cover it")
+    if not covers:
+        missing = sorted(needed - removed_set)
+        reasons.append(f"the removal misses {len(missing)} record(s) of the closure: {missing[:8]}")
+    if not (record.output_certified and record.activation_certified):
+        which = "outputs" if not record.output_certified else "activations"
+        reasons.append(f"the record-level certificate does not hold at the level of {which} "
+                       f"({len(record.violations)} violation(s))")
+
+    post: Optional[bool] = None
+    if store_after is not None and keys is not None:
+        from .closure import _query          # local import: audit must not depend on the resolver
+        from .reference import ReferenceResolver
+        from .world import UNKNOWN
+        resolver = ReferenceResolver(store_after)
+        still = [k for k in keys
+                 if resolver.resolve(_query(k)).answer == closure.obj and closure.obj != UNKNOWN]
+        post = not still
+        if still:
+            reasons.append(f"the store still answers {closure.obj} for {len(still)} key(s) after the "
+                           f"removal, so the closure disagrees with the store: {still[:8]}")
+
+    return FactCertificate(
+        obj=int(closure.obj), n_keys=len(closure.keys), closure_size=closure.size,
+        removed=tuple(sorted(removed_set)), covers_closure=covers, record_certified=record_ok,
+        post_condition=post, valid=not reasons, void_reason="; ".join(reasons),
+        residual_note=residual_note)

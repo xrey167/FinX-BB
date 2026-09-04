@@ -482,3 +482,208 @@ def test_the_recorder_keeps_every_call_of_a_module_not_just_the_last():
             m.encode_bank(b)
         keys = [k for k in rec.captured if k.startswith("ln_key#")]
     assert len({k.split("|")[0] for k in keys}) >= 2, sorted(keys)
+
+
+# --------------- the composition: a record certificate is only as strong as the closure it covers
+
+from so.audit import FactCertificate, certify_fact                       # noqa: E402
+from so.closure import duplicate_keys, fact_closure, pod_keys            # noqa: E402
+from so.mvcc import MVCCStore                                            # noqa: E402
+from so.reference import ReferenceResolver                               # noqa: E402
+from so.world import Query                                               # noqa: E402
+
+
+def _clean(n_rows=1, n_eval=8):
+    """A record-level certificate that holds, as the composition would receive one."""
+    from so.audit import Certificate
+    return Certificate(True, True, True, n_rows, N_ENT, n_eval, 0, [])
+
+
+def _dirty(n_rows=1):
+    from so.audit import Certificate, Violation
+    return Certificate(False, False, False, n_rows, N_ENT, 8, 0,
+                       [Violation(0, 3, "encode_bank[v_fwd]", 1.2e-2)])
+
+
+def _no_path():
+    """``reachable`` is the field; ``certified_structurally`` is its negation."""
+    from so.audit import StructuralResult
+    return StructuralResult(False, 0.0, 4, "autograd found no path from the deleted payload to any output")
+
+
+def _pod_store(n_aliases=4, obj=7):
+    st = MVCCStore(marker_dim=16, seed=0)
+    target = st.write(3, 1, obj, provenance="target")
+    for i in range(n_aliases):
+        st.link(100 + i, 1, target, provenance=f"alias{i}")
+    return st, target
+
+
+def _dup_store(k=5, obj=7):
+    st = MVCCStore(marker_dim=16, seed=0)
+    kids = [st.write(100 + i, 1, obj, provenance=f"copy{i}") for i in range(k)]
+    return st, kids
+
+
+def test_a_pod_turns_one_record_certificate_into_a_fact_certificate():
+    """The whole point: k access paths, one object, and one certified removal covers the fact."""
+    st, target = _pod_store(n_aliases=4)
+    keys = pod_keys(st, target)
+    fc = fact_closure(st, keys, obj=7)
+    assert fc.size == 1 and fc.records == (target,)
+
+    st.evict(target)                                   # the deletion the closure prescribes
+    cert = certify_fact(_clean(), fc, [target], store_after=st, keys=keys, structural=_no_path())
+    assert cert.valid, cert.summary()
+    assert cert.covers_closure and cert.record_certified and cert.post_condition is True
+    assert "FACT CERTIFIED" in cert.summary()
+    for key in keys:                                   # and the store agrees, independently
+        assert ReferenceResolver(st).resolve(Query("fwd", key[0], (key[1],), (0,))).answer != 7
+
+
+def test_the_same_certificate_licenses_nothing_at_the_fact_level_under_duplication():
+    """The contrast that makes the composition worth having: identical record proof, void conclusion."""
+    st, kids = _dup_store(k=5)
+    keys = duplicate_keys(st, 7)
+    fc = fact_closure(st, keys, obj=7)
+    assert fc.size == 5
+
+    st.evict(kids[0])                                  # exactly as much deletion as the pod needed
+    cert = certify_fact(_clean(), fc, [kids[0]], store_after=st, keys=keys, structural=_no_path())
+    assert not cert.valid
+    assert "misses 4 record(s)" in cert.void_reason
+    assert cert.post_condition is False                # the store still answers, and says so
+    assert "still answers 7" in cert.void_reason
+
+
+def test_removing_the_whole_closure_of_a_duplicated_store_does_earn_the_certificate():
+    """It is not that duplication cannot be erased -- it is that it costs k, and the cost is visible."""
+    st, kids = _dup_store(k=5)
+    keys = duplicate_keys(st, 7)
+    fc = fact_closure(st, keys, obj=7)
+    for kid in fc.records:
+        st.evict(kid)
+    cert = certify_fact(_clean(n_rows=5), fc, fc.records, store_after=st, keys=keys,
+                        structural=_no_path())
+    assert cert.valid, cert.summary()
+    assert cert.closure_size == 5 and len(cert.removed) == 5
+
+
+def test_an_oversized_removal_is_wasteful_and_still_sound():
+    """Minimality is an efficiency property. The certificate must not confuse it with soundness."""
+    st, target = _pod_store(n_aliases=3)
+    keys = pod_keys(st, target)
+    fc = fact_closure(st, keys, obj=7)
+    extra = [k for k in st.cells if k != target]
+    for kid in [target] + extra:
+        st.evict(kid)
+    cert = certify_fact(_clean(n_rows=len(extra) + 1), fc, [target] + extra, store_after=st, keys=keys,
+                        structural=_no_path())
+    assert cert.valid and cert.closure_size == 1 and len(cert.removed) == len(extra) + 1
+
+
+def test_a_failed_record_certificate_cannot_be_rescued_by_a_closure_of_one():
+    """Both premises are needed. A pod does not make a leaking model clean."""
+    st, target = _pod_store(n_aliases=2)
+    keys = pod_keys(st, target)
+    fc = fact_closure(st, keys, obj=7)
+    st.evict(target)
+    cert = certify_fact(_dirty(), fc, [target], store_after=st, keys=keys, structural=_no_path())
+    assert not cert.valid
+    assert "does not hold at the level of outputs" in cert.void_reason
+
+
+def test_a_sweep_over_no_rows_is_refused_as_vacuous():
+    """The trap the machinery walks into: EVICT leaves nothing to perturb, and an empty sweep
+    certifies with one evaluation. Vacuous and strong look identical in a boolean."""
+    st, target = _pod_store(n_aliases=2)
+    keys = pod_keys(st, target)
+    fc = fact_closure(st, keys, obj=7)
+    st.evict(target)
+    vacuous = _clean(n_rows=0, n_eval=1)
+    cert = certify_fact(vacuous, fc, [target], store_after=st, keys=keys)
+    assert not cert.valid
+    assert "vacuously" in cert.void_reason
+    # the same empty sweep, with a structural result that says there is no path, IS the theorem
+    assert certify_fact(vacuous, fc, [target], store_after=st, keys=keys, structural=_no_path()).valid
+
+
+def test_a_structural_result_that_finds_a_path_does_not_repair_the_vacuous_sweep():
+    from so.audit import StructuralResult
+    st, target = _pod_store(n_aliases=1)
+    keys = pod_keys(st, target)
+    fc = fact_closure(st, keys, obj=7)
+    st.evict(target)
+    reachable = StructuralResult(True, 19.74, 4, "a path exists")
+    assert not certify_fact(_clean(n_rows=0), fc, [target], store_after=st, keys=keys,
+                            structural=reachable).valid
+
+
+def test_an_exhausted_closure_search_cannot_be_covered_by_anything():
+    """If the closure is unknown, no removal set can be shown to contain it, and saying so is the
+    only honest answer -- a search that ran out of budget is not a small closure."""
+    st, _ = _dup_store(k=6)
+    keys = duplicate_keys(st, 7)
+    fc = fact_closure(st, keys, obj=7, max_records=2)
+    assert fc.exhausted
+    cert = certify_fact(_clean(n_rows=2), fc, fc.records)
+    assert not cert.valid and "cut short" in cert.void_reason
+
+
+def test_the_post_condition_is_a_check_and_not_a_restatement_of_the_closure():
+    """A closure that disagrees with the store it describes is the failure that would make all of
+    this decorative, so the store is asked directly rather than trusted."""
+    st, target = _pod_store(n_aliases=2)
+    keys = pod_keys(st, target)
+    fc = fact_closure(st, keys, obj=7)
+    # the closure is covered on paper, but the deletion was never applied to the store
+    cert = certify_fact(_clean(), fc, [target], store_after=st, keys=keys, structural=_no_path())
+    assert cert.covers_closure and not cert.valid
+    assert cert.post_condition is False and "disagrees with the store" in cert.void_reason
+
+
+def test_the_residual_the_certificate_does_not_cover_is_carried_rather_than_hidden():
+    st, target = _pod_store(n_aliases=2)
+    keys = pod_keys(st, target)
+    fc = fact_closure(st, keys, obj=7)
+    st.evict(target)
+    note = "the frozen core knew this fact before the store existed (E-000013)"
+    cert = certify_fact(_clean(), fc, [target], store_after=st, keys=keys, structural=_no_path(),
+                        residual_note=note)
+    assert cert.valid and cert.residual_note == note
+
+
+def test_the_composition_runs_on_a_real_certificate_and_a_real_bank():
+    """End to end on the actual model: measure the closure, evict it, certify what remains.
+
+    The record certificate here is the interface one, run over the surviving bank; the structural
+    result is what carries the evicted row, since it is no longer an input to perturb.
+    """
+    from so.audit import certify_encoding, certify_structural
+    from so.data import bank_from_store
+    from so.train import make_centre
+
+    st = MVCCStore(marker_dim=16, seed=0)
+    st.marker_centre = make_centre(0, 16)
+    target = st.write(3, 1, 7, provenance="target")
+    for i in range(4):
+        st.link(10 + i, 1, target, provenance=f"alias{i}")
+    for i in range(8):                                   # unrelated traffic, so the bank is not trivial
+        st.write(20 + i, 2, 11 + i, provenance="other")
+
+    keys = pod_keys(st, target)
+    fc = fact_closure(st, keys, obj=7)
+    assert fc.size == 1 and fc.optimal
+
+    m = _model()
+    st.evict(target)
+    bank = bank_from_store(st).tensors()
+    q = _queries(bank)
+    record = certify_encoding(m, bank, [], N_ENT)        # nothing left to sweep: vacuous on its own
+    struct = certify_structural(m, bank, [], _run_grad(m, bank, q), D_MODEL, outputs_of=LOGITS)
+    assert struct.certified_structurally, struct.summary()
+
+    cert = certify_fact(record, fc, [target], store_after=st, keys=keys, structural=struct,
+                        residual_note="says nothing about what the core knew before the store existed")
+    assert cert.valid, cert.summary()
+    assert cert.n_keys == 5 and cert.closure_size == 1
