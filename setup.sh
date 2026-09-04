@@ -13,12 +13,23 @@ HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 cd "$HERE"
 
 echo "== system packages"
-if command -v apt-get >/dev/null 2>&1; then
+NEED=""
+for c in python3 pip3 make git; do command -v "$c" >/dev/null 2>&1 || NEED="$NEED $c"; done
+python3 -c "import venv" >/dev/null 2>&1 || NEED="$NEED python3-venv"
+if [ "${NO_APT:-0}" = "1" ]; then
+    echo "   NO_APT=1, skipping"
+elif [ -z "$NEED" ]; then
+    echo "   already present: python3, pip3, make, git, venv"
+elif command -v apt-get >/dev/null 2>&1; then
+    echo "   missing:$NEED - installing"
     SUDO=""; [ "$(id -u)" -ne 0 ] && SUDO="sudo"
-    $SUDO apt-get update -qq
-    $SUDO apt-get install -y -qq python3 python3-pip python3-venv git curl >/dev/null
+    # A slow mirror or an offline machine must not hang the whole run: apt gets a budget and its
+    # failure is reported rather than fatal. The import check further down is what actually decides.
+    timeout 300 $SUDO apt-get update -qq || echo "   apt-get update unfinished after 300 s, continuing"
+    timeout 600 $SUDO apt-get install -y -qq python3 python3-pip python3-venv make git curl >/dev/null \
+        || echo "   apt-get install failed, continuing with what is installed"
 else
-    echo "   apt-get not found, skipping (install python3, python3-venv and git yourself)"
+    echo "   apt-get not found; install python3, python3-venv, make and git yourself"
 fi
 python3 --version
 
@@ -30,10 +41,15 @@ if [ "$VENV" = "1" ]; then
     "$PY" -m pip install --quiet --upgrade pip
 fi
 
-echo "== PyTorch, CPU build"
-"$PY" -m pip install --quiet torch --index-url https://download.pytorch.org/whl/cpu
-echo "== everything else"
-"$PY" -m pip install --quiet -r so/requirements.txt
+if "$PY" -c "import torch, numpy, transformers" >/dev/null 2>&1; then
+    echo "== python packages already importable, skipping the install"
+else
+    echo "== PyTorch, CPU build (about 200 MB)"
+    "$PY" -m pip install --quiet torch --index-url https://download.pytorch.org/whl/cpu \
+        || "$PY" -m pip install --quiet torch
+    echo "== everything else"
+    "$PY" -m pip install --quiet -r so/requirements.txt
+fi
 
 echo "== check"
 "$PY" - <<'PYCHK'
