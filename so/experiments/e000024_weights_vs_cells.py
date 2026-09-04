@@ -54,7 +54,7 @@ import torch.nn.functional as F
 
 from so import ledger
 from so.attacks import LinearProbe, forced_choice, object_rank
-from so.data import bank_from_store
+from so.data import Bank, bank_from_store
 from so.experiments import e000008_gpt2_adapter as E8
 from so.experiments.e000001b_mini_transformer import CHECKPOINTS, CKPT_SUFFIX, _sha256
 from so.llm_adapter import AdapterConfig
@@ -72,11 +72,27 @@ UNLEARN_STEPS = 400
 UNLEARN_LR = 1e-4
 RELEARN_STEPS = 60
 RELEARN_LR = 1e-4
-PPL_TEXT = (
-    "The history of the city is long and its buildings show every period of it. "
-    "A river runs through the middle, and the bridges over it were rebuilt twice. "
-    "Most of the population lives on the eastern bank, where the railway station is."
-)
+PPL_TEXTS = [
+    "The history of the city is long and its buildings show every period of it. A river runs through "
+    "the middle, and the bridges over it were rebuilt twice. Most of the population lives on the "
+    "eastern bank, where the railway station is.",
+    "Water expands when it freezes, which is why pipes burst in winter and why ice floats. The same "
+    "property keeps lakes from freezing solid, so fish survive under the surface until spring.",
+    "She opened the letter twice before reading it, first at the door and then again at the kitchen "
+    "table, as though the second time the words might have arranged themselves differently.",
+    "A compiler reads the source text, builds a tree from it, checks that the names and types agree, "
+    "and only then emits instructions. Each stage can reject the program with its own kind of error.",
+    "Trade along the coast collapsed after the harbour silted up. Ships that once anchored in the bay "
+    "went further north, and within a generation the warehouses stood empty.",
+    "The rule is simple enough to state and hard to apply: whoever holds the key is responsible for "
+    "what is done with it, whether or not they were the one who turned it.",
+]
+# the same shapes E-000013 measured, including the two that end on a name -- a state that looks
+# maximally like a routing key, and where the adapter is most likely to inject into ordinary text
+GENERIC = ["{s} said that", "The story of {s} begins", "In the morning, {s}",
+           "Everyone knows that {s}", "{s} walked into the", "According to {s}",
+           "The meeting ended when {s}", "Nobody expected {s} to"]
+N_GENERIC = 200
 
 
 # --------------------------------------------------------------------------- LoRA
@@ -345,11 +361,53 @@ def unlearn(gk: E8.GPT2Knowledge, setup: Setup, params: List[nn.Parameter], mode
 
 # --------------------------------------------------------------------------- measurement
 
-def perplexity(gk: E8.GPT2Knowledge, text: str = PPL_TEXT) -> float:
+def perplexity(gk: E8.GPT2Knowledge, texts: Sequence[str] = PPL_TEXTS) -> float:
+    """Token-weighted perplexity of the LM itself over several paragraphs of ordinary prose."""
+    nll, n_tok = 0.0, 0
     with torch.no_grad():
-        ids = gk.tok(text, return_tensors="pt")["input_ids"]
-        out = gk.model.lm(input_ids=ids, labels=ids)
-        return float(torch.exp(out.loss).item())
+        for text in texts:
+            ids = gk.tok(text, return_tensors="pt")["input_ids"]
+            out = gk.model.lm(input_ids=ids, labels=ids)
+            k = ids.shape[1] - 1
+            nll += float(out.loss.item()) * k
+            n_tok += k
+    return float(np.exp(nll / max(n_tok, 1)))
+
+
+def generic_prompts(gk: E8.GPT2Knowledge, seed: int, n: int = N_GENERIC) -> List[str]:
+    rng = np.random.default_rng(21000 + seed)
+    return [GENERIC[int(rng.integers(len(GENERIC)))].format(s=gk.names[int(rng.integers(gk.n_entities))])
+            for _ in range(n)]
+
+
+@torch.no_grad()
+def full_logits(gk: E8.GPT2Knowledge, texts: Sequence[str], bank: Optional[Bank] = None) -> np.ndarray:
+    """Full-vocabulary logits at the last token, with the knowledge layer attached or bypassed."""
+    tensors = bank.tensors() if bank is not None else None
+    out = []
+    for i in range(0, len(texts), 32):
+        ids, am, last = E8.encode_texts(gk.tok, list(texts[i: i + 32]))
+        if tensors is None:
+            lg = gk.model.lm(input_ids=ids, attention_mask=am).logits
+            out.append(lg[torch.arange(ids.shape[0]), last].numpy())
+        else:
+            _, full, _, _ = gk.model(tensors, ids, am, last)
+            out.append(full.numpy())
+    return np.concatenate(out)
+
+
+def kl_rows(base: np.ndarray, other: np.ndarray) -> np.ndarray:
+    """KL(base || other) per row, in nats, over the full vocabulary (E-000013's measure)."""
+    b = torch.log_softmax(torch.as_tensor(base), -1)
+    a = torch.log_softmax(torch.as_tensor(other), -1)
+    return (b.exp() * (b - a)).sum(-1).numpy()
+
+
+def collateral(base: np.ndarray, current: np.ndarray, tag: str) -> Dict[str, float]:
+    kl = kl_rows(base, current)
+    return {f"{tag}/generic_kl_mean": float(kl.mean()),
+            f"{tag}/generic_kl_max": float(kl.max()),
+            f"{tag}/generic_top1_matches_base": float((current.argmax(-1) == base.argmax(-1)).mean())}
 
 
 def measure(score: Scorer, setup: Setup, gk: E8.GPT2Knowledge, seed: int, tag: str) -> Dict[str, float]:
@@ -467,10 +525,16 @@ def run_cells_arm(seed: int, n_targets: int, n_cells: int = N_CELLS, verbose: bo
     kids = load_world(store, setup.world)
 
     weights_before = torch.cat([p.detach().reshape(-1) for p in gk.model.lm.parameters()])
-    ppl_before = perplexity(gk)
+    generic = generic_prompts(gk, seed)
+    base_generic = full_logits(gk, generic)              # the pretrained model, knowledge layer bypassed
+    m: Dict[str, float] = {"cells/ppl_base": perplexity(gk)}
     score = cells_scorer(gk, store, setup.world)
-    m = measure(score, setup, gk, seed, "cells/before")
-    m["cells/ppl_before"] = ppl_before
+    m.update(measure(score, setup, gk, seed, "cells/before"))
+    m["cells/ppl_before"] = m["cells/ppl_base"]          # the frozen core is the same model either way
+    # the honest deployment condition for this arm: the store is attached while ordinary text is read,
+    # so the adapter can perturb it. E-000013 measured exactly this and found it is not zero.
+    m.update(collateral(base_generic, full_logits(gk, generic, bank_from_store(store, respect_markers=True)),
+                        "cells/before"))
 
     t0 = time.time()
     for f in setup.targets:
@@ -482,7 +546,10 @@ def run_cells_arm(seed: int, n_targets: int, n_cells: int = N_CELLS, verbose: bo
     weights_after = torch.cat([p.detach().reshape(-1) for p in gk.model.lm.parameters()])
     m["cells/weight_delta_l2"] = float((weights_after - weights_before).norm().item())
     m["cells/ppl_after"] = perplexity(gk)
+    m["cells/ppl_delta"] = abs(m["cells/ppl_after"] - m["cells/ppl_base"])
     m["cells/n_params_changed"] = 0.0
+    m.update(collateral(base_generic, full_logits(gk, generic, bank_from_store(store, respect_markers=True)),
+                        "cells/after"))
     if verbose:
         print(f"  cells: direct {m['cells/before/direct_acc']:.3f} -> {m['cells/after/direct_acc']:.3f}, "
               f"forced choice {m['cells/after/forced_choice']:.3f}, delete {m['cells/delete_seconds']*1e3:.1f} ms",
@@ -499,6 +566,8 @@ def run_weights_arms(setup: Setup, seed: int, steps: int, unlearn_steps: int, ve
     """A second, independent GPT-2 whose weights DO carry the facts, unlearned two ways."""
     gk = E8.GPT2Knowledge(AdapterConfig(status_gated=True))   # config unused: the adapter is bypassed
     ppl_base = perplexity(gk)
+    generic = generic_prompts(gk, seed)
+    base_generic = full_logits(gk, generic)                  # captured BEFORE any LoRA exists
     out = train_lora(gk, setup, seed, steps, LORA_LR, verbose=verbose)
     params = out["params"]
     trained = lora_state(gk.model.lm)
@@ -509,6 +578,7 @@ def run_weights_arms(setup: Setup, seed: int, steps: int, unlearn_steps: int, ve
                            "weights/ppl_after_learning": perplexity(gk)}
     score = weights_scorer(gk)
     m.update(measure(score, setup, gk, seed, "weights/before"))
+    m.update(collateral(base_generic, full_logits(gk, generic), "weights/before"))
     m["weights/before_delta_l2"] = lora_delta_norm(gk.model.lm)
 
     for mode, tag in (("ga", "ga"), ("relabel", "relabel")):
@@ -519,6 +589,7 @@ def run_weights_arms(setup: Setup, seed: int, steps: int, unlearn_steps: int, ve
         m[f"{tag}/unlearn_steps"] = float(u["steps_used"])
         m.update(measure(weights_scorer(gk), setup, gk, seed, f"{tag}/after"))
         m[f"{tag}/ppl_after"] = perplexity(gk)
+        m.update(collateral(base_generic, full_logits(gk, generic), f"{tag}/after"))
         m[f"{tag}/n_params_changed"] = float(out["n_lora_params"])
         m[f"{tag}/weight_delta_l2"] = lora_delta_norm(gk.model.lm)
         after = lora_state(gk.model.lm)
@@ -541,6 +612,7 @@ REPORT_KEYS = [
     "cells/before/direct_acc", "cells/after/direct_acc", "cells/after/paraphrase_acc",
     "cells/after/forced_choice", "cells/after/true_obj_top1", "cells/after/true_obj_mean_rank",
     "cells/after/probe_top1", "cells/after/probe_top5", "cells/after/bystander_acc",
+    "cells/ppl_base", "cells/ppl_after", "cells/ppl_delta", "cells/after/generic_kl_mean", "cells/after/generic_top1_matches_base",
     "cells/relearn/supplied_acc", "cells/relearn/heldout_acc", "cells/relearn/heldout_forced_choice",
     "cells/relearn/heldout_top1", "cells/weight_delta_l2", "cells/delete_seconds",
     "weights/before/direct_acc",
@@ -548,11 +620,15 @@ REPORT_KEYS = [
     "ga/after/true_obj_mean_rank", "ga/after/probe_top1", "ga/after/probe_top5", "ga/after/bystander_acc",
     "ga/relearn/supplied_acc", "ga/relearn/heldout_acc", "ga/relearn/heldout_forced_choice",
     "ga/relearn/heldout_top1", "ga/weight_delta_l2", "ga/delete_seconds",
+    "ga/ppl_after", "ga/after/generic_kl_mean", "ga/after/generic_top1_matches_base",
     "relabel/after/direct_acc", "relabel/after/paraphrase_acc", "relabel/after/forced_choice",
     "relabel/after/true_obj_top1", "relabel/after/true_obj_mean_rank", "relabel/after/probe_top1",
     "relabel/after/probe_top5", "relabel/after/bystander_acc",
     "relabel/relearn/supplied_acc", "relabel/relearn/heldout_acc", "relabel/relearn/heldout_forced_choice",
     "relabel/relearn/heldout_top1", "relabel/weight_delta_l2", "relabel/delete_seconds",
+    "relabel/ppl_after", "relabel/after/generic_kl_mean", "relabel/after/generic_top1_matches_base",
+    "weights/ppl_base", "weights/ppl_after_learning", "weights/before/generic_kl_mean",
+    "weights/n_lora_params", "weights/train_steps_used",
 ]
 
 CRITERIA = {
@@ -568,6 +644,7 @@ CRITERIA = {
     "cells/relearn/heldout_acc": ("<=", 0.05),
     # the frozen core is untouched, bit for bit
     "cells/weight_delta_l2": ("<=", 0.0),
+    "cells/ppl_delta": ("<=", 0.0),          # and the frozen core reads ordinary prose exactly as before
     "cells/after/bystander_acc": (">=", 0.70),
 }
 
@@ -605,7 +682,9 @@ def main(argv: List[str] | None = None) -> Dict[str, Any]:
              "cells/relearn/heldout_acc", "ga/relearn/heldout_acc", "relabel/relearn/heldout_acc",
              "cells/relearn/heldout_top1", "ga/relearn/heldout_top1", "relabel/relearn/heldout_top1",
              "cells/weight_delta_l2", "ga/weight_delta_l2", "relabel/weight_delta_l2",
-             "cells/delete_seconds", "ga/delete_seconds", "relabel/delete_seconds"}
+             "cells/delete_seconds", "ga/delete_seconds", "relabel/delete_seconds",
+             "cells/ppl_after", "ga/ppl_after", "relabel/ppl_after",
+             "cells/after/generic_kl_mean", "ga/after/generic_kl_mean", "relabel/after/generic_kl_mean"}
     sizes = {k: args.n_targets for k in keys if k.endswith(("direct_acc", "paraphrase_acc", "forced_choice",
                                                             "true_obj_top1", "probe_top1", "probe_top5",
                                                             "bystander_acc"))}
@@ -638,6 +717,13 @@ def main(argv: List[str] | None = None) -> Dict[str, Any]:
          w("relabel/after/bystander_acc", False), "-"],
         ["L2 change of model weights", w("cells/weight_delta_l2", True), w("ga/weight_delta_l2", True),
          w("relabel/weight_delta_l2", True), "-"],
+        ["perplexity on ordinary prose", w("cells/ppl_after", True), w("ga/ppl_after", True),
+         w("relabel/ppl_after", True), f"{'-'}"],
+        ["KL to the pretrained model, generic text", w("cells/after/generic_kl_mean", True),
+         w("ga/after/generic_kl_mean", True), w("relabel/after/generic_kl_mean", True), "0.0000"],
+        ["generic top-1 still the pretrained one", w("cells/after/generic_top1_matches_base", False),
+         w("ga/after/generic_top1_matches_base", False), w("relabel/after/generic_top1_matches_base", False),
+         "1.0000"],
         ["seconds to delete 50 facts", w("cells/delete_seconds", True), w("ga/delete_seconds", True),
          w("relabel/delete_seconds", True), "-"],
     ])

@@ -165,7 +165,13 @@ def _answers(gk: E8.GPT2Knowledge, bank: Bank, keys: Sequence[Tuple[int, int]], 
     return np.concatenate(out), np.concatenate(hid), np.concatenate(lg)
 
 
-def evaluate(gk: E8.GPT2Knowledge, seed: int, centre: np.ndarray) -> Dict[str, Any]:
+def evaluate(gk: E8.GPT2Knowledge, seed: int, centre: np.ndarray, template: int = 0) -> Dict[str, Any]:
+    """``template`` is the phrasing every read below uses.
+
+    It defaults to 0, which is what this record was written from.  Reading in this system turns out to
+    be strongly bimodal by phrasing (E-000025), and template 0 is one of the weak ones, so a lifecycle
+    claim measured here sits on a read that works about half the time.  E-000026 runs the same battery
+    at a strong template chosen by a rule fixed in advance."""
     rng = np.random.default_rng(seed)
     world, spec = E15.sample_alias_world(rng, EVAL["n_base"], EVAL["n_groups"], EVAL["n_alias_per_group"],
                                          gk.n_entities, 4, N_TRAIN_TEMPLATES)
@@ -186,12 +192,12 @@ def evaluate(gk: E8.GPT2Knowledge, seed: int, centre: np.ndarray) -> Dict[str, A
     direct_keys = [base_keys[int(i)] for i in rng.choice(len(base_keys), size=min(EVAL["n_direct"], len(base_keys)),
                                                          replace=False)]
     truth_d = np.array([world.index[k] for k in direct_keys])
-    a_d, _, _ = _answers(gk, sym(), direct_keys, gk.names)
+    a_d, _, _ = _answers(gk, sym(), direct_keys, gk.names, template=template)
     m["direct"] = float((a_d == truth_d).mean())
     truth_a = np.array([world.index[spec.alias_of[k]] for k in alias_keys])
-    a_a, hid_a, lg_a = _answers(gk, sym(), alias_keys, gk.names)
+    a_a, hid_a, lg_a = _answers(gk, sym(), alias_keys, gk.names, template=template)
     m["alias_direct"] = float((a_a == truth_a).mean())
-    a_dup, _, _ = _answers(gk, dup(), alias_keys, gk.names)
+    a_dup, _, _ = _answers(gk, dup(), alias_keys, gk.names, template=template)
     m["dup_direct"] = float((a_dup == truth_a).mean())
     heldout = tuple(range(N_TRAIN_TEMPLATES, N_TRAIN_TEMPLATES + E17.N_HELDOUT))
     for t in (1, *heldout):
@@ -206,8 +212,8 @@ def evaluate(gk: E8.GPT2Knowledge, seed: int, centre: np.ndarray) -> Dict[str, A
     for k in targets:
         sym_store.update(sym_kids[k], new_obj[k]); dup_store.update(dup_kids[k], new_obj[k])
     want = np.array([new_obj[spec.alias_of[a]] for a in alias_keys])
-    a_sym_u = _answers(gk, sym(), alias_keys, gk.names)[0]
-    a_dup_u = _answers(gk, dup(), alias_keys, gk.names)[0]
+    a_sym_u = _answers(gk, sym(), alias_keys, gk.names, template=template)[0]
+    a_dup_u = _answers(gk, dup(), alias_keys, gk.names, template=template)[0]
     m["shared_update/alias_new_object"] = float((a_sym_u == want).mean())
     m["duplicate_update/alias_new_object"] = float((a_dup_u == want).mean())
     # the complement: in the duplication arm the copies must still hold the OLD object, which is what
@@ -216,11 +222,11 @@ def evaluate(gk: E8.GPT2Knowledge, seed: int, centre: np.ndarray) -> Dict[str, A
     m["duplicate_update/alias_old_object"] = float((a_dup_u == truth_a).mean())
     for k in targets:
         sym_store.rollback(sym_kids[k], 1); dup_store.rollback(dup_kids[k], 1)
-    m["rollback/alias_direct"] = float((_answers(gk, sym(), alias_keys, gk.names)[0] == truth_a).mean())
+    m["rollback/alias_direct"] = float((_answers(gk, sym(), alias_keys, gk.names, template=template)[0] == truth_a).mean())
 
     # ---- probe on fact cells, then attacks through every alias after ONE shred of the shared object
     probe_keys = [k for k in base_keys if k not in set(targets)]
-    _, hid_p, _ = _answers(gk, sym(), probe_keys, gk.names)
+    _, hid_p, _ = _answers(gk, sym(), probe_keys, gk.names, template=template)
     y = np.array([world.index[k] for k in probe_keys])
     split = int(0.8 * len(probe_keys))
     probe = LinearProbe(hid_p.shape[1], n_ent, seed=seed)
@@ -230,20 +236,20 @@ def evaluate(gk: E8.GPT2Knowledge, seed: int, centre: np.ndarray) -> Dict[str, A
     m["active/alias_forced_choice"] = forced_choice(lg_a, truth_a, np.random.default_rng(seed), n_ent)
     for k in targets:
         sym_store.shred(sym_kids[k]); dup_store.shred(dup_kids[k])
-    a_s, hid_s, lg_s = _answers(gk, sym(), alias_keys, gk.names)
+    a_s, hid_s, lg_s = _answers(gk, sym(), alias_keys, gk.names, template=template)
     m["shred_target/alias_unknown"] = float((a_s == UNKNOWN).mean())
     m["shred_target/alias_true_object"] = float((a_s == truth_a).mean())
     m["shred_target/alias_probe_top1"] = probe.accuracy(hid_s, truth_a)
     m["shred_target/alias_forced_choice"] = forced_choice(lg_s, truth_a, np.random.default_rng(seed), n_ent)
     rk = object_rank(lg_s, truth_a, n_ent)
     m["shred_target/alias_top1_among_entities"] = rk["top1"]; m["shred_target/alias_mean_rank"] = rk["mean_rank"]
-    a_ds, hid_ds, lg_ds = _answers(gk, dup(), alias_keys, gk.names)
+    a_ds, hid_ds, lg_ds = _answers(gk, dup(), alias_keys, gk.names, template=template)
     m["dup_shred/copy_direct_acc"] = float((a_ds == truth_a).mean())
     m["dup_shred/copy_probe_top1"] = probe.accuracy(hid_ds, truth_a)
     m["dup_shred/copy_forced_choice"] = forced_choice(lg_ds, truth_a, np.random.default_rng(seed), n_ent)
     for k in targets:
         sym_store.resign(sym_kids[k]); dup_store.resign(dup_kids[k])
-    m["resign_target/alias_direct"] = float((_answers(gk, sym(), alias_keys, gk.names)[0] == truth_a).mean())
+    m["resign_target/alias_direct"] = float((_answers(gk, sym(), alias_keys, gk.names, template=template)[0] == truth_a).mean())
 
     # ---- one alias at a time, and the dangling pointer after DELETE
     first = [ks[0] for _, ks in spec.groups]
@@ -252,14 +258,14 @@ def evaluate(gk: E8.GPT2Knowledge, seed: int, centre: np.ndarray) -> Dict[str, A
     truth_t = np.array([world.index[k] for k in targets])
     for a in first:
         sym_store.revoke(sym_kids[a])
-    m["revoke_alias/alias_unknown"] = float((_answers(gk, sym(), first, gk.names)[0] == UNKNOWN).mean())
-    m["revoke_alias/sibling_readable"] = float((_answers(gk, sym(), second, gk.names)[0] == truth_second).mean())
-    m["revoke_alias/target_readable"] = float((_answers(gk, sym(), targets, gk.names)[0] == truth_t).mean())
+    m["revoke_alias/alias_unknown"] = float((_answers(gk, sym(), first, gk.names, template=template)[0] == UNKNOWN).mean())
+    m["revoke_alias/sibling_readable"] = float((_answers(gk, sym(), second, gk.names, template=template)[0] == truth_second).mean())
+    m["revoke_alias/target_readable"] = float((_answers(gk, sym(), targets, gk.names, template=template)[0] == truth_t).mean())
     for a in first:
         sym_store.restore(sym_kids[a])
     for k in targets:
         sym_store.delete(sym_kids[k])
-    a_del, _, _ = _answers(gk, sym(), alias_keys, gk.names)
+    a_del, _, _ = _answers(gk, sym(), alias_keys, gk.names, template=template)
     m["delete_target/alias_unknown"] = float((a_del == UNKNOWN).mean())
     m["delete_target/alias_true_object"] = float((a_del == truth_a).mean())
     return m

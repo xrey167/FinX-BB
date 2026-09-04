@@ -2,7 +2,7 @@
 # with no GPU; the per-model figures come from the 'train_seconds' field of the
 # recorded results, so they are what this code actually took, not an estimate.
 #
-#   make test | smoke | synthetic | gpt2 | report | clean-results
+#   make test | smoke | synthetic | gpt2 | demo | compare | rescore | report | clean-results
 #
 # PY       which interpreter to use          (default: python3, or .venv/bin/python if present)
 # THREADS  torch threads per experiment      (default: all cores)
@@ -13,7 +13,7 @@ THREADS ?= $(shell nproc)
 SEEDS ?= 0 1 2
 RUN = OMP_NUM_THREADS=$(THREADS) SO_THREADS=$(THREADS) $(PY) -m
 
-.PHONY: help test smoke synthetic gpt2 demo report clean-results env
+.PHONY: help test smoke synthetic gpt2 demo compare rescore report clean-results env
 
 help:
 	@echo "make test        unit tests, ~10 s"
@@ -21,6 +21,8 @@ help:
 	@echo "make synthetic   recorded synthetic chain, ~3 h on 4 cores"
 	@echo "make gpt2        frozen-GPT-2 chain, ~20 h on 4 cores, downloads GPT-2 once"
 	@echo "make demo        watch one fact get deleted from a frozen GPT-2, ~3 min (needs a checkpoint)"
+	@echo "make compare     deletion from weights vs from cells, head to head (needs a checkpoint)"
+	@echo "make rescore     read the symlink checkpoints at all twelve templates, no training"
 	@echo "make report      rebuild docs/so-results-2026-09-02.md from so/results/"
 	@echo "make env         print what will be used"
 	@echo ""
@@ -57,11 +59,22 @@ gpt2:
 	$(RUN) so.experiments.e000017_paraphrase_gap --phase train --seeds $(SEEDS)
 	$(RUN) so.experiments.e000017_paraphrase_gap --phase diagnose --seeds $(SEEDS)
 	$(RUN) so.experiments.e000020_symlink_gpt2 --seeds $(SEEDS)
+	$(RUN) so.experiments.e000025_template_rescoring --seeds $(SEEDS)
+	$(RUN) so.experiments.e000024_weights_vs_cells --seeds $(SEEDS)
 	$(MAKE) report
 
 # the claim as a transcript on one fact, from a checkpoint the gpt2 target produces
 demo:
 	$(RUN) so.demo --threads $(THREADS)
+
+# what the architecture buys: the same 50 facts deleted three ways and attacked identically.
+# Trains a LoRA for the weights arms, so budget roughly 40 min per seed on 4 cores.
+compare:
+	$(RUN) so.experiments.e000024_weights_vs_cells --seeds $(SEEDS)
+
+# no training at all: re-read the recorded symlink checkpoints at every template, ~7 min per seed
+rescore:
+	$(RUN) so.experiments.e000025_template_rescoring --seeds $(SEEDS)
 
 report:
 	$(PY) -m so.report
