@@ -2210,6 +2210,62 @@ clears the target the row would come back with, which the test checks by restori
 a refusal that the store does not owe; the assertion was wrong, not the store, and it was corrected to
 the documented behaviour rather than the behaviour being changed to fit it.
 
+### 31.31 The U/T distinction is history independence, and has been since 2001 (2026-09-04)
+
+The prior-art check I should have run before claiming came back, and it retracts the framing this
+programme has defended longest.
+
+**Naor and Teague, "Anti-persistence: history independent data structures" (STOC 2001), Definition
+2.1 — the *weakest* notion in that literature:** *"A data structure implementation is history
+independent if any two sequences S1 and S2 that yield the same content induce the same distribution on
+the memory representation."*
+
+The mapping is exact, not analogical. Take `S1` = create a fact reachable by k keys, then delete it
+(U removals); `S2` = never create it. Both yield the same content — no path yields the object — and
+under EXPORTING the memory representations differ, by the k−1 surviving link rows naming the removed
+key. That is a violation of the weakest definition in the field.
+
+> **U is the cost of making the CONTENT correct. T is the cost of making the MEMORY REPRESENTATION
+> correct as well. `T − U` is the history-independence residue.**
+
+And their framing sentence is the thing I thought I was pointing out: *"if some piece of information
+cannot be retrieved via the legitimate interface of a system, then it should not be retrievable even
+when there is full access to the system."* That is E-000046's exported-view/raw-store split, in 2001.
+
+**They also isolated the exact knob.** Their §3 is *"Data Structures without Pointers: open
+addressing"* and §4 is pointers, introduced with the memory-management problem that pointers force;
+their abstract calls the general variable-size record scheme *"the main open problem we leave"*. A LINK
+cell exporting a target key **is** a pointer, and `bank()` continuing to export it after the target is
+gone is a non-history-independent reference discipline.
+
+**An inversion worth recording, because it clarifies rather than merely corrects.** Hartline, Hong,
+Mohr, Pentney and Rocke (ISAAC 2002 / Algorithmica 2005), Theorem 1: *"For a reversible data structure
+to be SHI, a canonical representation for each state must be determined during the data structure's
+initialization."* In that literature canonicalisation is the **cure** demanded by strong history
+independence; in this ledger canonicalisation was written up as the **cause** of the T = k disclosure.
+Both are right and they are about different objects: SHI canonicalises the *representation given the
+content*, whereas this store canonicalises the *fact* and then adds address-bearing rows — which is
+precisely the representation-level non-canonicality SHI forbids.
+
+**And the field has priced the opaque option.** Buchbinder and Petrank (CRYPTO 2003) give an SHI/WHI
+separation with an exponential gap and matching bounds; Blelloch and Golovin (FOCS 2007) give SHI
+hashing at O(1) expected insert and delete, so in that setting opacity is asymptotically free;
+Golovin's B-treap and the B-skip-list carry it to B-tree-shaped stores, and the line is active
+(ACM TODS 2025). Ficklebase (Bajaj and Sion, ICDE 2013) owns the deletion-residue form outright: once
+a tuple is expired *"any and all its side-effects are removed, thereby eliminating all its traces,
+rendering it unrecoverable, and also guaranteeing that the deletion itself is undetectable."*
+
+**So what is left, stated small.** The U/T *distinction* is not a contribution — it is weak history
+independence, measured. What this repository has is an implementation and a measurement in a setting
+where the concept had not been applied: **a store that a frozen language model reads**, where the
+tracelessness certificate composes with a model-side deletion proof (§31.14, §31.16) that no
+history-independence result addresses, because none of them has a reader whose behaviour has to be
+certified too. `blank` and `certify_traceless` are that implementation. Whether `ON DELETE SET NULL`
+already covers `blank` at the relational level is not yet checked and should be assumed until it is.
+
+This is the seventh retraction of the session and the one that costs the most, because U/T was the
+claim that had survived every previous review. It survived them because none of them was this check.
+
 ### 31.8 Boundary
 
 CPU only, no GPU, no LLM above 124M parameters, synthetic worlds, single-token entities, two surface forms per relation, one session. Nothing here shows unlearning of facts already encoded in pretrained weights. Evidence levels recorded: E3–E4 for the synthetic system (F4 for SHRED with the verified gate, E-000010 — **on the value channel only**: E-000028 recovers the shredded object at 1.0000 through the ungated reverse key, where REVOKE and DELETE are at chance, so F4 for SHRED is a claim about answers, logits, hidden states and probes and not about routing); E5 as substrate for the frozen-GPT-2 experiment, with reading, composition, update and the copy bound supported and behavioural deletion not yet supported at the pre-registered thresholds.
