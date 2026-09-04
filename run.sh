@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # The single entry point. From a freshly cloned repository on a bare Ubuntu server:
 #
-#   ./run.sh                 set up, run the unit tests, then the 15-minute smoke chain
+#   ./run.sh                 set up, run the unit tests, then the smoke chain (~35 min)
 #   ./run.sh test            set up and run the unit tests only
 #   ./run.sh synthetic       set up and reproduce the synthetic chain      (~3 h on 4 cores)
 #   ./run.sh gpt2            set up and reproduce the frozen-GPT-2 chain   (~20 h, downloads GPT-2)

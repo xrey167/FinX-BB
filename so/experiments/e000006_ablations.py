@@ -27,7 +27,7 @@ import torch
 from so import ledger
 from so.evaluation import run_suite
 from so.experiments.common import answers, fresh_world, load_base_model
-from so.experiments.e000001b_mini_transformer import CHECKPOINTS, EVAL_CONFIG
+from so.experiments.e000001b_mini_transformer import CHECKPOINTS, CKPT_SUFFIX, EVAL_CONFIG
 from so.interventions import disable_mask
 from so.model import ModelConfig, MutableKnowledgeTransformer
 from so.train import TrainConfig, train
@@ -46,7 +46,7 @@ KEYS = ["direct", "direct_unknown_rate", "hop2", "hop3", "hop2_broken_unknown", 
 
 
 def train_variant(name: str, seed: int, steps: int, force: bool = False):
-    path = CHECKPOINTS / f"e000006_{name}_seed{seed}.pt"
+    path = CHECKPOINTS / f"e000006_{name}{CKPT_SUFFIX}_seed{seed}.pt"
     v = VARIANTS[name]
     mc = ModelConfig(**v["model"])
     if path.exists() and not force:

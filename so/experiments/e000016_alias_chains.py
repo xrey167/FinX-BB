@@ -29,14 +29,14 @@ import torch
 
 from so import ledger
 from so.experiments import e000015_symlink_cells as E15
-from so.experiments.e000001b_mini_transformer import CHECKPOINTS, _sha256
+from so.experiments.e000001b_mini_transformer import CHECKPOINTS, CKPT_SUFFIX, _sha256
 from so.model import ModelConfig, MutableKnowledgeTransformer
 
 P_CHAIN = 0.30
 
 
 def train_or_load(seed: int, steps: int, n_deref: int, force: bool = False) -> Dict[str, Any]:
-    path = CHECKPOINTS / f"e000016_deref{n_deref}_seed{seed}.pt"
+    path = CHECKPOINTS / f"e000016_deref{n_deref}{CKPT_SUFFIX}_seed{seed}.pt"
     cfg_m, cfg_t = E15.model_config(n_deref), E15.train_config(seed, steps)
     if path.exists() and not force:
         ck = torch.load(path, weights_only=False)

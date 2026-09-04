@@ -39,7 +39,7 @@ from so import ledger
 from so.attacks import LinearProbe, forced_choice, object_rank
 from so.data import Bank, bank_from_store, bank_from_world, sample_training_queries
 from so.experiments import e000008_gpt2_adapter as E8
-from so.experiments.e000001b_mini_transformer import CHECKPOINTS, _sha256
+from so.experiments.e000001b_mini_transformer import CHECKPOINTS, CKPT_SUFFIX, _sha256
 from so.experiments.e000012_status_gated_revoke import route_targets_status_gated
 from so.llm_adapter import AdapterConfig, KnowledgeAdapterLM
 from so.mvcc import MVCCStore
@@ -224,7 +224,7 @@ def train_adapter_prior(gk: GPT2KnowledgePrior, seed: int, steps: int, batch_siz
 
 
 def train_or_load(gk: GPT2KnowledgePrior, seed: int, steps: int, force: bool = False) -> Dict[str, Any]:
-    path = CHECKPOINTS / f"e000013_gpt2_seed{seed}.pt"
+    path = CHECKPOINTS / f"e000013_gpt2{CKPT_SUFFIX}_seed{seed}.pt"
     if path.exists() and not force:
         ck = torch.load(path, weights_only=False)
         gk.model.load_state_dict(ck["adapter"], strict=False)

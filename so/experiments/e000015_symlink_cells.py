@@ -51,7 +51,7 @@ import torch.nn.functional as F
 from so import ledger
 from so.attacks import LinearProbe, forced_choice, object_rank
 from so.data import Bank, Batch, bank_from_store, failing_hop_target, reverse_target, sample_training_queries
-from so.experiments.e000001b_mini_transformer import CHECKPOINTS, _sha256
+from so.experiments.e000001b_mini_transformer import CHECKPOINTS, CKPT_SUFFIX, _sha256
 from so.model import ModelConfig, MutableKnowledgeTransformer
 from so.mvcc import MVCCStore
 from so.reference import ReferenceResolver
@@ -614,7 +614,7 @@ def train_config(seed: int, steps: int) -> TrainConfig:
 
 
 def train_or_load(seed: int, steps: int, n_deref: int = 1, force: bool = False) -> Dict[str, Any]:
-    path = CHECKPOINTS / f"e000015_deref{n_deref}_seed{seed}.pt"
+    path = CHECKPOINTS / f"e000015_deref{n_deref}{CKPT_SUFFIX}_seed{seed}.pt"
     cfg_m, cfg_t = model_config(n_deref), train_config(seed, steps)
     if path.exists() and not force:
         ck = torch.load(path, weights_only=False)

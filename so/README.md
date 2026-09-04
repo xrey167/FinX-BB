@@ -42,7 +42,7 @@ along: `make smoke PY=.venv/bin/python`.
 | target | what it runs | measured cost on 4 cores |
 |---|---|---|
 | `make test` | unit tests | ~10 s |
-| `make smoke` | the synthetic chain at one seed and 800 steps, records get a `-quick` suffix | ~15 min |
+| `make smoke` | the synthetic chain at one seed and 800 steps, trained from scratch in a `-quick` namespace | ~35 min |
 | `make synthetic` | the recorded synthetic chain: E-000001-A through E-000010, plus 10k cells, symlink cells, alias chains, the fresh-seed chance test and the gate error rates | ~3 h |
 | `make gpt2` | the frozen-GPT-2 chain: E-000008, E-000011, E-000012, E-000013, E-000017, E-000020 | ~20 h, downloads GPT-2 once (~550 MB) |
 | `make report` | rebuilds `docs/so-results-2026-09-02.md` from whatever is in `so/results/` | seconds |

@@ -31,7 +31,7 @@ import torch.nn.functional as F
 from so import ledger
 from so.attacks import LinearProbe, forced_choice, object_rank
 from so.data import Bank, bank_from_store, bank_from_world, failing_hop_target, sample_training_queries
-from so.experiments.e000001b_mini_transformer import CHECKPOINTS
+from so.experiments.e000001b_mini_transformer import CHECKPOINTS, CKPT_SUFFIX
 from so.llm_adapter import AdapterConfig, KnowledgeAdapterLM
 from so.mvcc import MVCCStore
 from so.reference import ReferenceResolver, load_world
@@ -204,7 +204,7 @@ def adapter_state(model: KnowledgeAdapterLM) -> Dict[str, torch.Tensor]:
 
 
 def train_or_load(gk: GPT2Knowledge, seed: int, steps: int, force: bool = False, batch_size: int = 32) -> Dict[str, Any]:
-    path = CHECKPOINTS / f"e000008_gpt2_seed{seed}.pt"
+    path = CHECKPOINTS / f"e000008_gpt2{CKPT_SUFFIX}_seed{seed}.pt"
     if path.exists() and not force:
         ck = torch.load(path, weights_only=False)
         gk.model.load_state_dict(ck["adapter"], strict=False)

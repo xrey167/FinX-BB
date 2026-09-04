@@ -31,7 +31,7 @@ Es wird keine GPU gebraucht. Alle aufgezeichneten Zahlen stammen von einer Masch
 ```bash
 ./setup.sh          # apt-Pakete, virtuelle Umgebung, PyTorch als CPU-Build, danach die Unit-Tests
 make test           # 48 Tests, etwa 10 Sekunden
-make smoke          # verkleinerte Fassung der synthetischen Kette, etwa 15 Minuten
+make smoke          # verkleinerte Fassung der synthetischen Kette, etwa 35 Minuten
 make synthetic      # die aufgezeichnete synthetische Kette, etwa 3 Stunden
 make gpt2           # die Kette mit eingefrorenem GPT-2, etwa 20 Stunden, lädt GPT-2 einmalig
 make report         # baut docs/so-results-2026-09-02.md aus so/results/ neu

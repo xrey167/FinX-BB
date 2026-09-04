@@ -42,7 +42,7 @@ from so import ledger
 from so.data import bank_from_world, sample_training_queries
 from so.experiments import e000008_gpt2_adapter as E8
 from so.experiments import e000017_paraphrase_gap as E17
-from so.experiments.e000001b_mini_transformer import CHECKPOINTS, _sha256
+from so.experiments.e000001b_mini_transformer import CHECKPOINTS, CKPT_SUFFIX, _sha256
 from so.experiments.e000012_status_gated_revoke import route_targets_status_gated
 from so.llm_adapter import AdapterConfig
 from so.train import TrainConfig, lr_at, make_centre, routing_loss
@@ -140,7 +140,7 @@ def train_arm(gk: E8.GPT2Knowledge, seed: int, steps: int, generic_share: float,
 
 
 def train_or_load(gk: E8.GPT2Knowledge, seed: int, steps: int, arm: str, force: bool = False) -> Dict[str, Any]:
-    path = CHECKPOINTS / f"e000018_{arm}_seed{seed}.pt"
+    path = CHECKPOINTS / f"e000018_{arm}{CKPT_SUFFIX}_seed{seed}.pt"
     if path.exists() and not force:
         ck = torch.load(path, weights_only=False)
         gk.model.load_state_dict(ck["adapter"], strict=False)

@@ -24,7 +24,7 @@ from so import ledger
 from so.data import failing_hop_target
 from so.experiments import e000008_gpt2_adapter as E8
 from so.experiments import e000011_gpt2_v2 as E11
-from so.experiments.e000001b_mini_transformer import CHECKPOINTS, _sha256
+from so.experiments.e000001b_mini_transformer import CHECKPOINTS, CKPT_SUFFIX, _sha256
 from so.llm_adapter import AdapterConfig
 from so.world import Query
 
@@ -47,7 +47,7 @@ def route_targets_status_gated(queries: List[Query], bank, world, n_reads: int) 
 
 
 def train_or_load(gk: E8.GPT2Knowledge, seed: int, steps: int, force: bool = False) -> Dict[str, Any]:
-    path = CHECKPOINTS / f"e000012_gpt2_seed{seed}.pt"
+    path = CHECKPOINTS / f"e000012_gpt2{CKPT_SUFFIX}_seed{seed}.pt"
     if path.exists() and not force:
         ck = torch.load(path, weights_only=False)
         gk.model.load_state_dict(ck["adapter"], strict=False)

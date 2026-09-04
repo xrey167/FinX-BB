@@ -65,7 +65,7 @@ cat <<'MSG'
 Ready. Next steps, cheapest first:
 
   make test        unit tests only, about 10 seconds
-  make smoke       a reduced version of the whole synthetic chain, about 15 minutes
+  make smoke       a reduced version of the whole synthetic chain, about 35 minutes
   make synthetic   the recorded synthetic chain, about 3 hours on 4 cores
   make gpt2        the frozen-GPT-2 chain, about 20 hours on 4 cores (downloads GPT-2 once, ~550 MB)
   make report      rebuild docs/so-results-2026-09-02.md from whatever is in so/results/

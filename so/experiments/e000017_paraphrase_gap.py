@@ -41,7 +41,7 @@ import torch.nn.functional as F
 from so import ledger
 from so.data import Bank, bank_from_store, bank_from_world, sample_training_queries
 from so.experiments import e000008_gpt2_adapter as E8
-from so.experiments.e000001b_mini_transformer import CHECKPOINTS, _sha256
+from so.experiments.e000001b_mini_transformer import CHECKPOINTS, CKPT_SUFFIX, _sha256
 from so.experiments.e000012_status_gated_revoke import route_targets_status_gated
 from so.llm_adapter import AdapterConfig
 from so.mvcc import MVCCStore
@@ -236,7 +236,7 @@ def train_adapter_templates(gk: E8.GPT2Knowledge, seed: int, steps: int, n_train
 def train_or_load(gk: E8.GPT2Knowledge, seed: int, steps: int, n_train: int, consistency: float,
                   force: bool = False) -> Dict[str, Any]:
     tag = f"t{n_train}_c{consistency:g}"
-    path = CHECKPOINTS / f"e000017_{tag}_seed{seed}.pt"
+    path = CHECKPOINTS / f"e000017_{tag}{CKPT_SUFFIX}_seed{seed}.pt"
     if path.exists() and not force:
         ck = torch.load(path, weights_only=False)
         gk.model.load_state_dict(ck["adapter"], strict=False)
@@ -358,7 +358,7 @@ def main(argv: Optional[List[str]] = None) -> Dict[str, Any]:
         per_seed = []
         for seed in args.seeds:
             gk = E8.GPT2Knowledge(AdapterConfig(status_gated=True))
-            path = CHECKPOINTS / f"e000012_gpt2_seed{seed}.pt"
+            path = CHECKPOINTS / f"e000012_gpt2{CKPT_SUFFIX}_seed{seed}.pt"
             ck = torch.load(path, weights_only=False)
             gk.model.load_state_dict(ck["adapter"], strict=False)
             gk.model.eval()

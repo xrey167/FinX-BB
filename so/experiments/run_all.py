@@ -43,7 +43,10 @@ def main() -> None:
     args = ap.parse_args()
     if args.quick:
         import os
+        # reduced runs get their own result AND checkpoint namespace, so a smoke run can never load
+        # a model trained at the full budget, and can never overwrite one
         os.environ["SO_RESULT_SUFFIX"] = "-quick"
+        os.environ.setdefault("SO_CKPT_SUFFIX", "-quick")
     t0 = time.time()
     chain = [c for c in CHAIN if not args.only or any(o in c[0] for o in args.only)]
     for i, (module, full_args, quick_args) in enumerate(chain, 1):

@@ -11,6 +11,8 @@ Run:  python -m so.experiments.e000001b_mini_transformer [--steps N] [--seeds ..
 
 from __future__ import annotations
 
+import os
+
 import argparse
 from pathlib import Path
 from typing import Any, Dict, List
@@ -31,8 +33,17 @@ EVAL_CONFIG: Dict[str, Any] = dict(
 CHECKPOINTS = ledger.RESULTS_DIR / "checkpoints"
 
 
+CKPT_SUFFIX = os.environ.get("SO_CKPT_SUFFIX", "")
+
+
 def checkpoint_path(name: str, seed: int) -> Path:
-    return CHECKPOINTS / f"{name}_seed{seed}.pt"
+    """Where a trained model is cached.
+
+    ``SO_CKPT_SUFFIX`` keeps reduced runs in their own namespace. Without it a smoke run at 800 steps
+    would silently load a checkpoint trained at 4000 and report three seconds for what is a training
+    experiment — and, worse, a reduced run would overwrite a recorded one.
+    """
+    return CHECKPOINTS / f"{name}{CKPT_SUFFIX}_seed{seed}.pt"
 
 
 def _sha256(path: Path) -> str:

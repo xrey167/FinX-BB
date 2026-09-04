@@ -17,7 +17,7 @@ RUN = OMP_NUM_THREADS=$(THREADS) SO_THREADS=$(THREADS) $(PY) -m
 
 help:
 	@echo "make test        unit tests, ~10 s"
-	@echo "make smoke       reduced synthetic chain, ~15 min, writes *-quick records"
+	@echo "make smoke       reduced synthetic chain from scratch, ~35 min on 4 cores, writes *-quick records"
 	@echo "make synthetic   recorded synthetic chain, ~3 h on 4 cores"
 	@echo "make gpt2        frozen-GPT-2 chain, ~20 h on 4 cores, downloads GPT-2 once"
 	@echo "make report      rebuild docs/so-results-2026-09-02.md from so/results/"
@@ -33,7 +33,8 @@ env:
 test:
 	$(PY) -m pytest so/tests -q
 
-# ---------------------------------------------------------------- smoke: minutes
+# ------------------------------------------------- smoke: trains everything at a reduced budget
+# Its models and records live in a -quick namespace, so it never reuses or overwrites a recorded one.
 smoke:
 	$(RUN) so.experiments.run_all --quick
 
