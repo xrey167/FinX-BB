@@ -36,6 +36,18 @@
       "min": 0.0,
       "n": 3
     },
+    "canonical/trace_closure_max": {
+      "max": 3.0,
+      "mean": 3.0,
+      "min": 3.0,
+      "n": 3
+    },
+    "canonical/trace_closure_mean": {
+      "max": 3.0,
+      "mean": 3.0,
+      "min": 3.0,
+      "n": 3
+    },
     "canonical/uniquely_identified": {
       "max": 1.0,
       "mean": 1.0,
@@ -64,6 +76,18 @@
       "max": 0.0,
       "mean": 0.0,
       "min": 0.0,
+      "n": 3
+    },
+    "duplicated/trace_closure_max": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "duplicated/trace_closure_mean": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
       "n": 3
     },
     "duplicated/uniquely_identified": {
@@ -106,6 +130,12 @@
         "pass": true,
         "threshold": 0.95
       },
+      "canonical/trace_closure_mean": {
+        "observed": 3.0,
+        "op": ">=",
+        "pass": true,
+        "threshold": 3.0
+      },
       "canonical/uniquely_identified": {
         "observed": 1.0,
         "op": ">=",
@@ -123,6 +153,12 @@
         "op": "<=",
         "pass": true,
         "threshold": 0.05
+      },
+      "duplicated/trace_closure_mean": {
+        "observed": 1.0,
+        "op": "<=",
+        "pass": true,
+        "threshold": 1.0
       }
     }
   },
@@ -144,15 +180,19 @@
       "canonical/candidate_keys_mean": 1.0,
       "canonical/deleted_key_disclosed": 1.0,
       "canonical/false_positive_keys": 0.0,
+      "canonical/trace_closure_max": 3.0,
+      "canonical/trace_closure_mean": 3.0,
       "canonical/uniquely_identified": 1.0,
       "duplicated/baseline_dangling": 0.0,
       "duplicated/candidate_keys_mean": 1536.0,
       "duplicated/deleted_key_disclosed": 0.0,
       "duplicated/false_positive_keys": 0.0,
+      "duplicated/trace_closure_max": 1.0,
+      "duplicated/trace_closure_mean": 1.0,
       "duplicated/uniquely_identified": 0.0,
       "key_space": 1536,
       "n_groups": 100,
-      "seconds": 0.790816068649292,
+      "seconds": 2.6989481449127197,
       "seed": 0
     },
     {
@@ -162,15 +202,19 @@
       "canonical/candidate_keys_mean": 1.0,
       "canonical/deleted_key_disclosed": 1.0,
       "canonical/false_positive_keys": 0.0,
+      "canonical/trace_closure_max": 3.0,
+      "canonical/trace_closure_mean": 3.0,
       "canonical/uniquely_identified": 1.0,
       "duplicated/baseline_dangling": 0.0,
       "duplicated/candidate_keys_mean": 1536.0,
       "duplicated/deleted_key_disclosed": 0.0,
       "duplicated/false_positive_keys": 0.0,
+      "duplicated/trace_closure_max": 1.0,
+      "duplicated/trace_closure_mean": 1.0,
       "duplicated/uniquely_identified": 0.0,
       "key_space": 1536,
       "n_groups": 100,
-      "seconds": 0.8862793445587158,
+      "seconds": 2.7651772499084473,
       "seed": 1
     },
     {
@@ -180,19 +224,23 @@
       "canonical/candidate_keys_mean": 1.0,
       "canonical/deleted_key_disclosed": 1.0,
       "canonical/false_positive_keys": 0.0,
+      "canonical/trace_closure_max": 3.0,
+      "canonical/trace_closure_mean": 3.0,
       "canonical/uniquely_identified": 1.0,
       "duplicated/baseline_dangling": 0.0,
       "duplicated/candidate_keys_mean": 1536.0,
       "duplicated/deleted_key_disclosed": 0.0,
       "duplicated/false_positive_keys": 0.0,
+      "duplicated/trace_closure_max": 1.0,
+      "duplicated/trace_closure_mean": 1.0,
       "duplicated/uniquely_identified": 0.0,
       "key_space": 1536,
       "n_groups": 100,
-      "seconds": 0.7779035568237305,
+      "seconds": 3.035087823867798,
       "seed": 2
     }
   ],
-  "recorded_at": "2026-09-04T16:59:54+00:00",
+  "recorded_at": "2026-09-04T17:02:22+00:00",
   "seeds": [
     0,
     1,

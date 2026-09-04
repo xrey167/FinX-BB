@@ -1621,6 +1621,20 @@ recorded as a number rather than argued — with the key blanked, an alias to a 
 indistinguishable from an alias to key (0, 0), so E-000015's `delete_target/alias_unknown` stops being
 a discovery about the model and becomes a tautology about the bank.
 
+**And the closure inverts with the guarantee.** E-000032 measures how many records must go before no
+query yields the object. This measures how many before the bank shows no evidence a deletion happened
+there. The same two stores swap places, exactly:
+
+| guarantee | canonical pod | duplicated |
+|---|---|---|
+| unreachable to the reader (E-000032) | **1.00** | 3.00 |
+| no trace left in the bank (E-000035) | 3.00 | **1.00** |
+
+A pod's aliases are the signposts, so leaving no trace costs the object plus all of them; a duplicated
+store costs the one record you were removing anyway. Both numbers are exact on every seed. Quoting
+only the first row is quoting the half that flatters the design, and this programme has done that
+until now.
+
 **The claim this changes.** "Canonicalisation makes erasure a single certifiable operation" is now
 paired with "and it turns every alias into a deletion oracle". Both are properties of the same design
 decision. An erasure guarantee that does not mention the second is describing half its own system —

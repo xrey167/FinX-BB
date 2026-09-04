@@ -21,6 +21,19 @@ pod's object leaves every alias still pointing at it, and `MVCCStore.bank()` kee
 deliberately so the model has to discover the miss rather than be handed it. Each surviving
 alias is therefore a signpost reading *a record stood here and is gone*.
 
+## The closure inverts with the guarantee
+
+| guarantee | canonical pod | duplicated |
+|---|---|---|
+| unreachable to the reader (E-000032) | 1.00 | 3.00 |
+| no trace left in the bank (here) | 3.00 | 1.00 |
+
+E-000032 measures the first row: how many records must go before no query yields the object.
+This experiment measures the second: how many before the bank shows no evidence a deletion
+happened there. The same two stores swap places. A pod's aliases are the signposts, so they
+must go too; a duplicated store costs the one record you were removing anyway. Quoting only
+the first row would be quoting the half that flatters the design.
+
 ## The mitigation, and what it costs
 
 Blanking a dangling pointer's key closes the channel (1.0000) and makes every such pointer identical (1.0000). It also removes what E-000015's
@@ -36,6 +49,8 @@ discovery. The trade is recorded as a number rather than argued.
 | canonical/uniquely_identified | >= 0.9 | 1.0000 | PASS |
 | duplicated/deleted_key_disclosed | <= 0.05 | 0.0000 | PASS |
 | duplicated/candidate_keys_mean | >= 1000.0 | 1536.0000 | PASS |
+| canonical/trace_closure_mean | >= 3.0 | 3.0000 | PASS |
+| duplicated/trace_closure_mean | <= 1.0 | 1.0000 | PASS |
 | blanked/channel_closed | >= 1.0 | 1.0000 | PASS |
 | blanked/pointers_indistinguishable | >= 1.0 | 1.0000 | PASS |
 

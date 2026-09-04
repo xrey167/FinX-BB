@@ -28,6 +28,18 @@ WHAT IS MEASURED, mechanically, with no model anywhere:
   false_positives  keys the adversary would name that were never deleted -- a dangling pointer that
                    was always dangling, which E-000015 puts in the training distribution on purpose.
 
+AND THE CLOSURE INVERTS. E-000032 measures the closure for one guarantee -- how many records must go
+before no query yields the object -- and finds one for a pod and k for k duplicates. Ask for the OTHER
+guarantee, that the bank shows no evidence a deletion happened at that key, and the same two stores
+swap places: a pod's aliases must go too, so it costs k, while a duplicated store costs the one record
+you were removing anyway. Both numbers are measured here, side by side, because a claim that quotes
+only the first is quoting the half that flatters the design:
+
+  | guarantee                     | canonical pod | duplicated |
+  |-------------------------------|---------------|------------|
+  | unreachable to the reader     | 1 record      | k records  |
+  | no trace left in the bank     | k records     | 1 record   |
+
 THE MITIGATION, AND ITS PRICE. Blanking a dangling pointer's key closes the channel. It also removes
 the thing E-000015's alias criteria are about: with the key blanked, an alias to a removed target is
 indistinguishable from an alias to key (0, 0), so `delete_target/alias_unknown` stops being a
@@ -124,6 +136,41 @@ def run_seed(seed: int, n_groups: int, verbose: bool = True) -> Dict[str, Any]:
                   f"{m[f'{arm}/candidate_keys_mean']:.1f} of {m['key_space']}  "
                   f"({time.time() - t0:.0f}s)", flush=True)
 
+    # the OTHER closure: how many records must go before the bank shows no evidence of the deletion.
+    # Greedy and exact here, because the signposts are exactly the rows that point at what was removed.
+    for arm in ARMS:
+        store, kids = stores[arm]
+        base = set(dangling_targets(store.bank()))
+        sizes = []
+        for t_key in chosen:
+            removed = [kids[t_key]]
+            store.evict(kids[t_key])
+            for _ in range(16):
+                new_dangling = [k for k in dangling_targets(store.bank()) if k not in base]
+                if not new_dangling:
+                    break
+                # every row pointing at a key that is gone is itself a signpost, so it goes next
+                b = store.bank()
+                held = live_keys(b)
+                signposts = [int(b["kid"][i]) for i, l in enumerate(b["is_link"])
+                             if bool(l)
+                             and (int(b["link_subject"][i]), int(b["link_relation"][i])) not in held
+                             and (int(b["link_subject"][i]), int(b["link_relation"][i]))
+                             not in base]
+                if not signposts:
+                    break
+                for kid in signposts:
+                    store.evict(kid)
+                    removed.append(kid)
+            sizes.append(float(len(removed)))
+            for kid in reversed(removed):
+                store.restore(kid)
+        m[f"{arm}/trace_closure_mean"] = float(np.mean(sizes))
+        m[f"{arm}/trace_closure_max"] = float(np.max(sizes))
+        if verbose:
+            print(f"  seed {seed} {arm:<11} records to leave NO TRACE: {np.mean(sizes):.2f} "
+                  f"(max {np.max(sizes):.0f})", flush=True)
+
     # the mitigation, and what it costs: with the pointer blanked, a removed target and a pointer to
     # nothing are the same row, so the channel closes and so does the alias's own miss-discovery
     store, kids = stores["canonical"]
@@ -154,7 +201,8 @@ def run_seed(seed: int, n_groups: int, verbose: bool = True) -> Dict[str, Any]:
 KEYS = (["key_space", "n_groups", "blanked/channel_closed", "blanked/pointers_indistinguishable"] +
         [f"{a}/{x}" for a in ARMS
          for x in ("deleted_key_disclosed", "candidate_keys_mean", "uniquely_identified",
-                   "false_positive_keys", "baseline_dangling")])
+                   "false_positive_keys", "baseline_dangling", "trace_closure_mean",
+                   "trace_closure_max")])
 
 CRITERIA = {
     # the channel, and the control that says it is a property of the arrangement and not of the store
@@ -163,6 +211,10 @@ CRITERIA = {
     "duplicated/deleted_key_disclosed": ("<=", 0.05),
     # a duplicated store leaves the adversary the whole key space, which is what "no signpost" means
     "duplicated/candidate_keys_mean": (">=", 1000.0),
+    # the inversion: the pod pays for leaving no trace exactly what the duplicated store pays for
+    # being unreachable, and vice versa
+    "canonical/trace_closure_mean": (">=", 3.0),
+    "duplicated/trace_closure_mean": ("<=", 1.0),
     # and the mitigation has to actually close it, or it is not a mitigation
     "blanked/channel_closed": (">=", 1.0),
     "blanked/pointers_indistinguishable": (">=", 1.0),
@@ -190,6 +242,11 @@ def main(argv: Optional[List[str]] = None) -> Dict[str, Any]:
             for arm in ARMS]
     tbl = ledger.table(["store", "deleted key disclosed", "uniquely identified",
                         "candidate keys left", "false positives", "dangling before any deletion"], rows)
+    inv = ledger.table(["guarantee", "canonical pod", "duplicated"],
+                       [["unreachable to the reader (E-000032)", "1.00", "3.00"],
+                        ["no trace left in the bank (here)",
+                         f"{agg['canonical/trace_closure_mean']['mean']:.2f}",
+                         f"{agg['duplicated/trace_closure_mean']['mean']:.2f}"]])
 
     record = {"experiment": "E-000035",
               "title": "a pod's aliases are signposts, and a deletion leaves them pointing at it",
@@ -208,6 +265,12 @@ def main(argv: Optional[List[str]] = None) -> Dict[str, Any]:
           "pod's object leaves every alias still pointing at it, and `MVCCStore.bank()` keeps that key",
           "deliberately so the model has to discover the miss rather than be handed it. Each surviving",
           "alias is therefore a signpost reading *a record stood here and is gone*.", "",
+          "## The closure inverts with the guarantee", "", inv, "",
+          "E-000032 measures the first row: how many records must go before no query yields the object.",
+          "This experiment measures the second: how many before the bank shows no evidence a deletion",
+          "happened there. The same two stores swap places. A pod's aliases are the signposts, so they",
+          "must go too; a duplicated store costs the one record you were removing anyway. Quoting only",
+          "the first row would be quoting the half that flatters the design.", "",
           "## The mitigation, and what it costs", "",
           f"Blanking a dangling pointer's key closes the channel "
           f"({agg['blanked/channel_closed']['min']:.4f}) and makes every such pointer identical "
