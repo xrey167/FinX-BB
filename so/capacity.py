@@ -18,10 +18,18 @@ linear is a cost of superposition that is paid at deletion time.
 WHY THE MODULE MEASURES RATHER THAN ASSERTS. The bound says what is POSSIBLE. It says nothing about
 what a particular model did, and the difference is the whole question. Two numbers separate them:
 
-    pressure   = sum_i dim A_i / d    -- how much of the budget the facts' deletion subspaces demand
-    efficiency = rank(union A_i) / sum_i dim A_i
-                                      -- 1.0 when they are mutually independent, lower when they
-                                         overlap and collateral is therefore forced
+    pressure      = sum_i dim A_i / d   -- how much of the budget the deletion subspaces demand
+    orthogonality = sigma_min of the stacked orthonormal bases
+                                        -- 1.0 exactly when the subspaces are mutually ORTHOGONAL,
+                                           falling to 0 as they become linearly dependent
+
+A NOTE ON WHY THE SECOND IS NOT A RANK. The first version of this module used
+``rank(union) / sum_i dim A_i``, which measures LINEAR INDEPENDENCE, and the theorem needs
+ORTHOGONALITY. The two are not the same and the difference is not academic: measured on GPT-2 (
+E-000043) twelve deletion subspaces totalling 58 directions had rank exactly 58 -- a direct sum,
+"efficiency" 1.0000 -- while their pairwise principal cosines were 0.5566 on average and 0.8559 at
+worst. Independent and nowhere near orthogonal. ``sigma_min`` of the stacked bases is 1.0 only for a
+mutually orthonormal collection and degrades smoothly, which is the quantity the argument runs on.
 
 A model at LOW pressure and LOW efficiency had room for private subspaces and did not take it: the
 failure is allocation, and allocation is a training objective. A model at pressure near 1 is against
@@ -84,7 +92,8 @@ class Allocation:
     dims: Tuple[int, ...] = ()
     union_rank: int = 0
     pressure: float = 0.0
-    efficiency: float = 1.0
+    orthogonality: float = 1.0     # sigma_min of the stacked bases: the quantity the theorem needs
+    rank_efficiency: float = 1.0   # rank / sum of dims: independence only, reported for contrast
     max_overlap: float = 0.0
     mean_overlap: float = 0.0
     bound: float = 0.0
@@ -101,17 +110,18 @@ class Allocation:
         if self.pressure > 0.8:
             why = ("AGAINST THE BOUND: the deletion subspaces demand most of the dimension budget, so "
                    "overlap is forced and no training objective removes it without more dimensions")
-        elif self.efficiency > 0.95:
-            why = ("ALLOCATED: the subspaces are nearly independent and there is budget to spare, so "
+        elif self.orthogonality > 0.95:
+            why = ("ALLOCATED: the subspaces are nearly orthogonal and there is budget to spare, so "
                    "clean deletion is available here")
         else:
-            why = ("ALLOCATION, NOT CAPACITY: the subspaces overlap while "
+            why = ("ALLOCATION, NOT CAPACITY: the subspaces are far from orthogonal while "
                    f"{100 * self.headroom:.0f}% of the budget is unused -- the model had room to give "
                    "each fact a private subspace and did not, which is a training objective and not a "
                    "law of dimension")
         return (f"{self.n_facts} fact(s), {sum(self.dims)} direction(s) in d={self.d}: pressure "
-                f"{self.pressure:.4f} against a bound of {self.bound:.0f} facts, efficiency "
-                f"{self.efficiency:.4f}, largest pairwise overlap {self.max_overlap:.4f} -- {why}")
+                f"{self.pressure:.4f} against a bound of {self.bound:.0f} facts, orthogonality "
+                f"{self.orthogonality:.4f} (rank-independence {self.rank_efficiency:.4f}), largest "
+                f"pairwise overlap {self.max_overlap:.4f} -- {why}")
 
 
 def allocation(subspaces: Sequence[torch.Tensor], d: Optional[int] = None) -> Allocation:
@@ -130,10 +140,15 @@ def allocation(subspaces: Sequence[torch.Tensor], d: Optional[int] = None) -> Al
     total = sum(dims)
     union = torch.cat([q for q in qs if q.shape[1]], dim=1)
     rank = int(torch.linalg.matrix_rank(union, tol=1e-5)) if union.numel() else 0
+    # sigma_min of the stacked orthonormal bases: 1.0 iff the collection is mutually orthonormal.
+    # Rank alone cannot see the difference between a direct sum and an orthogonal one, and it is the
+    # orthogonal one the argument needs.
+    smin = float(torch.linalg.svdvals(union).min()) if union.numel() and union.shape[1] > 1 else 1.0
     pairs = [subspace_overlap(mats[i], mats[j]) for i in range(len(mats)) for j in range(i + 1, len(mats))]
     s_mean = total / max(len(mats), 1)
     return Allocation(d=dim, n_facts=len(mats), dims=dims, union_rank=rank,
-                      pressure=total / max(dim, 1), efficiency=rank / max(total, 1),
+                      pressure=total / max(dim, 1), orthogonality=smin,
+                      rank_efficiency=rank / max(total, 1),
                       max_overlap=max(pairs) if pairs else 0.0,
                       mean_overlap=float(sum(pairs) / len(pairs)) if pairs else 0.0,
                       bound=capacity_bound(dim, s_mean))

@@ -17,22 +17,22 @@ THAT IS A STATEMENT ABOUT WHAT IS POSSIBLE, AND SAYS NOTHING ABOUT WHAT THIS MOD
 is the whole experiment, and two numbers separate them (``so/capacity.py``):
 
     pressure   = sum_i dim A_i / d
-    efficiency = rank(union A_i) / sum_i dim A_i
+    orthogonality = sigma_min of the stacked orthonormal bases, 1.0 iff mutually orthogonal
 
 High pressure means the bound is binding and no objective fixes it without more dimensions. LOW
-pressure with LOW efficiency means the model had room to give each fact a private subspace and did not
+pressure with LOW orthogonality means the model had room to give each fact a private subspace and did not
 -- an allocation failure, which is a training objective.
 
 AND A REFINEMENT THE THEOREM ACTUALLY NEEDS, measured separately because it may be where the truth is.
 The orthogonality the argument requires is between ``A_i`` and ``V_j``, not between ``A_i`` and
 ``A_j``. Deletion subspaces can be mutually independent while each still intrudes on other facts'
-READOUT subspaces, and that would produce exactly the collateral E-000040 measured with efficiency
+READOUT subspaces, and that would produce exactly the collateral E-000040 measured with orthogonality
 near one. Both quantities are reported; if they disagree, the second is the one the mechanism runs
 through and the first is the one that would have been quoted.
 
 WHAT WOULD KILL THE READING. ``pressure`` above 0.5 makes the allocation reading unavailable -- the
 bound would be close enough to binding that overlap is partly forced -- and it is pre-registered as a
-criterion that can fail. ``efficiency`` at 0.95 or above with collateral still present would say the
+criterion that can fail. ``orthogonality`` at 0.95 or above with collateral still present would say the
 deletion subspaces are already well allocated and the mechanism is elsewhere, which is why
 ``overlap_AV`` is measured in the same run rather than after seeing the first number.
 
@@ -190,10 +190,13 @@ def run(layer: int, threads: int, verbose: bool = True) -> Dict[str, Any]:
         "layer": layer, "d": d, "n_held": len(held), "n_silenced": len(subs),
         "silenced_rate": float(np.mean([r["silenced"] for r in rows])),
         "answer_before": float(np.mean([r["answer_before"] for r in rows])),
-        "answer_after": float(np.mean([r["answer_after"] for r in rows])),
+        "answer_after_all": float(np.mean([r["answer_after"] for r in rows])),
+        "answer_after": float(np.mean([r["answer_after"] for r in rows if r["silenced"]]))
+        if any(r["silenced"] for r in rows) else float("nan"),
         "collateral": float(np.mean([r["collateral"] for r in rows])),
         "dim_A_mean": float(np.mean([r["dim_A"] for r in rows])),
-        "pressure": alloc.pressure, "efficiency": alloc.efficiency, "headroom": alloc.headroom,
+        "pressure": alloc.pressure, "orthogonality": alloc.orthogonality,
+        "rank_efficiency": alloc.rank_efficiency, "headroom": alloc.headroom,
         "union_rank": float(alloc.union_rank), "sum_dims": float(sum(alloc.dims)),
         "overlap_AA_max": alloc.max_overlap, "overlap_AA_mean": alloc.mean_overlap,
         "overlap_AV_max": float(np.max(av)) if av else float("nan"),
@@ -210,13 +213,17 @@ def run(layer: int, threads: int, verbose: bool = True) -> Dict[str, Any]:
 
 
 KEYS = ["d", "n_held", "n_silenced", "silenced_rate", "answer_before", "answer_after", "collateral",
-        "dim_A_mean", "pressure", "efficiency", "headroom", "union_rank", "sum_dims",
+        "answer_after_all", "dim_A_mean", "pressure", "orthogonality", "rank_efficiency",
+        "headroom", "union_rank", "sum_dims",
         "overlap_AA_max", "overlap_AA_mean", "overlap_AV_max", "overlap_AV_mean", "capacity_bound"]
 
 CRITERIA = {
     # attack validity, and a deletion to measure
     "answer_before": (">=", 0.75),
+    # over the facts a subspace of their own basis actually silences; the rate at which that fails
+    # is its own criterion rather than being averaged into this one
     "answer_after": ("<=", 0.25),
+    "silenced_rate": (">=", 0.50),
     # THE READING DEPENDS ON THIS AND IT CAN FAIL: if the deletion subspaces demand more than half the
     # dimension budget, the bound is close enough to binding that overlap is partly forced, and
     # "allocation, not capacity" is not available as a conclusion.
@@ -224,13 +231,13 @@ CRITERIA = {
     # THE CLAIM: with budget to spare, the subspaces still are not independent. Failing this would say
     # the deletion subspaces ARE well allocated and the collateral comes from somewhere else -- which
     # overlap_AV is measured in the same run to catch.
-    "efficiency": ("<=", 0.95),
+    "orthogonality": ("<=", 0.95),
 }
 
 DECISION_RULE = (
-    "pressure <= 0.5 and efficiency <= 0.95 -> ALLOCATION, not capacity: the model had room for private "
+    "pressure <= 0.5 and orthogonality <= 0.95 -> ALLOCATION, not capacity: the model had room for private "
     "subspaces and did not take it, so a training objective is the remedy. pressure > 0.8 -> the bound "
-    "is binding and no objective fixes it without more dimensions. efficiency > 0.95 with collateral "
+    "is binding and no objective fixes it without more dimensions. orthogonality > 0.95 with collateral "
     "still present -> the deletion subspaces are independent and the mechanism runs through A_i against "
     "V_j instead, which is measured in the same run. Fixed before the numbers were seen.")
 
@@ -261,11 +268,16 @@ def main(argv: Optional[List[str]] = None) -> Dict[str, Any]:
                         ["directions demanded in total", f"{m['sum_dims']:.0f} of {m['d']}"],
                         ["**pressure** (demand / d)", f"**{m['pressure']:.4f}**"],
                         ["headroom left unused", f"{m['headroom']:.4f}"],
-                        ["**efficiency** (rank of the union / total)", f"**{m['efficiency']:.4f}**"]]), "",
+                        ["**orthogonality** (sigma_min of the stacked bases)",
+                         f"**{m['orthogonality']:.4f}**"],
+                        ["rank-independence (rank / total), for contrast",
+                         f"{m['rank_efficiency']:.4f}"]]), "",
           "## What the deletion costs, and where the overlap actually is", "",
           ledger.table(["measure", "value"],
                        [["the model answers, before", f"{m['answer_before']:.4f}"],
-                        ["the model answers, after its own deletion", f"{m['answer_after']:.4f}"],
+                        ["facts a subspace of their own basis silences", f"{m['silenced_rate']:.4f}"],
+                        ["answers after its own deletion, over those", f"{m['answer_after']:.4f}"],
+                        ["the same over every fact, silenced or not", f"{m['answer_after_all']:.4f}"],
                         ["bystander facts under the same ablation", f"{m['collateral']:.4f}"],
                         ["overlap of A_i with A_j, mean", f"{m['overlap_AA_mean']:.4f}"],
                         ["overlap of A_i with A_j, max", f"{m['overlap_AA_max']:.4f}"],
@@ -275,7 +287,12 @@ def main(argv: Optional[List[str]] = None) -> Dict[str, Any]:
           "The last two rows are the refinement. The orthogonality the argument requires is between a",
           "fact's DELETION subspace and every other fact's READOUT subspace, not between two deletion",
           "subspaces. They can be mutually independent while each still intrudes on what other facts",
-          "read from, and that produces collateral with efficiency near one.", "",
+          "read from, and that produces collateral with orthogonality near one.", "",
+          "", "The instrument had a bug this run found. The first version measured "
+          "`rank(union)/total`, which is LINEAR INDEPENDENCE; the theorem needs ORTHOGONALITY. It "
+          "reported 1.0000 on twelve subspaces whose pairwise principal cosines were 0.5566 mean "
+          "and 0.8559 max in the same run -- a direct sum, nowhere near orthogonal. sigma_min is "
+          "now the primary and the rank is kept beside it.", "",
           "## Verdict", "", m["verdict"], "", "## The rule, fixed before the numbers", "",
           DECISION_RULE, "", "## Pre-registered criteria", "", ledger.criteria_table(check), ""]
     path = ledger.save("e000043_allocation", record, "\n".join(md))
