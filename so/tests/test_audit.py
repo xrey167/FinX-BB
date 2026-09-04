@@ -63,7 +63,7 @@ def test_the_audit_catches_the_shred_key_leak_in_the_outputs():
     res = audit_independence(m, _run(m, a, q), _run(m, b, q))
     assert not res.output_independent, res.summary()
     assert not res.activation_independent
-    assert any("k_rev" in d.module for d in res.differences), res.summary()
+    assert any(d.base == "k_rev" for d in res.differences), res.summary()
 
 
 def test_gating_the_reverse_key_restores_output_independence():
@@ -101,7 +101,7 @@ def test_revoke_is_answer_independent_but_still_embeds_the_deleted_object():
     assert not full.output_independent                            # but a returned diagnostic does
     assert [d.output for d in full.output_differences] == ["2value_norm."], full.summary()
     assert not full.activation_independent
-    assert any(d.module.endswith("ent_emb") for d in full.differences), full.summary()
+    assert any(d.base == "ent_emb" for d in full.differences), full.summary()
 
 
 def test_deleting_the_rows_is_independent_at_both_levels():

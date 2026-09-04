@@ -38,6 +38,14 @@ class Difference:
     max_abs: float
     shape: Tuple[int, ...]
 
+    @property
+    def base(self) -> str:
+        """The module name without the call index. ``ent_emb#2`` -> ``ent_emb``.
+
+        Captures are keyed by call index because a module invoked more than once used to keep only its
+        last output. Callers that care which module leaked, not which invocation, want this."""
+        return self.module.split("#", 1)[0]
+
     def __str__(self) -> str:
         return f"{self.module}[{self.output}] differs by {self.max_abs:.3e} (shape {tuple(self.shape)})"
 
