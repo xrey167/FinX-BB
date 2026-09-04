@@ -140,3 +140,57 @@ def test_alias_row_value_differs_from_a_fact_row_value():
     enc = _adapter(use_links=True, n_deref=1).encode_bank(bank)
     v = enc["values"]
     assert not torch.allclose(v[bank["is_link"]].mean(0), v[~bank["is_link"]].mean(0))
+
+
+def _injection_norm(adapter, bank, ids, am, last):
+    """How far the adapter moves the frozen model's last-token logits."""
+    with torch.no_grad():
+        base = adapter(None, ids, am, last)[1]
+        out = adapter(bank, ids, am, last)[1]
+    return float((out - base).abs().mean())
+
+
+def test_match_gate_actually_reduces_the_injection():
+    """It did not, before the injection path was restructured.
+
+    The gate multiplied the read and the RMS match then divided by the RMS of that same gated read,
+    so the factor cancelled exactly and E-000018's gate arm measured no effect at all. The
+    normaliser is now taken from the ungated read.
+    """
+    ids, am, last = _prompt()
+    bank = _bank()
+    a = _adapter(match_gate=True)
+    with torch.no_grad():
+        a.match_tau.fill_(0.99)          # nothing can match: the gate should close
+        a.match_temp.fill_(50.0)
+    closed = _injection_norm(a, bank, ids, am, last)
+    with torch.no_grad():
+        a.match_tau.fill_(-0.99)         # everything matches: the gate should be open
+    open_ = _injection_norm(a, bank, ids, am, last)
+    assert closed < 0.2 * open_, f"closed gate injects {closed:.4f} against an open {open_:.4f}"
+
+
+def test_two_channel_null_can_silence_the_refusal_channel():
+    ids, am, last = _prompt()
+    bank = _bank()
+    a = _adapter(two_channel_null=True)
+    with torch.no_grad():                # force the relevance score to zero and to one
+        for m in a.query_relevance.values():
+            m[-1].bias.fill_(-20.0)
+    silent = _injection_norm(a, bank, ids, am, last)
+    with torch.no_grad():
+        for m in a.query_relevance.values():
+            m[-1].bias.fill_(20.0)
+    loud = _injection_norm(a, bank, ids, am, last)
+    assert silent != pytest.approx(loud, rel=1e-3), "the relevance channel changes nothing"
+
+
+def test_ungated_adapter_is_unchanged_by_the_restructuring():
+    """With both channels off the read is cell + null again, so nothing recorded earlier moves."""
+    ids, am, last = _prompt()
+    bank = _bank()
+    a = _adapter()
+    with torch.no_grad():
+        cand, full, _, _ = a(bank, ids, am, last)
+    assert torch.isfinite(cand).all() and torch.isfinite(full).all()
+    assert _injection_norm(a, bank, ids, am, last) > 0

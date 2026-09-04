@@ -203,8 +203,14 @@ def bank_with_links(rng: np.random.Generator, world: World, spec: AliasSpec, cen
             cur = (int(l_sub[nxt]), int(l_rel[nxt]))
     kid_of_key = {(int(s), int(r)): int(i) for i, (s, r, u) in enumerate(zip(subject, relation, usable)) if u}
     active_pos = {(int(s), int(r)): int(i) for i, (s, r, a) in enumerate(zip(subject, relation, active)) if a}
+    # status-gated designs need this: the original rows stay addressable when revoked, the stale
+    # duplicates never are. Without it a status-gated model trains on a bank where nothing is routable
+    # and is then evaluated on one where everything is.
+    routable = np.concatenate([np.ones(n, dtype=bool), np.zeros(total - n, dtype=bool)])
+    routable_pos = {(int(s), int(r)): int(i) for i, (s, r, rt) in enumerate(zip(subject, relation, routable)) if rt}
     return Bank(subject, relation, obj, marker.astype(np.float32), active, usable, np.arange(total),
                 index_view, kid_of_key, active_pos, marker_valid=~shred,
+                routable=routable, routable_pos=routable_pos,
                 is_link=is_link, link_subject=l_sub, link_relation=l_rel, trace_of_key=trace_of_key)
 
 

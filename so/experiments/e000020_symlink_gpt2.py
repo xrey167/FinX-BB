@@ -192,20 +192,27 @@ def evaluate(gk: E8.GPT2Knowledge, seed: int, centre: np.ndarray) -> Dict[str, A
     m["alias_direct"] = float((a_a == truth_a).mean())
     a_dup, _, _ = _answers(gk, dup(), alias_keys, gk.names)
     m["dup_direct"] = float((a_dup == truth_a).mean())
-    for t in (1, N_TRAIN_TEMPLATES, N_TRAIN_TEMPLATES + 1):
+    heldout = tuple(range(N_TRAIN_TEMPLATES, N_TRAIN_TEMPLATES + E17.N_HELDOUT))
+    for t in (1, *heldout):
         tag = "train" if t < N_TRAIN_TEMPLATES else "heldout"
         aa, _, _ = _answers(gk, sym(), alias_keys, gk.names, template=t)
         m[f"alias_template{t}_{tag}"] = float((aa == truth_a).mean())
-    m["alias_heldout_min"] = float(min(m[f"alias_template{t}_heldout"]
-                                       for t in (N_TRAIN_TEMPLATES, N_TRAIN_TEMPLATES + 1)))
+    m["alias_heldout_min"] = float(min(m[f"alias_template{t}_heldout"] for t in heldout))
+    m["alias_heldout_mean"] = float(np.mean([m[f"alias_template{t}_heldout"] for t in heldout]))
 
     # ---- SHARING: one UPDATE on the shared object
     new_obj = {k: int((world.index[k] + 1 + rng.integers(0, n_ent - 1)) % n_ent) for k in targets}
     for k in targets:
         sym_store.update(sym_kids[k], new_obj[k]); dup_store.update(dup_kids[k], new_obj[k])
     want = np.array([new_obj[spec.alias_of[a]] for a in alias_keys])
-    m["shared_update/alias_new_object"] = float((_answers(gk, sym(), alias_keys, gk.names)[0] == want).mean())
-    m["duplicate_update/alias_new_object"] = float((_answers(gk, dup(), alias_keys, gk.names)[0] == want).mean())
+    a_sym_u = _answers(gk, sym(), alias_keys, gk.names)[0]
+    a_dup_u = _answers(gk, dup(), alias_keys, gk.names)[0]
+    m["shared_update/alias_new_object"] = float((a_sym_u == want).mean())
+    m["duplicate_update/alias_new_object"] = float((a_dup_u == want).mean())
+    # the complement: in the duplication arm the copies must still hold the OLD object, which is what
+    # makes "one update did not reach them" a fact about the store rather than about a broken read
+    m["shared_update/alias_old_object"] = float((a_sym_u == truth_a).mean())
+    m["duplicate_update/alias_old_object"] = float((a_dup_u == truth_a).mean())
     for k in targets:
         sym_store.rollback(sym_kids[k], 1); dup_store.rollback(dup_kids[k], 1)
     m["rollback/alias_direct"] = float((_answers(gk, sym(), alias_keys, gk.names)[0] == truth_a).mean())
@@ -266,7 +273,8 @@ def criteria_groups() -> Dict[str, Dict[str, Tuple[str, float]]]:
                                      "dup_direct": (">=", 0.85), "alias_heldout_min": (">=", 0.50)},
         "one_update_reaches_every_path": {"shared_update/alias_new_object": (">=", 0.90),
                                           "duplicate_update/alias_new_object": ("<=", 0.05),
-                                          "rollback/alias_direct": (">=", 0.80)},
+                                          "rollback/alias_direct": (">=", 0.80),
+                                          "duplicate_update/alias_old_object": (">=", 0.85)},
         "one_shred_deletes_every_path": {"shred_target/alias_unknown": (">=", 0.90),
                                          "shred_target/alias_true_object": ("<=", 0.05),
                                          "dup_shred/copy_direct_acc": (">=", 0.85),
@@ -274,7 +282,10 @@ def criteria_groups() -> Dict[str, Dict[str, Tuple[str, float]]]:
         "attacks_through_every_alias": {"shred_target/alias_probe_top1": ("<=", 0.05),
                                         "shred_target/alias_forced_choice": ("<=", 0.60),
                                         "shred_target/alias_top1_among_entities": ("<=", 0.05)},
-        "attack_validity": {"active/alias_probe_top1": (">=", 0.25), "probe_calibration_top1": (">=", 0.20)},
+        # the duplication arm's probe number is the right-hand side of the headline contrast; without a
+        # floor a merely weak probe would print "3% vs 4%" and read as a deletion result
+        "attack_validity": {"active/alias_probe_top1": (">=", 0.25), "probe_calibration_top1": (">=", 0.20),
+                            "dup_shred/copy_probe_top1": (">=", 0.20)},
         "alias_lifecycle": {"revoke_alias/alias_unknown": (">=", 0.90), "revoke_alias/sibling_readable": (">=", 0.80),
                             "revoke_alias/target_readable": (">=", 0.80), "delete_target/alias_unknown": (">=", 0.90),
                             "delete_target/alias_true_object": ("<=", 0.05)},
@@ -315,8 +326,12 @@ def main(argv: Optional[List[str]] = None) -> Dict[str, Any]:
     all_criteria = {k: v for g in groups.values() for k, v in g.items()}
     check = ledger.check_criteria(agg, all_criteria)
     met = {g: all(check["criteria"][k]["pass"] for k in ks) for g, ks in groups.items()}
+    # the same rule as E-000015: F4 also requires the alias lifecycle (a revoked alias, a dangling
+    # pointer after DELETE). The floor is F0, not F1: this design keeps a revoked cell addressed and
+    # closes the gate instead of removing it from routing, so F1 would claim routing removal.
     level = ("F4" if met["one_shred_deletes_every_path"] and met["attacks_through_every_alias"]
-             and met["attack_validity"] else ("F3" if met["one_shred_deletes_every_path"] else "F1"))
+             and met["attack_validity"] and met["alias_lifecycle"]
+             else ("F3" if met["one_shred_deletes_every_path"] and met["attack_validity"] else "F0"))
     n_alias = EVAL["n_groups"] * EVAL["n_alias_per_group"]
     record = {
         "experiment": "E-000020",
@@ -346,7 +361,11 @@ def main(argv: Optional[List[str]] = None) -> Dict[str, Any]:
         "criteria": check["criteria"], "claim_supported": check["claim_supported"],
         "per_seed": per_seed, "aggregate": agg,
     }
-    rows = [(k, f"{agg[k]['mean']:.4f}", f"{agg[k]['min']:.4f}") for k in KEYS if k in agg]
+    lower = {k for k, (op, _) in all_criteria.items() if op == "<="} | {
+        "shred_target/alias_true_object", "shred_target/alias_probe_top1", "shred_target/alias_forced_choice",
+        "shred_target/alias_top1_among_entities", "delete_target/alias_true_object",
+        "duplicate_update/alias_new_object"}
+    rows = [(k, f"{agg[k]['mean']:.4f}", f"{ledger.worst(agg[k], k in lower):.4f}") for k in KEYS if k in agg]
     contrast = [
         ("one UPDATE on the shared object reaches every access path",
          ledger.pct(agg["shared_update/alias_new_object"]["mean"]), ledger.pct(agg["duplicate_update/alias_new_object"]["mean"])),
@@ -367,8 +386,7 @@ def main(argv: Optional[List[str]] = None) -> Dict[str, Any]:
         "Exact binomial intervals (pooled over seeds):", "",
         ledger.table(ledger.CI_HEADERS, ledger.ci_rows(per_seed, [k for k in KEYS if k in record["sample_sizes"]],
                                                        record["sample_sizes"],
-                                                       lower_is_better=[k for k in KEYS if "true_object" in k
-                                                                        or k == "duplicate_update/alias_new_object"])), "",
+                                                       lower_is_better=sorted(lower))), "",
         "Pre-registered criteria (worst seed):", "", ledger.criteria_table(check), "",
         "By construction: " + "; ".join(record["by_construction"]) + ".", "",
         "Learned: " + "; ".join(record["learned"]) + ".", "",

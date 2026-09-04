@@ -189,6 +189,7 @@ class KnowledgeAdapterLM(nn.Module):
             scores = scores.masked_fill(~allowed[None], float("-inf"))
             p = torch.softmax(scores, dim=-1)
             val = p @ values                                                  # (B, d)
+            w_null = p[:, -1:]                    # how much of val came from the null column
             if self.cfg.n_deref > 0:
                 # the resolve slot is recorded HERE, before its dereferences, so the routing tensor reads
                 # (resolve, deref...) per read layer and lines up with the supervision built by the
@@ -206,14 +207,16 @@ class KnowledgeAdapterLM(nn.Module):
                     pd = torch.softmax(sd, dim=-1)
                     # the null column carries the incoming value: "what I read was not a pointer"
                     val = pd[:, :-1] @ values[:-1] + pd[:, -1:] * val
+                    w_null = w_null * pd[:, -1:]  # the null share survives only through the passthroughs
                     ctx["routing"].append(pd)
+            null_c = w_null * values[-1][None]        # the null column's share of the read
+            cell_c = val - null_c                     # everything the cells contributed
             if self.cfg.two_channel_null:
                 # the null column stops carrying the ' unknown' direction on its own: its contribution is
-                # multiplied by how much this text looks like a question about a cell at all
+                # scaled by how much this text looks like a question about a cell at all
                 rel = torch.sigmoid(self.query_relevance[str(layer)](hl)).squeeze(-1)
-                val = val - p[:, -1:] * values[-1][None] * (1.0 - rel)[:, None]
+                null_c = null_c * rel[:, None]
                 ctx.setdefault("relevance", []).append(rel.detach())
-            read = self.o_proj[str(layer)](val)                               # (B, d)
             if self.cfg.match_gate:
                 # absolute agreement with the best REAL cell key; the null key is excluded on purpose, because
                 # the question is whether any cell matches at all, not which one wins the competition
@@ -224,18 +227,20 @@ class KnowledgeAdapterLM(nn.Module):
                 cos_max = cos.max(dim=-1).values if cos.shape[-1] else torch.full((B,), -1.0, device=h.device)
                 m = torch.sigmoid((cos_max - self.match_tau[read_index]) * self.match_temp[read_index].abs())
                 ctx.setdefault("match", []).append(m.detach())
-                read = read * m[:, None]
+                cell_c = cell_c * m[:, None]          # a payload is injected only when a cell actually matches
+            read = self.o_proj[str(layer)](cell_c + null_c)                   # (B, d)
             rms_h = hl.detach().pow(2).mean(-1, keepdim=True).sqrt()
             if self.cfg.fallback == "prior":
                 read = read * rms_h * self.inject_gain[read_index]               # static: a zero read stays zero
             else:
-                rms_r = read.pow(2).mean(-1, keepdim=True).sqrt() + 1e-6
-                # The ratio is clamped because a read can cancel to almost nothing — the two-channel null
-                # subtracts part of the null value, and an exact cancellation sends rms_r to the epsilon and
-                # the ratio to a million, which is what made E-000022 diverge to NaN on its second seed at
-                # the step where the generic term switches on. In a healthy read the ratio is near one, so
-                # this bound never binds and no recorded result changes.
-                read = read * (rms_h / rms_r).clamp(max=10.0) * self.inject_gain[read_index]
+                # The normaliser is computed from the UNGATED read. Taking it from the gated one divides the
+                # gates straight back out — read * m, then divided by the RMS of read * m, is read again —
+                # which is why the match gate arm of E-000018 measured no effect whatsoever. With the
+                # reference ungated, a closed gate genuinely injects less, and the denominator can no longer
+                # be driven to zero by a cancellation, which was the NaN in E-000022's second seed.
+                ref = self.o_proj[str(layer)](val)
+                rms_r = ref.pow(2).mean(-1, keepdim=True).sqrt().clamp_min(1e-3 * rms_h + 1e-6)
+                read = read * (rms_h / rms_r) * self.inject_gain[read_index]
             delta = torch.zeros_like(h)
             delta[ar, ctx["last_idx"]] = read
             if self.cfg.n_deref == 0:

@@ -192,6 +192,15 @@ def ci_rows(per_seed: List[Dict[str, Any]], keys: Sequence[str], sizes: Dict[str
     return rows
 
 
+def worst(stat: Dict[str, float], lower_is_better: bool) -> float:
+    """The worst seed of an aggregate: the maximum for a leak, the minimum for an accuracy.
+
+    Reporting ``min`` for a lower-is-better metric prints the BEST seed under a "worst seed" heading,
+    which several records did before this helper existed.
+    """
+    return stat["max"] if lower_is_better else stat["min"]
+
+
 CI_HEADERS = ["measure", "mean over seeds", "worst seed", "pooled n", "95% CI lower", "95% CI upper"]
 
 
@@ -212,10 +221,10 @@ def check_criteria(agg: Dict[str, Dict[str, float]], criteria: Dict[str, Tuple[s
     return {"criteria": detail, "claim_supported": ok_all}
 
 
-def criteria_table(check: Dict[str, Any]) -> str:
+def criteria_table(check: Dict[str, Any], basis: str = "worst seed") -> str:
     rows = [(m, f"{d['op']} {d['threshold']}", "-" if d["observed"] is None else f"{d['observed']:.4f}",
              "PASS" if d["pass"] else "FAIL") for m, d in check["criteria"].items()]
-    return table(["criterion (worst seed)", "required", "observed", "result"], rows)
+    return table([f"criterion ({basis})", "required", "observed", "result"], rows)
 
 
 def aggregate(per_seed: List[Dict[str, Any]], keys: Sequence[str]) -> Dict[str, Dict[str, float]]:
