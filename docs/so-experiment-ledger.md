@@ -1975,8 +1975,34 @@ the addressing.** This closes a loop with §31.24: reading a fact through a new 
 addressing (`routing_share` 0.8861), and deleting one damages bystanders through addressing. One
 structure, measured from both ends.
 
-**ALLOCATION, NOT CAPACITY.** The model had 92% of its dimension budget free and still gave twelve
-facts deletion subspaces overlapping 0.41 more than the matched null. Allocation is a training objective; capacity would
+**RETRACTED — the null was wrong.** The verdict above compared overlap against a *random-state* null.
+Random states carry no template structure, and every fact here is asked with the same eight templates,
+so the basis rows beyond the first are phrasing directions the DESIGN shares out to every fact. Against
+a **design-matched permutation null** — within each template, shuffle which fact's state sits where,
+preserving both marginals and destroying only the fact × template interaction — every sign reverses:
+
+| subspace | real | random null | design-matched null |
+|---|---|---|---|
+| deletion subspaces (k ≈ 6) | 0.5898 | 0.1725 → **+0.4173** | 0.7895 → **−0.1997** |
+| content only | 0.2232 | 0.0638 → +0.1594 | 0.1871 → **+0.0361** |
+| addressing only | 0.5954 | 0.1930 → +0.4024 | 0.7762 → **−0.1809** |
+
+Permuting the interaction *raises* the overlap, so the model's structure makes its subspaces MORE
+distinct than chance. `excess_overlap` and `address_over_content` are kept as pre-registered and now
+**FAIL** at −0.1306 and −0.2170. Both "allocation, not capacity" and "the sharing is in the addressing"
+are withdrawn.
+
+**What survives, and it is the stronger statement.** The collateral is real (0.3897 from 1.0000), the
+capacity bound is nowhere near binding (pressure 0.0755, 92% headroom), and the model is not
+allocating badly. So the damage is neither a capacity limit nor a training defect. It comes from a
+fact's deletion subspace necessarily CONTAINING addressing directions, and addressing being shared
+because facts are asked in the same ways — sharing that lives in the task, not in the model, and that
+no allocation objective can remove. In a store the address and the object are separate records; in a
+representation they cannot be pulled apart by allocation. **E-000044 is the test: if this reading is
+right, the pod objective should not substantially reduce collateral.**
+
+The withdrawn verdict, kept for the record: the model had 92% of its dimension budget free and gave
+twelve facts deletion subspaces overlapping 0.41 more than a random-state null. Allocation is a training objective; capacity would
 have been a law of dimension. That is the difference between a limit and a defect, and it is why the
 pod objective — access paths of one fact sharing a core, cores of different facts disjoint — is worth
 training rather than merely wishing for.

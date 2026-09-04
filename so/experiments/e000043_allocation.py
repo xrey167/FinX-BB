@@ -178,17 +178,43 @@ def run(layer: int, threads: int, verbose: bool = True) -> Dict[str, Any]:
             print(f"  {s:<10} dim(A) {len(chosen)} | answer {held_rate[s]:.2f} -> {after:.2f} | "
                   f"collateral {coll:.2f}  ({time.time()-t0:.0f}s)", flush=True)
 
-    # ------------------------------------------------------------------ the matched null
-    # Overlap under this construction has a non-zero null: seventeen RANDOM states put through the
-    # identical code path already overlap. Quoting the raw number against a baseline of zero would
-    # overstate the effect by exactly that much, so the null is built here, by the same functions, and
-    # every overlap below is reported with it.
+    # ------------------------------------------------------------------ the null, and which null
+    # TWO NULLS, and the first version of this experiment used the wrong one.
+    #
+    # RANDOM STATES through the identical code path overlap at 0.1448 rather than 0, so a raw overlap
+    # quoted against zero overstates the effect. That much was right. But random states carry NO
+    # TEMPLATE STRUCTURE, and every fact here is asked with the same eight templates, so the rows of
+    # the basis beyond the first are phrasing directions that the DESIGN shares out to every fact.
+    # Against a null with no phrasing structure at all, any experiment of this shape reports a large
+    # excess and would do so whatever the model had learned.
+    #
+    # The design-matched null is a PERMUTATION: within each template, shuffle which fact's state sits
+    # where. Both marginals survive -- the template effect exactly, the fact effect as a multiset --
+    # and only the fact x template interaction is destroyed, which is the part a claim about the MODEL
+    # has to be about. Measured, it runs the other way: the permuted null overlaps MORE than the real
+    # states (0.7895 against 0.5898 at six directions), so the real interaction makes the subspaces
+    # more distinct rather than less. Both nulls are reported; the permutation one is primary.
     g = torch.Generator().manual_seed(0)
     rnd = {s: torch.randn(len(TEMPLATES), d, generator=g) for s in held}
-    Vn: Dict[str, torch.Tensor] = {}
+    Vr: Dict[str, torch.Tensor] = {}
     for s in held:
         others = torch.stack([rnd[x] for x in held if x != s]).mean(0)
-        Vn[s] = fact_basis(rnd[s], others)
+        Vr[s] = fact_basis(rnd[s], others)
+
+    Vp_runs: List[Dict[str, torch.Tensor]] = []
+    for pseed in (0, 1, 2):
+        pr = np.random.default_rng(pseed)
+        perm = {s: torch.zeros_like(res[s]) for s in held}
+        for t in range(len(TEMPLATES)):
+            order = pr.permutation(len(held))
+            for i, s in enumerate(held):
+                perm[s][t] = res[held[order[i]]][t]
+        vp = {}
+        for s in held:
+            others = torch.stack([perm[x] for x in held if x != s]).mean(0)
+            vp[s] = fact_basis(perm[s], others)
+        Vp_runs.append(vp)
+    Vn = Vp_runs[0]
 
     def mean_overlap(mats: Dict[str, torch.Tensor], names: Sequence[str]) -> float:
         pairs = [subspace_overlap(mats[a], mats[b])
@@ -205,14 +231,21 @@ def run(layer: int, threads: int, verbose: bool = True) -> Dict[str, Any]:
     content_n = {s: Vn[s][:1] for s in held}
     address_n = {s: Vn[s][1:] for s in held}
 
-    ov_full, ov_full_n = mean_overlap(V, held), mean_overlap(Vn, held)
-    ov_cont, ov_cont_n = mean_overlap(content, held), mean_overlap(content_n, held)
-    ov_addr, ov_addr_n = mean_overlap(address, held), mean_overlap(address_n, held)
+    def null_mean(sel) -> Tuple[float, float]:
+        perm = float(np.mean([mean_overlap({s: v[s][sel] for s in held}, held) for v in Vp_runs]))
+        rand = mean_overlap({s: Vr[s][sel] for s in held}, held)
+        return perm, rand
+
+    ov_full = mean_overlap(V, held); ov_full_n, ov_full_r = null_mean(slice(None))
+    ov_cont = mean_overlap(content, held); ov_cont_n, ov_cont_r = null_mean(slice(0, 1))
+    ov_addr = mean_overlap(address, held); ov_addr_n, ov_addr_r = null_mean(slice(1, None))
 
     subs = [A[s] for s in held if s in A]
     names_A = [s for s in held if s in A]
-    An = {s: Vn[s][:A[s].shape[0]] for s in names_A}
-    alloc = allocation(subs, d, null_overlap=mean_overlap(An, names_A))
+    null_A = float(np.mean([mean_overlap({s: v[s][:A[s].shape[0]] for s in names_A}, names_A)
+                            for v in Vp_runs]))
+    null_A_rand = mean_overlap({s: Vr[s][:A[s].shape[0]] for s in names_A}, names_A)
+    alloc = allocation(subs, d, null_overlap=null_A)
 
     # THE REFINEMENT: the orthogonality the theorem needs is A_i against V_j, not A_i against A_j.
     names = names_A
@@ -235,6 +268,9 @@ def run(layer: int, threads: int, verbose: bool = True) -> Dict[str, Any]:
         "overlap_AV_max": float(np.max(av)) if av else float("nan"),
         "overlap_AV_mean": float(np.mean(av)) if av else float("nan"),
         "null_overlap": alloc.null_overlap, "excess_overlap": alloc.excess,
+        "null_overlap_random": null_A_rand, "excess_overlap_random": alloc.mean_overlap - null_A_rand,
+        "null_full_random": ov_full_r, "null_content_random": ov_cont_r,
+        "null_address_random": ov_addr_r,
         "overlap_full": ov_full, "null_full": ov_full_n, "excess_full": ov_full - ov_full_n,
         "overlap_content": ov_cont, "null_content": ov_cont_n, "excess_content": ov_cont - ov_cont_n,
         "overlap_address": ov_addr, "null_address": ov_addr_n, "excess_address": ov_addr - ov_addr_n,
@@ -254,7 +290,9 @@ KEYS = ["d", "n_held", "n_silenced", "silenced_rate", "answer_before", "answer_a
         "answer_after_all", "dim_A_mean", "pressure", "orthogonality", "rank_efficiency",
         "headroom", "union_rank", "sum_dims",
         "overlap_AA_max", "overlap_AA_mean", "overlap_AV_max", "overlap_AV_mean", "capacity_bound",
-        "null_overlap", "excess_overlap", "overlap_full", "null_full", "excess_full",
+        "null_overlap", "excess_overlap", "null_overlap_random", "excess_overlap_random",
+        "overlap_full", "null_full", "excess_full", "null_full_random",
+        "null_content_random", "null_address_random",
         "overlap_content", "null_content", "excess_content",
         "overlap_address", "null_address", "excess_address", "address_over_content"]
 
@@ -274,10 +312,11 @@ CRITERIA = {
     # overlap_AV is measured in the same run to catch.
     # the deletion subspaces must overlap MORE than a matched null, or there is no effect to explain
     "excess_overlap": (">=", 0.10),
-    # THE CLAIM THIS RUN IS FOR: the sharing is in the ADDRESSING, not in the content. A fact's own
-    # content direction can be private while the machinery that says which phrasing asked for it is
-    # shared with every other fact asked the same way. Failing this would mean the content directions
-    # are as entangled as the addressing ones, and the symlink reading would be wrong.
+    # THESE TWO WERE REGISTERED AGAINST A RANDOM-STATE NULL AND ARE KEPT AS REGISTERED so the record
+    # shows them failing rather than being quietly rewritten. Against the design-matched permutation
+    # null both reverse: excess_overlap is -0.1306 and address_over_content is -0.2170. The reading
+    # they encoded -- that the model allocates badly and that the sharing is in the addressing --
+    # is withdrawn. What replaced it is in the report above.
     "address_over_content": (">=", 0.10),
 }
 
@@ -335,10 +374,18 @@ def main(argv: Optional[List[str]] = None) -> Dict[str, Any]:
                          f"{m['null_full']:.4f}", f"{m['excess_full']:+.4f}"],
                         ["**addressing minus content**", "", "",
                          f"**{m['address_over_content']:+.4f}**"]]), "",
-          "A fact's own content direction being near the null while its addressing rows are far above",
-          "it is the symlink result stated in activation space: what a store keeps in separate records",
-          "-- the object and the keys that reach it -- a representation keeps in one subspace, so a",
-          "deletion aimed at the content pays its collateral to the addressing.", "",
+          "READ THE SIGNS. Against the design-matched null the addressing rows overlap LESS than",
+          "chance, not more: permuting the fact x template interaction RAISES their overlap. So the",
+          "sharing in the addressing is a property of the design -- every fact asked with the same",
+          "templates -- and the model's own structure makes those subspaces more distinct rather than",
+          "less. An earlier version of this experiment used a random-state null, which carries no",
+          "template structure at all, and reported the opposite sign on both rows.", "",
+          "What survives is the structural point, and it is stronger for not being a training defect:",
+          "a fact's deletion subspace necessarily CONTAINS addressing directions, and addressing is",
+          "shared across facts because facts are asked in the same ways. In a store the address and",
+          "the object are separate records, so deleting the object leaves the addressing untouched. In",
+          "a representation they cannot be pulled apart by allocation, because the sharing is in the",
+          "task and not in the model.", "",
           "## What the deletion costs, and where the overlap actually is", "",
           ledger.table(["measure", "value"],
                        [["the model answers, before", f"{m['answer_before']:.4f}"],
@@ -355,11 +402,13 @@ def main(argv: Optional[List[str]] = None) -> Dict[str, Any]:
           "fact's DELETION subspace and every other fact's READOUT subspace, not between two deletion",
           "subspaces. They can be mutually independent while each still intrudes on what other facts",
           "read from, and that produces collateral with orthogonality near one.", "",
-          "", "The instrument had a bug this run found. The first version measured "
-          "`rank(union)/total`, which is LINEAR INDEPENDENCE; the theorem needs ORTHOGONALITY. It "
-          "reported 1.0000 on twelve subspaces whose pairwise principal cosines were 0.5566 mean "
-          "and 0.8559 max in the same run -- a direct sum, nowhere near orthogonal. sigma_min is "
-          "now the primary and the rank is kept beside it.", "",
+          "", "TWO INSTRUMENT FAULTS THIS EXPERIMENT FOUND IN ITSELF, both recorded because each "
+          "changed a published number. (1) It first measured `rank(union)/total`, which is LINEAR "
+          "INDEPENDENCE, and reported 1.0000 on twelve subspaces whose pairwise principal cosines "
+          "were 0.5566 and 0.8559 -- a direct sum, nowhere near orthogonal. (2) It then compared "
+          "overlap against a RANDOM-STATE null, which carries no template structure, and reported "
+          "+0.4118 where the design-matched permutation null gives -0.1306. The verdict reversed.",
+          "",
           "## Verdict", "", m["verdict"], "", "## The rule, fixed before the numbers", "",
           DECISION_RULE, "", "## Pre-registered criteria", "", ledger.criteria_table(check), ""]
     path = ledger.save("e000043_allocation", record, "\n".join(md))

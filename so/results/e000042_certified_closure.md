@@ -13,7 +13,7 @@ the paper-faithful J-lens ablation, with the paper's own guard against touching 
 | measure | value |
 |---|---|
 | facts the model answers at >= 0.75 | 17 |
-| facts attempted | 6 |
+| facts attempted | 3 |
 | facts any subset of the pool could silence | 0.0000 |
 
 This is a result, not a failure to get one: a J-lens ablation that respects the

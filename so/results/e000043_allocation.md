@@ -14,8 +14,8 @@ silences every phrasing is found, and the set of those subspaces is read two way
 | **pressure** (demand / d) | **0.0755** |
 | headroom left unused | 0.9245 |
 | mean pairwise overlap of the deletion subspaces | 0.5566 |
-| the same on a MATCHED NULL (random states, identical construction) | 0.1448 |
-| **excess over the null** | **+0.4118** |
+| the same on a MATCHED NULL (random states, identical construction) | 0.6872 |
+| **excess over the null** | **-0.1307** |
 | sigma_min of the stacked bases (a dependency check, not a summary) | 0.2393 |
 
 ## Where the sharing is: content or addressing
@@ -26,15 +26,24 @@ the same matched null.
 
 | subspace | overlap | matched null | excess |
 |---|---|---|---|
-| content direction only | 0.2232 | 0.0638 | +0.1594 |
-| addressing rows only | 0.5954 | 0.1930 | +0.4024 |
-| the whole basis | 0.6157 | 0.2048 | +0.4109 |
-| **addressing minus content** |  |  | **+0.2430** |
+| content direction only | 0.2232 | 0.1871 | +0.0361 |
+| addressing rows only | 0.5954 | 0.7762 | -0.1809 |
+| the whole basis | 0.6157 | 0.8178 | -0.2021 |
+| **addressing minus content** |  |  | **-0.2170** |
 
-A fact's own content direction being near the null while its addressing rows are far above
-it is the symlink result stated in activation space: what a store keeps in separate records
--- the object and the keys that reach it -- a representation keeps in one subspace, so a
-deletion aimed at the content pays its collateral to the addressing.
+READ THE SIGNS. Against the design-matched null the addressing rows overlap LESS than
+chance, not more: permuting the fact x template interaction RAISES their overlap. So the
+sharing in the addressing is a property of the design -- every fact asked with the same
+templates -- and the model's own structure makes those subspaces more distinct rather than
+less. An earlier version of this experiment used a random-state null, which carries no
+template structure at all, and reported the opposite sign on both rows.
+
+What survives is the structural point, and it is stronger for not being a training defect:
+a fact's deletion subspace necessarily CONTAINS addressing directions, and addressing is
+shared across facts because facts are asked in the same ways. In a store the address and
+the object are separate records, so deleting the object leaves the addressing untouched. In
+a representation they cannot be pulled apart by allocation, because the sharing is in the
+task and not in the model.
 
 ## What the deletion costs, and where the overlap actually is
 
@@ -56,11 +65,11 @@ subspaces. They can be mutually independent while each still intrudes on what ot
 read from, and that produces collateral with orthogonality near one.
 
 
-The instrument had a bug this run found. The first version measured `rank(union)/total`, which is LINEAR INDEPENDENCE; the theorem needs ORTHOGONALITY. It reported 1.0000 on twelve subspaces whose pairwise principal cosines were 0.5566 mean and 0.8559 max in the same run -- a direct sum, nowhere near orthogonal. sigma_min is now the primary and the rank is kept beside it.
+TWO INSTRUMENT FAULTS THIS EXPERIMENT FOUND IN ITSELF, both recorded because each changed a published number. (1) It first measured `rank(union)/total`, which is LINEAR INDEPENDENCE, and reported 1.0000 on twelve subspaces whose pairwise principal cosines were 0.5566 and 0.8559 -- a direct sum, nowhere near orthogonal. (2) It then compared overlap against a RANDOM-STATE null, which carries no template structure, and reported +0.4118 where the design-matched permutation null gives -0.1306. The verdict reversed.
 
 ## Verdict
 
-12 fact(s), 58 direction(s) in d=768: pressure 0.0755 against a bound of 159 facts, mean pairwise overlap 0.5566 against a matched null of 0.1448 (max 0.8559) -- ALLOCATION, NOT CAPACITY: the subspaces overlap 0.4118 more than a matched null while 92% of the budget is unused -- the model had room to give each fact a private subspace and did not, which is a training objective and not a law of dimension
+12 fact(s), 58 direction(s) in d=768: pressure 0.0755 against a bound of 159 facts, mean pairwise overlap 0.5566 against a matched null of 0.6872 (max 0.8559) -- ALLOCATED: the subspaces are no more overlapping than a matched null and there is budget to spare, so clean deletion is available here
 
 ## The rule, fixed before the numbers
 
@@ -74,5 +83,5 @@ pressure <= 0.5 and orthogonality <= 0.95 -> ALLOCATION, not capacity: the model
 | answer_after | <= 0.25 | 0.0312 | PASS |
 | silenced_rate | >= 0.5 | 0.7059 | PASS |
 | pressure | <= 0.5 | 0.0755 | PASS |
-| excess_overlap | >= 0.1 | 0.4118 | PASS |
-| address_over_content | >= 0.1 | 0.2430 | PASS |
+| excess_overlap | >= 0.1 | -0.1307 | FAIL |
+| address_over_content | >= 0.1 | -0.2170 | FAIL |

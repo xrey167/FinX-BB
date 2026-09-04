@@ -13,9 +13,9 @@
       "n": 1
     },
     "n_attempted": {
-      "max": 6.0,
-      "mean": 6.0,
-      "min": 6.0,
+      "max": 3.0,
+      "mean": 3.0,
+      "min": 3.0,
       "n": 1
     },
     "n_held": {
@@ -69,14 +69,14 @@
   "finding": "the paper-faithful J-lens ablation, with the paper's own guard against touching tokens in the clean output, does not silence these facts at this pool size -- so there is no closure to bound, and that is the result",
   "layer": 7,
   "model": "gpt2",
-  "pool_size": 8,
-  "recorded_at": "2026-09-04T20:42:43+00:00",
+  "pool_size": 10,
+  "recorded_at": "2026-09-04T21:32:40+00:00",
   "result": {
     "control_bound_can_exceed_one": 1.0,
     "finding": "the paper-faithful J-lens ablation, with the paper's own guard against touching tokens in the clean output, does not silence these facts at this pool size -- so there is no closure to bound, and that is the result",
     "held/answer_before": 0.9338235294117647,
     "layer": 7,
-    "n_attempted": 6,
+    "n_attempted": 3,
     "n_held": 17,
     "n_measured": 0,
     "per_fact": [
@@ -93,7 +93,9 @@
           326,
           286,
           284,
-          379
+          379,
+          428,
+          645
         ],
         "silenceable": 0.0,
         "subject": "France"
@@ -111,7 +113,9 @@
           326,
           379,
           286,
-          284
+          284,
+          523,
+          477
         ],
         "silenceable": 0.0,
         "subject": "Japan"
@@ -129,74 +133,22 @@
           326,
           290,
           286,
-          379
+          379,
+          284,
+          523
         ],
         "silenceable": 0.0,
         "subject": "Italy"
-      },
-      {
-        "answer_before": 1.0,
-        "excluded": "no subset of the J-lens pool silences every phrasing",
-        "guard_tokens": 35,
-        "n_answering": 8,
-        "pool": [
-          11,
-          13,
-          355,
-          290,
-          326,
-          286,
-          284,
-          645
-        ],
-        "silenceable": 0.0,
-        "subject": "Germany"
-      },
-      {
-        "answer_before": 1.0,
-        "excluded": "no subset of the J-lens pool silences every phrasing",
-        "guard_tokens": 32,
-        "n_answering": 8,
-        "pool": [
-          11,
-          355,
-          13,
-          290,
-          326,
-          379,
-          286,
-          284
-        ],
-        "silenceable": 0.0,
-        "subject": "Russia"
-      },
-      {
-        "answer_before": 1.0,
-        "excluded": "no subset of the J-lens pool silences every phrasing",
-        "guard_tokens": 37,
-        "n_answering": 8,
-        "pool": [
-          11,
-          319,
-          355,
-          13,
-          290,
-          326,
-          379,
-          286
-        ],
-        "silenceable": 0.0,
-        "subject": "China"
       }
     ],
-    "pool_size": 8,
+    "pool_size": 10,
     "positive_control": {
       "bound": 3,
       "certified": 1.0,
       "expected": 3,
       "ok": 1.0
     },
-    "seconds": 899.2566375732422,
+    "seconds": 3658.619158744812,
     "silenceable_rate": 0.0
   },
   "seeds": [

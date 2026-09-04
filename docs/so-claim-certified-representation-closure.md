@@ -20,56 +20,50 @@ need only be orthogonal to `V_j` to within each fact's logit margin, and almost-
 limit — which means an observed failure to delete cleanly *cannot* be blamed on capacity at any
 plausible scale.
 
-**Measured (E-000043, frozen GPT-2 small, d = 768, 17 capital facts × 8 phrasings, six
-pre-registered criteria, all PASS):**
+**Measured (E-000043, frozen GPT-2 small, d = 768, 17 capital facts × 8 phrasings):**
 
 | | |
 |---|---|
 | facts a subspace of their own basis silences | 12 of 17 (0.7059), to 0.0312 |
 | directions demanded in total | **58 of 768** — `pressure` 0.0755, bound 159 facts |
 | headroom left unused | **0.9245** |
-| mean pairwise overlap of the deletion subspaces | 0.5566, against a **matched null of 0.1448** |
-| **excess over the null** | **+0.4118** |
-| bystander facts under the same ablation | 0.3897 from 1.0000 |
+| bystander facts under the same ablation | **0.3897** from 1.0000 |
+| deletion-subspace overlap vs a **design-matched null** | 0.5566 vs 0.6872 — **−0.1306** |
 
-> **The failure is allocation, not capacity.** The model had 92% of its dimension budget free and
-> still gave twelve facts deletion subspaces overlapping 0.41 more than random states put through the
-> identical construction. Allocation is a training objective; capacity would have been a law of
-> dimension.
+## The retraction, and what replaced it
 
-## And the sharing is in the addressing, not the content
+I claimed "allocation, not capacity" — that the model had room for private subspaces and did not take
+it. **That claim is withdrawn.** It rested on comparing overlap against a *random-state* null, and
+random states carry no template structure, while every fact here is asked with the same eight
+templates. Against a **design-matched permutation null** — shuffle, within each template, which fact's
+state sits where, preserving both marginals and destroying only the fact × template interaction — the
+numbers reverse:
 
-Splitting each fact's basis into its **content** direction (row 0 — what all its phrasings share) and
-its **addressing** rows (the phrasing spread), against the same matched null:
-
-| subspace | overlap | matched null | excess |
+| subspace | real | random null | design-matched null |
 |---|---|---|---|
-| content direction only | 0.2232 | 0.0638 | **+0.1594** |
-| addressing rows only | 0.5954 | 0.1930 | **+0.4024** |
-| **addressing minus content** | | | **+0.2430** |
+| deletion subspaces (k ≈ 6) | 0.5898 | 0.1725 → **+0.4173** | 0.7895 → **−0.1997** |
+| content direction only | 0.2232 | 0.0638 → +0.1594 | 0.1871 → **+0.0361** |
+| addressing rows only | 0.5954 | 0.1930 → +0.4024 | 0.7762 → **−0.1809** |
 
-**A fact's own content direction is nearly private. What is shared is the machinery that says which
-phrasing asked for it.** That is the symlink result stated in activation space: *what a store keeps in
-separate records — the object, and the keys that reach it — a representation keeps in one subspace, so
-a deletion aimed at the content pays its collateral to the addressing.*
+**The model overlaps *less* than chance, not more.** Permuting the interaction *raises* the overlap,
+so the model's own structure makes the subspaces more distinct. Both pre-registered criteria
+(`excess_overlap ≥ 0.10`, `address_over_content ≥ 0.10`) are kept as registered and now **FAIL**, at
+−0.1306 and −0.2170.
 
-And it closes a loop with the reading side. E-000039-A measures that **88.6%** of the held-out
-paraphrase gap is closed by forcing the address (`routing_share` 0.8861, worst seed 0.8818, against a
-rule fixed in advance at 0.7). **Reading a fact through a new phrasing fails at addressing. Deleting a
-fact damages bystanders through addressing.** One structure, measured from both ends.
+**What survives is stronger for not being a defect.** The collateral is real (0.3897 from 1.0000), the
+capacity bound is nowhere near binding (0.0755 pressure, 92% headroom), and the model is *not*
+allocating badly. So the damage is neither a capacity limit nor a training failure. It comes from a
+fact's deletion subspace necessarily **containing addressing directions**, and addressing being shared
+across facts *because facts are asked in the same ways*. That sharing lives in the task, not in the
+model, and no allocation objective can remove it.
 
-**And the store is the limit case, which is where the symlink comes in.** An addressable memory's
-addresses are *records*, not directions in a fixed-dimensional space, so it has no dimension bound at
-all: clean-deletion capacity equals the record count. That is the precise, quantitative sense in which
-giving a model an inode is a capacity property and not a convenience. Measured on the store side:
-fact closure 1 for a canonical pod against *k* for *k* copies, `proved optimal` 1.00 in every arm
-(E-000032), the store-side statistic `(closure − 1)/k` predicting the neural reader with error
-**0.0000**, and the law `U = 1 + copies, T = k` holding in **105 of 105** cells (E-000041).
+> **In a store the address and the object are separate records, so deleting the object leaves the
+> addressing untouched. In a representation they cannot be pulled apart by allocation. That is the
+> measured sense in which a symlink is not a convenience but a different kind of object.**
 
-**The pod is the objective that closes the gap.** Within one fact, its access paths should share a
-core — that is a symlink in activation space, and it makes the closure 1. Across facts, cores should
-be disjoint — that is privacy, and it makes the collateral 0. E-000043 says there is room for both and
-that GPT-2 took neither.
+**A prediction, on the record before the experiment finishes.** E-000044 trains the pod objective. If
+this reading is right, it should *not* substantially reduce collateral — the problem is not
+allocation. A large collateral gain would falsify it.
 
 ## An instrument bug worth recording, because it reversed the answer
 
