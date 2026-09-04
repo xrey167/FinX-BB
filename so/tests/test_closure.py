@@ -271,3 +271,71 @@ def test_the_search_reports_exhaustion_instead_of_lying_when_it_is_cut_short():
     fc = fact_closure(st, duplicate_keys(st, 7), obj=7, max_records=2)
     assert fc.exhausted and fc.size == 2 and not fc.optimal
     assert len(duplicate_keys(st, 7)) == 5      # and it still put the store back
+
+
+# ------------------ the workload is part of the answer: canonicalisation does not touch derivations
+
+def test_the_closure_is_one_over_single_hop_and_larger_over_a_workload_that_includes_the_derivation():
+    """The limit the pod claim must state, and the one E-000019 already recorded at full strength.
+
+    A canonical pod collapses the DUPLICATION term of the closure to one. It does nothing to the
+    DERIVATION term: a two-hop path to the same object is a second way to answer, and removing the
+    object's record leaves it working. Reporting the Q1 number as "the" closure would turn that into
+    a false guarantee, so the workload travels with the number.
+    """
+    st = _store()
+    target = st.write(3, 1, 7, provenance="target")
+    st.link(10, 1, target, provenance="alias")
+    st.write(3, 2, 5, provenance="hop1")          # 3 --2--> 5
+    st.write(5, 3, 7, provenance="hop2")          # 5 --3--> 7, so 3 reaches 7 in two hops as well
+    keys = pod_keys(st, target)
+
+    narrow = fact_closure(st, keys, obj=7)
+    assert narrow.size == 1 and narrow.records == (target,)
+    assert "Q1" in narrow.workload and "single-hop" in narrow.summary()
+
+    two_hop = Query("fwd", 3, (2, 3), (0, 0))
+    wide = fact_closure(st, keys, obj=7,
+                        queries=[Query("fwd", k[0], (k[1],), (0,)) for k in keys] + [two_hop],
+                        workload="Q1 plus the two-hop path 3 -2-> 5 -3-> 7")
+    assert wide.size == 2, wide.summary()
+    assert target in wide.records
+    assert "two-hop" in wide.summary()
+
+
+def test_the_certificate_prints_the_workload_it_was_proved_over():
+    """A fact-level claim that does not name its query set is not a claim."""
+    from so.audit import AbsenceCheck, Certificate, certify_fact
+    st = _store()
+    target = st.write(3, 1, 7, provenance="target")
+    st.link(10, 1, target, provenance="alias")
+    keys = pod_keys(st, target)
+    fc = fact_closure(st, keys, obj=7)
+    st.evict(target)
+    cert = certify_fact(Certificate(True, True, True, 0, 32, 1, 0, []), fc, [target],
+                        store_after=st, keys=keys,
+                        absence=AbsenceCheck(True, True, 1, 3, 2))
+    assert cert.valid and cert.workload == fc.workload
+    assert "Q1" in cert.summary()
+
+
+def test_a_wider_workload_can_turn_a_valid_certificate_into_a_void_one():
+    """The point of carrying the workload: the same removal, judged against more questions, fails."""
+    from so.audit import AbsenceCheck, Certificate, certify_fact
+    st = _store()
+    target = st.write(3, 1, 7, provenance="target")
+    st.write(3, 2, 5, provenance="hop1")
+    st.write(5, 3, 7, provenance="hop2")
+    keys = pod_keys(st, target)
+    two_hop = Query("fwd", 3, (2, 3), (0, 0))
+    qs = [Query("fwd", k[0], (k[1],), (0,)) for k in keys] + [two_hop]
+    wide = fact_closure(st, keys, obj=7, queries=qs, workload="Q1 + one two-hop path")
+    assert wide.size == 2
+
+    st.evict(target)                                  # only the record the NARROW closure named
+    cert = certify_fact(Certificate(True, True, True, 0, 32, 1, 0, []), wide, [target],
+                        store_after=st, keys=keys, absence=AbsenceCheck(True, True, 1, 3, 2))
+    assert not cert.valid
+    assert "misses 1 record(s)" in cert.void_reason
+    # and the store agrees: the two-hop question still answers 7
+    assert ReferenceResolver(st).resolve(two_hop).answer == 7

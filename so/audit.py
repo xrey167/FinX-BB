@@ -876,6 +876,12 @@ class FactCertificate:
         before the store existed is outside it -- E-000013 measures that separately -- and
         ``residual_note`` is where a caller records that limit rather than letting the word
         "certificate" swallow it.
+      * The closure is the resilience of a QUERY SET, and the certificate is only as wide as that set.
+        ``FactClosure.workload`` names it and ``summary`` prints it, because the default workload is
+        one single-hop question per key: a fact a multi-hop derivation still reaches is outside the
+        claim, and E-000019 records that case at ``derivable_recovery_after_revoke_K3 = 1.0``.
+        Canonicalisation collapses the duplication term of the closure and does not touch the
+        derivation term.
       * A verified post-condition (no key resolves to the object afterwards) is checked when the caller
         supplies the store, because a closure argument that disagrees with the store it describes is
         the one failure mode that would make all of this decorative.
@@ -905,15 +911,19 @@ class FactCertificate:
     valid: bool = False
     void_reason: str = ""
     payload_absent: bool = False
+    workload: str = ""
     residual_note: str = ""
 
     def summary(self) -> str:
+        # The workload travels with the verdict. A closure is the resilience of a query set, so a
+        # fact-level claim that does not name the query set it was proved over is not a claim.
+        scope = f" over [{self.workload}]" if self.workload else ""
         if self.valid:
             post = "" if self.post_condition is None else ", post-condition verified"
-            return (f"FACT CERTIFIED: object {self.obj} unreachable through all {self.n_keys} key(s); "
-                    f"{len(self.removed)} record(s) removed covering a closure of {self.closure_size}"
-                    f"{post}")
-        return f"NOT A FACT CERTIFICATE: {self.void_reason}"
+            return (f"FACT CERTIFIED{scope}: object {self.obj} unreachable through all {self.n_keys} "
+                    f"key(s); {len(self.removed)} record(s) removed covering a closure of "
+                    f"{self.closure_size}{post}")
+        return f"NOT A FACT CERTIFICATE{scope}: {self.void_reason}"
 
 
 def certify_fact(record: "Certificate", closure: "FactClosure", removed: Sequence[int],
@@ -983,4 +993,5 @@ def certify_fact(record: "Certificate", closure: "FactClosure", removed: Sequenc
         obj=int(closure.obj), n_keys=len(closure.keys), closure_size=closure.size,
         removed=tuple(sorted(removed_set)), covers_closure=covers, record_certified=record_ok,
         post_condition=post, valid=not reasons, void_reason="; ".join(reasons),
-        payload_absent=absent_ok, residual_note=residual_note)
+        payload_absent=absent_ok, workload=getattr(closure, "workload", ""),
+        residual_note=residual_note)

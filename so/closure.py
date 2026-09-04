@@ -198,6 +198,8 @@ class FactClosure:
     exhausted: bool = False
     lower_bound: int = 0
     optimal: bool = False
+    n_queries: int = 0
+    workload: str = "Q1: one single-hop forward question per key"
 
     @property
     def size(self) -> int:
@@ -207,7 +209,7 @@ class FactClosure:
         how = (f"exact (matches a certified lower bound of {self.lower_bound})" if self.optimal
                else f"greedy upper bound, lower bound {self.lower_bound}")
         return (f"object {self.obj} reachable through {len(self.keys)} key(s): "
-                f"closure {self.size} record(s), {how}"
+                f"closure {self.size} record(s), {how}, over [{self.workload}]"
                 + (" -- SEARCH EXHAUSTED" if self.exhausted else ""))
 
 
@@ -232,24 +234,47 @@ def _disjoint_lower_bound(derivations: Iterable[frozenset]) -> int:
     return len(chosen)
 
 
-def fact_closure(store: MVCCStore, keys: Sequence[Tuple[int, int]], obj: Optional[int] = None,
-                 max_records: int = 256, restore: bool = True) -> FactClosure:
-    """Remove records until no key in ``keys`` resolves to ``obj`` any more.
+def fact_closure(store: MVCCStore, keys: Sequence[Tuple[int, int]] = (), obj: Optional[int] = None,
+                 max_records: int = 256, restore: bool = True,
+                 queries: Optional[Sequence[Query]] = None,
+                 workload: Optional[str] = None) -> FactClosure:
+    """Remove records until no query in the workload yields ``obj`` any more.
+
+    THE WORKLOAD IS PART OF THE ANSWER, and leaving it implicit is how a closure number becomes a
+    false guarantee. By default the workload is Q1 -- one single-hop forward question per key -- and
+    the number returned is the resilience of "some key still answers ``obj``" WITH RESPECT TO Q1. A
+    fact that a MULTI-HOP derivation still reaches is not counted, and this repository has that case
+    on record at full strength: ``dependency/derivable_recovery_after_revoke_K3 = 1.0`` in every seed
+    of E-000019. So the closure decomposes into a duplication term, which canonicalisation collapses
+    to one, and a derivation term, which it does not touch at all.
+
+    Pass ``queries`` to widen the workload -- multi-hop paths, reverse questions, whatever the
+    guarantee is meant to cover -- and the returned closure is then the resilience over that set.
+    ``FactClosure.workload`` carries the description into the certificate, so a fact-level claim never
+    travels without the scope it was proved in.
 
     ``restore`` puts the store back exactly as it was, so this is a measurement and not an edit.
     """
     ks = [(int(a), int(b)) for a, b in keys]
-    live = {k: ReferenceResolver(store).resolve(_query(k)) for k in ks}
+    qs = list(queries) if queries is not None else [_query(k) for k in ks]
+    if workload is None:
+        workload = ("Q1: one single-hop forward question per key"
+                    if queries is None else f"{len(qs)} caller-supplied queries")
+    labels: List[Tuple[int, int]] = ([(int(q.start), int(q.path[0])) for q in qs]
+                                     if queries is not None else ks)
+    live = [ReferenceResolver(store).resolve(q) for q in qs]
     if obj is None:
-        answers = [r.answer for r in live.values() if r.answer != UNKNOWN]
+        answers = [r.answer for r in live if r.answer != UNKNOWN]
         if not answers:
-            return FactClosure(UNKNOWN, tuple(ks), (), False, 0, True)
+            return FactClosure(UNKNOWN, tuple(labels), (), False, 0, True, len(qs), workload)
         obj = max(set(answers), key=answers.count)
     obj = int(obj)
-    targets = tuple(k for k in ks if live[k].answer == obj)
+    hit = [i for i, r in enumerate(live) if r.answer == obj]
+    targets = tuple(labels[i] for i in hit)
+    target_qs = [qs[i] for i in hit]
 
     # the must-hit sets as the store stands now; the bound is computed from these, before any edit
-    initial = [frozenset(int(x) for x in live[k].trace) for k in targets]
+    initial = [frozenset(int(x) for x in live[i].trace) for i in hit]
     bound = _disjoint_lower_bound(initial)
 
     removed: List[int] = []
@@ -258,8 +283,8 @@ def fact_closure(store: MVCCStore, keys: Sequence[Tuple[int, int]], obj: Optiona
         while True:
             resolver = ReferenceResolver(store)
             traces: List[List[int]] = []
-            for k in targets:
-                res = resolver.resolve(_query(k))
+            for q in target_qs:
+                res = resolver.resolve(q)
                 if res.answer == obj:
                     traces.append([int(x) for x in res.trace])
             if not traces:
@@ -286,7 +311,7 @@ def fact_closure(store: MVCCStore, keys: Sequence[Tuple[int, int]], obj: Optiona
                 store.restore(kid)
 
     optimal = (not exhausted) and len(removed) == bound
-    return FactClosure(obj, targets, tuple(removed), exhausted, bound, optimal)
+    return FactClosure(obj, targets, tuple(removed), exhausted, bound, optimal, len(qs), workload)
 
 
 #: The database name for what ``fact_closure`` computes: the minimum contingency set for the Boolean
