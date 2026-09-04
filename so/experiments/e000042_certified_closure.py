@@ -227,9 +227,16 @@ def run(layer: int, pool_size: int, max_facts: int, seeds: Sequence[int], thread
                 return not table[tuple(sorted((int(x) for x in d), key=ids.index))][q]
             return f
 
+        # THE SUPPORT IS CAPPED AT HALF THE POOL, and the reason is the vacuity hole. A pursuit run to
+        # a tight tolerance on a small pool takes every atom; the complement is then empty, there is no
+        # disjoint ablation to try, and the must-hit property holds by having nothing to test against.
+        # Capping keeps the complement non-empty, which makes the test HARDER -- a smaller set is a
+        # stronger claim and easier to refute -- and the pursuit takes the largest coefficients first,
+        # so what is kept is the dominant part of the state rather than an arbitrary truncation.
+        n_atoms = max(1, pool_size // 2)
         supports, certs, resid = [], [], []
         for q in answering:
-            sup = nonneg_pursuit(res[q], atoms, ids=ids, n_atoms=pool_size, tol=0.05)
+            sup = nonneg_pursuit(res[q], atoms, ids=ids, n_atoms=n_atoms, tol=0.05)
             supports.append(sup)
             resid.append(sup.residual_fraction)
             certs.append(certify_must_hit(silences_for(q), sup.directions, ids))
@@ -244,10 +251,10 @@ def run(layer: int, pool_size: int, max_facts: int, seeds: Sequence[int], thread
             rcerts = []
             for sup, q in zip(supports, answering):
                 k = max(1, sup.size)
-                pick = tuple(sorted((int(ids[i]) for i in rng.choice(len(ids), size=min(k, len(ids)),
+                pick = tuple(sorted((int(ids[i]) for i in rng.choice(len(ids), size=min(k, len(ids) - 1),
                                                                     replace=False)), key=ids.index))
                 rcerts.append(certify_must_hit(silences_for(q), pick, ids))
-            rand_hold.append(float(np.mean([c.holds for c in rcerts])))
+            rand_hold.append(float(np.mean([c.holds and not c.vacuous for c in rcerts])))
             rand_bound.append(float(disjoint_lower_bound(rcerts).lower_bound))
 
         row = {
@@ -259,6 +266,8 @@ def run(layer: int, pool_size: int, max_facts: int, seeds: Sequence[int], thread
             "support_residual": float(np.mean(resid)),
             "musthit_rate": float(np.mean([c.holds for c in certs])),
             "musthit_exhaustive": float(np.mean([c.exhaustive for c in certs])),
+            "musthit_vacuous": float(np.mean([c.vacuous for c in certs])),
+            "musthit_subsets_tested": float(np.mean([c.subsets_tested for c in certs])),
             "lower_bound": bound.lower_bound, "bound_certified": float(bound.certified),
             "shared_atoms": len(bound.shared_atoms),
             "bound_sound": float(bound.lower_bound <= len(star)),
@@ -288,7 +297,8 @@ def run(layer: int, pool_size: int, max_facts: int, seeds: Sequence[int], thread
         return m
     for k in ("answer_before", "optimum", "greedy", "greedy_excess", "collateral_at_optimum",
               "collateral_before", "support_size", "support_residual", "musthit_rate",
-              "musthit_exhaustive", "lower_bound", "bound_certified", "shared_atoms", "bound_sound",
+              "musthit_exhaustive", "musthit_vacuous", "musthit_subsets_tested",
+              "lower_bound", "bound_certified", "shared_atoms", "bound_sound",
               "tightness", "musthit_rate_random", "lower_bound_random"):
         m[k] = float(np.mean([r[k] for r in good]))
     m["bound_sound_min"] = float(np.min([r["bound_sound"] for r in good]))
@@ -300,7 +310,8 @@ def run(layer: int, pool_size: int, max_facts: int, seeds: Sequence[int], thread
 
 KEYS = ["n_held", "n_attempted", "n_measured", "control_bound_can_exceed_one", "answer_before",
         "optimum", "greedy", "greedy_excess", "collateral_at_optimum", "collateral_before",
-        "support_size", "support_residual", "musthit_rate", "musthit_exhaustive", "lower_bound",
+        "support_size", "support_residual", "musthit_rate", "musthit_exhaustive", "musthit_vacuous",
+        "musthit_subsets_tested", "lower_bound",
         "bound_certified", "shared_atoms", "bound_sound", "bound_sound_min", "tightness",
         "musthit_rate_random", "lower_bound_random", "musthit_advantage"]
 
@@ -312,8 +323,10 @@ CRITERIA = {
     # THE CLAIM'S SOUNDNESS, checked against the true optimum found by enumeration. One violation
     # anywhere falsifies it, which is why the worst fact is the criterion and not the mean.
     "bound_sound_min": (">=", 1.0),
-    # the certificate must be exhaustive, not truncated by budget
+    # the certificate must be exhaustive, not truncated by budget, and must have had something to
+    # test: a support filling the pool passes by having no disjoint ablation to try
     "musthit_exhaustive": (">=", 1.0),
+    "musthit_vacuous": ("<=", 0.0),
     # the J-lens support must pass the must-hit test
     "musthit_rate": (">=", 0.70),
     # AND THE CONTROL THAT CAN KILL IT: a random support of the same size must NOT, or the pool is
@@ -371,6 +384,10 @@ def main(argv: Optional[List[str]] = None) -> Dict[str, Any]:
                             [["atoms in the support", f"{m['support_size']:.2f}"],
                              ["share of the state the support explains",
                               f"{1.0 - m['support_residual']:.4f}"],
+                             ["disjoint ablations actually tried per phrasing",
+                              f"{m['musthit_subsets_tested']:.1f}"],
+                             ["certificates that had nothing to test (vacuous)",
+                              f"{m['musthit_vacuous']:.4f}"],
                              ["support passes the exhaustive must-hit test", f"{m['musthit_rate']:.4f}"],
                              ["a RANDOM support of the same size does (control)",
                               f"{m['musthit_rate_random']:.4f}"],

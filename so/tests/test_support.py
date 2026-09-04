@@ -148,3 +148,18 @@ def test_a_gap_between_the_two_sides_is_reported_as_a_gap():
     c = certified_closure(7, 5, b, n_queries=2)
     assert not c.optimal and c.lower == 2 and c.upper == 5
     assert "[2, 5]" in c.summary()
+
+
+# ------------------------------------------------------------------------- vacuity
+def test_a_support_that_fills_the_pool_is_flagged_vacuous():
+    """It passes by having nothing to test against, which is not the same as passing."""
+    pool = [0, 1, 2]
+    c = certify_must_hit(lambda d: bool(d), (0, 1, 2), pool)
+    assert c.vacuous and c.subsets_tested == 0
+    assert "VACUOUS" in c.summary()
+
+
+def test_a_vacuous_support_cannot_certify_a_bound():
+    b = disjoint_lower_bound([_cert((0, 1)), MustHitCertificate((2, 3), (), 0, 0, True, True, None,
+                                                                vacuous=True)])
+    assert b.lower_bound == 2 and not b.certified

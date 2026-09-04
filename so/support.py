@@ -152,8 +152,12 @@ class MustHitCertificate:
     exhaustive: bool = False
     holds: bool = False
     counterexample: Optional[Tuple[int, ...]] = None
+    vacuous: bool = False
 
     def summary(self) -> str:
+        if self.vacuous:
+            return ("VACUOUS: the support fills the pool, so there is no disjoint ablation to try and "
+                    "the must-hit property holds by having nothing to test against")
         how = ("exhaustive over the complement" if self.exhaustive
                else f"exhaustive to size {self.max_size_exhausted} of {len(self.complement)}")
         if not self.holds:
@@ -179,6 +183,13 @@ def certify_must_hit(silences: Callable[[Sequence[int]], bool], support: Sequenc
 
     Raises when the query does not answer with nothing removed at all -- every subset would then
     "silence" it and the certificate would pass on a query carrying no fact.
+
+    A support that fills the pool leaves NO disjoint ablation to try. The must-hit property is then
+    true by vacuity -- any non-empty subset of the pool must intersect a support that is the pool --
+    and the result is flagged ``vacuous`` so that a bound cannot be built on it. That is not a corner
+    case: a pursuit run to a tight reconstruction tolerance on a small pool takes every atom, and a
+    certificate that passed because it had nothing to test would be the sixth instrument in this
+    programme that cannot fail.
     """
     if silences(()):
         raise ValueError(
@@ -201,7 +212,8 @@ def certify_must_hit(silences: Callable[[Sequence[int]], bool], support: Sequenc
             break
         largest = size
     return MustHitCertificate(tuple(sorted(have)), comp, tested, largest,
-                              largest == len(comp) and counter is None, counter is None, counter)
+                              largest == len(comp) and counter is None, counter is None, counter,
+                              vacuous=len(comp) == 0)
 
 
 def _n_choose_k(n: int, k: int) -> int:
@@ -221,8 +233,10 @@ class DisjointBound:
     -- so the greedy family below is valid even where it is not the largest, and the bound is
     therefore conservative in the direction that matters.
 
-    ``certified`` is false the moment one support in the family failed its must-hit test or was tested
-    only partially. A bound reported with ``certified`` false is a conjecture and is labelled one.
+    ``certified`` is false the moment one support in the family failed its must-hit test, was tested
+    only partially, or was VACUOUS -- a support filling the pool passes by having nothing to test
+    against, and a bound resting on one of those is a bound resting on nothing. A bound reported with
+    ``certified`` false is a conjecture and is labelled one.
     """
 
     family: Tuple[Tuple[int, ...], ...] = ()
@@ -257,7 +271,7 @@ def disjoint_lower_bound(certs: Sequence[MustHitCertificate]) -> DisjointBound:
         if s and not (s & used):
             used |= s
             family.append(certs[i].support)
-            ok = ok and certs[i].holds and certs[i].exhaustive
+            ok = ok and certs[i].holds and certs[i].exhaustive and not certs[i].vacuous
     shared = set(certs[0].support)
     for c in certs[1:]:
         shared &= set(c.support)
