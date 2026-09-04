@@ -1218,6 +1218,53 @@ deletion primitive if anything else in the computation is a function of the same
 quantity derived from a cell has to be enumerated and gated, or the cell has to leave the addressable
 set entirely.
 
+### 31.11 The lifecycle claims were also statements about one phrasing (2026-09-04)
+
+§31.9 corrected E-000020's *reading* numbers. Its whole battery was taken at the same template 0, so
+every lifecycle and attack claim in that record — update, rollback, shred, revoke, delete, the probe,
+forced choice — was a statement about a phrasing the model reads at 0.5633. E-000026 re-runs the
+battery unchanged at three phrasings. The two strong ones are chosen at run time from
+E-000017-B's record of the **link-free** adapter, so the choice cannot be tuned in the link arm's
+favour; the rule picks trained template 3 and held-out template 10.
+
+| measure (worst seed) | template 0 | template 3 | template 10 (held out) |
+|---|---|---|---|
+| base fact read directly | 0.5633 | 0.9933 | 0.9967 |
+| read through an alias | 0.5000 | 0.8600 | 0.8700 |
+| read through a duplicated copy | 0.5900 | 0.9950 | 1.0000 |
+| one UPDATE reaches every alias | 0.5350 | 0.8650 | 0.8850 |
+| the same UPDATE reaches a copy | 0.0000 | 0.0000 | 0.0000 |
+| one SHRED: alias answers unknown | 0.9950 | 0.9950 | 1.0000 |
+| one SHRED: alias names the object | 0.0000 | 0.0000 | 0.0000 |
+| probe after that SHRED | 0.0100 | 0.0100 | 0.0100 |
+| the same probe on a LIVE alias | 0.4200 | 0.7800 | 0.8000 |
+| revoke one alias, sibling still reads | 0.5800 | 0.8800 | 0.8800 |
+| DELETE: alias answers unknown | 0.9650 | 0.9600 | 0.9100 |
+
+Criteria groups passed, out of six: **template 0 — 2** (attacks_through_every_alias, attack_validity); trained template 3 — 4; held-out template 10 — 4 (one_shred_deletes_every_path, attacks_through_every_alias, attack_validity, alias_lifecycle).
+
+What the phrasing was hiding:
+
+1. **One SHRED of the shared object deletes it from every alias, and now against an attack that
+   works.** At template 0 the probe recovers only 0.42 of live aliases, so "0.01 after SHRED" was a
+   weak statement. At the held-out template 10 the same probe recovers 0.80 live and 0.01 after one
+   SHRED, forced choice sits at 0.43 against 0.5, and no alias names the object. `one_shred_deletes_every_path`
+   and `alias_lifecycle` both fail at template 0 and both pass at either strong phrasing.
+2. **The sharing contrast is not a phrasing effect.** `duplicate_update/alias_new_object` is 0.0000
+   at every template: an update to one copy never reaches the others, whatever the question looks
+   like. The shared-object side rises from 0.5350 to 0.8850 — a real improvement that still misses
+   its pre-registered 0.90 on the worst seed, and is recorded as a miss rather than rounded up.
+3. **`reading_through_an_alias` still fails at all three**, because its fourth criterion is
+   `alias_heldout_min` ≥ 0.50 — the *weakest* of the four held-out templates, which is template 11,
+   where even the link-free adapter reads 0.42. That is the criterion doing its job: the system has a
+   phrasing it cannot read, and a strong average does not excuse it.
+
+The methodological point outlives this experiment. A capability measured at one phrasing is a
+statement about that phrasing, and a *deletion* measured at a phrasing the model barely reads is
+close to vacuous — the fact was half-gone before the operation. Every claim of this kind from here on
+is reported at a strong and a weak phrasing, and the attack that certifies it has to be shown working
+on live cells at the same phrasing.
+
 ### 31.8 Boundary
 
 CPU only, no GPU, no LLM above 124M parameters, synthetic worlds, single-token entities, two surface forms per relation, one session. Nothing here shows unlearning of facts already encoded in pretrained weights. Evidence levels recorded: E3–E4 for the synthetic system (F4 for SHRED with the verified gate, E-000010 — **on the value channel only**: E-000028 recovers the shredded object at 1.0000 through the ungated reverse key, where REVOKE and DELETE are at chance, so F4 for SHRED is a claim about answers, logits, hidden states and probes and not about routing); E5 as substrate for the frozen-GPT-2 experiment, with reading, composition, update and the copy bound supported and behavioural deletion not yet supported at the pre-registered thresholds.

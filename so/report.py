@@ -35,6 +35,19 @@ PROPERTIES = {
 
 # post-hoc interpretation of recorded outcomes (the JSON records are never edited)
 NOTES = {
+    "e000026_lifecycle_readable_template": "E-000020 ran its whole battery at template 0, so update, rollback, "
+        "shred, revoke, delete and both attacks were statements about a phrasing the model reads at 0.5633. This "
+        "re-runs the battery unchanged at three phrasings, the two strong ones chosen at run time from "
+        "E-000017-B's record of the LINK-FREE adapter so the choice cannot favour the link arm; it picks trained "
+        "template 3 and held-out template 10. Criteria groups passed out of six: 2 at template 0, "
+        "4 at template 3, 4 at template 10. The deletion claim gains "
+        "the most, because its attack becomes valid: the probe recovers 0.42 of LIVE aliases at template 0 and 0.80 "
+        "at template 10, so 0.01 after one SHRED of the shared object is a real result there and a weak one here. "
+        "The sharing contrast is phrasing-independent -- an update to one duplicate never reaches the others "
+        "(0.0000 everywhere) -- while the shared-object side rises from 0.5350 to 0.8850 and still misses its "
+        "pre-registered 0.90 on the worst seed, recorded as a miss. reading_through_an_alias fails at all three "
+        "because its alias_heldout_min criterion is the WEAKEST held-out template, where even the link-free "
+        "adapter reads 0.42. Ledger 31.11.",
     "e000028_key_channel": "The strongest deletion claim here -- F4 for SHRED with the verified gate -- was only "
         "ever measured on the value channel: the answer, the logits, the hidden state, the linear probe. shred() "
         "writes only the marker and leaves the row ACTIVE, and in encode_bank the routing keys are computed before "
