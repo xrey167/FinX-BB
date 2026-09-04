@@ -2266,6 +2266,50 @@ already covers `blank` at the relational level is not yet checked and should be 
 This is the seventh retraction of the session and the one that costs the most, because U/T was the
 claim that had survived every previous review. It survived them because none of them was this check.
 
+### 31.32 The pod objective moves the statistic and misses the bar, on a substrate that never had the failure (2026-09-04, E-000044)
+
+E-000044 is the constructive half E-000043 asked for: train the pod objective (`so/pod.py` — every
+access path of one fact pulled onto one carrier, carriers of different facts pushed apart, hinged at
+the larger of the Welch bound and the centring floor) against an otherwise identical baseline, and
+ask whether the excess overlap against the design-matched permutation null comes down, and at what
+price in accuracy. Two arms, three seeds, 700 steps, `pod_weight = private_weight = 1.0`, 24 pod facts
+per step. Both arms reach accuracy 1.0000; the price is zero.
+
+| measure | arm A (baseline) | arm B (pod objective) | drop, mean | drop, worst seed |
+|---|---|---|---|---|
+| excess overlap, full | 0.2399 | 0.1998 | +0.0401 | +0.0361 |
+| excess overlap, addressing | 0.2484 | 0.2172 | +0.0312 | +0.0243 |
+| excess overlap, content | 0.0510 | 0.0325 | +0.0185 | — |
+| bystander accuracy under deletion | 0.9983 | 1.0000 | +0.0017 | +0.0000 |
+| closure size | 1.00 | 1.00 | 0.00 | 0.00 |
+
+Per seed the full-overlap drop is +0.0371 / +0.0361 / +0.0472: the same sign every time, and one
+third of the pre-registered bar of 0.10. **Both claim criteria FAIL as registered**: `excess_full_drop`
+0.0361 against 0.10, `collateral_gain` 0.0000 against 0.05.
+
+**Two things the numbers say, kept apart.** First, the objective does what it was written to do, at
+zero cost — it reduces the overlap between fact subspaces, in content and in addressing, on every
+seed, without touching accuracy — and it does so by an amount that the rule fixed before the run does
+not reward. The rule has three branches (a drop of 0.10 at no price; a drop only at a price; no drop)
+and the observation falls between the first and the third. That is a gap in the rule and it is
+recorded as one; the favourable reading is not taken.
+
+Second, and this is the finding that matters: **the collateral criterion could not have passed on
+this substrate, because the failure it measures is not there.** Arm A already deletes at closure
+1.00 with bystanders at 0.9983 — the synthetic model trained from scratch allocates its facts cleanly
+without being asked to. The allocation failure E-000043 measured (bystanders to 0.3897, −0.13 overlap
+against the permutation null with 92% of the dimension budget unused) is a property of the **frozen
+GPT-2 with an adapter**, where the facts land in a representation nobody trained for them. E-000044
+therefore trained the remedy on a patient without the disease. The 0.04 it moved is the only signal
+the design could produce, and it is consistent with the objective working; it is not evidence that
+the failure is trainable away, because the failure was absent.
+
+**What it licenses.** Nothing beyond: the pod objective is cheap, sign-consistent and harmless on a
+clean substrate. The constructive half of E-000043 remains untested, and the test it needs is now
+specified by this failure: the same two arms on the E-000020 symlink checkpoints — the frozen GPT-2
+adapter, where arm A exhibits the collateral loss — with the criteria unchanged. That experiment is
+E-000047 and has not been run.
+
 ### 31.8 Boundary
 
 CPU only, no GPU, no LLM above 124M parameters, synthetic worlds, single-token entities, two surface forms per relation, one session. Nothing here shows unlearning of facts already encoded in pretrained weights. Evidence levels recorded: E3–E4 for the synthetic system (F4 for SHRED with the verified gate, E-000010 — **on the value channel only**: E-000028 recovers the shredded object at 1.0000 through the ungated reverse key, where REVOKE and DELETE are at chance, so F4 for SHRED is a claim about answers, logits, hidden states and probes and not about routing); E5 as substrate for the frozen-GPT-2 experiment, with reading, composition, update and the copy bound supported and behavioural deletion not yet supported at the pre-registered thresholds.
