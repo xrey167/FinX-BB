@@ -1,3 +1,60 @@
+# Fan-in, fan-out, and why a symlink is a different kind of object
+
+## The claim
+
+**In a store, an alias is simultaneously an access path *in* and a surviving record. In a
+representation those are different objects, and that is the whole difference.**
+
+E-000041 measured, mechanically and exhaustively (105 of 105 cells, k = 2…8): for a fact on *k* access
+paths, **U = 1 + copies** (records to make it unreachable) and **T = k** (records to make it
+unreachable *and* leave nothing pointing at what was removed). Both are counted in *k* — and the reason
+is that a store's alias row is doing two jobs at once. It is a way *in* to the object, and it is a
+record that survives the object's deletion carrying the object's key. E-000035 measures the
+consequence: a pod's aliases name the deleted key at **1.0000**, uniquely, against **0.0000** for a
+duplicated store.
+
+**A representation does not fuse those two roles, so U and T come apart and are governed by different
+counts:**
+
+| | store | representation |
+|---|---|---|
+| **U** — make it unreachable | alias rows (*k*) | **fan-in**: how many ways the fact can be asked |
+| **T** — leave no trace | the same alias rows (*k*) | **fan-out**: how many readers consume the carrier |
+
+So the traceless-to-unreachable ratio is not a constant. **T/U ≈ fan-out / fan-in.** A concept read by
+many downstream predicates but asked in few ways is *maximally cheap to hide and maximally expensive
+to erase* — and nothing about that is visible if you measure only one of the two counts.
+
+## Why this is the reading, and not the earlier ones
+
+Three attempts to carry U/T into a representation failed, all measuring **fan-in** and calling it the
+whole story: a guard-respecting J-lens ablation silenced **0 of 6** facts across all 256 subsets; the
+collateral of a subspace deletion was **0.3897** from 1.0000 with the model overlapping *less* than a
+design-matched null (−0.13) and 92% of its dimensions unused — neither a capacity limit nor an
+allocation defect; and `hole_detectable` failed its own bar. Those are not three unlucky experiments.
+They are three measurements of the wrong count.
+
+## The prediction, not yet tested
+
+The workspace paper (Gurnee, Sofroniew, … Lindsey, Transformer Circuits, 6 July 2026) supplies the
+fan-out measurement already. Its **broadcast** experiment — swap a concept's J-lens vector, count how
+many downstream templates follow — reports 76/192 overall, and per category *"almost perfectly for
+country facts (42/48 off-diagonal cells reach rank 1) and progressively less for months, animals, and
+number relations (0/48)"*. And it reports the residue in its own disconfirming case: swapping a
+passage's language vector leaves continuation and anomaly detection unmoved **while the concept still
+appears in the lens readouts of all four tasks** — a reader retaining evidence of a referent that was
+changed, which is what a dangling reference looks like from the inside.
+
+> **Prediction: T/U tracks broadcast across categories.** Countries, at 42/48, should show a large gap;
+> number relations, at 0/48, should show none. If the gap is flat in broadcast, the identification is
+> wrong.
+
+**Status: this is a claim with a prediction, not a measured result.** E-000045 is the test, and the
+duality objection above is answered in the design rather than assumed away. Everything below this line
+is measured; everything in this section beyond E-000041 and E-000035 is not yet.
+
+---
+
 # Deletion capacity, allocation, and the pod — what is claimed, at the size it survives
 
 ## The claim
