@@ -1773,6 +1773,8 @@ Learned: following a pointer inside a frozen pretrained transformer: the derefer
 
 Not claimed: chains deeper than one dereference; multi-token entities; anything above 124M parameters.
 
+**Interpretation (post hoc, record unchanged):** The synthetic symlink result carried to a real pretrained model, and it splits cleanly. The sharing and deletion contrast holds: one operation on the shared object leaves every alias path unreadable and unrecoverable (probe 0.33%, forced choice 0.51 at a chance of 0.5) while the duplication arm, built from the same world and read by the same model, stays recoverable at 49.8% and 0.97. Reading does not hold: 57% on direct facts against the 85% this adapter reaches without links. A diagnostic settles where that cost sits — the link-free adapter reads the same evaluation world at 82.7%, and 84.7% with the machinery attached, so the mechanism is free at inference and the price is paid in learning the harder distribution.
+
 ## E-000021 — The verification gate as a classifier
 
 The standing audit's objection that the deletion certificate is a learned classifier whose false-accept rate is reported only as a worst-seed maximum.

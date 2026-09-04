@@ -95,6 +95,13 @@ NOTES = {
         "none is the added capacity, and no arm gets within a factor of twelve of the bar. The reason is that "
         "refusing a question and ignoring prose are routed through one null column and pull in opposite directions, "
         "which is a design fault rather than a tuning failure.",
+    "e000020_symlink_gpt2": "The synthetic symlink result carried to a real pretrained model, and it splits cleanly. "
+        "The sharing and deletion contrast holds: one operation on the shared object leaves every alias path "
+        "unreadable and unrecoverable (probe 0.33%, forced choice 0.51 at a chance of 0.5) while the duplication arm, "
+        "built from the same world and read by the same model, stays recoverable at 49.8% and 0.97. Reading does not "
+        "hold: 57% on direct facts against the 85% this adapter reaches without links. A diagnostic settles where that "
+        "cost sits — the link-free adapter reads the same evaluation world at 82.7%, and 84.7% with the machinery "
+        "attached, so the mechanism is free at inference and the price is paid in learning the harder distribution.",
     "e000021_gate_error_rates": "The number the deletion claim needed and did not have. Across 2.2 million fresh "
         "unsigned markers and eleven checkpoints the gate admits one in about 1,180, with a tight interval and no "
         "false rejects at all. That is the bound on every SHRED result in this programme: behavioural deletion is "
