@@ -486,11 +486,13 @@ def main(argv: Optional[List[str]] = None) -> Dict[str, Any]:
                              ["bystander accuracy under those deletions",
                               f"{agg['collateral_all_facts']['mean']:.4f}",
                               f"{agg['collateral_all_facts']['min']:.4f}"]]), "",
-               "The second row is the pod, measured inside a frozen model's own weights: most of what",
-               "carries a fact is not that fact's. The third is what that costs. A fact whose carrier",
-               "is shared cannot be removed without removing what shares it -- E-000041's `T` with no",
-               "`U` beneath it to fall back on, and the reason a store that can name its aliases is",
-               "not the same object as a model that cannot.", ""]
+               "Read these two rows together, because separately each one misleads. Only a small share",
+               "of a fact's basis is shared, so the carrier is mostly the fact's OWN -- and yet only",
+               "about half of the facts can be silenced using nothing but their own directions, and the",
+               "bystanders still lose ground when they are. Privacy of the carrier is therefore not",
+               "sufficient for a clean deletion: the directions a fact does not share with any single",
+               "other fact are still directions the rest of the model is using. A store can name the",
+               "aliases that would be left dangling; a model cannot, and this is what that costs.", ""]
     if not void and note:
         md += ["## The traceless comparison is not aggregated", "", note + ".", "",
                "The per-fact rows are in the record. This is not a void experiment: the section above",

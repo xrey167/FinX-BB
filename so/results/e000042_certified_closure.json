@@ -1,0 +1,104 @@
+{
+  "aggregate": {
+    "control_bound_can_exceed_one": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 1
+    },
+    "n_attempted": {
+      "max": 6.0,
+      "mean": 6.0,
+      "min": 6.0,
+      "n": 1
+    },
+    "n_held": {
+      "max": 17.0,
+      "mean": 17.0,
+      "min": 17.0,
+      "n": 1
+    },
+    "n_measured": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 1
+    }
+  },
+  "criteria": {
+    "claim_supported": true,
+    "criteria": {
+      "control_bound_can_exceed_one": {
+        "observed": 1.0,
+        "op": ">=",
+        "pass": true,
+        "threshold": 1.0
+      }
+    }
+  },
+  "environment": {
+    "device": "cpu",
+    "numpy": "2.4.6",
+    "platform": "Linux-6.18.44-fc-v24-x86_64-with-glibc2.39",
+    "python": "3.11.15",
+    "threads": "2",
+    "torch": "2.14.0+cpu"
+  },
+  "evidence_level": "E5",
+  "evidence_level_meaning": "Transformer evidence",
+  "experiment": "E-000042",
+  "layer": 7,
+  "model": "gpt2",
+  "pool_size": 8,
+  "recorded_at": "2026-09-04T19:53:50+00:00",
+  "result": {
+    "control_bound_can_exceed_one": 1.0,
+    "layer": 7,
+    "n_attempted": 6,
+    "n_held": 17,
+    "n_measured": 0,
+    "per_fact": [
+      {
+        "excluded": "no subset of the pool silences every phrasing",
+        "subject": "France"
+      },
+      {
+        "excluded": "no subset of the pool silences every phrasing",
+        "subject": "Japan"
+      },
+      {
+        "excluded": "no subset of the pool silences every phrasing",
+        "subject": "Italy"
+      },
+      {
+        "excluded": "no subset of the pool silences every phrasing",
+        "subject": "Germany"
+      },
+      {
+        "excluded": "no subset of the pool silences every phrasing",
+        "subject": "Russia"
+      },
+      {
+        "excluded": "no subset of the pool silences every phrasing",
+        "subject": "China"
+      }
+    ],
+    "pool_size": 8,
+    "positive_control": {
+      "bound": 3,
+      "certified": 1.0,
+      "expected": 3,
+      "ok": 1.0
+    },
+    "void": "fewer than three facts the pool can silence; there is nothing to bound"
+  },
+  "seeds": [
+    0,
+    1,
+    2
+  ],
+  "seeds_vary": "the random-support control only; the ablation table is exhaustive and the model is frozen, so the optimum, the supports, the certificates and the bound are deterministic",
+  "title": "a certified lower bound for deletion in a representation, from the J-lens support",
+  "trains_nothing": true,
+  "void": "fewer than three facts the pool can silence; there is nothing to bound"
+}

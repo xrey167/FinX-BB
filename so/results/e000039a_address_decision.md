@@ -7,5 +7,5 @@ routing_share >= 0.7 -> train the address arm alone; <= 0.3 -> train the read ar
 | measure | mean over seeds | worst seed |
 |---|---|---|
 | heldout/gap | 1.1100 | 1.0400 |
-| heldout/residual_gap | nan | nan |
-| heldout/routing_share | nan | nan |
+| heldout/residual_gap | 0.1267 | 0.1100 |
+| heldout/routing_share | 0.8861 | 0.8818 |
