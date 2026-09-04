@@ -44,6 +44,7 @@
 | e000027_untied_output | - | - | - | not run | - |
 | e000027_untied_input | - | - | - | not run | - |
 | E-000028 | the channel SHRED does not close | - | - | recorded | 2026-09-04 14:33 |
+| E-000029 | what the marker gate actually certifies | - | - | recorded | 2026-09-04 14:50 |
 
 ## The six breakthrough properties (ledger section 3)
 
@@ -2170,3 +2171,63 @@ number means nothing. `revoke` and `delete` remove the row from routing altogeth
 | delete/margin_mean | 0.0022 | 0.0016 | - | - | - |
 
 **Interpretation (post hoc, record unchanged):** The strongest deletion claim here -- F4 for SHRED with the verified gate -- was only ever measured on the value channel: the answer, the logits, the hidden state, the linear probe. shred() writes only the marker and leaves the row ACTIVE, and in encode_bank the routing keys are computed before the gate and are never gated, so a shredded cell's reverse key k_rev(LN(object + relation)) still names the object. An attacker given the cell's subject and relation locates its column from the routing of the ordinary forward question and sweeps candidate objects through a reverse query: over 500 targets on five seeds the shredded object comes back at 1.0000 against a chance of 0.0039, with numbers identical to the live cell's to four decimals -- the keys are the same tensors before and after. REVOKE and DELETE remove the row from routing and land on chance (0.0040, mean rank 128.0 against 127.5). The E-000010 and E-000019 records stand: every number in them is about the value channel and every one is still correct. What is withdrawn is the unqualified reading of F4 for SHRED. This is a synthetic-model defect: the GPT-2 adapter's key is k_proj(ln_key(subject + relation)) and carries no object, which two tests assert as a property. ModelConfig.gate_reverse_key repairs it and is unevaluated -- it needs its own training run. Ledger 31.10.
+
+## E-000029 — what the marker gate actually certifies
+
+11 recorded checkpoints, no training.
+
+E-000021 reported the gate's false-accept rate as 8.49e-04 and called it the bound on the deletion
+guarantee. Its unsigned class comes from `invalid_markers`, which rejects every draw within 0.7 of
+the centre, while the store calls everything beyond 0.35 deleted. The band in between was
+measured by nothing. These are the three distributions side by side.
+
+### The gate's accept rate, by where the marker is
+
+| marker distribution | accepted | of | rate | 95% CI lower | 95% CI upper |
+|---|---|---|---|---|---|
+| uniform | 5843 | 5500000 | 1.062e-03 | 1.035e-03 | 1.090e-03 |
+| annulus | 2199996 | 2200000 | 1.000e+00 | 1.000e+00 | 1.000e+00 |
+| rejection_sampled | 1881 | 2200000 | 8.550e-04 | 8.168e-04 | 8.945e-04 |
+
+### Accept rate by distance from the centre
+
+| distance from the centre | accept rate (mean over checkpoints) | mean gate score |
+|---|---|---|
+| 0.10 | 1.0000 | 0.9985 |
+| 0.20 | 1.0000 | 0.9978 |
+| 0.30 | 1.0000 | 0.9962 |
+| 0.40 | 1.0000 | 0.9917 |
+| 0.50 | 1.0000 | 0.9777 |
+| 0.60 | 1.0000 | 0.9300 |
+| 0.70 | 0.9999 | 0.7725 |
+| 0.80 | 0.2191 | 0.4320 |
+| 0.90 | 0.0000 | 0.1299 |
+| 1.00 | 0.0000 | 0.0254 |
+| 1.10 | 0.0000 | 0.0044 |
+| 1.20 | 0.0000 | 0.0008 |
+| 1.30 | 0.0000 | 0.0002 |
+| 1.40 | 0.0000 | 0.0000 |
+| 1.50 | 0.0000 | 0.0000 |
+| 1.60 | 0.0000 | 0.0000 |
+| 1.70 | 0.0000 | 0.0000 |
+| 1.80 | 0.0000 | 0.0000 |
+| 1.90 | 0.0000 | 0.0000 |
+| 2.00 | 0.0000 | 0.0000 |
+
+Operational radius (smallest shell with an accept rate of exactly zero), worst checkpoint: 0.90 against a declared 0.35.
+
+### The centre is not a secret
+
+A signed marker is `normalise(centre + N(0, 0.05^2))`, so the mean of 950 of them
+estimates the centre to 0.0076 on the worst checkpoint, well inside
+the 0.35 radius. Markers minted from that estimate pass `marker_valid` at 0.9999 and the learned gate at 1.0000. `make_centre` derives the centre from `10_000 + seed`,
+and every checkpoint stores it verbatim, so shipping a model ships the ability to mint signatures.
+
+### Pre-registered criteria
+
+| criterion (worst checkpoint) | required | observed | result |
+|---|---|---|---|
+| annulus_accept_rate | <= 0.001 | 1.0000 | FAIL |
+| uniform_accept_rate | <= 0.001 | 0.0013 | FAIL |
+
+**Interpretation (post hoc, record unchanged):** E-000021 put the gate's false-accept rate at 8.49e-04 and the programme called that the bound on the deletion guarantee. The rate is right; the distribution is not the one the guarantee is about. marker_valid deletes everything beyond 0.35 of the centre, but invalid_markers -- E-000021's unsigned class -- rejects every draw within 0.7, and new_invalid_markers, which is what shred() writes, rejects the same band. The annulus between was measured by nothing. Over eleven recorded checkpoints, with markers placed on each shell by construction because rejection sampling cannot reach the near shells in sixteen dimensions: the gate accepts EVERYTHING out to 0.70 at 1.0000, 0.2191 at 0.80, and first reaches zero at 0.90. Its operational radius is 0.90 on every checkpoint against a declared 0.35, and the deleted annulus is accepted at 1.0000 (2,200,000 markers). The rejection-sampled column reproduces E-000021 at 8.550e-04, which is how one knows the re-measurement is faithful before looking at what it missed. The boundary sits at 0.8 because training shows signed markers at 0.194 and unsigned ones at 0.7 and nothing between, so the classifier learned the MARGIN rather than the predicate -- and the recorded false-accept rate is just the tail of the shred sampler crossing it. The centre is not a secret either: the mean of 950 signed markers estimates it to 0.0076, minted markers pass marker_valid at 0.9999 and the gate at 1.0000, make_centre derives it from 10_000 + seed, and every checkpoint stores it verbatim. The gate is an integrity check, not a signature. Ledger 31.12.

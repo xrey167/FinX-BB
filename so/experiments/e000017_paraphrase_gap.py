@@ -326,6 +326,14 @@ def criteria_groups(n_train: int) -> Dict[str, Dict[str, Tuple[str, float]]]:
     """
     return {
         "reading_generalises": {"heldout/active_correct": (">=", 0.90), "train/active_correct": (">=", 0.95)},
+        # WARNING (found 2026-09-04, ledger 31.13): in a STATUS-GATED design these four are two numbers,
+        # not four. The status flag multiplies the same verification gate the marker feeds, so a revoked
+        # cell and a hard-gated shredded cell null the injected value by the same arithmetic and the two
+        # refusal rates come out identical -- 36 of 36 cells here and all three seeds of E-000012, while
+        # E-000011, which has no status flag, separates them at 0.510 against 0.899. The criteria are
+        # left exactly as pre-registered so the recorded verdicts stay reproducible; what they must not
+        # be read as is two mechanisms agreeing. An independent check on representational shredding
+        # needs the status flag left ACTIVE, which no recorded run does.
         "refusal_generalises": {"revoke_heldout_min": (">=", 0.85), "shred_heldout_min": (">=", 0.85)},
         "refusal_on_trained_templates_holds": {"revoke_train_min": (">=", 0.95), "shred_train_min": (">=", 0.90)},
         "deleted_object_never_returns": {"heldout/revoked_deleted_object": ("<=", 0.02),

@@ -21,7 +21,7 @@ DOC = Path(__file__).resolve().parent.parent / "docs" / "so-results-2026-09-02.m
 ORDER = ["e000001a_reference", "e000001b_mini_transformer", "e000002_memorization_control",
          "e000003_retention_generalization", "e000004_reconstruction_attacks", "e000005_causal_interventions",
          "e000006_ablations", "e000007_biomarker", "e000008_gpt2_adapter", "e000009_verification_gate",
-         "e000010_balanced_gate", "e000011_gpt2_v2", "e000012_status_gated_revoke", "e000013_prior_conflict", "e000014_bank_10k", "e000015_symlink_cells", "e000016_alias_chains", "e000017a_paraphrase_diagnosis", "e000017b_templates8", "e000018_both", "e000018_gate", "e000018_generic", "e000019_fresh_seed_chance", "e000020_symlink_gpt2", "e000021_gate_error_rates", "e000022_two_channel_null", "e000023_curriculum", "e000023_longer", "e000024_weights_vs_cells", "e000025_template_rescoring", "e000026_lifecycle_readable_template", "e000027_untied_output", "e000027_untied_input", "e000028_key_channel"]
+         "e000010_balanced_gate", "e000011_gpt2_v2", "e000012_status_gated_revoke", "e000013_prior_conflict", "e000014_bank_10k", "e000015_symlink_cells", "e000016_alias_chains", "e000017a_paraphrase_diagnosis", "e000017b_templates8", "e000018_both", "e000018_gate", "e000018_generic", "e000019_fresh_seed_chance", "e000020_symlink_gpt2", "e000021_gate_error_rates", "e000022_two_channel_null", "e000023_curriculum", "e000023_longer", "e000024_weights_vs_cells", "e000025_template_rescoring", "e000026_lifecycle_readable_template", "e000027_untied_output", "e000027_untied_input", "e000028_key_channel", "e000029_marker_geometry"]
 
 # ledger §3 properties -> the experiments that bear on them
 PROPERTIES = {
@@ -35,6 +35,24 @@ PROPERTIES = {
 
 # post-hoc interpretation of recorded outcomes (the JSON records are never edited)
 NOTES = {
+    "e000029_marker_geometry": "E-000021 put the gate's false-accept rate at 8.49e-04 and the programme called "
+        "that the bound on the deletion guarantee. The rate is right; the distribution is not the one the "
+        "guarantee is about. marker_valid deletes everything beyond 0.35 of the centre, but invalid_markers -- "
+        "E-000021's unsigned class -- rejects every draw within 0.7, and new_invalid_markers, which is what "
+        "shred() writes, rejects the same band. The annulus between was measured by nothing. Over eleven "
+        "recorded checkpoints, with markers placed on each shell by construction because rejection sampling "
+        "cannot reach the near shells in sixteen dimensions: the gate accepts EVERYTHING out to 0.70 at 1.0000, "
+        "0.2191 at 0.80, and first reaches zero at 0.90. Its operational radius is 0.90 on every checkpoint "
+        "against a declared 0.35, and the deleted annulus is accepted at 1.0000 (2,200,000 markers). "
+        "The rejection-sampled column reproduces E-000021 at 8.550e-04, "
+        "which is how one knows the re-measurement is faithful before looking at what it missed. The boundary "
+        "sits at 0.8 because training shows signed markers at 0.194 and unsigned ones at 0.7 and nothing "
+        "between, so the classifier learned the MARGIN rather than the predicate -- and the recorded "
+        "false-accept rate is just the tail of the shred sampler crossing it. The centre is not a secret "
+        "either: the mean of 950 signed markers estimates it to 0.0076, minted "
+        "markers pass marker_valid at 0.9999 and the gate at "
+        "1.0000, make_centre derives it from 10_000 + seed, and every "
+        "checkpoint stores it verbatim. The gate is an integrity check, not a signature. Ledger 31.12.",
     "e000026_lifecycle_readable_template": "E-000020 ran its whole battery at template 0, so update, rollback, "
         "shred, revoke, delete and both attacks were statements about a phrasing the model reads at 0.5633. This "
         "re-runs the battery unchanged at three phrasings, the two strong ones chosen at run time from "

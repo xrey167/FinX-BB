@@ -1265,6 +1265,113 @@ close to vacuous — the fact was half-gone before the operation. Every claim of
 is reported at a strong and a weak phrasing, and the attack that certifies it has to be shown working
 on live cells at the same phrasing.
 
+### 31.12 The gate's boundary is not the boundary the store declares (2026-09-04)
+
+E-000021 measured the verification gate's false-accept rate at 8.49e-04 over 2.2 million markers and
+the programme called that the bound on the deletion guarantee. The number is correct. The
+distribution it was measured on is not the one the guarantee is about.
+
+`MVCCStore.marker_valid` accepts a marker within `valid_radius = 0.35` of the centre and calls
+everything beyond it deleted. But `so.data.invalid_markers` — E-000021's unsigned class — rejects
+every draw within **0.7**, and `MVCCStore.new_invalid_marker`, which is what `shred()` writes,
+rejects the same band (`2 * valid_radius`). So the annulus 0.35 < ‖m − κ‖ < 0.7 is populated by no
+training distribution, no evaluation distribution and no store operation anywhere in the programme,
+while the store's own predicate calls all of it deleted.
+
+E-000029 measures the gate over the geometry instead of over a convenient sample. Eleven recorded
+checkpoints, no training, markers placed on each shell by construction — rejection sampling cannot
+reach the near shells, since a uniform unit vector in sixteen dimensions sits at ‖m − κ‖ ≈ √2.
+
+| distance from the centre | accept rate | mean gate score |
+|---|---|---|
+| 0.10 | 1.0000 | 0.9985 |
+| 0.20 | 1.0000 | 0.9978 |
+| 0.30 | 1.0000 | 0.9962 |
+| 0.40 | 1.0000 | 0.9917 |
+| 0.50 | 1.0000 | 0.9777 |
+| 0.60 | 1.0000 | 0.9300 |
+| 0.70 | 0.9999 | 0.7725 |
+| 0.80 | 0.2191 | 0.4320 |
+| 0.90 | 0.0000 | 0.1299 |
+| 1.00 | 0.0000 | 0.0254 |
+| 1.10 | 0.0000 | 0.0044 |
+| 1.20 | 0.0000 | 0.0008 |
+
+**The gate's operational radius is 0.90 on every one of the eleven checkpoints, against a declared
+0.35.** Everything out to 0.70 is accepted at 1.0000; the transition is at 0.80 (0.2191); zero is
+first reached at 0.90. The annulus the store deletes is accepted at
+2,199,996 of 2,200,000 — a rate of 1.0000.
+
+| marker distribution | rate | 95% CI |
+|---|---|---|
+| uniform on the sphere, no rejection | 1.062e-03 | 1.035e-03 – 1.090e-03 |
+| the annulus the store calls deleted | 1.000e+00 | 1.000 – 1.000 |
+| rejection-sampled ≥ 0.7, i.e. E-000021's class | 8.550e-04 | 8.168e-04 – 8.945e-04 |
+
+The third row reproduces E-000021's 8.49e-04 to within its interval, which is how one knows the
+re-measurement is faithful before one looks at what it missed.
+
+**Why the boundary sits where it does, and why that is the general lesson.** The training data has
+signed markers at ‖m − κ‖ ≈ 0.194 and unsigned ones at ≥ 0.7, with nothing between. A classifier
+trained on two separated clusters puts its boundary in the *margin*, not at a number nobody told it
+about — so the gate learned ≈0.8 and the specification says 0.35. The recorded false-accept rate
+follows from this rather than from anything mysterious about learned classifiers: `shred()` writes
+markers uniformly beyond 0.7, about 5.8e-03 of which land inside 0.9, and integrating the gate's
+accept curve over that tail gives the ~8.5e-04 that was measured. **A learned gate certifies the
+margin between the classes it was shown, not the predicate it was meant to implement.** Making it
+implement the predicate is a change to the data, not to the architecture: draw unsigned markers from
+the whole region beyond the declared radius, the annulus included. That needs a training run and is
+not yet evaluated.
+
+**And the centre is not a secret.** `new_valid_marker` returns `normalise(κ + N(0, 0.05²·I))`, so
+every signed marker in a bank is a noisy copy of κ. The mean of 950 of them — about what one
+evaluation bank holds — estimates κ to 0.0076 on the worst
+checkpoint, comfortably inside the 0.35 radius; the estimate itself passes `marker_valid` on every
+checkpoint, markers minted from it pass at 0.9999 and the learned
+gate at 1.0000, and a *single* signed marker copied onto a
+shredded row passes as well. `make_centre` derives κ from `10_000 + seed`, and every checkpoint
+serialises κ verbatim, so shipping a trained model ships the ability to mint signatures.
+
+What this narrows: the marker gate is an **integrity check against unprivileged or accidental
+modification**, not a cryptographic signature against an adversary with bank or checkpoint access.
+The architecture document's crypto-shredding analogy does not survive contact with an adversary who
+has either. Nothing in the recorded deletion results depends on the marker being secret — SHRED's
+guarantee is that the gate closes, not that an attacker cannot open it — but the analogy was doing
+rhetorical work the mechanism does not support, and the claim is withdrawn to the integrity reading.
+
+### 31.13 Two criteria that are one measurement (2026-09-04)
+
+E-000017-B's pre-registered groups check refusal after REVOKE and after SHRED separately, and the
+ledger and roadmap both phrase the result as holding "after REVOKE and after SHRED" — which reads as
+two deletion mechanisms agreeing. Per seed they are one number.
+
+In every one of the 36 comparable cells of `e000017b_templates8.json`, `revoke/templateN_unknown`
+equals `shred_hard/templateN_unknown` exactly, so `revoke_heldout_min` = `shred_heldout_min` = 0.92 /
+0.91 / 0.865 and `revoke_train_min` = `shred_train_min` = 0.955 / 0.96 / 0.96. All three seeds of
+`e000012_status_gated_revoke.json` show the same identity. `e000011_gpt2_v2.json`, the same
+architecture *before* the status flag, separates them completely: revoke_heldout 0.510 against
+shred_heldout 0.899, revoke_heldout_min 0.173 against 0.750.
+
+The identity arrives with the status flag and is by construction: E-000012's design change makes the
+flag multiply the same verification gate the marker feeds, so a revoked cell and a hard-gated
+shredded cell null the injected value by the same arithmetic, and the frozen model's answer is then
+decided by the same remaining computation. The two are separately executed — the experiment revokes,
+measures, restores, shreds, sets `hard_gate` and measures again — and they *can* diverge, which one
+divergent template pair in E-000012 shows. They simply do not.
+
+What follows:
+
+1. **Four of E-000017-B's ten criteria are two distinct numbers.** `refusal_generalises` rests on one
+   measurement, not two, and its margin is 0.015. The `shred_train_min` ≥ 0.90 bar is vacuous beside
+   the ≥ 0.95 bar on the identical quantity.
+2. **No recorded verdict changes**, and the criteria are left exactly as pre-registered so that they
+   stay reproducible. A warning at the definition says what they may not be read as.
+3. **The adjudication of kill criterion 5 is untouched.** That criterion is a single unconditional
+   held-out number against a 95% bar, and 0.898 is below 0.95 however many mechanisms produced it.
+4. **The record contains no independent evidence that representational shredding refuses on held-out
+   phrasings** — only that the gate closes. Getting it would mean measuring after SHRED with the
+   status flag left ACTIVE, which no recorded run does.
+
 ### 31.8 Boundary
 
 CPU only, no GPU, no LLM above 124M parameters, synthetic worlds, single-token entities, two surface forms per relation, one session. Nothing here shows unlearning of facts already encoded in pretrained weights. Evidence levels recorded: E3–E4 for the synthetic system (F4 for SHRED with the verified gate, E-000010 — **on the value channel only**: E-000028 recovers the shredded object at 1.0000 through the ungated reverse key, where REVOKE and DELETE are at chance, so F4 for SHRED is a claim about answers, logits, hidden states and probes and not about routing); E5 as substrate for the frozen-GPT-2 experiment, with reading, composition, update and the copy bound supported and behavioural deletion not yet supported at the pre-registered thresholds.
