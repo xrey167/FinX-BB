@@ -10,12 +10,12 @@ residual stream of the last token.
     text tokens ──► GPT-2 blocks 0..L ──┬──► blocks L+1..11 ──► LM head ──► object token
                                         │ read at block L (last token)
                                         ▼
-                      routing attention over cell keys  (key = wte[subject] + R[relation])
+                      routing attention over cell keys  (key = W_in[subject] + R[relation])
                                         │
                                         ▼
-                      gated cell value  (value = Wv · wte[object] ⊙ gate(marker))
+                      gated cell value  (value = Wv · W_out[object] ⊙ gate(marker))
 
-Because the value is built from the model's own (tied) token embedding of the
+Because the value is built from the model's own OUTPUT embedding row for the
 object, adding it into the residual stream raises that token's logit through
 the unchanged LM head.  The marker gate does not merely attenuate the value
 (the RMS-matched injection would undo that): it selects between the payload
@@ -117,7 +117,9 @@ class KnowledgeAdapterLM(nn.Module):
             self.deref_pass_bias = nn.Parameter(torch.full((len(cfg.read_layers),), 7.0))
         self.null_key = nn.Parameter(torch.randn(len(cfg.read_layers), cfg.d_key) * 0.02)
         with torch.no_grad():
-            unk = lm.transformer.wte.weight[unknown_token_id].detach().clone()
+            out_emb = lm.get_output_embeddings()
+            w_out = (lm.get_input_embeddings() if out_emb is None else out_emb).weight
+            unk = w_out[unknown_token_id].detach().clone()
         self.null_value = nn.Parameter(unk[None].repeat(len(cfg.read_layers), 1))   # "nothing found" -> ' unknown'
         if cfg.fallback == "prior":
             # "nothing found" -> no injection at all (fixed, not learnable: no constant shortcut can be learned)
@@ -127,8 +129,33 @@ class KnowledgeAdapterLM(nn.Module):
         self._hooks = [lm.transformer.h[l].register_forward_hook(self._make_hook(i, l)) for i, l in enumerate(cfg.read_layers)]
 
     @property
+    def w_in(self) -> torch.Tensor:
+        """The input-embedding matrix: the space the residual stream is written in."""
+        return self.lm.get_input_embeddings().weight
+
+    @property
+    def w_out(self) -> torch.Tensor:
+        """The output-embedding matrix: the rows the LM head scores the residual against.
+
+        On GPT-2 this is the SAME tensor as ``w_in`` -- the model ties them -- which is why the layer
+        could be written against ``wte`` alone and still work.  Most models since do not tie them
+        (Llama, Qwen, OLMo, Pythia all default to untied, and Pythia's two matrices have a row-wise
+        cosine near zero), and there the distinction decides whether the mechanism works at all: a
+        payload built from the INPUT embedding of the object raises nothing at the head.  Every
+        logit-raising direction below therefore comes from ``w_out`` and every addressing direction
+        from ``w_in``.
+        """
+        out = self.lm.get_output_embeddings()
+        return self.w_in if out is None else out.weight
+
+    @property
     def wte(self) -> torch.Tensor:
-        return self.lm.transformer.wte.weight
+        """Retained name: the input embeddings. Kept so older call sites keep meaning what they meant."""
+        return self.w_in
+
+    @property
+    def ties_embeddings(self) -> bool:
+        return self.w_in.data_ptr() == self.w_out.data_ptr()
 
     def adapter_parameters(self):
         return [p for n, p in self.named_parameters() if not n.startswith("lm.") and p.requires_grad]
@@ -146,15 +173,15 @@ class KnowledgeAdapterLM(nn.Module):
         return g
 
     def encode_bank(self, bank: Dict[str, torch.Tensor]) -> Dict[str, torch.Tensor]:
-        subj = self.wte[self.entity_token_ids[bank["subject"]]]
-        obj = self.wte[self.entity_token_ids[bank["obj"]]]
+        subj = self.w_in[self.entity_token_ids[bank["subject"]]]     # a key, not a logit direction
+        obj = self.w_out[self.entity_token_ids[bank["obj"]]]
         keys = self.k_proj(self.ln_key(subj + self.rel_emb(bank["relation"])))
         g = self.gate(bank["marker"])
         payload = self.v_proj(obj)
         if self.cfg.use_links and "is_link" in bank:
             # Control-plane materialisation, exactly like the marker: an alias row carries its TARGET'S KEY
             # instead of an object. The model is never told that a value it has read is a pointer.
-            tgt = self.k_proj(self.ln_key(self.wte[self.entity_token_ids[bank["link_subject"]]]
+            tgt = self.k_proj(self.ln_key(self.w_in[self.entity_token_ids[bank["link_subject"]]]
                                           + self.rel_emb(bank["link_relation"])))
             payload = torch.where(bank["is_link"][:, None], self.v_link(tgt), payload)
         if self.cfg.status_gated:
@@ -165,7 +192,7 @@ class KnowledgeAdapterLM(nn.Module):
             payload = payload / (payload.pow(2).mean(-1, keepdim=True).sqrt() + 1e-6)
             values = payload * g
         else:
-            unk = self.v_proj(self.wte[self.candidate_ids[-1]][None])          # the ' unknown' direction
+            unk = self.v_proj(self.w_out[self.candidate_ids[-1]][None])        # the ' unknown' direction
             # the gate selects between the payload and "unknown": an unsigned payload READS AS unknown.
             # (a mere attenuation would be undone by the RMS-matched injection downstream)
             values = payload * g + unk * (1 - g)

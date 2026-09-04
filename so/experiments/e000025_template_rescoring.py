@@ -82,11 +82,16 @@ def run_seed(seed: int, verbose: bool = True) -> Dict[str, Any]:
     free_gk, free_meta = load_adapter("e000017_t8_c0", seed, AdapterConfig(status_gated=True))
     centre = link_meta["centre"]
 
-    rng = np.random.default_rng(seed)
+    # E-000020 evaluates at world seed 2000 + seed (e000020_symlink_gpt2.py:327), so the same offset is
+    # used here: the template-0 column is then E-000020's own condition, differing only in the phrasing
+    # loop around it, and for the one checkpoint whose SHA still matches that record it is a
+    # reproduction check rather than a fresh measurement.
+    world_seed = 2000 + seed
+    rng = np.random.default_rng(world_seed)
     world, spec = E15.sample_alias_world(rng, EVAL["n_base"], EVAL["n_groups"], EVAL["n_alias_per_group"],
                                          link_gk.n_entities, 4, E20.N_TRAIN_TEMPLATES)
-    sym_store, _ = E15.load_arm(world, spec, centre, seed, symlink=True)
-    dup_store, _ = E15.load_arm(world, spec, centre, seed, symlink=False)
+    sym_store, _ = E15.load_arm(world, spec, centre, world_seed, symlink=True)
+    dup_store, _ = E15.load_arm(world, spec, centre, world_seed, symlink=False)
     sym, dup = bank_from_store(sym_store), bank_from_store(dup_store)
 
     alias_keys = list(spec.alias_keys)
@@ -96,7 +101,7 @@ def run_seed(seed: int, verbose: bool = True) -> Dict[str, Any]:
     truth_direct = np.array([world.index[k] for k in direct_keys])
     truth_alias = np.array([world.index[spec.alias_of[k]] for k in alias_keys])
 
-    m: Dict[str, Any] = {"seed": seed,
+    m: Dict[str, Any] = {"seed": seed, "world_seed": world_seed,
                          "link_checkpoint_sha256": link_meta["sha256"],
                          "linkfree_checkpoint_sha256": free_meta["sha256"],
                          "n_alias_queries": len(alias_keys), "n_direct_queries": len(direct_keys)}

@@ -194,3 +194,55 @@ def test_ungated_adapter_is_unchanged_by_the_restructuring():
         cand, full, _, _ = a(bank, ids, am, last)
     assert torch.isfinite(cand).all() and torch.isfinite(full).all()
     assert _injection_norm(a, bank, ids, am, last) > 0
+
+
+# --------------------------------------------------------------------- tied vs untied output embeddings
+
+def _untied_lm():
+    cfg = transformers.GPT2Config(vocab_size=64, n_positions=16, n_embd=32, n_layer=2, n_head=2,
+                                  tie_word_embeddings=False)
+    torch.manual_seed(0)
+    lm = transformers.GPT2LMHeadModel(cfg).eval()
+    with torch.no_grad():                                  # make the two matrices genuinely unrelated
+        lm.get_output_embeddings().weight.copy_(torch.randn_like(lm.get_output_embeddings().weight) * 0.05)
+    return lm
+
+
+def test_gpt2_ties_its_embeddings_so_the_two_matrices_are_one():
+    m = _adapter()
+    assert m.ties_embeddings
+    assert torch.equal(m.w_in, m.w_out)
+    assert torch.equal(m.wte, m.w_in)          # the retained name still means the input side
+
+
+def test_the_payload_comes_from_the_output_embedding_when_they_differ():
+    """The value must raise the object's logit at the LM head, so it is built from the head's rows.
+
+    GPT-2 ties the two matrices, which let the layer be written against `wte` alone and still work.
+    Llama, Qwen, OLMo and Pythia do not tie them; there a payload built from the INPUT embedding
+    raises nothing at the head, and the mechanism would read near chance for a reason that has
+    nothing to do with the architecture being tested.
+    """
+    cfg = AdapterConfig(read_layers=(0, 1), d_key=16, marker_dim=16)
+    torch.manual_seed(1)
+    m = KnowledgeAdapterLM(_untied_lm(), cfg, list(range(10, 10 + N_ENT)), UNK).eval()
+    assert not m.ties_embeddings
+    assert not torch.equal(m.w_in, m.w_out)
+    b = _bank()
+    with torch.no_grad():
+        payload = m.v_proj(m.w_out[m.entity_token_ids[b["obj"]]])
+        enc = m.encode_bank(b)
+    # values are payload*g + unk*(1-g); where the gate is fully open the value IS the payload
+    open_gate = enc["gate"] > 0.999
+    if open_gate.any():
+        assert torch.allclose(enc["values"][open_gate], payload[open_gate], atol=1e-5)
+    wrong = m.v_proj(m.w_in[m.entity_token_ids[b["obj"]]])
+    assert not torch.allclose(payload, wrong, atol=1e-3)    # the two really are different directions
+
+
+def test_the_null_value_is_an_output_direction_on_an_untied_model():
+    cfg = AdapterConfig(read_layers=(0, 1), d_key=16, marker_dim=16)
+    torch.manual_seed(1)
+    lm = _untied_lm()
+    m = KnowledgeAdapterLM(lm, cfg, list(range(10, 10 + N_ENT)), UNK).eval()
+    assert torch.allclose(m.null_value[0], lm.get_output_embeddings().weight[UNK], atol=1e-6)
