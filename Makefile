@@ -13,13 +13,14 @@ THREADS ?= $(shell nproc)
 SEEDS ?= 0 1 2
 RUN = OMP_NUM_THREADS=$(THREADS) SO_THREADS=$(THREADS) $(PY) -m
 
-.PHONY: help test smoke synthetic gpt2 report clean-results env
+.PHONY: help test smoke synthetic gpt2 demo report clean-results env
 
 help:
 	@echo "make test        unit tests, ~10 s"
 	@echo "make smoke       reduced synthetic chain from scratch, ~35 min on 4 cores, writes *-quick records"
 	@echo "make synthetic   recorded synthetic chain, ~3 h on 4 cores"
 	@echo "make gpt2        frozen-GPT-2 chain, ~20 h on 4 cores, downloads GPT-2 once"
+	@echo "make demo        watch one fact get deleted from a frozen GPT-2, ~3 min (needs a checkpoint)"
 	@echo "make report      rebuild docs/so-results-2026-09-02.md from so/results/"
 	@echo "make env         print what will be used"
 	@echo ""
@@ -57,6 +58,10 @@ gpt2:
 	$(RUN) so.experiments.e000017_paraphrase_gap --phase diagnose --seeds $(SEEDS)
 	$(RUN) so.experiments.e000020_symlink_gpt2 --seeds $(SEEDS)
 	$(MAKE) report
+
+# the claim as a transcript on one fact, from a checkpoint the gpt2 target produces
+demo:
+	$(RUN) so.demo --threads $(THREADS)
 
 report:
 	$(PY) -m so.report
