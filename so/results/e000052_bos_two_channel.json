@@ -1,0 +1,2192 @@
+{
+  "adapter": {
+    "d_key": 256,
+    "fallback": "unknown",
+    "hard_gate": false,
+    "marker_dim": 16,
+    "match_gate": true,
+    "n_deref": 0,
+    "n_relations": 4,
+    "payload_from": "output",
+    "read_layers": [
+      8,
+      10
+    ],
+    "status_gated": true,
+    "two_channel_null": true,
+    "use_links": false,
+    "use_marker_gate": true
+  },
+  "aggregate": {
+    "off/broken1_unknown": {
+      "max": 0.93,
+      "mean": 0.93,
+      "min": 0.93,
+      "n": 1
+    },
+    "off/generic/kl_to_base": {
+      "max": 1.0743180513381958,
+      "mean": 1.0743180513381958,
+      "min": 1.0743180513381958,
+      "n": 1
+    },
+    "off/heldout/active_correct": {
+      "max": 0.495,
+      "mean": 0.495,
+      "min": 0.495,
+      "n": 1
+    },
+    "off/heldout/deleted_object_given_active_correct": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 1
+    },
+    "off/heldout/refusal_given_active_correct": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 1
+    },
+    "off/heldout/revoked_deleted_object": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 1
+    },
+    "off/n_targets": {
+      "max": 200.0,
+      "mean": 200.0,
+      "min": 200.0,
+      "n": 1
+    },
+    "off/revoke/template0_unknown": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 1
+    },
+    "off/revoke/template10_unknown": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 1
+    },
+    "off/revoke/template11_unknown": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 1
+    },
+    "off/revoke/template1_unknown": {
+      "max": 0.995,
+      "mean": 0.995,
+      "min": 0.995,
+      "n": 1
+    },
+    "off/revoke/template2_unknown": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 1
+    },
+    "off/revoke/template3_unknown": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 1
+    },
+    "off/revoke/template4_unknown": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 1
+    },
+    "off/revoke/template5_unknown": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 1
+    },
+    "off/revoke/template6_unknown": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 1
+    },
+    "off/revoke/template7_unknown": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 1
+    },
+    "off/revoke/template8_unknown": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 1
+    },
+    "off/revoke/template9_unknown": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 1
+    },
+    "off/revoke_heldout_min": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 1
+    },
+    "off/revoke_train_min": {
+      "max": 0.995,
+      "mean": 0.995,
+      "min": 0.995,
+      "n": 1
+    },
+    "off/seed": {
+      "max": 1800.0,
+      "mean": 1800.0,
+      "min": 1800.0,
+      "n": 1
+    },
+    "off/shred_hard/template0_unknown": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 1
+    },
+    "off/shred_hard/template10_unknown": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 1
+    },
+    "off/shred_hard/template11_unknown": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 1
+    },
+    "off/shred_hard/template1_unknown": {
+      "max": 0.995,
+      "mean": 0.995,
+      "min": 0.995,
+      "n": 1
+    },
+    "off/shred_hard/template2_unknown": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 1
+    },
+    "off/shred_hard/template3_unknown": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 1
+    },
+    "off/shred_hard/template4_unknown": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 1
+    },
+    "off/shred_hard/template5_unknown": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 1
+    },
+    "off/shred_hard/template6_unknown": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 1
+    },
+    "off/shred_hard/template7_unknown": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 1
+    },
+    "off/shred_hard/template8_unknown": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 1
+    },
+    "off/shred_hard/template9_unknown": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 1
+    },
+    "off/shred_heldout_min": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 1
+    },
+    "off/shred_train_min": {
+      "max": 0.995,
+      "mean": 0.995,
+      "min": 0.995,
+      "n": 1
+    },
+    "off/template0_train/active_correct": {
+      "max": 0.01,
+      "mean": 0.01,
+      "min": 0.01,
+      "n": 1
+    },
+    "off/template0_train/active_other_entity": {
+      "max": 0.01,
+      "mean": 0.01,
+      "min": 0.01,
+      "n": 1
+    },
+    "off/template0_train/active_unknown": {
+      "max": 0.98,
+      "mean": 0.98,
+      "min": 0.98,
+      "n": 1
+    },
+    "off/template0_train/deleted_object_given_active_correct": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 1
+    },
+    "off/template0_train/n_active_correct": {
+      "max": 2.0,
+      "mean": 2.0,
+      "min": 2.0,
+      "n": 1
+    },
+    "off/template0_train/refusal_given_active_correct": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 1
+    },
+    "off/template0_train/revoked_deleted_object": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 1
+    },
+    "off/template0_train/revoked_other_entity": {
+      "max": 0.01,
+      "mean": 0.01,
+      "min": 0.01,
+      "n": 1
+    },
+    "off/template0_train/revoked_unknown": {
+      "max": 0.99,
+      "mean": 0.99,
+      "min": 0.99,
+      "n": 1
+    },
+    "off/template10_heldout/active_correct": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 1
+    },
+    "off/template10_heldout/active_other_entity": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 1
+    },
+    "off/template10_heldout/active_unknown": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 1
+    },
+    "off/template10_heldout/deleted_object_given_active_correct": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 1
+    },
+    "off/template10_heldout/n_active_correct": {
+      "max": 200.0,
+      "mean": 200.0,
+      "min": 200.0,
+      "n": 1
+    },
+    "off/template10_heldout/refusal_given_active_correct": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 1
+    },
+    "off/template10_heldout/revoked_deleted_object": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 1
+    },
+    "off/template10_heldout/revoked_other_entity": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 1
+    },
+    "off/template10_heldout/revoked_unknown": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 1
+    },
+    "off/template11_heldout/active_correct": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 1
+    },
+    "off/template11_heldout/active_other_entity": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 1
+    },
+    "off/template11_heldout/active_unknown": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 1
+    },
+    "off/template11_heldout/deleted_object_given_active_correct": {
+      "max": NaN,
+      "mean": NaN,
+      "min": NaN,
+      "n": 1
+    },
+    "off/template11_heldout/n_active_correct": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 1
+    },
+    "off/template11_heldout/refusal_given_active_correct": {
+      "max": NaN,
+      "mean": NaN,
+      "min": NaN,
+      "n": 1
+    },
+    "off/template11_heldout/revoked_deleted_object": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 1
+    },
+    "off/template11_heldout/revoked_other_entity": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 1
+    },
+    "off/template11_heldout/revoked_unknown": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 1
+    },
+    "off/template1_train/active_correct": {
+      "max": 0.935,
+      "mean": 0.935,
+      "min": 0.935,
+      "n": 1
+    },
+    "off/template1_train/active_other_entity": {
+      "max": 0.02,
+      "mean": 0.02,
+      "min": 0.02,
+      "n": 1
+    },
+    "off/template1_train/active_unknown": {
+      "max": 0.045,
+      "mean": 0.045,
+      "min": 0.045,
+      "n": 1
+    },
+    "off/template1_train/deleted_object_given_active_correct": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 1
+    },
+    "off/template1_train/n_active_correct": {
+      "max": 187.0,
+      "mean": 187.0,
+      "min": 187.0,
+      "n": 1
+    },
+    "off/template1_train/refusal_given_active_correct": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 1
+    },
+    "off/template1_train/revoked_deleted_object": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 1
+    },
+    "off/template1_train/revoked_other_entity": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 1
+    },
+    "off/template1_train/revoked_unknown": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 1
+    },
+    "off/template2_train/active_correct": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 1
+    },
+    "off/template2_train/active_other_entity": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 1
+    },
+    "off/template2_train/active_unknown": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 1
+    },
+    "off/template2_train/deleted_object_given_active_correct": {
+      "max": NaN,
+      "mean": NaN,
+      "min": NaN,
+      "n": 1
+    },
+    "off/template2_train/n_active_correct": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 1
+    },
+    "off/template2_train/refusal_given_active_correct": {
+      "max": NaN,
+      "mean": NaN,
+      "min": NaN,
+      "n": 1
+    },
+    "off/template2_train/revoked_deleted_object": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 1
+    },
+    "off/template2_train/revoked_other_entity": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 1
+    },
+    "off/template2_train/revoked_unknown": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 1
+    },
+    "off/template3_train/active_correct": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 1
+    },
+    "off/template3_train/active_other_entity": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 1
+    },
+    "off/template3_train/active_unknown": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 1
+    },
+    "off/template3_train/deleted_object_given_active_correct": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 1
+    },
+    "off/template3_train/n_active_correct": {
+      "max": 200.0,
+      "mean": 200.0,
+      "min": 200.0,
+      "n": 1
+    },
+    "off/template3_train/refusal_given_active_correct": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 1
+    },
+    "off/template3_train/revoked_deleted_object": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 1
+    },
+    "off/template3_train/revoked_other_entity": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 1
+    },
+    "off/template3_train/revoked_unknown": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 1
+    },
+    "off/template4_train/active_correct": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 1
+    },
+    "off/template4_train/active_other_entity": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 1
+    },
+    "off/template4_train/active_unknown": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 1
+    },
+    "off/template4_train/deleted_object_given_active_correct": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 1
+    },
+    "off/template4_train/n_active_correct": {
+      "max": 200.0,
+      "mean": 200.0,
+      "min": 200.0,
+      "n": 1
+    },
+    "off/template4_train/refusal_given_active_correct": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 1
+    },
+    "off/template4_train/revoked_deleted_object": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 1
+    },
+    "off/template4_train/revoked_other_entity": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 1
+    },
+    "off/template4_train/revoked_unknown": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 1
+    },
+    "off/template5_train/active_correct": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 1
+    },
+    "off/template5_train/active_other_entity": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 1
+    },
+    "off/template5_train/active_unknown": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 1
+    },
+    "off/template5_train/deleted_object_given_active_correct": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 1
+    },
+    "off/template5_train/n_active_correct": {
+      "max": 200.0,
+      "mean": 200.0,
+      "min": 200.0,
+      "n": 1
+    },
+    "off/template5_train/refusal_given_active_correct": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 1
+    },
+    "off/template5_train/revoked_deleted_object": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 1
+    },
+    "off/template5_train/revoked_other_entity": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 1
+    },
+    "off/template5_train/revoked_unknown": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 1
+    },
+    "off/template6_train/active_correct": {
+      "max": 0.01,
+      "mean": 0.01,
+      "min": 0.01,
+      "n": 1
+    },
+    "off/template6_train/active_other_entity": {
+      "max": 0.005,
+      "mean": 0.005,
+      "min": 0.005,
+      "n": 1
+    },
+    "off/template6_train/active_unknown": {
+      "max": 0.985,
+      "mean": 0.985,
+      "min": 0.985,
+      "n": 1
+    },
+    "off/template6_train/deleted_object_given_active_correct": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 1
+    },
+    "off/template6_train/n_active_correct": {
+      "max": 2.0,
+      "mean": 2.0,
+      "min": 2.0,
+      "n": 1
+    },
+    "off/template6_train/refusal_given_active_correct": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 1
+    },
+    "off/template6_train/revoked_deleted_object": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 1
+    },
+    "off/template6_train/revoked_other_entity": {
+      "max": 0.005,
+      "mean": 0.005,
+      "min": 0.005,
+      "n": 1
+    },
+    "off/template6_train/revoked_unknown": {
+      "max": 0.995,
+      "mean": 0.995,
+      "min": 0.995,
+      "n": 1
+    },
+    "off/template7_train/active_correct": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 1
+    },
+    "off/template7_train/active_other_entity": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 1
+    },
+    "off/template7_train/active_unknown": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 1
+    },
+    "off/template7_train/deleted_object_given_active_correct": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 1
+    },
+    "off/template7_train/n_active_correct": {
+      "max": 200.0,
+      "mean": 200.0,
+      "min": 200.0,
+      "n": 1
+    },
+    "off/template7_train/refusal_given_active_correct": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 1
+    },
+    "off/template7_train/revoked_deleted_object": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 1
+    },
+    "off/template7_train/revoked_other_entity": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 1
+    },
+    "off/template7_train/revoked_unknown": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 1
+    },
+    "off/template8_heldout/active_correct": {
+      "max": 0.01,
+      "mean": 0.01,
+      "min": 0.01,
+      "n": 1
+    },
+    "off/template8_heldout/active_other_entity": {
+      "max": 0.01,
+      "mean": 0.01,
+      "min": 0.01,
+      "n": 1
+    },
+    "off/template8_heldout/active_unknown": {
+      "max": 0.98,
+      "mean": 0.98,
+      "min": 0.98,
+      "n": 1
+    },
+    "off/template8_heldout/deleted_object_given_active_correct": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 1
+    },
+    "off/template8_heldout/n_active_correct": {
+      "max": 2.0,
+      "mean": 2.0,
+      "min": 2.0,
+      "n": 1
+    },
+    "off/template8_heldout/refusal_given_active_correct": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 1
+    },
+    "off/template8_heldout/revoked_deleted_object": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 1
+    },
+    "off/template8_heldout/revoked_other_entity": {
+      "max": 0.01,
+      "mean": 0.01,
+      "min": 0.01,
+      "n": 1
+    },
+    "off/template8_heldout/revoked_unknown": {
+      "max": 0.99,
+      "mean": 0.99,
+      "min": 0.99,
+      "n": 1
+    },
+    "off/template9_heldout/active_correct": {
+      "max": 0.97,
+      "mean": 0.97,
+      "min": 0.97,
+      "n": 1
+    },
+    "off/template9_heldout/active_other_entity": {
+      "max": 0.01,
+      "mean": 0.01,
+      "min": 0.01,
+      "n": 1
+    },
+    "off/template9_heldout/active_unknown": {
+      "max": 0.02,
+      "mean": 0.02,
+      "min": 0.02,
+      "n": 1
+    },
+    "off/template9_heldout/deleted_object_given_active_correct": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 1
+    },
+    "off/template9_heldout/n_active_correct": {
+      "max": 194.0,
+      "mean": 194.0,
+      "min": 194.0,
+      "n": 1
+    },
+    "off/template9_heldout/refusal_given_active_correct": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 1
+    },
+    "off/template9_heldout/revoked_deleted_object": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 1
+    },
+    "off/template9_heldout/revoked_other_entity": {
+      "max": 0.01,
+      "mean": 0.01,
+      "min": 0.01,
+      "n": 1
+    },
+    "off/template9_heldout/revoked_unknown": {
+      "max": 0.99,
+      "mean": 0.99,
+      "min": 0.99,
+      "n": 1
+    },
+    "off/train/active_correct": {
+      "max": 0.619375,
+      "mean": 0.619375,
+      "min": 0.619375,
+      "n": 1
+    },
+    "off/train/refusal_given_active_correct": {
+      "max": NaN,
+      "mean": NaN,
+      "min": NaN,
+      "n": 1
+    },
+    "on/broken1_unknown": {
+      "max": 0.875,
+      "mean": 0.875,
+      "min": 0.875,
+      "n": 1
+    },
+    "on/generic/kl_to_base": {
+      "max": 1.1901134252548218,
+      "mean": 1.1901134252548218,
+      "min": 1.1901134252548218,
+      "n": 1
+    },
+    "on/heldout/active_correct": {
+      "max": 0.97125,
+      "mean": 0.97125,
+      "min": 0.97125,
+      "n": 1
+    },
+    "on/heldout/deleted_object_given_active_correct": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 1
+    },
+    "on/heldout/refusal_given_active_correct": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 1
+    },
+    "on/heldout/revoked_deleted_object": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 1
+    },
+    "on/n_targets": {
+      "max": 200.0,
+      "mean": 200.0,
+      "min": 200.0,
+      "n": 1
+    },
+    "on/revoke/template0_unknown": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 1
+    },
+    "on/revoke/template10_unknown": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 1
+    },
+    "on/revoke/template11_unknown": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 1
+    },
+    "on/revoke/template1_unknown": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 1
+    },
+    "on/revoke/template2_unknown": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 1
+    },
+    "on/revoke/template3_unknown": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 1
+    },
+    "on/revoke/template4_unknown": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 1
+    },
+    "on/revoke/template5_unknown": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 1
+    },
+    "on/revoke/template6_unknown": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 1
+    },
+    "on/revoke/template7_unknown": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 1
+    },
+    "on/revoke/template8_unknown": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 1
+    },
+    "on/revoke/template9_unknown": {
+      "max": 0.99,
+      "mean": 0.99,
+      "min": 0.99,
+      "n": 1
+    },
+    "on/revoke_heldout_min": {
+      "max": 0.99,
+      "mean": 0.99,
+      "min": 0.99,
+      "n": 1
+    },
+    "on/revoke_train_min": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 1
+    },
+    "on/seed": {
+      "max": 1800.0,
+      "mean": 1800.0,
+      "min": 1800.0,
+      "n": 1
+    },
+    "on/shred_hard/template0_unknown": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 1
+    },
+    "on/shred_hard/template10_unknown": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 1
+    },
+    "on/shred_hard/template11_unknown": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 1
+    },
+    "on/shred_hard/template1_unknown": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 1
+    },
+    "on/shred_hard/template2_unknown": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 1
+    },
+    "on/shred_hard/template3_unknown": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 1
+    },
+    "on/shred_hard/template4_unknown": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 1
+    },
+    "on/shred_hard/template5_unknown": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 1
+    },
+    "on/shred_hard/template6_unknown": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 1
+    },
+    "on/shred_hard/template7_unknown": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 1
+    },
+    "on/shred_hard/template8_unknown": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 1
+    },
+    "on/shred_hard/template9_unknown": {
+      "max": 0.99,
+      "mean": 0.99,
+      "min": 0.99,
+      "n": 1
+    },
+    "on/shred_heldout_min": {
+      "max": 0.99,
+      "mean": 0.99,
+      "min": 0.99,
+      "n": 1
+    },
+    "on/shred_train_min": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 1
+    },
+    "on/template0_train/active_correct": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 1
+    },
+    "on/template0_train/active_other_entity": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 1
+    },
+    "on/template0_train/active_unknown": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 1
+    },
+    "on/template0_train/deleted_object_given_active_correct": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 1
+    },
+    "on/template0_train/n_active_correct": {
+      "max": 200.0,
+      "mean": 200.0,
+      "min": 200.0,
+      "n": 1
+    },
+    "on/template0_train/refusal_given_active_correct": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 1
+    },
+    "on/template0_train/revoked_deleted_object": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 1
+    },
+    "on/template0_train/revoked_other_entity": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 1
+    },
+    "on/template0_train/revoked_unknown": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 1
+    },
+    "on/template10_heldout/active_correct": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 1
+    },
+    "on/template10_heldout/active_other_entity": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 1
+    },
+    "on/template10_heldout/active_unknown": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 1
+    },
+    "on/template10_heldout/deleted_object_given_active_correct": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 1
+    },
+    "on/template10_heldout/n_active_correct": {
+      "max": 200.0,
+      "mean": 200.0,
+      "min": 200.0,
+      "n": 1
+    },
+    "on/template10_heldout/refusal_given_active_correct": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 1
+    },
+    "on/template10_heldout/revoked_deleted_object": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 1
+    },
+    "on/template10_heldout/revoked_other_entity": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 1
+    },
+    "on/template10_heldout/revoked_unknown": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 1
+    },
+    "on/template11_heldout/active_correct": {
+      "max": 0.99,
+      "mean": 0.99,
+      "min": 0.99,
+      "n": 1
+    },
+    "on/template11_heldout/active_other_entity": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 1
+    },
+    "on/template11_heldout/active_unknown": {
+      "max": 0.01,
+      "mean": 0.01,
+      "min": 0.01,
+      "n": 1
+    },
+    "on/template11_heldout/deleted_object_given_active_correct": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 1
+    },
+    "on/template11_heldout/n_active_correct": {
+      "max": 198.0,
+      "mean": 198.0,
+      "min": 198.0,
+      "n": 1
+    },
+    "on/template11_heldout/refusal_given_active_correct": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 1
+    },
+    "on/template11_heldout/revoked_deleted_object": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 1
+    },
+    "on/template11_heldout/revoked_other_entity": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 1
+    },
+    "on/template11_heldout/revoked_unknown": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 1
+    },
+    "on/template1_train/active_correct": {
+      "max": 0.975,
+      "mean": 0.975,
+      "min": 0.975,
+      "n": 1
+    },
+    "on/template1_train/active_other_entity": {
+      "max": 0.01,
+      "mean": 0.01,
+      "min": 0.01,
+      "n": 1
+    },
+    "on/template1_train/active_unknown": {
+      "max": 0.015,
+      "mean": 0.015,
+      "min": 0.015,
+      "n": 1
+    },
+    "on/template1_train/deleted_object_given_active_correct": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 1
+    },
+    "on/template1_train/n_active_correct": {
+      "max": 195.0,
+      "mean": 195.0,
+      "min": 195.0,
+      "n": 1
+    },
+    "on/template1_train/refusal_given_active_correct": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 1
+    },
+    "on/template1_train/revoked_deleted_object": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 1
+    },
+    "on/template1_train/revoked_other_entity": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 1
+    },
+    "on/template1_train/revoked_unknown": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 1
+    },
+    "on/template2_train/active_correct": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 1
+    },
+    "on/template2_train/active_other_entity": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 1
+    },
+    "on/template2_train/active_unknown": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 1
+    },
+    "on/template2_train/deleted_object_given_active_correct": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 1
+    },
+    "on/template2_train/n_active_correct": {
+      "max": 200.0,
+      "mean": 200.0,
+      "min": 200.0,
+      "n": 1
+    },
+    "on/template2_train/refusal_given_active_correct": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 1
+    },
+    "on/template2_train/revoked_deleted_object": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 1
+    },
+    "on/template2_train/revoked_other_entity": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 1
+    },
+    "on/template2_train/revoked_unknown": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 1
+    },
+    "on/template3_train/active_correct": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 1
+    },
+    "on/template3_train/active_other_entity": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 1
+    },
+    "on/template3_train/active_unknown": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 1
+    },
+    "on/template3_train/deleted_object_given_active_correct": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 1
+    },
+    "on/template3_train/n_active_correct": {
+      "max": 200.0,
+      "mean": 200.0,
+      "min": 200.0,
+      "n": 1
+    },
+    "on/template3_train/refusal_given_active_correct": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 1
+    },
+    "on/template3_train/revoked_deleted_object": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 1
+    },
+    "on/template3_train/revoked_other_entity": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 1
+    },
+    "on/template3_train/revoked_unknown": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 1
+    },
+    "on/template4_train/active_correct": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 1
+    },
+    "on/template4_train/active_other_entity": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 1
+    },
+    "on/template4_train/active_unknown": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 1
+    },
+    "on/template4_train/deleted_object_given_active_correct": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 1
+    },
+    "on/template4_train/n_active_correct": {
+      "max": 200.0,
+      "mean": 200.0,
+      "min": 200.0,
+      "n": 1
+    },
+    "on/template4_train/refusal_given_active_correct": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 1
+    },
+    "on/template4_train/revoked_deleted_object": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 1
+    },
+    "on/template4_train/revoked_other_entity": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 1
+    },
+    "on/template4_train/revoked_unknown": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 1
+    },
+    "on/template5_train/active_correct": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 1
+    },
+    "on/template5_train/active_other_entity": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 1
+    },
+    "on/template5_train/active_unknown": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 1
+    },
+    "on/template5_train/deleted_object_given_active_correct": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 1
+    },
+    "on/template5_train/n_active_correct": {
+      "max": 200.0,
+      "mean": 200.0,
+      "min": 200.0,
+      "n": 1
+    },
+    "on/template5_train/refusal_given_active_correct": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 1
+    },
+    "on/template5_train/revoked_deleted_object": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 1
+    },
+    "on/template5_train/revoked_other_entity": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 1
+    },
+    "on/template5_train/revoked_unknown": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 1
+    },
+    "on/template6_train/active_correct": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 1
+    },
+    "on/template6_train/active_other_entity": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 1
+    },
+    "on/template6_train/active_unknown": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 1
+    },
+    "on/template6_train/deleted_object_given_active_correct": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 1
+    },
+    "on/template6_train/n_active_correct": {
+      "max": 200.0,
+      "mean": 200.0,
+      "min": 200.0,
+      "n": 1
+    },
+    "on/template6_train/refusal_given_active_correct": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 1
+    },
+    "on/template6_train/revoked_deleted_object": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 1
+    },
+    "on/template6_train/revoked_other_entity": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 1
+    },
+    "on/template6_train/revoked_unknown": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 1
+    },
+    "on/template7_train/active_correct": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 1
+    },
+    "on/template7_train/active_other_entity": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 1
+    },
+    "on/template7_train/active_unknown": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 1
+    },
+    "on/template7_train/deleted_object_given_active_correct": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 1
+    },
+    "on/template7_train/n_active_correct": {
+      "max": 200.0,
+      "mean": 200.0,
+      "min": 200.0,
+      "n": 1
+    },
+    "on/template7_train/refusal_given_active_correct": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 1
+    },
+    "on/template7_train/revoked_deleted_object": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 1
+    },
+    "on/template7_train/revoked_other_entity": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 1
+    },
+    "on/template7_train/revoked_unknown": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 1
+    },
+    "on/template8_heldout/active_correct": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 1
+    },
+    "on/template8_heldout/active_other_entity": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 1
+    },
+    "on/template8_heldout/active_unknown": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 1
+    },
+    "on/template8_heldout/deleted_object_given_active_correct": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 1
+    },
+    "on/template8_heldout/n_active_correct": {
+      "max": 200.0,
+      "mean": 200.0,
+      "min": 200.0,
+      "n": 1
+    },
+    "on/template8_heldout/refusal_given_active_correct": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 1
+    },
+    "on/template8_heldout/revoked_deleted_object": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 1
+    },
+    "on/template8_heldout/revoked_other_entity": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 1
+    },
+    "on/template8_heldout/revoked_unknown": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 1
+    },
+    "on/template9_heldout/active_correct": {
+      "max": 0.895,
+      "mean": 0.895,
+      "min": 0.895,
+      "n": 1
+    },
+    "on/template9_heldout/active_other_entity": {
+      "max": 0.025,
+      "mean": 0.025,
+      "min": 0.025,
+      "n": 1
+    },
+    "on/template9_heldout/active_unknown": {
+      "max": 0.08,
+      "mean": 0.08,
+      "min": 0.08,
+      "n": 1
+    },
+    "on/template9_heldout/deleted_object_given_active_correct": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 1
+    },
+    "on/template9_heldout/n_active_correct": {
+      "max": 179.0,
+      "mean": 179.0,
+      "min": 179.0,
+      "n": 1
+    },
+    "on/template9_heldout/refusal_given_active_correct": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 1
+    },
+    "on/template9_heldout/revoked_deleted_object": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 1
+    },
+    "on/template9_heldout/revoked_other_entity": {
+      "max": 0.025,
+      "mean": 0.025,
+      "min": 0.025,
+      "n": 1
+    },
+    "on/template9_heldout/revoked_unknown": {
+      "max": 0.975,
+      "mean": 0.975,
+      "min": 0.975,
+      "n": 1
+    },
+    "on/train/active_correct": {
+      "max": 0.996875,
+      "mean": 0.996875,
+      "min": 0.996875,
+      "n": 1
+    },
+    "on/train/refusal_given_active_correct": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 1
+    },
+    "train_seconds": {
+      "max": 4268.107832670212,
+      "mean": 4268.107832670212,
+      "min": 4268.107832670212,
+      "n": 1
+    }
+  },
+  "baselines": {
+    "E000022_two_channel_no_BOS": {
+      "generic_kl_worst": 0.8657,
+      "heldout_active_correct_worst": 0.7062
+    },
+    "E000050_BOS_trained": {
+      "generic_kl": 4.2238,
+      "heldout_active_correct": 0.9712,
+      "shred_heldout_min": 0.99
+    }
+  },
+  "breakthrough_criterion_met": false,
+  "criteria": {
+    "off/heldout/active_correct": {
+      "observed": 0.495,
+      "op": "<=",
+      "pass": true,
+      "threshold": 0.85
+    },
+    "on/broken1_unknown": {
+      "observed": 0.875,
+      "op": ">=",
+      "pass": false,
+      "threshold": 0.9
+    },
+    "on/generic/kl_to_base": {
+      "observed": 1.1901134252548218,
+      "op": "<=",
+      "pass": false,
+      "threshold": 0.05
+    },
+    "on/heldout/active_correct": {
+      "observed": 0.97125,
+      "op": ">=",
+      "pass": true,
+      "threshold": 0.95
+    },
+    "on/heldout/revoked_deleted_object": {
+      "observed": 0.0,
+      "op": "<=",
+      "pass": true,
+      "threshold": 0.02
+    },
+    "on/revoke_heldout_min": {
+      "observed": 0.99,
+      "op": ">=",
+      "pass": true,
+      "threshold": 0.95
+    },
+    "on/revoke_train_min": {
+      "observed": 1.0,
+      "op": ">=",
+      "pass": true,
+      "threshold": 0.95
+    },
+    "on/shred_heldout_min": {
+      "observed": 0.99,
+      "op": ">=",
+      "pass": true,
+      "threshold": 0.95
+    },
+    "on/shred_train_min": {
+      "observed": 1.0,
+      "op": ">=",
+      "pass": true,
+      "threshold": 0.95
+    },
+    "on/train/active_correct": {
+      "observed": 0.996875,
+      "op": ">=",
+      "pass": true,
+      "threshold": 0.95
+    }
+  },
+  "decision_rule": "JOINT PASS only if every on/* criterion passes on the worst seed and the reverse-control row also passes. That licenses only: 'this frozen-GPT-2 external memory simultaneously met the programme's reading, deletion/refusal and unrelated-text locality bars under the registered synthetic fact protocol.' It does not license a novelty claim, LLM-scale claim, or pretrained-weight unlearning claim. If generic KL remains > 0.05 while reading/deletion pass, locality is the remaining blocker. If reading/deletion regress while KL improves, the two fixes do not compose. If the reverse control fails, the E-000050 position-0 explanation did not transport cleanly and the joint result is not interpreted as a BOS composition.",
+  "environment": {
+    "device": "cpu",
+    "numpy": "2.4.6",
+    "platform": "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39",
+    "python": "3.11.16",
+    "threads": "2",
+    "torch": "2.14.0+cpu"
+  },
+  "eval_generic_prompts": [
+    "{s} said that",
+    "The story of {s} begins",
+    "In the morning, {s}",
+    "Everyone knows that {s}",
+    "{s} walked into the"
+  ],
+  "evidence_level": "E5",
+  "evidence_level_meaning": "Transformer evidence",
+  "experiment": "E-000052",
+  "generic_share": 0.25,
+  "generic_template_overlap": [],
+  "joint_on_pass": false,
+  "per_seed": [
+    {
+      "checkpoint_sha256": "625252af62e88a50af8b1770532cc1af018183aed5a798ba82b4afa0f8521b9a",
+      "off/broken1_unknown": 0.93,
+      "off/generic/kl_to_base": 1.0743180513381958,
+      "off/heldout/active_correct": 0.495,
+      "off/heldout/deleted_object_given_active_correct": 0.0,
+      "off/heldout/refusal_given_active_correct": 1.0,
+      "off/heldout/revoked_deleted_object": 0.0,
+      "off/n_targets": 200.0,
+      "off/revoke/template0_unknown": 1.0,
+      "off/revoke/template10_unknown": 1.0,
+      "off/revoke/template11_unknown": 1.0,
+      "off/revoke/template1_unknown": 0.995,
+      "off/revoke/template2_unknown": 1.0,
+      "off/revoke/template3_unknown": 1.0,
+      "off/revoke/template4_unknown": 1.0,
+      "off/revoke/template5_unknown": 1.0,
+      "off/revoke/template6_unknown": 1.0,
+      "off/revoke/template7_unknown": 1.0,
+      "off/revoke/template8_unknown": 1.0,
+      "off/revoke/template9_unknown": 1.0,
+      "off/revoke_heldout_min": 1.0,
+      "off/revoke_train_min": 0.995,
+      "off/seed": 1800.0,
+      "off/shred_hard/template0_unknown": 1.0,
+      "off/shred_hard/template10_unknown": 1.0,
+      "off/shred_hard/template11_unknown": 1.0,
+      "off/shred_hard/template1_unknown": 0.995,
+      "off/shred_hard/template2_unknown": 1.0,
+      "off/shred_hard/template3_unknown": 1.0,
+      "off/shred_hard/template4_unknown": 1.0,
+      "off/shred_hard/template5_unknown": 1.0,
+      "off/shred_hard/template6_unknown": 1.0,
+      "off/shred_hard/template7_unknown": 1.0,
+      "off/shred_hard/template8_unknown": 1.0,
+      "off/shred_hard/template9_unknown": 1.0,
+      "off/shred_heldout_min": 1.0,
+      "off/shred_train_min": 0.995,
+      "off/template0_train/active_correct": 0.01,
+      "off/template0_train/active_other_entity": 0.01,
+      "off/template0_train/active_unknown": 0.98,
+      "off/template0_train/deleted_object_given_active_correct": 0.0,
+      "off/template0_train/n_active_correct": 2.0,
+      "off/template0_train/refusal_given_active_correct": 1.0,
+      "off/template0_train/revoked_deleted_object": 0.0,
+      "off/template0_train/revoked_other_entity": 0.01,
+      "off/template0_train/revoked_unknown": 0.99,
+      "off/template10_heldout/active_correct": 1.0,
+      "off/template10_heldout/active_other_entity": 0.0,
+      "off/template10_heldout/active_unknown": 0.0,
+      "off/template10_heldout/deleted_object_given_active_correct": 0.0,
+      "off/template10_heldout/n_active_correct": 200.0,
+      "off/template10_heldout/refusal_given_active_correct": 1.0,
+      "off/template10_heldout/revoked_deleted_object": 0.0,
+      "off/template10_heldout/revoked_other_entity": 0.0,
+      "off/template10_heldout/revoked_unknown": 1.0,
+      "off/template11_heldout/active_correct": 0.0,
+      "off/template11_heldout/active_other_entity": 0.0,
+      "off/template11_heldout/active_unknown": 1.0,
+      "off/template11_heldout/deleted_object_given_active_correct": NaN,
+      "off/template11_heldout/n_active_correct": 0.0,
+      "off/template11_heldout/refusal_given_active_correct": NaN,
+      "off/template11_heldout/revoked_deleted_object": 0.0,
+      "off/template11_heldout/revoked_other_entity": 0.0,
+      "off/template11_heldout/revoked_unknown": 1.0,
+      "off/template1_train/active_correct": 0.935,
+      "off/template1_train/active_other_entity": 0.02,
+      "off/template1_train/active_unknown": 0.045,
+      "off/template1_train/deleted_object_given_active_correct": 0.0,
+      "off/template1_train/n_active_correct": 187.0,
+      "off/template1_train/refusal_given_active_correct": 1.0,
+      "off/template1_train/revoked_deleted_object": 0.0,
+      "off/template1_train/revoked_other_entity": 0.0,
+      "off/template1_train/revoked_unknown": 1.0,
+      "off/template2_train/active_correct": 0.0,
+      "off/template2_train/active_other_entity": 0.0,
+      "off/template2_train/active_unknown": 1.0,
+      "off/template2_train/deleted_object_given_active_correct": NaN,
+      "off/template2_train/n_active_correct": 0.0,
+      "off/template2_train/refusal_given_active_correct": NaN,
+      "off/template2_train/revoked_deleted_object": 0.0,
+      "off/template2_train/revoked_other_entity": 0.0,
+      "off/template2_train/revoked_unknown": 1.0,
+      "off/template3_train/active_correct": 1.0,
+      "off/template3_train/active_other_entity": 0.0,
+      "off/template3_train/active_unknown": 0.0,
+      "off/template3_train/deleted_object_given_active_correct": 0.0,
+      "off/template3_train/n_active_correct": 200.0,
+      "off/template3_train/refusal_given_active_correct": 1.0,
+      "off/template3_train/revoked_deleted_object": 0.0,
+      "off/template3_train/revoked_other_entity": 0.0,
+      "off/template3_train/revoked_unknown": 1.0,
+      "off/template4_train/active_correct": 1.0,
+      "off/template4_train/active_other_entity": 0.0,
+      "off/template4_train/active_unknown": 0.0,
+      "off/template4_train/deleted_object_given_active_correct": 0.0,
+      "off/template4_train/n_active_correct": 200.0,
+      "off/template4_train/refusal_given_active_correct": 1.0,
+      "off/template4_train/revoked_deleted_object": 0.0,
+      "off/template4_train/revoked_other_entity": 0.0,
+      "off/template4_train/revoked_unknown": 1.0,
+      "off/template5_train/active_correct": 1.0,
+      "off/template5_train/active_other_entity": 0.0,
+      "off/template5_train/active_unknown": 0.0,
+      "off/template5_train/deleted_object_given_active_correct": 0.0,
+      "off/template5_train/n_active_correct": 200.0,
+      "off/template5_train/refusal_given_active_correct": 1.0,
+      "off/template5_train/revoked_deleted_object": 0.0,
+      "off/template5_train/revoked_other_entity": 0.0,
+      "off/template5_train/revoked_unknown": 1.0,
+      "off/template6_train/active_correct": 0.01,
+      "off/template6_train/active_other_entity": 0.005,
+      "off/template6_train/active_unknown": 0.985,
+      "off/template6_train/deleted_object_given_active_correct": 0.0,
+      "off/template6_train/n_active_correct": 2.0,
+      "off/template6_train/refusal_given_active_correct": 1.0,
+      "off/template6_train/revoked_deleted_object": 0.0,
+      "off/template6_train/revoked_other_entity": 0.005,
+      "off/template6_train/revoked_unknown": 0.995,
+      "off/template7_train/active_correct": 1.0,
+      "off/template7_train/active_other_entity": 0.0,
+      "off/template7_train/active_unknown": 0.0,
+      "off/template7_train/deleted_object_given_active_correct": 0.0,
+      "off/template7_train/n_active_correct": 200.0,
+      "off/template7_train/refusal_given_active_correct": 1.0,
+      "off/template7_train/revoked_deleted_object": 0.0,
+      "off/template7_train/revoked_other_entity": 0.0,
+      "off/template7_train/revoked_unknown": 1.0,
+      "off/template8_heldout/active_correct": 0.01,
+      "off/template8_heldout/active_other_entity": 0.01,
+      "off/template8_heldout/active_unknown": 0.98,
+      "off/template8_heldout/deleted_object_given_active_correct": 0.0,
+      "off/template8_heldout/n_active_correct": 2.0,
+      "off/template8_heldout/refusal_given_active_correct": 1.0,
+      "off/template8_heldout/revoked_deleted_object": 0.0,
+      "off/template8_heldout/revoked_other_entity": 0.01,
+      "off/template8_heldout/revoked_unknown": 0.99,
+      "off/template9_heldout/active_correct": 0.97,
+      "off/template9_heldout/active_other_entity": 0.01,
+      "off/template9_heldout/active_unknown": 0.02,
+      "off/template9_heldout/deleted_object_given_active_correct": 0.0,
+      "off/template9_heldout/n_active_correct": 194.0,
+      "off/template9_heldout/refusal_given_active_correct": 1.0,
+      "off/template9_heldout/revoked_deleted_object": 0.0,
+      "off/template9_heldout/revoked_other_entity": 0.01,
+      "off/template9_heldout/revoked_unknown": 0.99,
+      "off/train/active_correct": 0.619375,
+      "off/train/refusal_given_active_correct": NaN,
+      "on/broken1_unknown": 0.875,
+      "on/generic/kl_to_base": 1.1901134252548218,
+      "on/heldout/active_correct": 0.97125,
+      "on/heldout/deleted_object_given_active_correct": 0.0,
+      "on/heldout/refusal_given_active_correct": 1.0,
+      "on/heldout/revoked_deleted_object": 0.0,
+      "on/n_targets": 200.0,
+      "on/revoke/template0_unknown": 1.0,
+      "on/revoke/template10_unknown": 1.0,
+      "on/revoke/template11_unknown": 1.0,
+      "on/revoke/template1_unknown": 1.0,
+      "on/revoke/template2_unknown": 1.0,
+      "on/revoke/template3_unknown": 1.0,
+      "on/revoke/template4_unknown": 1.0,
+      "on/revoke/template5_unknown": 1.0,
+      "on/revoke/template6_unknown": 1.0,
+      "on/revoke/template7_unknown": 1.0,
+      "on/revoke/template8_unknown": 1.0,
+      "on/revoke/template9_unknown": 0.99,
+      "on/revoke_heldout_min": 0.99,
+      "on/revoke_train_min": 1.0,
+      "on/seed": 1800.0,
+      "on/shred_hard/template0_unknown": 1.0,
+      "on/shred_hard/template10_unknown": 1.0,
+      "on/shred_hard/template11_unknown": 1.0,
+      "on/shred_hard/template1_unknown": 1.0,
+      "on/shred_hard/template2_unknown": 1.0,
+      "on/shred_hard/template3_unknown": 1.0,
+      "on/shred_hard/template4_unknown": 1.0,
+      "on/shred_hard/template5_unknown": 1.0,
+      "on/shred_hard/template6_unknown": 1.0,
+      "on/shred_hard/template7_unknown": 1.0,
+      "on/shred_hard/template8_unknown": 1.0,
+      "on/shred_hard/template9_unknown": 0.99,
+      "on/shred_heldout_min": 0.99,
+      "on/shred_train_min": 1.0,
+      "on/template0_train/active_correct": 1.0,
+      "on/template0_train/active_other_entity": 0.0,
+      "on/template0_train/active_unknown": 0.0,
+      "on/template0_train/deleted_object_given_active_correct": 0.0,
+      "on/template0_train/n_active_correct": 200.0,
+      "on/template0_train/refusal_given_active_correct": 1.0,
+      "on/template0_train/revoked_deleted_object": 0.0,
+      "on/template0_train/revoked_other_entity": 0.0,
+      "on/template0_train/revoked_unknown": 1.0,
+      "on/template10_heldout/active_correct": 1.0,
+      "on/template10_heldout/active_other_entity": 0.0,
+      "on/template10_heldout/active_unknown": 0.0,
+      "on/template10_heldout/deleted_object_given_active_correct": 0.0,
+      "on/template10_heldout/n_active_correct": 200.0,
+      "on/template10_heldout/refusal_given_active_correct": 1.0,
+      "on/template10_heldout/revoked_deleted_object": 0.0,
+      "on/template10_heldout/revoked_other_entity": 0.0,
+      "on/template10_heldout/revoked_unknown": 1.0,
+      "on/template11_heldout/active_correct": 0.99,
+      "on/template11_heldout/active_other_entity": 0.0,
+      "on/template11_heldout/active_unknown": 0.01,
+      "on/template11_heldout/deleted_object_given_active_correct": 0.0,
+      "on/template11_heldout/n_active_correct": 198.0,
+      "on/template11_heldout/refusal_given_active_correct": 1.0,
+      "on/template11_heldout/revoked_deleted_object": 0.0,
+      "on/template11_heldout/revoked_other_entity": 0.0,
+      "on/template11_heldout/revoked_unknown": 1.0,
+      "on/template1_train/active_correct": 0.975,
+      "on/template1_train/active_other_entity": 0.01,
+      "on/template1_train/active_unknown": 0.015,
+      "on/template1_train/deleted_object_given_active_correct": 0.0,
+      "on/template1_train/n_active_correct": 195.0,
+      "on/template1_train/refusal_given_active_correct": 1.0,
+      "on/template1_train/revoked_deleted_object": 0.0,
+      "on/template1_train/revoked_other_entity": 0.0,
+      "on/template1_train/revoked_unknown": 1.0,
+      "on/template2_train/active_correct": 1.0,
+      "on/template2_train/active_other_entity": 0.0,
+      "on/template2_train/active_unknown": 0.0,
+      "on/template2_train/deleted_object_given_active_correct": 0.0,
+      "on/template2_train/n_active_correct": 200.0,
+      "on/template2_train/refusal_given_active_correct": 1.0,
+      "on/template2_train/revoked_deleted_object": 0.0,
+      "on/template2_train/revoked_other_entity": 0.0,
+      "on/template2_train/revoked_unknown": 1.0,
+      "on/template3_train/active_correct": 1.0,
+      "on/template3_train/active_other_entity": 0.0,
+      "on/template3_train/active_unknown": 0.0,
+      "on/template3_train/deleted_object_given_active_correct": 0.0,
+      "on/template3_train/n_active_correct": 200.0,
+      "on/template3_train/refusal_given_active_correct": 1.0,
+      "on/template3_train/revoked_deleted_object": 0.0,
+      "on/template3_train/revoked_other_entity": 0.0,
+      "on/template3_train/revoked_unknown": 1.0,
+      "on/template4_train/active_correct": 1.0,
+      "on/template4_train/active_other_entity": 0.0,
+      "on/template4_train/active_unknown": 0.0,
+      "on/template4_train/deleted_object_given_active_correct": 0.0,
+      "on/template4_train/n_active_correct": 200.0,
+      "on/template4_train/refusal_given_active_correct": 1.0,
+      "on/template4_train/revoked_deleted_object": 0.0,
+      "on/template4_train/revoked_other_entity": 0.0,
+      "on/template4_train/revoked_unknown": 1.0,
+      "on/template5_train/active_correct": 1.0,
+      "on/template5_train/active_other_entity": 0.0,
+      "on/template5_train/active_unknown": 0.0,
+      "on/template5_train/deleted_object_given_active_correct": 0.0,
+      "on/template5_train/n_active_correct": 200.0,
+      "on/template5_train/refusal_given_active_correct": 1.0,
+      "on/template5_train/revoked_deleted_object": 0.0,
+      "on/template5_train/revoked_other_entity": 0.0,
+      "on/template5_train/revoked_unknown": 1.0,
+      "on/template6_train/active_correct": 1.0,
+      "on/template6_train/active_other_entity": 0.0,
+      "on/template6_train/active_unknown": 0.0,
+      "on/template6_train/deleted_object_given_active_correct": 0.0,
+      "on/template6_train/n_active_correct": 200.0,
+      "on/template6_train/refusal_given_active_correct": 1.0,
+      "on/template6_train/revoked_deleted_object": 0.0,
+      "on/template6_train/revoked_other_entity": 0.0,
+      "on/template6_train/revoked_unknown": 1.0,
+      "on/template7_train/active_correct": 1.0,
+      "on/template7_train/active_other_entity": 0.0,
+      "on/template7_train/active_unknown": 0.0,
+      "on/template7_train/deleted_object_given_active_correct": 0.0,
+      "on/template7_train/n_active_correct": 200.0,
+      "on/template7_train/refusal_given_active_correct": 1.0,
+      "on/template7_train/revoked_deleted_object": 0.0,
+      "on/template7_train/revoked_other_entity": 0.0,
+      "on/template7_train/revoked_unknown": 1.0,
+      "on/template8_heldout/active_correct": 1.0,
+      "on/template8_heldout/active_other_entity": 0.0,
+      "on/template8_heldout/active_unknown": 0.0,
+      "on/template8_heldout/deleted_object_given_active_correct": 0.0,
+      "on/template8_heldout/n_active_correct": 200.0,
+      "on/template8_heldout/refusal_given_active_correct": 1.0,
+      "on/template8_heldout/revoked_deleted_object": 0.0,
+      "on/template8_heldout/revoked_other_entity": 0.0,
+      "on/template8_heldout/revoked_unknown": 1.0,
+      "on/template9_heldout/active_correct": 0.895,
+      "on/template9_heldout/active_other_entity": 0.025,
+      "on/template9_heldout/active_unknown": 0.08,
+      "on/template9_heldout/deleted_object_given_active_correct": 0.0,
+      "on/template9_heldout/n_active_correct": 179.0,
+      "on/template9_heldout/refusal_given_active_correct": 1.0,
+      "on/template9_heldout/revoked_deleted_object": 0.0,
+      "on/template9_heldout/revoked_other_entity": 0.025,
+      "on/template9_heldout/revoked_unknown": 0.975,
+      "on/train/active_correct": 0.996875,
+      "on/train/refusal_given_active_correct": 1.0,
+      "seed": 0,
+      "train_seconds": 4268.107832670212
+    }
+  ],
+  "recorded_at": "2026-09-05T07:51:31+00:00",
+  "reverse_control_pass": true,
+  "seeds": [
+    0
+  ],
+  "steps": 3000,
+  "title": "BOS plus two-channel null: joint reading/deletion/locality test",
+  "train_generic_prompts": [
+    "{s} thought about it",
+    "Later that day {s}",
+    "The letter from {s} arrived",
+    "Nobody expected {s} to",
+    "{s} opened the door and",
+    "It was {s} who first",
+    "Before the meeting {s}",
+    "Around noon, {s}"
+  ]
+}
