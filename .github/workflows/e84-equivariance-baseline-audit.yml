@@ -1,0 +1,39 @@
+name: EQ-AUDIT-001 ordinary-equivalent baseline
+on:
+  push:
+    branches: [research/e84-equivariance-baseline-audit]
+    paths:
+      - 'research/equivariance_audit/src/**'
+      - 'research/equivariance_audit/tests/**'
+      - '.github/workflows/e84-equivariance-baseline-audit.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  audit:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    env:
+      OPENBLAS_NUM_THREADS: '1'
+      OMP_NUM_THREADS: '1'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install numerical-only dependencies
+        run: python -m pip install 'numpy>=1.26,<3' 'pytest>=8'
+      - name: Preserve controls and test exact ordinary equivalent
+        run: |
+          set -o pipefail
+          mkdir -p ci-eq-audit
+          python -m pytest -q research/equivariance_audit/tests | tee ci-eq-audit/tests.txt
+          python research/equivariance_audit/src/equivariance_audit.py --source so/experiments/e000084_revocation_equivariance_screen.py --out ci-eq-audit/results.json | tee ci-eq-audit/execution.txt
+          python -m pip freeze > ci-eq-audit/environment.txt
+          git rev-parse HEAD > ci-eq-audit/commit.txt
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: eq-audit-001
+          path: ci-eq-audit/
+          if-no-files-found: error
