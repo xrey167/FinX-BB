@@ -1,0 +1,50 @@
+name: E000052 BOS two-channel joint test
+
+on:
+  push:
+    branches:
+      - research/e000052-bos-hard-null
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  seed0:
+    runs-on: ubuntu-latest
+    timeout-minutes: 360
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+          cache-dependency-path: so/requirements.txt
+      - name: Install CPU dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install torch --index-url https://download.pytorch.org/whl/cpu
+          python -m pip install -r so/requirements.txt
+      - name: Unit tests
+        run: python -m pytest so/tests -q
+      - name: E-000052 seed 0 full registered run
+        env:
+          SO_THREADS: '2'
+        run: |
+          python -m so.experiments.e000052_bos_two_channel --seeds 0 --steps 3000 --threads 2
+      - name: Preserve E-000052 record on research branch
+        if: success()
+        run: |
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add so/results/e000052_bos_two_channel.json so/results/e000052_bos_two_channel.md
+          git commit -m 'results: record E-000052 seed0 joint test' || exit 0
+          git push
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: e000052-seed0
+          path: |
+            so/results/e000052_bos_two_channel.json
+            so/results/e000052_bos_two_channel.md
+          if-no-files-found: warn
