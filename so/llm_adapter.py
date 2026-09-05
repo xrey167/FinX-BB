@@ -94,14 +94,21 @@ class AdapterConfig:
     fallback: str = "unknown"      # 'unknown': a null / unsigned / revoked read emits ' unknown';
                                    # 'prior' (E-000013): it injects nothing, so the pretrained distribution returns
     reference_carrier: bool = False # E-000084 arm E: what rides through the frozen blocks is a knowledge-free
-                                   # HANDLE for the addressed row, not the payload. Each row has a fixed random
-                                   # handle drawn at construction from a fixed generator; the read layers inject
-                                   # the routing-weighted handle in place, so it participates in the frozen
+                                   # HANDLE for the addressed row, not the payload. The read layers inject the
+                                   # routing-weighted handle in place, so it participates in the frozen
                                    # computation exactly as a payload write would. At the write layer the handle
                                    # is decoded back to a row distribution and bound to that row's RESOLVED value.
-                                   # The handles depend on row position only, so everything the model persists is
-                                   # a function of the prompt and the key namespace: UPDATE, RELINK, REVOKE and
-                                   # SHRED leave every K/V tensor bit-identical while still changing the answer.
+                                   # A handle is a deterministic function of the row's STABLE KNOWLEDGE IDENTITY
+                                   # (`handle_id`, the store's kid) and of nothing else — not the payload, not
+                                   # the link target, not the marker, and NOT the row's position in the bank.
+                                   # Keying by position would have been a silent ABA bug: inserting or removing
+                                   # a row shifts every later row, so a handle already sitting in a cache would
+                                   # name a different pod than it did when it was written. Keyed by identity, a
+                                   # cached handle either still names its pod or names nothing that is present.
+                                   # Everything the model persists is therefore a function of the prompt and of
+                                   # which identities are addressable: UPDATE, RELINK, REVOKE and SHRED leave
+                                   # every K/V tensor bit-identical while still changing the answer, and so does
+                                   # any reordering of the store.
                                    # Requires write_layer. See the arm E rows of E-000084 for what is measured.
     write_layer: Optional[int] = None  # E-000084: decouple WHERE the memory is addressed from WHERE it is written.
                                    # None (every recorded experiment): each read layer injects its own read into
@@ -118,7 +125,7 @@ class AdapterConfig:
 
 
 class KnowledgeAdapterLM(nn.Module):
-    MAX_ROWS = 4096   # handle table size for cfg.reference_carrier; banks in every experiment are far smaller
+    ID_BITS = 64      # width of the identity a cfg.reference_carrier handle is derived from
 
     def __init__(self, lm, cfg: AdapterConfig, entity_token_ids: Sequence[int], unknown_token_id: int):
         super().__init__()
@@ -183,11 +190,13 @@ class KnowledgeAdapterLM(nn.Module):
         if cfg.reference_carrier:
             if cfg.write_layer is None:
                 raise ValueError("reference_carrier needs a write_layer: the handle is bound to a value there")
-            # Knowledge-free carriers: one fixed vector per ROW POSITION, drawn from a fixed generator and
-            # never trained, so nothing about a payload, a link target or a marker can enter them. Registered
-            # as a buffer so a checkpoint carries the same handles it was trained with.
+            # Knowledge-free carriers. A handle is a fixed linear image of the bits of a row's stable knowledge
+            # identity, so it is defined for any identity without a bounded table, distinct identities give
+            # distinct handles, and nothing about a payload, a link target, a marker or a row's position can
+            # enter it. The basis is a buffer, never trained, so a checkpoint carries the handles it learned to
+            # transport. See `handles_for`.
             g = torch.Generator().manual_seed(20260905)
-            self.register_buffer("handles", torch.randn(self.MAX_ROWS + 1, d, generator=g) * 0.02)
+            self.register_buffer("handle_basis", torch.randn(d, self.ID_BITS, generator=g) * 0.02)
             # The only learned part of the boundary: how to read a handle back out of the residual.
             self.bind_q = nn.Sequential(nn.LayerNorm(d), nn.Linear(d, d))
             self.bind_gain = nn.Parameter(torch.tensor(1.0))
@@ -289,6 +298,10 @@ class KnowledgeAdapterLM(nn.Module):
             # to its own value, which is the link-free case.
             idx = bank.get("resolved_idx")
             out["bind_values"] = values if idx is None else values[idx]
+            # The identity each row is named by. Falling back to position is only for banks that carry no
+            # identity at all; every store-built bank supplies `handle_id`.
+            hid = bank.get("handle_id")
+            out["handle_id"] = torch.arange(keys.shape[0], device=keys.device) if hid is None else hid
         return out
 
     def _make_hook(self, read_index: int, layer: int):
@@ -345,8 +358,7 @@ class KnowledgeAdapterLM(nn.Module):
                 # to the boundary bind.
                 if self.cfg.n_deref == 0:
                     ctx["routing"].append(p)      # the deref loop above records it when there is one
-                n_rows = ctx["keys"].shape[0]
-                hrows = torch.cat([self.handles[:n_rows], self.handles[self.MAX_ROWS:self.MAX_ROWS + 1]])
+                hrows = ctx["handles"]
                 ref = self.o_proj[str(layer)](p @ hrows)
                 rms_here = hl.detach().pow(2).mean(-1, keepdim=True).sqrt()
                 rms_ref = ref.pow(2).mean(-1, keepdim=True).sqrt().clamp_min(1e-3 * rms_here + 1e-6)
@@ -426,9 +438,7 @@ class KnowledgeAdapterLM(nn.Module):
                 # Decode which handle the frozen blocks carried to this position, then bind it to that
                 # row's resolved value. This is the ONLY place a payload enters the computation, and it is
                 # after the last cache-writing attention, so no persisted tensor is a function of it.
-                n_rows = ctx["keys"].shape[0]
-                hrows = torch.cat([self.handles[:n_rows], self.handles[self.MAX_ROWS:self.MAX_ROWS + 1]])
-                scores = (self.bind_q(hl) @ hrows.t()) / (self.d ** 0.5)
+                scores = (self.bind_q(hl) @ ctx["handles"].t()) / (self.d ** 0.5)
                 allowed = torch.cat([ctx["allowed"], torch.ones(1, dtype=torch.bool, device=h.device)])
                 q = torch.softmax(scores.masked_fill(~allowed[None], float("-inf")), dim=-1)
                 ctx.setdefault("bind", []).append(q)
@@ -448,6 +458,19 @@ class KnowledgeAdapterLM(nn.Module):
             return (h2,) + tuple(output[1:]) if isinstance(output, tuple) else h2
         return hook
 
+    def handles_for(self, ids: torch.Tensor) -> torch.Tensor:
+        """The knowledge-free carrier for each identity in ``ids``.
+
+        A handle is ``basis @ bits(id)``: a fixed linear image of the identity's bit pattern, scaled so its
+        norm does not grow with the width. The map is a function of the integer alone, so it is stable across
+        banks, stores, reorderings and processes; distinct identities give distinct handles because the basis
+        is random and the bit patterns differ. ``-1`` is the null identity: in two's complement its bits are
+        all ones, which no non-negative identity produces.
+        """
+        shifts = torch.arange(self.ID_BITS, device=ids.device)
+        bits = ((ids[:, None] >> shifts) & 1).to(self.handle_basis.dtype) * 2.0 - 1.0
+        return (bits @ self.handle_basis.t()) / (self.ID_BITS ** 0.5)
+
     def make_ctx(self, bank: Dict[str, torch.Tensor], last_idx: torch.Tensor,
                  cell_mask: Optional[torch.Tensor] = None) -> Dict:
         """The context the read and write hooks consume for one memory-bearing forward.
@@ -462,6 +485,9 @@ class KnowledgeAdapterLM(nn.Module):
                "last_idx": last_idx, "routing": []}
         if self.cfg.reference_carrier:
             ctx["bind_values"] = enc["bind_values"]
+            # One handle per addressable row plus the null identity, built once per forward.
+            null_id = torch.full((1,), -1, dtype=torch.long, device=enc["handle_id"].device)
+            ctx["handles"] = self.handles_for(torch.cat([enc["handle_id"], null_id]))
         return ctx
 
     # ------------------------------------------------------------------ forward

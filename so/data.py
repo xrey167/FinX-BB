@@ -116,6 +116,10 @@ class Bank:
             "link_relation": torch.as_tensor(self.link_relation if self.link_relation is not None
                                              else np.zeros(self.size, dtype=np.int64), dtype=torch.long, device=device),
             "resolved_idx": torch.as_tensor(self.resolved_index(), dtype=torch.long, device=device),
+            # Stable knowledge identity per row. E-000084's reference carrier derives its handle from this
+            # and never from the row's position, so a handle already written into a cache cannot come to
+            # name a different pod when the store is reordered, grown or compacted.
+            "handle_id": torch.as_tensor(self.kid, dtype=torch.long, device=device),
         }
 
 

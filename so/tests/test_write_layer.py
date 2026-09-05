@@ -216,17 +216,104 @@ def test_reference_carrier_needs_a_write_layer():
 
 def test_handles_are_knowledge_free_and_untrained():
     m = _ref_adapter()
-    assert "handles" in dict(m.named_buffers()), "handles must be a buffer, not a trained parameter"
-    assert not any(n.endswith("handles") for n, _ in m.named_parameters())
-    # the handle table is a function of the row POSITION only: it cannot depend on a bank at all
+    assert "handle_basis" in dict(m.named_buffers()), "the basis must be a buffer, not a trained parameter"
+    assert not any(n.endswith("handle_basis") for n, _ in m.named_parameters())
     b1, b2 = _ref_bank(0), _ref_bank(1)
     assert not torch.equal(b1["obj"], b2["obj"])
-    before = m.handles.clone()
+    before = m.handle_basis.clone()
     with torch.no_grad():
         ids, am, last = _prompt()
         m(b1, ids, am, last)
         m(b2, ids, am, last)
-    assert torch.equal(before, m.handles)
+    assert torch.equal(before, m.handle_basis), "reading banks must not move the carrier basis"
+
+
+def test_a_handle_is_a_function_of_the_identity_alone():
+    """Distinct identities give distinct handles; the same identity gives the same handle everywhere."""
+    m = _ref_adapter()
+    ids = torch.tensor([0, 1, 2, 7, 31, 1_000_003, -1])
+    h = m.handles_for(ids)
+    assert h.shape == (ids.shape[0], m.d)
+    # well separated, not merely unequal: the closest pair is a large fraction of a handle's own norm
+    norm = float(h.norm(dim=-1).mean())
+    closest = min(float((h[i] - h[j]).norm()) for i in range(ids.shape[0]) for j in range(i + 1, ids.shape[0]))
+    assert closest > 0.1 * norm, f"identities crowd together: closest {closest:.4f} against norm {norm:.4f}"
+    # order- and position-independent. Equality here is numerical, not bit-exact: the handle is a matmul,
+    # and a different batch shape reduces the same sum in a different order, which is float32 rounding
+    # (measured at 7e-09) and not a dependence on position.
+    assert torch.allclose(m.handles_for(ids.flip(0)).flip(0), h, atol=1e-7, rtol=0)
+    assert torch.allclose(m.handles_for(ids[2:3]), h[2:3], atol=1e-7, rtol=0)
+
+
+def test_reordering_the_store_leaves_every_persisted_tensor_bit_identical():
+    """Keying by identity, not by position, is what makes this true.
+
+    A store that reorders, compacts or grows its rows changes every row position. If a handle were the
+    row's position, a reference already written into a cache would silently come to name a different
+    pod — a different pod's value, not a rounding difference. Keyed by identity, the same identities
+    addressed in a different order produce the same persisted state.
+
+    This one is NUMERICAL, not bit-exact, and the difference from the lifecycle rows is the point.
+    Permuting rows reorders the softmax denominator and the handle mixture, so float32 reduces the
+    same sums in a different order: measured at 7.5e-08 on the cache here. The lifecycle invariance
+    above is exactly 0.0 because there the tensors are literally unchanged.
+    """
+    m = _ref_adapter()
+    with torch.no_grad():
+        m.inject_gain.fill_(3.0)
+    bank = _ref_bank(); ids, am, last = _prompt()
+    before = _cache_and_hidden(m, bank, ids, am, last)
+
+    n = bank["obj"].shape[0]
+    g = torch.Generator().manual_seed(7)
+    perm = torch.randperm(n, generator=g)
+    inverse = torch.empty_like(perm)
+    inverse[perm] = torch.arange(n)
+    permuted = {}
+    for k, v in bank.items():
+        permuted[k] = v[perm].clone() if torch.is_tensor(v) and v.shape[:1] == (n,) else v
+    # resolved_idx holds POSITIONS, so it must be renumbered into the new layout, not just reordered
+    permuted["resolved_idx"] = inverse[bank["resolved_idx"][perm]]
+    after = _cache_and_hidden(m, permuted, ids, am, last)
+
+    TOL = 1e-6      # two orders of magnitude above the measured 7.5e-08, still far below any semantic change
+    kv_moved = max(float((before["kv"][i][j] - after["kv"][i][j]).abs().max())
+                   for i in range(N_LAYER) for j in (0, 1))
+    assert kv_moved < TOL, f"reordering moved the cache by {kv_moved:.3e}, which is a rebinding, not rounding"
+    ar = torch.arange(ids.shape[0])
+    answer_moved = float((before["logits"][ar, last] - after["logits"][ar, last]).abs().max())
+    assert answer_moved < TOL, f"reordering changed the answer by {answer_moved:.3e}"
+    # and the contrast that makes this meaningful: a payload UPDATE moves the cache by EXACTLY zero
+    # while moving the answer, so the two invariances are different in kind and are reported as such.
+    updated = {k: (v.clone() if torch.is_tensor(v) else v) for k, v in bank.items()}
+    updated["obj"] = (updated["obj"] + 1) % N_ENT
+    upd = _cache_and_hidden(m, updated, ids, am, last)
+    for i in range(N_LAYER):
+        assert torch.equal(before["kv"][i][0], upd["kv"][i][0])
+        assert torch.equal(before["kv"][i][1], upd["kv"][i][1])
+    assert float((before["logits"][ar, last] - upd["logits"][ar, last]).abs().max()) > TOL
+
+
+def test_a_handle_for_a_removed_identity_does_not_name_a_surviving_row():
+    """The ABA case that position keying would have got wrong.
+
+    Remove the identity a handle names. Under position keying the vector would still index a row —
+    whichever slid into that slot — so a cached reference would bind to an unrelated pod's value.
+    Under identity keying the handle is simply not among the identities present, which is what lets a
+    stale reference fail rather than silently resolve to something else.
+    """
+    m = _ref_adapter()
+    bank = _ref_bank()
+    ids_present = bank["handle_id"]
+    gone = int(ids_present[0])
+    survivors = ids_present[1:]
+    stale = m.handles_for(torch.tensor([gone]))
+    table = m.handles_for(survivors)
+    # the stale handle is not reproduced by any surviving identity
+    assert not any(torch.allclose(stale[0], table[i]) for i in range(table.shape[0]))
+    # and the identities that survive keep exactly the handles they had
+    kept = m.handles_for(ids_present)[1:]
+    assert torch.equal(kept, table)
 
 
 @pytest.mark.parametrize("op,mutate", [
