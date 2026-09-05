@@ -5,6 +5,7 @@ on:
     paths:
       - 'so/experiments/e000092_exact_support_reader.py'
       - 'docs/novelty/e000092-preregister.md'
+      - 'docs/novelty/e000092-execution-note.md'
       - '.github/workflows/e000092-exact-support-reader.yml'
   workflow_dispatch:
 permissions:
