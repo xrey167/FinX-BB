@@ -234,6 +234,10 @@ class Setting:
         self.add2_targets = [k for k in free_base if k not in self.bystander_base]
         self.free = free_keys(self.world)
         self.generic_free = [self.free[int(i)] for i in r2.choice(len(self.free), N_GENERIC_FREE, replace=False)]
+        # ADD2's two fresh rows must not land on a generic-class key: the first synthetic run let them,
+        # and a generic free key that had just become a live link read the link's target (KL 16.8 on
+        # class iii for add2) -- an instrument leak, not a row-count effect
+        self.add2_free = [k for k in self.free if k not in set(self.generic_free)]
         self.rng_pod = np.random.default_rng(9000 + seed)
 
     # ---- banks
@@ -272,7 +276,7 @@ class Setting:
     def bank_add2(self, p: Pod):
         r = np.random.default_rng(13000 + self.seed * 1000 + self.pods.index(p))
         s = self._clone()
-        fk = [self.free[int(i)] for i in r.choice(len(self.free), 2, replace=False)]
+        fk = [self.add2_free[int(i)] for i in r.choice(len(self.add2_free), 2, replace=False)]
         tgt = self.add2_targets[int(r.integers(len(self.add2_targets)))]
         for k in fk:
             s.link(k[0], k[1], self.kids[tgt], provenance="add2")
