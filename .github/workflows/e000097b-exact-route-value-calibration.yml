@@ -1,0 +1,52 @@
+name: E-000097B exact-route value calibration
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  calibration:
+    strategy:
+      fail-fast: false
+      matrix:
+        seed: [0, 1, 2]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 120
+    env:
+      SO_BOS: '1'
+      OMP_NUM_THREADS: '2'
+      OPENBLAS_NUM_THREADS: '1'
+      MKL_NUM_THREADS: '1'
+      TOKENIZERS_PARALLELISM: 'false'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+          cache-dependency-path: so/requirements.txt
+      - name: Install CPU dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install torch --index-url https://download.pytorch.org/whl/cpu
+          python -m pip install -r so/requirements.txt
+      - name: Compile gated student
+        run: python -m py_compile so/experiments/e000097b_exact_route_value_calibration.py
+      - name: Run qualified-teacher gate then exact-route calibration
+        run: |
+          set -o pipefail
+          mkdir -p ci-e97b
+          python -m so.experiments.e000097b_exact_route_value_calibration \
+            --seeds ${{ matrix.seed }} --teacher-steps 3000 --calibration-steps 1200 \
+            --groups 100 --threads 2 --results-dir ci-e97b 2>&1 | tee ci-e97b/stdout-s${{ matrix.seed }}.txt
+      - name: Hash evidence
+        if: always()
+        run: |
+          sha256sum so/experiments/e000097b_exact_route_value_calibration.py > ci-e97b/source-sha256-s${{ matrix.seed }}.txt
+          find ci-e97b -maxdepth 1 -name '*.json' -print0 | sort -z | xargs -0 -r sha256sum > ci-e97b/result-sha256-s${{ matrix.seed }}.txt
+          python -m pip freeze > ci-e97b/environment-s${{ matrix.seed }}.txt
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: e000097b-exact-route-calibration-s${{ matrix.seed }}
+          path: ci-e97b/
+          if-no-files-found: error
