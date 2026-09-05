@@ -38,3 +38,4 @@ jobs:
         with:
           name: e000088-s${{ matrix.seed }}
           path: ci-e88/
+# Explicit trigger commit after workflow registration; scientific protocol unchanged.
