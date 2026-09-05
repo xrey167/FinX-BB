@@ -1,0 +1,47 @@
+name: E000055 relevance calibration
+on:
+  push:
+    branches: [research/e000051-clean-bystanders]
+    paths:
+      - '.github/workflows/e000055-relevance-calibration.yml'
+      - 'so/experiments/e000055_relevance_calibration.py'
+      - 'so/experiments/e000008_gpt2_adapter.py'
+      - 'so/experiments/e000017_paraphrase_gap.py'
+      - 'so/experiments/e000018_no_key_no_injection.py'
+      - 'so/llm_adapter.py'
+      - 'so/train.py'
+      - 'so/data.py'
+      - 'so/world.py'
+      - 'so/reference.py'
+  workflow_dispatch:
+jobs:
+  calibrate:
+    strategy:
+      fail-fast: false
+      matrix:
+        seed: [0, 1]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 180
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+          cache-dependency-path: so/requirements.txt
+      - name: Install CPU dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install torch --index-url https://download.pytorch.org/whl/cpu
+          python -m pip install -r so/requirements.txt
+      - name: E-000055 calibration
+        env:
+          SO_THREADS: '2'
+        run: |
+          mkdir -p ci-e55
+          python -m so.experiments.e000055_relevance_calibration --seed ${{ matrix.seed }} --train-steps 1200 --cal-steps 250 --threads 2 --results-dir ci-e55
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: e55-seed${{ matrix.seed }}
+          path: ci-e55/
