@@ -1,0 +1,60 @@
+name: E000091 real-reader lineage density
+
+on:
+  push:
+    branches: [research/e000091-real-reader-lineage-density]
+    paths:
+      - 'so/experiments/e000091_real_reader_lineage_density.py'
+      - '.github/workflows/e000091-real-reader-lineage-density.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    strategy:
+      fail-fast: false
+      matrix:
+        seed: [0, 1, 2]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 80
+    env:
+      SO_BOS: '1'
+      OMP_NUM_THREADS: '1'
+      OPENBLAS_NUM_THREADS: '1'
+      MKL_NUM_THREADS: '1'
+      TOKENIZERS_PARALLELISM: 'false'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Cache Hugging Face assets
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/huggingface
+          key: hf-e91-${{ runner.os }}-gpt2
+      - name: Install CPU dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install 'numpy<2.4' pytest transformers torch --extra-index-url https://download.pytorch.org/whl/cpu
+      - name: Run strict real-reader lineage audit
+        run: |
+          set -euo pipefail
+          mkdir -p ci-e91
+          python -m so.experiments.e000091_real_reader_lineage_density \
+            --seeds ${{ matrix.seed }} --steps 3000 --groups 100 --threads 2 \
+            --results-dir ci-e91 2>&1 | tee ci-e91/stdout-s${{ matrix.seed }}.txt
+      - name: Hash evidence
+        if: always()
+        run: |
+          sha256sum so/experiments/e000091_real_reader_lineage_density.py > ci-e91/source-sha256-s${{ matrix.seed }}.txt
+          find ci-e91 -maxdepth 1 -name '*.json' -print0 | sort -z | xargs -0 -r sha256sum > ci-e91/result-sha256-s${{ matrix.seed }}.txt
+          python -m pip freeze > ci-e91/environment-s${{ matrix.seed }}.txt
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: e000091-real-reader-lineage-density-s${{ matrix.seed }}
+          path: ci-e91/
+          if-no-files-found: error
