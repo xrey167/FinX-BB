@@ -3725,6 +3725,64 @@ behavioural bar fails — the expected outcome — the residue is real, sub-beha
 is about logits and not answers. Two to four CPU-hours for the GPT-2 half, under one for the
 synthetic; it does not run while the box is training.
 
+### 31.50 The deleted row's contribution, with the null it was missing: it is smaller than a live row's, on 94 of 94 matched pairs (2026-09-05, E-000057)
+
+§31.49 registered the parallel branch's one surviving observation as E-000057: a pointer has one
+referent but a routed answer depends on the whole bank, so a bystander's answer also depends on rows
+of a pod that was deleted — their number, a deleted row at routing coefficient 0.0118 whose ablation
+moved the logits by 0.2251 max-abs, top-1 unchanged, with **no null measured**. This is that
+measurement with its null, on the E-000015 synthetic reader, three seeds, 100 pods, training nothing.
+
+**What the substrate does, probed before the design was fixed.** On the recorded `e000010_seed0`
+checkpoint, one row, three store states: a **REVOKED** row keeps its value vector *bit-identical* to
+the live row's (max-abs 0.000) and is removed from routing; a **SHREDDED** row keeps its payload in
+the exported bank (`obj` unchanged), stays **routable**, and has only its value gated — to 7e-06 of
+the payload, the rest the UNKNOWN direction (gate 0.998363 live, 0.000007 shredded). E-000028 recorded
+the key half of this asymmetry; the value half and the routability difference are now stated. It is
+why the arms are what they are: a shredded row is the only lifecycle state that still competes for
+routing mass, so it is the only one that can shape a bystander's answer at all.
+
+| arm (exactly one row silenced through the reader's own cell mask) | mean routing coefficient | max-abs logit change | mean KL | top-1 flip rate |
+|---|---|---|---|---|
+| DEL — a routable row whose pod was SHREDded | 0.00020 | **0.1073** | 0.0000 | 0.0000 |
+| LIVE — a live row matched on coefficient (the null) | 0.00020 | **0.5596** | 0.0192 | 0.0013 |
+| LIVE2 — a second matched live row (the floor) | 0.00020 | 0.5923 | 0.0209 | 0.0013 |
+| REV — a revoked row (the zero control) | 0.00000 | **0.0000** | 0.0000 | 0.0000 |
+| TOP — the highest-coefficient row (validity) | 0.01376 | 17.8188 | 1.0683 | 0.0842 |
+
+| paired comparison over pods | dominance, worst seed | median ratio | sign-test z |
+|---|---|---|---|
+| DEL against its matched LIVE null | **0.000** | 0.313 | −6.94 |
+| LIVE against LIVE2 (the floor) | 0.468 | 0.997 | −0.14 |
+
+**The reading, by the rule fixed before the run: NO-EFFECT, and past it.** The three validity rows
+hold — the revoked row moves the forward by exactly zero, silencing the top row moves it by 17.8, and
+the floor sits at chance (0.468, ratio 0.997, z = −0.14). Against that, silencing a deleted row moves
+the logits **less** than silencing a live row of the same routing mass, on every one of 94 matched
+pairs in the worst seed (dominance 0.000, median ratio 0.31, z = −6.94), with a KL of 0.0000 and a
+top-1 flip rate of exactly 0.0000 against the null's 0.0013. So a deleted-but-routable row is not a
+hidden dependency: it is a *weaker* contributor than an arbitrary live row of the same weight, because
+what it injects is the UNKNOWN direction the null column already carries. The dependency-closure
+requirement has no measurable basis on this substrate, and the other branch's 0.2251 is the magnitude
+an arbitrary row of that coefficient produces — the same order as this table's 0.107 to 0.560 — not
+the size of a deletion residue.
+
+**One instrument was thrown away in the making of this, and the control that threw it.** The first
+version scored E-000051's five-feature probe on the ablated logits, arm against arm; its floor — two
+coefficient-matched *live* rows — came back at 1.000, because a probe separates any two distinct rows
+whatever their status. A second version drew the null as "closest match" and the floor as "second
+closest", which makes the floor asymmetric by construction and duly returned 1.000 again. Both were
+caught by the floor row before anything was recorded, and the design became the paired magnitude
+comparison the question actually asks, with the two matched rows randomised into null and floor. That
+is the third time in this ledger (§31.33, §31.44) that a control written to catch the instrument caught
+it; it is the only reason the number above means anything.
+
+Record: `so/results/e000057_dependency_closure.{json,md}`. Owned, and cited so nothing here is
+claimed as a mechanism: dependency tracking and revoking a capability together with everything derived
+from it (Redell 1974; CHERIvoke 2019; Cornucopia, S&P 2020; Cornucopia Reloaded, ASPLOS 2024, which
+performs the check at the point of use), and PAMSPEC with Wu and Canedo (arXiv:2609.00243) for the
+agent-memory instantiation. The GPT-2 half is not run.
+
 ### 31.8 Boundary
 
 CPU only, no GPU, no LLM above 124M parameters, synthetic worlds, single-token entities, two surface forms per relation, one session. Nothing here shows unlearning of facts already encoded in pretrained weights. Evidence levels recorded: E3–E4 for the synthetic system (F4 for SHRED with the verified gate, E-000010 — **on the value channel only**: E-000028 recovers the shredded object at 1.0000 through the ungated reverse key, where REVOKE and DELETE are at chance, so F4 for SHRED is a claim about answers, logits, hidden states and probes and not about routing); E5 as substrate for the frozen-GPT-2 experiment, with reading, composition, update and the copy bound supported and behavioural deletion not yet supported at the pre-registered thresholds.
