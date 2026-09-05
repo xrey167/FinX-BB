@@ -1,0 +1,55 @@
+name: E000094 straight-through exact-support reader
+on:
+  push:
+    branches: [research/e000094-straight-through-exact-support]
+    paths:
+      - 'so/experiments/e000094_straight_through_exact_support.py'
+      - 'docs/novelty/e000094-preregister.md'
+      - '.github/workflows/e000094-straight-through-exact-support.yml'
+permissions:
+  contents: read
+jobs:
+  exact-forward:
+    strategy:
+      fail-fast: false
+      matrix:
+        seed: [0, 1, 2]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 120
+    env:
+      SO_BOS: '1'
+      OMP_NUM_THREADS: '2'
+      OPENBLAS_NUM_THREADS: '1'
+      MKL_NUM_THREADS: '1'
+      TOKENIZERS_PARALLELISM: 'false'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+          cache-dependency-path: so/requirements.txt
+      - name: Install CPU dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install torch --index-url https://download.pytorch.org/whl/cpu
+          python -m pip install -r so/requirements.txt
+      - name: Run preregistered E94 seed
+        run: |
+          set -o pipefail
+          mkdir -p ci-e94
+          python -m so.experiments.e000094_straight_through_exact_support \
+            --seeds ${{ matrix.seed }} --steps 3000 --groups 100 --threads 2 --results-dir ci-e94 \
+            2>&1 | tee ci-e94/stdout-s${{ matrix.seed }}.txt
+      - name: Hash evidence
+        if: always()
+        run: |
+          sha256sum so/experiments/e000094_straight_through_exact_support.py > ci-e94/source-sha256-s${{ matrix.seed }}.txt
+          find ci-e94 -maxdepth 1 -name '*.json' -print0 | sort -z | xargs -0 -r sha256sum > ci-e94/result-sha256-s${{ matrix.seed }}.txt
+          python -m pip freeze > ci-e94/environment-s${{ matrix.seed }}.txt
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: e000094-straight-through-exact-support-s${{ matrix.seed }}
+          path: ci-e94/
+          if-no-files-found: error
