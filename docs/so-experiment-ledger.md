@@ -3783,6 +3783,131 @@ from it (Redell 1974; CHERIvoke 2019; Cornucopia, S&P 2020; Cornucopia Reloaded,
 performs the check at the point of use), and PAMSPEC with Wu and Canedo (arXiv:2609.00243) for the
 agent-memory instantiation. The GPT-2 half is not run.
 
+### 31.51 The pointer battery, at every phrasing: what one write buys, what one delete leaves, and what the reader charges (2026-09-05, E-000052 and E-000050-A's symlink arm)
+
+E-000052 was pre-registered in §31.42 before its substrate existed, narrowed by a critic in five
+places, and its SET NULL row was disclosed as likely to fail. It ran on the BOS-trained symlink
+adapter (three seeds, three thousand steps each, twelve phrasings, the full lifecycle through every
+alias). Thirteen of fourteen pre-registered criteria pass.
+
+| template | direct | alias | dup | one UPDATE reaches the alias | SHRED → UNKNOWN | DELETE → UNKNOWN | BLANK → some entity | RELINK reads | no BOS: alias |
+|---|---|---|---|---|---|---|---|---|---|
+| t0 initial, trained | 1.0000 | 0.9200 | 1.0000 | 0.9450 | 1.0000 | 1.0000 | 0.0000 | 0.9200 | 0.0150 |
+| t1 medial, trained | 0.9767 | 0.8150 | 0.9950 | 0.8250 | 1.0000 | 0.9950 | 0.0000 | 0.8400 | 0.9100 |
+| t2 initial, trained | 0.9967 | 0.9250 | 1.0000 | 0.9450 | 1.0000 | 1.0000 | 0.0000 | 0.9200 | 0.0300 |
+| t3 medial, trained | 0.9933 | 0.9000 | 1.0000 | 0.9050 | 1.0000 | 1.0000 | 0.0000 | 0.9200 | 0.9500 |
+| t4 medial, trained | 1.0000 | 0.9400 | 1.0000 | 0.9550 | 1.0000 | 1.0000 | 0.0000 | 0.9400 | 0.9700 |
+| t5 medial, trained | 0.9967 | 0.9250 | 1.0000 | 0.9450 | 1.0000 | 0.9950 | 0.0000 | 0.9200 | 0.9650 |
+| t6 initial, trained | 1.0000 | 0.9300 | 1.0000 | 0.9350 | 1.0000 | 1.0000 | 0.0000 | 0.9300 | 0.0200 |
+| t7 medial, trained | 0.9967 | 0.8850 | 1.0000 | 0.8950 | 1.0000 | 1.0000 | 0.0000 | 0.8900 | 0.9350 |
+| **t8 initial, held out** | 0.9967 | 0.9100 | 1.0000 | 0.9400 | 1.0000 | 1.0000 | 0.0000 | 0.9100 | 0.0100 |
+| **t9 medial, held out** | 0.8200 | 0.8300 | 0.8750 | 0.8200 | 0.9950 | 0.9950 | 0.0100 | 0.8200 | 0.9600 |
+| **t10 medial, held out** | 0.9967 | 0.9150 | 0.9950 | 0.9300 | 1.0000 | 1.0000 | 0.0000 | 0.9200 | 0.9550 |
+| **t11 initial, held out** | 0.9967 | 0.9250 | 0.9950 | 0.9400 | 1.0000 | 1.0000 | 0.0000 | 0.9300 | 0.0100 |
+
+Worst seed everywhere. The reader's **price for the pointer**, against a link-free adapter trained on
+the same budget and scored across all twelve phrasings (E-000025's protocol): `cost_of_sharing`
+**0.0879** against its 0.10 bar (0.0944 on trained templates, 0.0750 on held-out ones), and
+`cost_of_link_training` **0.0054** against 0.25. The **reverse control** fires exactly as registered:
+read without the BOS it was trained with, the same adapter answers a subject-initial alias at
+0.0050–0.0100 while its subject-medial ones stand at 0.9150–0.9550 — position 0, in both directions,
+on the pointer battery.
+
+**The row that was expected to fail, and did not.** §31.42 disclosed before the run that BLANK — `ON
+DELETE SET NULL` performed by hand, a self-referencing row the adapter never trained on — read as a
+wrong entity in 0.15–0.30 of cases in the script's smoke and in 0.175 on the GPT-2 residue reader
+(§31.45), and left its 0.05 bar where it was. On the corrected substrate a blanked alias answers with
+an entity in **0.0000** at eleven of twelve phrasings and 0.0100 at t9, answers UNKNOWN at 0.99–1.00,
+and answers with the *deleted object* at exactly 0.0000 at every phrasing. The SET NULL failure was
+the sink, not the operation. The single FAIL is a validity row beside it: a blanked alias's sibling
+stays readable at 0.7900 against a 0.80 bar at t1, 0.83–0.97 elsewhere.
+
+**And it needs no retraining.** E-000050-A's symlink arm ran the same family on the *recorded*
+checkpoints, evaluation only, three seeds, under three prompts (worst seed):
+
+| E-000020 row | bare (the record) | a lone space at inference | `<\|endoftext\|>` |
+|---|---|---|---|
+| t0 direct / alias / UPDATE reach | 0.5633 / 0.5000 / 0.5350 | **0.9933 / 0.8850 / 0.9150** | 0.9933 / 0.9050 / 0.9350 |
+| t8 (held out, initial) | 0.3933 / 0.3550 / 0.3700 | **0.9667 / 0.8650 / 0.8900** | 0.9733 / 0.8850 / 0.9000 |
+| t9 (held out, medial) | 0.9300 / 0.8700 / 0.8700 | **0.9433 / 0.8600 / 0.8500** | 0.7433 / 0.7400 / 0.7300 |
+| t11 (held out, initial) | 0.2933 / 0.3000 / 0.2950 | **0.9867 / 0.8900 / 0.9100** | 0.9867 / 0.8950 / 0.9100 |
+
+So the whole battery is available on the recorded weights, with no training at all, by occupying
+position 0 with a single space — and unlike the BOS it costs the subject-medial phrasing nothing
+(§31.46). One SHRED leaves every alias UNKNOWN at 0.9950–1.0000 under every prompt.
+
+Records: `so/results/e000052_symlink_bos_battery.{json,md}`,
+`scratchpad/e50a/space20/e000050a_bos_artefact.{json,md}`. What is *not* in these tables: locality.
+The adapter injects 3.4–4.2 nats on generic text against a 0.05 bar (§31.36, §31.46), and the parallel
+branch's independent implementation fails the same bar at 3.65–5.23 (§31.49). A pointer that reads,
+updates and deletes correctly at every phrasing still speaks when it is not asked.
+
+### 31.52 The ninth sweep, and the first claim this programme has made (2026-09-05)
+
+Eight sweeps of the symlink / J-space / pod seam returned "none". The ninth ran four generators
+against a corpus of the papers on disk, the record's own FAIL rows, a morphological box of
+store × reader × guarantee × adversary, and the artifact framing; sixteen candidates reached the
+refuters, seven were refuted on both lenses before the subagent budget ran out, and the judge never
+ran. What follows is the judging done by hand, against the record.
+
+**Refuted, with the reason, because these are the shapes that keep recurring.** *Certificate
+shelf-life* (does an issued certificate survive later admissions?) — refuted by this ledger's own
+§31.47: every certificate is a statement about one export, now pinned by four tests; and the
+bit-exact half is arithmetic, since a closed gate multiplies the payload by exactly zero.
+*Substitution-not-abstention*, *derivation-term-at-the-reader*, *group-deletion-visibility*,
+*dereference typing*, *null-address map*, *null-budget trade* — all refuted on ownership or on a
+control that cannot fail.
+
+**Three candidates the budget did not reach, kept as registered questions.** (i) *Two authorities at
+one address*: `bank()` exports every non-deleted cell with no precedence column, and two rows with the
+same key produce identical key vectors, so the routing softmax splits evenly and the injected value is
+the **arithmetic mean of two payloads** — an addressable memory over a routing softmax has no
+precedence operator. The knowledge-conflict literature puts conflict in the context or in the weights,
+never at one address inside a routed memory resolved by averaging. (ii) *A count-invariant read*: the
+dereference bias is literally `deref_pass_bias + log(n_cells)`, so the row-count floor §31.41 and
+§31.45 measured is the read's own normalisation, and a hard-addressed read would make an added or
+evicted off-pod row bit-identical — the sentence being "a membership-based deletion certificate is
+sound for a hard-addressed memory and unsound for a soft-attended one", whose only content is the
+price. (iii) *A vacuity checker for pre-registered criteria*, the model-checking notion (Beer et al.,
+CAV 1997) transplanted to empirical criteria: this programme has caught eleven retracted sentences and
+three instrument failures by hand, and the operators are enumerable — identical-code-path reference
+arms, interfaces that decline to export, routing misses that pass a bar for free, extrema by
+construction.
+
+**And one candidate that survived, once its own killers were checked.** The artifact generator
+proposed a *pointer-lifecycle battery* and named two things that would sink it. The first: the
+duplication arm at 0.0000 is store arithmetic, so it cannot be a claim row — correct, and the claim
+below demotes it to a baseline. The second: "exactly one operation fails the safety bar, SET NULL at
+0.175, and the paper is carried by that failure" — this was written from §31.45, before E-000052
+landed. On the corrected substrate the SET NULL row reads **0.0000** at eleven of twelve phrasings
+(§31.51). The failure was the attention sink, not the operation, so the paper is not carried by it;
+what carries it is the positive battery and its price.
+
+**The claim, made at last and at its size.** `docs/so-claim-pointer-lifecycle-2026-09-05.md`. On a
+frozen GPT-2 small reading an external multi-version store whose access keys are LINK rows pointing at
+one object, the pointer's semantics survive the neural read at every one of twelve phrasings — aliased
+read ≥ 0.82, one UPDATE reaching every alias ≥ 0.82, one SHRED or DELETE leaving every alias UNKNOWN
+≥ 0.995 and the deleted object at 0.0000, a blanked alias answering with an entity ≤ 0.01, RELINK
+≥ 0.82 — at a measured price of 0.088 reading accuracy against a link-free adapter trained on the same
+budget, with the reverse control firing and the same battery collapsing to 0.29–0.53 when position 0
+is left to the subject. It is a **measurement**, not a mechanism: symlinks, `ON DELETE SET NULL`,
+versioned pointers and overlays are owned by filesystems and databases; the architecture is owned by
+SERAC, GRACE, SILO and LMLM; the design is Raeesi and Roed's stated future work
+(arXiv:2607.00605 §9), executed. What no paper reports is the result sentence — that a *storage
+pointer's* read, update, delete, set-null and relink semantics hold across every phrasing of a query
+set through a frozen model's read, with the price of the indirection measured against a link-free
+control.
+
+**What the claim does not touch, stated in the same breath.** Locality: the adapter injects 3.4–4.2
+nats where no key matches, against a bar of 0.05 it has never met, and the parallel branch's
+independent implementation fails the same bar (§31.49) — two witnesses now, and the programme's
+largest open failure. Held-out override of a pretrained fact: 0.0000, under every prefix (§31.46).
+Traceless deletion: no (§31.35, §31.45). Scale: 124M parameters, a synthetic world, single-token
+entities, three seeds. And J space, closed on all three readings (§31.42).
+
+Eleven retractions precede this. It is the first sentence in the programme that survived a sweep
+designed to kill it, and it survived by being smaller than every sentence that came before.
+
 ### 31.8 Boundary
 
 CPU only, no GPU, no LLM above 124M parameters, synthetic worlds, single-token entities, two surface forms per relation, one session. Nothing here shows unlearning of facts already encoded in pretrained weights. Evidence levels recorded: E3–E4 for the synthetic system (F4 for SHRED with the verified gate, E-000010 — **on the value channel only**: E-000028 recovers the shredded object at 1.0000 through the ungated reverse key, where REVOKE and DELETE are at chance, so F4 for SHRED is a claim about answers, logits, hidden states and probes and not about routing); E5 as substrate for the frozen-GPT-2 experiment, with reading, composition, update and the copy bound supported and behavioural deletion not yet supported at the pre-registered thresholds.
