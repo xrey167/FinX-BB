@@ -15,6 +15,8 @@ ingredients below are treated as prior art unless a composed property survives d
 | WISE | dual parametric memory, routing, sharding for lifelong editing | modular/sharded edit memory is not new |
 | Knowledge Externalization (ICLR 2026) | removable/editable external memory tokens and reversible knowledge restoration | externalized editable knowledge objects are not new |
 | J-Access (arXiv:2608.11408) | Jacobian-lens audit of residual knowledge; optimizing the audit causes evasion | J-space/J-lens stays an independent audit, never a training target |
+| generational handles / slot maps | index+generation stale-handle rejection and ABA protection at dereference | incarnation counters and stale-handle rejection are standard systems techniques |
+| VERLIB / versioned pointers | versioned shared pointers and atomic/snapshot-consistent loads | “versioned pointer” and snapshot semantics are not new |
 | crypto-shredding / secure deletion | key destruction and versioned secure-deletion graphs | HMACs, keys, epochs, key erasure and “crypto shred” are not new |
 | canonical pointer/reference systems | canonical objects, aliases/pointers, generations, dangling references | pointers, canonical ids, refcounts and generation counters are not new individually |
 
@@ -25,11 +27,13 @@ Sources used in this update:
 - https://aclanthology.org/2026.findings-acl.792/
 - https://proceedings.iclr.cc/paper_files/paper/2026/hash/7e9c2053258b1bdd32ff2654802cd594-Abstract-Conference.html
 - https://arxiv.org/abs/2608.11408
+- https://www.csd.cmu.edu/sites/default/files/phd-thesis/CMU-CS-23-125.pdf
+- https://docs.rs/renew-memory/latest/renew_memory/struct.Handle.html
 - https://www.syssec.ethz.ch/publications/2013-11-04-secure-data-deletion-from-persistent-media-20-500-11850-74089/
 
 ## Remaining candidate composed property
 
-The defensible target is deliberately narrower than “versioned memory” or “symlink pods”:
+The defensible target is deliberately narrower than “versioned memory”, “safe handles”, or “symlink pods”:
 
 > **Causally Attested Versioned Indirection (CAVI):** a neural-memory consumption protocol in which
 > pointer-only aliases and canonical knowledge pods are independently versioned; cached resolution and
@@ -38,7 +42,10 @@ The defensible target is deliberately narrower than “versioned memory” or �
 > take an exact no-memory BYPASS while in-scope stale/missing references take UNKNOWN; and an independent
 > causal/J-lens audit checks deletion without being optimized.
 
-This only remains interesting if the *composition* yields a property simpler baselines cannot match.
+The candidate novelty is therefore not the pointer check. It is the **neural-memory execution contract**
+and its composed guarantee across linguistic alias resolution, canonical mutable knowledge, stale exported
+neural tensors, live consumption, explicit scope semantics, and independent causal deletion attestation.
+This remains interesting only if that composition yields a measurable property simpler baselines cannot match.
 
 ## Critical falsification matrix
 
@@ -58,8 +65,8 @@ binding, the claimed CAVI distinction is falsified.
 ### F2 — canonical pod update / SHRED / DELETE / ABA
 
 Old serialized rows and old resolver witnesses must fail after incarnation change, including delete +
-recreate under the same logical identity. Pod-only checks are expected to pass this control; CAVI cannot
-claim these controls as unique.
+recreate under the same logical identity. Pod-only/generational-handle checks are expected to pass this
+control; CAVI cannot claim these controls as unique.
 
 ### F3 — exact scope semantics
 
@@ -78,8 +85,15 @@ Test old resolver output, serialized tensors, old aliases, rollback/restore, ABA
 and mutation in the resolve→inject gap. The final validation must occur at the neural memory read boundary,
 not merely when the Bank is exported.
 
+### F6 — systems-equivalent baseline
+
+Implement the strongest ordinary systems baseline honestly: a generational/versioned referent handle checked
+at consumption, plus commit-time authorization. The only CAVI-specific win that counts is a failure mode
+caused by **reference rebinding / neural-memory materialization / scope composition** that this baseline cannot
+close without becoming functionally equivalent to dual reference+referent validation at neural consumption.
+
 ## Promotion rule
 
-E-000070 is only a screening experiment. A positive result is promoted to multiple seeds, another
+E-000070/E-000071 are only screening experiments. A positive result is promoted to multiple seeds, another
 pretrained model, joint performance bars, E-000063 composed certificate integration, and reconstruction /
 J-Access-style independent audits. No individual positive row is a novelty claim.
