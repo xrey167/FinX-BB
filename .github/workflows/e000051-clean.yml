@@ -4,6 +4,18 @@ on:
   push:
     branches:
       - research/e000051-clean-bystanders
+    paths:
+      - '.github/workflows/e000051-clean.yml'
+      - 'so/experiments/e000051b_clean_bystanders.py'
+      - 'so/experiments/e000051_residue_reader.py'
+      - 'so/attacks.py'
+      - 'so/audit.py'
+      - 'so/data.py'
+      - 'so/llm_adapter.py'
+      - 'so/model.py'
+      - 'so/mvcc.py'
+      - 'so/world.py'
+      - 'so/tests/**'
   workflow_dispatch:
 
 permissions:
