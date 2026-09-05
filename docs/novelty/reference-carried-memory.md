@@ -7,11 +7,17 @@ The capability gate is running and the targeted prior-art search is incomplete. 
 ## The claim, in one sentence
 
 > In a frozen language model with an external mutable memory, the state the model persists can be made
-> a function of the prompt and the alias namespace alone — carrying a knowledge-free reference that
-> participates in the frozen computation, with every mutable relation (payload, alias binding, marker,
-> lifecycle status) applied only after the last cache-writing block — so that UPDATE, RELINK, REVOKE
-> and SHRED change the model's answer while leaving every persisted tensor bit-identical, and
+> a function of the prompt and the addressed **identities** alone — carrying a knowledge-free reference
+> that participates in the frozen computation, with every mutable relation (payload, alias binding,
+> marker, lifecycle status) applied only after the last cache-writing block — so that UPDATE, RELINK,
+> REVOKE and SHRED change the model's answer while leaving every persisted tensor bit-identical, and
 > revocation of already-materialised neural state costs nothing and needs no lineage metadata.
+
+The architectural statement behind it, which is the part that would travel:
+
+> The cost of revoking materialised neural state is not intrinsic to external memory. It is the price of
+> having transported the **value**. Transport a **reference** instead and participation is preserved,
+> while the persisted state stops being a function of anything a lifecycle operation changes.
 
 ## Why this is the seam, and not the previous three answers
 
