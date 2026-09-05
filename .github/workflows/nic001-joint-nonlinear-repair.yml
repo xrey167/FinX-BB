@@ -1,0 +1,55 @@
+name: NIC001 joint nonlinear repair
+on:
+  push:
+    branches: [research/nic001-joint-nonlinear-repair]
+    paths:
+      - so/experiments/nic001_joint_nonlinear_repair.py
+      - so/tests/test_nic001_joint_nonlinear_repair.py
+      - .github/workflows/nic001-joint-nonlinear-repair.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  screen:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        arm: [exact, distilgpt2, pythia70m]
+    env:
+      OMP_NUM_THREADS: '1'
+      OPENBLAS_NUM_THREADS: '1'
+      MKL_NUM_THREADS: '1'
+      HF_HUB_DISABLE_XET: '1'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - name: Install pinned CPU dependencies
+        run: |
+          python -m pip install numpy==2.3.5 pytest==9.0.2 transformers==4.57.6
+          python -m pip install torch==2.10.0 --index-url https://download.pytorch.org/whl/cpu
+      - name: Execute complete scientific arm and tests
+        env:
+          ARM: ${{ matrix.arm }}
+        run: |
+          set -euo pipefail
+          mkdir -p ci-nic001
+          if [ "$ARM" = exact ]; then
+            python -m so.experiments.nic001_joint_nonlinear_repair --output-dir ci-nic001 | tee ci-nic001/run.txt
+          elif [ "$ARM" = distilgpt2 ]; then
+            python -m so.experiments.nic001_joint_nonlinear_repair --model distilbert/distilgpt2 --output-dir ci-nic001 | tee ci-nic001/run.txt
+          else
+            python -m so.experiments.nic001_joint_nonlinear_repair --model EleutherAI/pythia-70m --output-dir ci-nic001 | tee ci-nic001/run.txt
+          fi
+          python -m pytest so/tests/test_nic001_joint_nonlinear_repair.py -q -ra | tee ci-nic001/pytest.txt
+          python -m pip freeze > ci-nic001/environment.txt
+          sha256sum so/experiments/nic001_joint_nonlinear_repair.py so/tests/test_nic001_joint_nonlinear_repair.py ci-nic001/*.json > ci-nic001/sha256.txt
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: nic001-${{ matrix.arm }}
+          path: ci-nic001/
+          if-no-files-found: warn
