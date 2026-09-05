@@ -1,119 +1,156 @@
-# CAVI — technical novelty claim candidate
+# CAVI-N — technical novelty claim candidate
 
 Date: 2026-09-05
 Status: **research-level technical novelty candidate; not a legal patentability opinion**
 
 ## Name
 
-**CAVI — Causally Attested Versioned Indirection for Neural Memory**
+**CAVI-N — Neural-Consumption Continuity for Causally Attested Versioned Indirection**
+
+`CAVI` remains the implementation umbrella. `CAVI-N` is the only currently live novelty subclaim.
+
+## Decisive prior-art narrowing
+
+Fresh review of the 19 July 2026 IETF Internet-Draft **PAMSPEC / Architecture and Data Model for Persistent Memory in Agentic Systems** materially falsifies the earlier broad CAVI novelty framing. PAMSPEC already specifies stable canonical Memory Objects, immutable versions, independently versioned Relationship Objects, an authoritative Persistent State Plane, non-authoritative derived representations/caches, scope enforcement during relationship traversal, expected-version concurrency, and propagation of deletion/redaction to derived state.
+
+Therefore none of the following can carry the novelty claim, individually or as a loose composition:
+
+- canonical memory identity;
+- versioned objects;
+- versioned aliases/relationships/pointers;
+- authoritative-vs-derived-state separation;
+- freshness/staleness metadata;
+- cache invalidation as a general systems requirement;
+- lifecycle state, tombstones, event ledgers, provenance or scope enforcement.
+
+The candidate survives only if there is a specifically **neural execution** property not reducible to those established semantics.
 
 ## The narrow claim
 
 A neural-memory system in which:
 
-1. many linguistic access paths are **pointer-only aliases** to one canonical knowledge object;
-2. the canonical object has a stable `pod_id` and a monotonic `incarnation`/generation;
-3. previously materialized neural-memory tensors are treated as **data, not authority**;
-4. immediately before a memory payload is consumed by a neural read/broadcast hook, the runtime must validate a live authorization witness bound to the exact `(pod_id, incarnation)`;
-5. UPDATE/REVOKE/SHRED/EVICT/DELETE invalidate all prior incarnation witnesses and therefore invalidate both linguistic aliases **and already-exported neural-memory snapshots** without requiring those snapshots to be found and rewritten;
-6. out-of-scope execution uses an explicit `BYPASS` state with exact no-memory injection;
-7. lifecycle success is attested against the **same `(pod_id, incarnation)`** in two independent domains:
-   - store/control-plane reachability closure; and
-   - causal neural accessibility/broadcast audit (e.g. J-space/J-lens), which is never optimized as the deletion objective;
-8. output, key-channel, stale-snapshot, reconstruction and adversarial elicitation attacks are additional non-authoritative checks, not substitutes for the two-domain certificate.
+1. linguistic access paths resolve through pointer-only aliases to authoritative knowledge objects, but those object/pointer/version semantics are treated as prior-art infrastructure rather than novelty;
+2. every successful resolve produces an **authority-lineage witness** bound to both the exact alias/reference incarnation and the exact referent/pod incarnation;
+3. neural material derived from that resolution — including a materialized memory Bank, routing distribution, selected route, resolved payload vector, cached activation or serialized intermediate tensor — is **non-authoritative and cannot become a bearer capability** merely because it was produced while authority was valid;
+4. whenever such derived material is later injected into or consumed by the model, the runtime revalidates its original live authority lineage adjacent to that actual neural injection/consumption site;
+5. a reference relink, referent lifecycle transition, incarnation change, ABA restore or relevant scope/authorization transition invalidates old lineage even when the old referent remains live and a simple referent-version check would still pass;
+6. invalid lineage fails closed to explicit `BYPASS`/`UNKNOWN` semantics, with out-of-scope `BYPASS` equal to the no-memory base-model path rather than a soft residual gate;
+7. fresh current-generation state retains the intended memory capability, so safety is not purchased by disabling memory;
+8. store/control-plane reachability and causal neural accessibility are measured independently for the same knowledge identity; J-space/J-lens is audit-only and is never optimized, routed through, or treated as authority.
 
-## Why this is narrower than known work
+## Candidate differentiator
+
+The remaining distinction is **authority-lineage continuity across the tensor boundary**:
+
+> An authorized memory read does not permanently authorize the neural tensors derived from that read.  If those tensors survive into a later model-consumption event, their originating reference+referent authority must still be live at that event; otherwise they are inert and execution reduces to the correct no-memory path.
+
+This is narrower than saying "derived state is non-authoritative" — PAMSPEC already says that for embeddings and retrieval/ranking caches. CAVI-N only remains interesting if an opaque **neural** derivation can demonstrably resurrect stale knowledge after ordinary memory invalidation, and if preserving authoritative reference lineage through that derivation closes the attack where simpler version or commit-time checks do not.
+
+## Prior-art exclusions
 
 The following are explicitly prior art and are **not** claimed:
 
 - external/editable memory — SERAC, WISE, Knowledge Externalization and related systems;
 - semantic routing / scope classifiers — SERAC lineage, WISE, DKME, KEDAS/CRAFT;
-- canonical records, aliases and pointers — database normalization/indirection and limited-memory systems;
-- MVCC / generations / freshness witnesses — database systems and recent agent-memory/authorization work;
+- canonical records, stable object IDs, relationships, aliases and pointers — databases, PAMSPEC and systems indirection;
+- canonical-vs-derived state — PAMSPEC and cache/index architectures;
+- MVCC, expected versions, generations, freshness witnesses, ABA-safe handles and linearizability — database/concurrent systems;
+- revocable validity and stale-memory exclusion — STALE, TEPA and related memory lifecycle work;
+- freshness-aware cache reuse — FreshCache and caching literature;
+- stale KV-cache/association eviction — SleepGate and cache-management work;
 - transactional agent memory — MemTX;
 - commit-time freshness authorization — Commit-Time Authorization;
+- capabilities, epochs, HMACs, leases, locks or one-use tokens — security/systems primitives;
+- cryptographic erasure / crypto-shredding — established key-destruction practice;
 - J-space / Jacobian Lens — Anthropic;
 - J-space accessibility auditing — J-Access and related mechanistic unlearning audits.
 
-The candidate distinction is the **cross-layer consumption contract**:
+## Why the Symlink–Pod idea still matters technically
 
-> A cached neural-memory materialization cannot authorize its own later consumption. Authority is revalidated atomically at the neural consumption boundary against the current canonical pod incarnation, and deletion is certified for that exact incarnation in both pointer reachability and an independent causal neural-broadcast domain.
+The symlink/pod structure is no longer itself a novelty claim. It is the experimental substrate that creates a clean **reference-vs-referent invalidation** test.
 
-## Why the Symlink–Pod idea matters
+If alias `A` originally points to live pod `P` and is later relinked to live pod `Q`, then `P` can remain unchanged and current. A simple `pod_id/incarnation(P)` check still approves stale `A -> P` derived state. A full lineage witness bound to the **alias incarnation and binding plus pod incarnation** must reject it.
 
-Without pointer-only aliases, a lifecycle operation can leave duplicated payload carriers and stale copies.
-With canonical indirection, all linguistic aliases resolve to one identity. The remaining systems problem is that a previously exported `Bank`/tensor can outlive the source-of-truth transition. CAVI makes this stale neural material non-authoritative by construction.
-
-This changes the deletion unit from "all phrases that can retrieve the fact" to:
-
-`knowledge object = (pod_id, incarnation)`
-
-and the consumption rule from:
-
-`retrieved tensor -> neural injection`
-
-to:
-
-`retrieved tensor + live incarnation witness -> atomic validation -> neural injection OR fail closed`
+That counterexample is the key reason to keep aliases explicit: it distinguishes reference freshness from referent freshness and gives a falsifiable baseline against ordinary version checks.
 
 ## Role of J-space
 
-J-space is **not the address bus**. E-000062 falsified that version of the thesis.
+J-space is **not the address bus**. E-000062 decisively falsified that thesis.
 
-J-space is retained only as an independent causal audit surface because interventions there can causally alter downstream model behavior. CAVI does not train against the J-space audit. This separation is important because recent J-Access work shows that optimizing an audit can create audit evasion.
+J-space/J-lens is retained only as an independent causal audit surface. CAVI-N does not train against the audit and does not use it for routing, authorization or gating. This separation is required because J-Access shows that directly optimizing an accessibility audit can induce audit evasion while making later recovery worse.
 
 ## Falsifiable invariants
 
-A CAVI implementation must satisfy all of the following:
+### N1 — Reference + referent identity
+Every authorized alias resolve yields a witness for the exact `(alias_id, alias_incarnation, pod_id, pod_incarnation)` tuple. A live old pod is insufficient after alias relink.
 
-### I1 — Alias identity
-Every live alias resolves to exactly one `(pod_id, current_incarnation)`; aliases carry no payload copy.
+### N2 — Derived neural state is non-authoritative
+A routing distribution, route selection, resolved payload or hidden activation captured under a valid witness cannot authorize its own later use.
 
-### I2 — Incarnation monotonicity
-RESTORE/ROLLBACK/RESIGN cannot silently resurrect an old incarnation. They create a new authorized incarnation or explicitly activate a version under a new witness.
+### N3 — Consumption-time lineage validation
+If derived neural state is reused at a later adapter/model injection site, its originating witness is validated immediately adjacent to that use under a race-safe authority boundary.
 
-### I3 — Stale neural snapshots are inert
-A `Bank`/tensor exported before UPDATE/REVOKE/SHRED/EVICT/DELETE cannot be consumed after the transition unless re-authorized against the new current incarnation.
+### N4 — ABA safety
+DELETE/SHRED/RESTORE/ROLLBACK cannot make an old lineage witness valid merely by reusing a logical ID. Restored/recreated authority is a new incarnation.
 
-### I4 — Atomic consumption validation
-No time-of-check/time-of-use race exists between validation and the actual neural read hook. Revocation concurrent with inference must either happen-before consumption or force fail-closed behavior.
+### N5 — Reference mutation safety
+Relinking or revoking an alias invalidates old state derived through that alias even when the old pod is still live and unchanged.
 
-### I5 — Exact bypass
-`BYPASS` produces the frozen base-model path with zero memory injection, not merely a small soft-gate weight.
+### N6 — Race safety
+A lifecycle/reference mutation concurrent with inference must linearize before or after consumption. Cached pre-check/commit-time authorization cannot bridge an invalidation that occurs before the neural consumption point.
 
-### I6 — Same-identity dual attestation
-The store certificate and causal neural-access audit both refer to the exact same `(pod_id, incarnation)` and both pass against a never-memory control.
+### N7 — Exact bypass
+`BYPASS` follows the frozen base-model path with zero neural-memory injection.
 
-### I7 — Audit independence
-The causal audit is not used as a training loss or direct optimization objective.
+### N8 — Fresh-current capability
+After relink/update/restore, newly resolved current-generation state still provides the intended memory behavior.
+
+### N9 — Independent audit
+Store reachability and J-space/J-lens causal accessibility are evaluated independently against NEVER-memory controls. The audit is not optimized.
 
 ## Breakthrough experiment sequence
 
-- **E-000066**: stale exported Bank attack — already reproduced the vulnerability.
-- **E-000068**: live incarnation authority control — established invalidation of stale capabilities, but using known security primitives.
-- **E-000069**: authorized injection boundary — tests validation immediately before injection.
-- **E-000070**: real trained symlink consumption attack — tests the contract on the neural adapter rather than only a store simulation.
-- **E-000071**: read-hook TOCTOU race — tests atomicity under lifecycle changes concurrent with neural consumption.
-- **E-000072**: staged scope state machine — tests exact BYPASS/RESOLVE/UNKNOWN before memory routing.
-- **Next**: same-identity composed certificate with store closure + never-memory-controlled J-space causal audit + stale-snapshot/reconstruction attacks across multiple seeds/backbones.
+- **E-000066**: stale exported Bank replay — reproduced the vulnerability 20/20.
+- **E-000068**: live-incarnation one-use capability — closed that replay class 5/5, but using known security primitives; not novelty.
+- **E-000069**: authorized injection boundary — moved validation toward the effect boundary.
+- **E-000070**: real trained symlink consumption attack — compares full alias+pod lineage with pod-only and cached-authorization baselines on actual adapter memory reads.
+- **E-000071**: actual read-hook TOCTOU race — moves live validation to the neural consumption hook.
+- **E-000072**: staged BYPASS/RESOLVE/UNKNOWN scope — performance/scope line after J-space routing was removed.
+- **E-000073**: serialized **post-read hidden activation** replay with `bank=None`; tests whether an authorized neural activation becomes a stale bearer capability after relink/ABA/race.
+- **E-000074**: serialized **routing distribution + resolved payload** replay with `bank=None`; tests the earlier neural-derivation boundary and directly compares commit-time, pod-only and full reference+referent lineage checks.
+- **E-000063**: independent output/locality + NEVER-controlled J-lens workspace audit; it must remain an audit composition, not a routing objective.
 
 ## Research-level claim threshold
 
-Do **not** call this a breakthrough from a single positive experiment.
-A defensible technical claim requires:
+Do **not** call this a breakthrough from a single positive experiment. A defensible technical claim requires:
 
+- a demonstrated stale-neural-derived-state resurrection attack, not a hypothetical threat;
+- full lineage validation to close that attack while simpler pod/version and cached commit-time baselines fail;
+- fresh-current memory capability preserved;
 - >=3 independent seeds;
-- >1 public backbone where feasible;
-- canonical-pointer baseline, ordinary external-memory baseline, semantic-router baseline and version-only baseline;
-- stale snapshot, stale router cache, serialized bank replay, reconstruction and adversarial elicitation attacks;
-- concurrent read/revoke race testing;
+- >1 public backbone or materially different model setting where feasible;
+- stale Bank, cached router, cached route, resolved payload, serialized hidden-state, old-alias, ABA, rollback/restore and concurrent race attacks;
 - exact-bypass locality checks;
-- independent J-space/J-lens audit against never-memory controls;
-- no direct optimization of the audit;
-- a final prior-art search specifically for neural-memory consumption-time incarnation validation and same-object dual-domain attestation.
+- canonical-pointer/external-memory/version-only/commit-time baselines;
+- independent J-space/J-lens audit against NEVER-memory controls with no audit optimization;
+- final prior-art search specifically for **lineage-carrying neural intermediate state with consumption-time revocation/revalidation**;
+- evidence that the property is not simply ordinary cache invalidation or a direct restatement of PAMSPEC relationship/version semantics.
 
-## Candidate paper claim
+## Claim-killing tests
 
-> **CAVI introduces version-qualified neural-memory consumption: linguistic aliases resolve to one canonical knowledge identity, but cached neural-memory materializations remain non-authoritative until atomically revalidated against the current pod incarnation at the point of neural consumption. A lifecycle transition therefore invalidates both future alias resolution and previously exported neural-memory snapshots, while deletion is independently attested for the same object incarnation in store reachability and the model's causal broadcast pathway.**
+Withdraw CAVI-N as a novelty candidate if any of these holds:
 
-If the composed experiment battery survives, this is the claim to defend. If it fails, the claim is withdrawn rather than weakened into generic external memory, symlink, versioning or J-space language.
+1. stale neural derived state does not actually resurrect stale knowledge;
+2. a pod/version equality check matches full alias+pod lineage on alias relink and ABA;
+3. commit-time authorization is sufficient even when authority changes before neural consumption;
+4. ordinary invalidation/version tags on caches provide the same guarantee without preserving the authoritative reference lineage into neural state;
+5. the result is semantically covered by PAMSPEC's authoritative/derived separation and relationship traversal rules without a neural-specific correctness property;
+6. exact BYPASS perturbs the base model or requires hidden memory injection;
+7. the property disappears across seeds/backbones;
+8. the independent causal audit cannot separate live-memory influence from query/base-model influence.
+
+## Candidate paper claim — provisional
+
+> **CAVI-N tests authority-lineage continuity for neural memory: memory-derived routing, payload and activation tensors remain revocable after materialization because their originating reference-and-referent witness is revalidated at later neural consumption.  This prevents stale neural intermediates from becoming bearer capabilities across alias relinks and object-incarnation changes, while invalid state collapses to exact no-memory execution and fresh current-generation memory remains usable.**
+
+This sentence is **not yet supported as a novelty claim**. It becomes defensible only if E-000070/071/073/074, multi-seed/backbone replication, E-000063 audit composition and the final prior-art distinction all survive.
