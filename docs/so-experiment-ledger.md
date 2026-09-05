@@ -2737,6 +2737,12 @@ exactly those that put the subject at token position 0, and GPT-2's tokenizer pr
 
 ### 31.38 The held-out paraphrase gap is the position-0 token, and a BOS at training time closes its subject-initial half for free (2026-09-05, E-000050)
 
+[Retracted in part, §31.44: the pre-registered rule's third branch fired (arm C failed the generic,
+medial-reading and addressing rows in every seed), so "for free", "at no price", "the honest held-out
+numbers are C's" and the re-scoping to C are withdrawn; the medial "residue" is C's regression on t9
+against an untrained control that has no medial gap; arm D's SHRED 1.0000 is a refusal floor; arm B's
+seed 0 was probed before registration. The subject-initial finding (arms A, B, D) stands.]
+
 The probe that opened this (§31.37's end): GPT-2's tokenizer prepends no BOS, so a template that begins
 with the subject makes the subject the position-0 token — the attention-sink position, whose residual
 is a fixed direction — and the adapter's routing query reads the sink instead of the subject. Four arms
@@ -2764,7 +2770,7 @@ trained with a BOS, held-out reading 0.9712 (bar 0.95, PASS), subject-initial he
 and two rows FAIL: subject-medial held-out reading 0.91 with addressing 0.83 (bars 0.95), and
 generic-text injection 4.22 nats against the control's 3.65.
 
-**The decision rule fires two of its branches, and the record keeps both.** The subject-initial half
+**The decision rule fires two of its branches, and the record keeps both.** [Wrong — the third branch fired; §31.44.] The subject-initial half
 of the held-out paraphrase failure — the half that fired E-000017's kill criterion, produced
 E-000025's bimodality, drove E-000026's template selection and defeated E-000039-B's tie — is the
 position-0 token and nothing else; a BOS at training time closes it at no price on the trained
@@ -2779,7 +2785,11 @@ adapter it has trained, and by this one by more.
 (ICLR 2025: the sink follows position 0, not the token), and the field's prepend-BOS convention
 (TransformerLens). The diagnosis-and-remedy chain — subject at token 0 on a GPT-2-family model breaks
 the key a locate-and-edit method reads, any prefix repairs it, Llama's `<s>` prevents it — is Yang et
-al., "The Fall of ROME" (Findings of EMNLP 2024), for a weight edit, and is cited first. What was not
+al., "The Fall of ROME" (Findings of EMNLP 2024), for a weight edit, and is cited first. [Correction, §31.43: this
+adapter's subjects are single BPE tokens by construction, so the failing templates here are exactly
+Yang et al.'s collapse condition — subject-initial *and* single-token — and not a new condition; what
+this section adds is the external-memory measurement of it and the bare-BOS control in both
+directions.] What was not
 published is the measurement on an external addressable memory's paraphrase generalisation and
 deletion propagation, with a bare BOS, both at inference (a trade) and at training (free on the
 initial half), with the reverse control; and two of its numbers correct the sweep's own refuters: the
@@ -2792,7 +2802,7 @@ template now carries this section: E-000017-B's kill criterion (fired on templat
 subject-initial), E-000025's twelve-template table (rows 0, 2, 6, 8, 11), E-000026's template rule,
 E-000039-A's "88.6% of the gap is addressing" (the addressing share *is* the position-0 share),
 E-000039-B, and the target table's second row in §31.36. None of those numbers is wrong; each was a
-measurement of an adapter reading a sink. The instrument switch (`SO_BOS=1` in `encode_texts`, read at
+measurement of an adapter reading a sink. [§31.44: the subject-initial rows of each are re-scoped; kill criterion 5 is not, since it still fires under a BOS on t9.] The instrument switch (`SO_BOS=1` in `encode_texts`, read at
 call time) is on for every run from here.
 
 ### 31.39 The J-space pod is by construction in this adapter, and the one measurement that survived is predicted by §31.38 (2026-09-05)
@@ -2991,6 +3001,38 @@ marker channel), the two-clause store/reader structure (Garg, Goldwasser and Vas
 half is queued behind E-000050 and decides whether a frozen language model's adapter, which routes
 with the same dense softmax, carries the same two channels.
 
+**E-000053, measured (2026-09-05): content-derived markers close the marker channel at this reader, and
+the frozen reader accepts them.** `MVCCStore(content_markers=True)` draws every marker from an HMAC of
+the row's exported content instead of the seeded generator (§31.42 registered it; `so/experiments/e000053_hi_markers_reader.py`,
+three seeds, 100 pods, trains nothing). All 23 pre-registered rows pass at the worst seed.
+
+| arm (positive vs reference) | AUC, deleted keys | AUC, bystanders | AUC, generic | recorded, bystanders (E-000051) | max KL, bystanders |
+|---|---|---|---|---|---|
+| LIVE vs NEVER (validity) | 1.000 | — | — | — | — |
+| CASCADE vs NEVER (the marker channel) | 0.500 | **0.500** (every seed) | 0.500 | 0.948 | 0.000 |
+| BLANK vs CASCADE | 1.000 | 0.800 (worst 0.769) | 0.670 | 0.817 | 0.102 |
+| DANGLE vs CASCADE | 0.999 | 0.839 (worst 0.833) | 0.681 | 0.869 | 0.030 |
+| PERM vs PERM2 (float floor) | — | 0.487 | 0.571 | 0.499 | 0.000 |
+| ADD2 vs PERM (row-count floor) | — | 0.974 (worst 0.944) | 0.770 | 0.965 | 0.000 |
+| DUP vs DUPX (identical content, identical markers) | — | 0.499 | — | — | 0.000 |
+
+Read in the order the rule fixed. Store half: CASCADE exported-HI 1.000 and `markers_equal` 1.000 on
+every pod (the generator scheme gave 0.000 on the same pods), BLANK and DANGLE still 0.000 with two
+residue rows. R1, the row that could have failed: the E-000015 reader, trained on generator-drawn
+markers, accepts the re-signed live bank as its own — gate acceptance 1.000, max gate delta 0.002, top-1
+agreement 1.000, KL ≤ 0.0001 nats, reading accuracy unchanged — while the markers themselves moved by
+up to 0.281. So the option does not need retraining. R2: ADD2 moves by 0.020–0.032 per seed, within the
+±0.05 bar, and stays above 0.90. M1: CASCADE-versus-NEVER at exactly 0.500 on every class with
+interface residual 0.000 (E-000051: 0.0116) — the pipeline check it was declared to be, and no other
+channel (row order, a placeholder column) reaches the reader. M2: BLANK and DANGLE against CASCADE
+stay within 0.014–0.042 of E-000051's per-seed values and below the ADD2 floor on every seed: the
+two live rows are the whole residue, as §31.41 read them. S1, registered and not decided on: two rows
+with identical content now carry identical markers (pair distance 0.000; generator scheme 0.135–0.194)
+and the reader cannot tell them from two distinct-marker rows (AUC 0.499, KL 10⁻⁹). Nothing here is a
+claim: the composition is Hartline et al.'s canonical-representation argument with a deterministic
+reader, and the measured content is that this reader's learned gate is indifferent to which sample of
+the marker family signs the bank. The record: `so/results/e000053_hi_markers_reader.{json,md}`.
+
 ### 31.42 After the artefact: what the seam still holds, and what closed with it (2026-09-05)
 
 With E-000050 (§31.38) and E-000051 (§31.41) in hand, an eleven-agent workflow constructed the three
@@ -3025,7 +3067,7 @@ M1 is a pipeline check). What can fail: whether the frozen reader's *learned* ga
 bank as its own (R1 — the gate was trained on generator-drawn markers; the derived ones are a
 different sample of the same family), whether the row-count floor and the residue AUCs stay where
 E-000051 put them (R2, M2), and the side effect that identical content now carries identical markers
-(S1). The option is on record (`MVCCStore(content_markers=True)`, default off, 269 tests). Running.
+(S1). The option is on record (`MVCCStore(content_markers=True)`, default off, 269 tests). Measured; the row is at the end of §31.41 — every registered clause held, R1 included.
 
 **E-000052 — the pointer battery on the BOS-trained symlink adapter, narrowed.** One refuter left it
 standing ("what Raeesi and Roed name as future work and nobody runs"); the other found most of its
@@ -3043,7 +3085,11 @@ seed spread, not 0.05; "anchor fails" and "bar fails while the anchor holds" are
 a negative can fire at trained templates; the medial-template `≤` rows are scored only where
 `alias_direct ≥ 0.80`, since a routing miss passes every one of them for free; and only the
 wrong-entity rate is a claim row for BLANK, the UNKNOWN rate being validity. The substrate — the
-E-000020 trainer unchanged with a BOS on every prompt — is training behind E-000051's GPT-2 half.
+E-000020 trainer unchanged with a BOS on every prompt — is training behind E-000051's GPT-2 half. Disclosed before the substrate exists: the script's end-to-end smoke, run on the
+*recorded* no-BOS E-000020 checkpoint (seed 0, templates 3 and 8, the evaluation shrunk), printed the
+SET NULL row at 0.15 (t3) and 0.30 (t8) wrong-entity, and E-000051's GPT-2 seed 0 read a blanked alias
+as an entity in 0.175 of cases — so the row the battery is about is likely to fail on the BOS-trained
+substrate too, and the pre-registered bar (≤ 0.05) is left exactly where it was.
 Everything in it is a measurement; the mechanism is SQL-92's, the remedy is Yang et al.'s, and the
 design is Raeesi and Roed's future work.
 
@@ -3051,6 +3097,292 @@ design is Raeesi and Roed's future work.
 after this entry is three measurements in flight (E-000051 on the GPT-2 reader, E-000052, E-000053),
 one instrument finding with a field-level question attached (E-000050 and its re-analysis), and no
 mechanism. The J-space half is closed on all three readings.
+
+### 31.43 The position-0 condition in the field: four fifths of the editing efficacy prompts, none of the paraphrase metric by design, and E-000050's failing case is the single-token collapse Yang et al. already own (2026-09-05)
+
+§31.38 left a question attached to its instrument finding: if a subject at token 0 with no BOS breaks
+this adapter's routing, how much of the published GPT-2-family editing and memory-adapter evidence was
+measured under that condition, and does any of it split by it? An eight-agent workflow (43 minutes,
+1.13 M tokens) took a census at the source — every prompt of every benchmark it could download, run
+through the HF `gpt2` tokenizer as the released code loads it (ByteLevel post-processor, one added
+token, no `add_bos_token`), with "subject at token 0" meaning the prompt begins with the subject string
+*and* token 0's offset span lies inside the subject span — read the BOS handling of each released
+evaluation at file and line (ROME, MEMIT, EasyEdit, the Fall of ROME fork, RippleEdits, MEMIT-CSK,
+GRACE/MELO, MEND, MEMOIR, Larimar, Memory Injections), looked for per-item results to re-split, and
+put the union of its candidate sentences to two refuters and a completeness critic. What follows is
+what survived, with the critic's labels: MEASURED where a tokenizer ran over the released file,
+INFERRED where a subject span or a code path was reconstructed, REPORTED where a paper's own table is
+the only source.
+
+| benchmark / system | prompt type | subject at GPT-2 token 0 | BOS in the released evaluation | label |
+|---|---|---|---|---|
+| CounterFact (Meng et al., 21,919 cases) | `requested_rewrite` (efficacy) | 17,575 / 21,919 = 80.18% (strict token-prefix 80.04%; single-token subject at 0: 80 = 0.36%) | none — `rome/experiments/evaluate.py:91-92`, `eval_utils_counterfact.py:114-123`; `memit` `:94-95`, `:136-147` | MEASURED |
+| CounterFact | `paraphrase_prompts` (generalisation) | 1 / 43,838, and that one spurious (a random-text prefix on every item; Hase et al. 2023 §3.4) | same path | MEASURED |
+| CounterFact | neighborhood / attribute / generation | 80.08% / 80.21% / 63.15% (subject span reconstructed from the relation's templates) | same path | INFERRED |
+| MCF (`multi_counterfact.json`, 20,877) | rewrite / paraphrase / neighborhood / attribute / generation | 82.35% / 0 of 41,754 / 82.30% / 82.40% / 63.33% | MEMIT path | MEASURED |
+| Fall of ROME released case files | rewrite prompt | GPT-2-XL collapse 77 / 77 at token 0 **and** single-token; GPT-J 85 / 85 at 0, 79 / 85 single-token; `normal_1k` 777 / 1000 at 0, 0 single-token-at-0 | fork of EasyEdit, no BOS (`editor.py:151-154`); the test-time random prefix is applied to the rewrite prompt only (`editor.py:359-362`) | MEASURED (files), REPORTED (Tables 4–5) |
+| Fall of ROME released case files | `rephrase_prompt` (EasyEdit counterfact-edit format) | 42 / 77 (GPT-2-XL collapse), 46 / 85 (GPT-J), 529 / 1000 (normal) subject-initial; locality = neighborhood, 100% | evaluated unprefixed, no BOS (`evaluate.py:56-66`); never split | MEASURED / REPORTED |
+| KnowEdit WikiData_counterfact (839 test) | prompt / rephrase | 59 / 839 = 7.0% / 597 / 839 = 71.2% | EasyEdit `editor.py:145-148`, no BOS; rewrite and rephrase scored as single strings, unpadded | MEASURED (recomputed by the critic; the census script for this row was not retained) |
+| zsRE (19,086 / 1,037 / 1,301) | src / rephrase / locality | ≈ 0% / 0.7–1.4% / 100% "nq question:"-prefixed | ROME `dsets/zsre.py`, `eval_utils_zsre.py:101-105`; EasyEdit path | MEASURED |
+| MQuAKE-CF-3k (6,015) | cloze edit prompts / question forms | 4,248 / 6,015 = 70.6% / 0–0.2% (27 of 44 cloze templates `[X]`-initial, 0 of 44 question templates) | README: edited models scored on the same cloze statement; the tokenisation path is external to the repo | MEASURED + REPORTED |
+| RippleEdits | edits / six test categories | 2.7–7.9% / 0–8.4% (string proxy on the relation templates; no subject label in the files) | `src/queryexecutor.py:65` bare encode for gpt2-xl / gpt-j | INFERRED |
+| PEP3k / 20Q (MEMIT-CSK) | edit set / 20Q | 51.7% (a further 47.8% with an article at 0, a string test) / 90.2% | `evaluate_csk.py:119-120`, `eval_utils_csk.py:98-104` bare, right-padded | MEASURED |
+| WISE / MEMOIR (GPT-J) | zsRE edit / hallucination / temporal | 0 / 1,037; 0 / 600 (fixed Wikipedia header); 75 / 75 = 100% | read from EasyEdit's copy, the WISE clone failed; EasyEdit forces `padding_side='left'` for these algorithms (`editor.py:181-183`) | MEASURED (copy) |
+| GRACE / MELO (GPT-2-XL) | all prompts | 0% (`This is a Wikipedia passage about {concept}.` header) | GPT2TokenizerFast, pad = eos, no BOS (`grace/models.py:98`) | MEASURED |
+| Larimar (GPT-2-large decoder) | CounterFact / zsRE | 0% at token 0 by construction: an explicit `<BOS>` string on every evaluated prompt (`counterfact_eval_rephrase.py:579-581, 644, 664-668`); 72.2% of its prefix-stripped paraphrases are subject-initial *after* that BOS (string proxy for its stripping) | never ran without a BOS | MEASURED / INFERRED |
+| Memory Injections (GPT-2 small / large) | multi-hop prompts | 6.8% / 0% — but TransformerLens `to_tokens` with `prepend_bos` at its default (`utils.py:31, 147`); the pinned `transformer-lens==1.4.0` source was not read | never ran without a BOS | MEASURED (default INFERRED for the pinned version) |
+| Left padding on HF `gpt2` (transformers 5.16.1, eager) | — | pads receive 0.0 attention, so a pad is **not** a quasi-BOS; `position_ids = arange` ignores the mask, so a left-padded shorter prompt's first real token *loses* the sink (layer-2 max abs 618 → 34–37 on 4 / 4 prompts, final-state cosine 0.83–0.94, argmax changes 4 / 4; mask-derived positions restore cosine 1.000) | — | MEASURED (GPT-J untested) |
+| Per-item re-split (third-party re-run of the MEMIT evaluate script on GPT-2-XL, 3,533 single edits per method; 3,119 subject-at-0 vs 414 not) | rewrite / neighborhood / paraphrase | ROME rewrite 1.000 vs 1.000, MEMIT 0.971 vs 0.971; neighborhood ROME 0.745 vs 0.669; paraphrase (every item subject-medial, split by the *edit* prompt's position) 0.986 vs 0.929 | MEMIT path | MEASURED, and discounted below |
+
+No official per-item results exist (the ROME/MEMIT result directory is gone from `baulab.info`; Fall
+of ROME releases case lists, not outputs), and no paper in the search reports a subject-position split
+for paraphrase generalisation or for a memory read.
+
+**What the refuters removed.** Three things, each from the census's own numbers. (1) The negation
+"the standard paraphrase metric never places the subject at token 0" is true for Meng et al.'s
+`paraphrase_prompts` and MCF (random-text-prefixed by design, a file property ROME's Appendix D does
+not state) and for zsRE, and false for the EasyEdit-format CounterFact rephrase (53% in Fall of ROME's
+thousand normal cases), KnowEdit WikiData_counterfact rephrase (71%) and MQuAKE cloze (70.6%) — so
+every EasyEdit-harness GPT-2-XL / GPT-J CounterFact generalisation number since 2024 is about half
+subject-initial and unsplit. (2) An axis confusion: the census condition is the subject's *first*
+token at position 0, but ROME and MEMIT read and write at `subject_last`, which is position 0 only for
+the 80 single-token subjects (0.36%), and the third-party re-split shows the condition carries no
+efficacy penalty (1.000 vs 1.000; Fall of ROME's normal row is 96.16% on cases that are 78%
+subject-initial). (3) Left padding, which the census had inferred to act as a quasi-BOS for the
+KnowEdit-ZsRE Relation_Specificity row, was measured to do the opposite: the shorter subject-initial
+prompt in a left-padded batch is evaluated with *no* token at position 0 and no sink. The re-split's
+paraphrase column (0.986 vs 0.929) splits by the edit prompt over all-medial paraphrases and contrasts
+templates within a relation; it is evidence about nothing here and is not quoted.
+
+**What the critic corrected, and it changes the landing.** E-000050's subjects are single BPE tokens
+by construction: `select_entities` in `so/experiments/e000008_gpt2_adapter.py` takes the first 256
+tokens matching `Ġ[A-Z][a-z]{3,}` and raises "not enough single-token entity names" otherwise, and
+every record carries the note "entities are the first 256 capitalised single BPE tokens of GPT-2". So
+the templates that fail in §31.38 are exactly Yang et al.'s collapse condition — subject-initial
+**and** single-token, 77 / 77 of their GPT-2-XL collapse cases — which is 80 of 21,919 CounterFact
+prompts, 3 of the 3,119 subject-at-0 cases in the re-split, 0 of the 777 in `normal_1k`, and 0 of 59
+prompts and 11 of 597 rephrases in KnowEdit WikiData_counterfact. The 80% census describes a different
+condition, a multi-token subject whose first token sits at the sink, on which ROME's `subject_last`
+key never sits at position 0, no penalty is visible, and this repository has no measurement. The
+workflow's landing sentence closed with "a learned routing query fails on the condition where ROME's
+efficacy key does not"; at the matched condition ROME's key *does* fail (Fall of ROME Table 4,
+efficacy 5.19%), and the sentence contrasted two conditions. Two smaller overstatements go with it:
+`normal_1k` is defined by the absence of collapse, so its 96% cannot show "no penalty"; and "any
+prefix repairs it" is broader than the paper, which tested random prefixes from its editing
+distribution — the bare-`<|endoftext|>` result, in both directions, is E-000050's own. §31.38 now
+carries this note in place.
+
+**The sentence that survives.** E-000050 reproduces the Fall of ROME collapse condition on an external
+addressable memory over frozen GPT-2 whose routing query is read at the last prompt token — a read
+*through* the sink into the last-token state, not a key extracted at it — and is the only
+BOS-versus-no-BOS control of that condition in either direction (recorded weights read with a BOS:
+a trade, initial 0.97 / 0.98, medial 0.95 → 0.70 / 0.64; BOS-trained weights read without one:
+initial 0.00 / 0.00, medial 0.95 / 0.97), on axes no editing paper reports: held-out paraphrase reading
+and addressing, and deletion propagation (0.865 → 0.990). What is unpublished as numbers is the
+census — CounterFact rewrite 80.2%, MCF 82.4%, the ROME-harness paraphrase metric 0% by design, the
+EasyEdit-format rephrase 53%, KnowEdit rephrase 71%, MQuAKE cloze 70.6% against 0% for every question
+form, zsRE ≈ 0%, the WISE / MEMOIR temporal set 100% — together with the file-and-line record that
+ROME, MEMIT, EasyEdit, RippleEdits, MEMIT-CSK and GRACE / MELO evaluate with no BOS while Larimar and
+Memory Injections carry one by construction and never ran without it, the left-padding measurement,
+and the negative that no paper splits by subject position. Everything mechanistic is owned: the sink
+(Xiao 2023, Sun 2024, Gu ICLR 2025, Ran-Milo 2026), the single-token subject-initial collapse and the
+`<s>` escape (Fall of ROME; Butterfly Effect), the prefixed / unprefixed key asymmetry (Rebuilding
+ROME), the library defaults (HF `add_bos_token=False`; TransformerLens `prepend_bos=True`, "heads
+often use the first position as a resting position").
+
+**Not claimed.** That any published ROME / MEMIT efficacy, locality or generation number is
+artefactual (the condition is present at ~80% and shows no penalty where it can be seen). That the
+EasyEdit-harness generalisation numbers *are* contaminated (they are half subject-initial and
+unsplit; that is a question, not a finding). That Larimar or Memory Injections would fail without
+their BOS (neither ran the control). That E-000050's failure is a property of GPT-2 reading
+subject-initial prompts in general rather than of this adapter's learned routing on single-token
+subjects. The literature search was two targeted queries plus the census's own list, and a
+2025–26 evaluation critique reporting a subject-position split could exist unseen; Fall of ROME's
+`rephrase_prompt` provenance as EasyEdit's `counterfact-edit.json` is inferred from field names; GPT-J
+padding is untested.
+
+**The cheapest decisive measurement, registered as E-000054 and not run.** The critic's, not the
+workflow's: the proposed thousand-edit EasyEdit run would again be 99% multi-token-subject cases, the
+condition E-000050 never tested. Inside this repository the question — is the adapter's failure the
+single-token collapse condition, or subject-at-0 in general — costs a change to the subject surface
+only: render each of the 256 entities as a two-token subject whose identity needs both tokens (a
+16 × 16 product code, so the sink eats half the identity), against a two-token surface identified by
+its second token alone (the sink eats nothing), on E-000050's harness, trained without a BOS and read
+at the initial and medial templates, then trained with one; three seeds. The prediction that could
+fail: the product-code surface fails at the initial templates without a BOS and recovers with one, the
+second-token surface does not fail, and the medial residue is unchanged by either. The field-side
+option, if the published harness must be touched, is about two hundred EasyEdit ROME edits on
+GPT-2-XL — the 77 collapse cases plus the normal cases whose rephrase is subject-initial — with and
+without an evaluation-time `<|endoftext|>`, split by the rephrase prompt's own subject position;
+it needs ROME's layer-covariance statistics and a GPU this box does not have.
+
+**Standing.** Twenty repetitions of the request, eight sweeps, ten retractions and one landing
+narrowed by its own critic. The field question attached to §31.38 is answered as far as a census can
+answer it: the condition is the majority condition of the efficacy numbers and absent from the
+paraphrase metric by design, and the case that breaks this adapter is the 0.36% case the literature
+already names. The instrument finding stands at its size; the claim that it contaminates published
+evaluations does not exist and was not made.
+
+### 31.44 Eleventh retraction: the BOS-trained arm fired the "costs capability" branch of its own rule, the medial residue is that arm's regression, and the training-free fix is a different token (2026-09-05, E-000050 audit)
+
+A fourteen-agent workflow (57 minutes, 2.27 M tokens) audited E-000050's code, records and controls
+with three independent auditors, drafted three candidate claims from three angles, attacked each twice,
+judged the survivors and put the judged sentence to a completeness critic. Two auditors said the record
+stands; one said it does not; the judge found every draft broken as written. Every number below was
+re-read from `so/results/e000050_bos_trained.json` in this session before it was written down. §31.38
+is retracted in the following parts and corrected in place.
+
+**1. The rule's third branch fired, and I wrote up the first two.** The decision rule fixed before the
+run reads: "C passes every row → the honest held-out numbers for the memory are C's … C passes the
+subject-initial rows and fails the medial ones → the artefact is the subject-initial half only and the
+remainder is semantic. C fails the trained-template or generic rows → a BOS at training time costs
+capability and the finding is B's alone." Arm C failed three registered rows in every seed — generic
+KL 4.170 / 4.158 / 4.224 against the 3.65 bar, held-out medial reading 0.91, held-out addressing 0.83
+— so the third branch fired. §31.38's title ("closes its subject-initial half for free"), "at no
+price", "the decision rule fires two of its branches, and the record keeps both", and the re-scoping of
+every prior held-out number to C's are withdrawn. `SO_BOS=1` as the default instrument was an
+engineering decision taken outside the rule; it stays only for runs already registered under it, whose
+rows compare BOS-trained to BOS-trained (E-000052's price arm).
+
+**2. The "residual medial gap" is C's regression, not a residue.** The untrained control has no medial
+gap. Per seed on the 200-target rows, t9 (the one genuinely unseen subject-medial template):
+
+| arm | t9 reading, seeds 0 / 1 / 2 | t9 refusal while active (`active_unknown`) | t10 |
+|---|---|---|---|
+| A — recorded, no BOS | 0.990 / 0.955 / 0.960 | 0.005 / 0.025 / 0.025 | 1.00 |
+| B — recorded, BOS at inference | 0.810 / 0.705 / 0.775 | 0.135 / 0.170 / 0.140 | 1.00 |
+| C — BOS-trained, BOS | 0.945 / 0.905 / 0.885 | 0.055 / 0.090 / 0.105 | 1.00 |
+| D — BOS-trained, no BOS | 0.995 / 0.995 / 0.990 | 0.005 / 0.005 / 0.010 | 1.00 |
+
+C is below A on t9 in every seed, and the loss is mostly refusal — the same direction as C's broken-key
+gain (0.63 → 0.935). t10 is "It is known that " followed by the trained t0 verbatim and reads 1.00 in
+every arm and seed, so "the two medial held-out forms" of §31.38 is one form. The sentence "that
+residue is where the paraphrase problem of this memory now lives" is withdrawn: the paraphrase problem
+of the *recorded* memory was the subject-initial half, and the BOS-trained memory's medial gap is a cost
+the training introduced.
+
+**3. The generic-KL bar compared a BOS-prefixed distribution against a bare one.** The GENERIC prompts
+go through `encode_texts` too, so arm C's 4.22 carries the BOS while the 3.65 bar is arm A's on bare
+text. Arm B — identical weights, BOS at inference only — already sits at 3.920 / 3.336 / 3.558 against
+A's 3.647 / 2.959 / 3.216, +0.27 to +0.38 nats with no weight changed. Like for like, C − B is +0.25 /
++0.82 / +0.67 and D − A is +0.15 / +0.70 / +0.57 per seed. The direction (the BOS-trained adapter
+injects more where no key matches) survives; the attribution of the whole 0.57 to training does not.
+An unlogged five-prompt check the auditor quoted was re-run here (BOS-trained seed 0, five prompts): the
+BOS alone moves the base by 0.25 nats, the adapter by 4.8. And the quantity is the *mean* generic KL
+per seed, worst seed, not a maximum, wherever this ledger wrote "max".
+
+**4. Three deletion rows were vacuous or doubled, and the one clause that carries was not written.**
+Arm D's "SHRED reaches the worst held-out phrasing 1.0000" is the refusal floor of an adapter that
+answers UNKNOWN before any deletion (D's t11 `active_unknown` is 1.0 in every seed); the column is an
+unconditional UNKNOWN rate, and arm A's 0.865 on t11 is inflated the same way (t11 read correctly at
+0.41–0.445 while active, `active_unknown` 0.47–0.49). `shred_heldout_min` and `revoke_heldout_min`
+are one measurement (identical in every arm and seed, §31.13's identity) counted as two PASS rows.
+`revoked_deleted_object ≤ 0.02` cannot fail under the status gate (0.0000 in every arm, seed and prior
+record). What carries the re-reading of the record's 0.865 is a row nobody quoted: on t11 the
+other-entity rate is 0.085 / 0.085 / 0.105 while the fact is active and 0.065 / 0.105 / 0.090 after
+it is revoked, with refusal conditional on a correct read at 1.000 / 0.988 / 0.976 — the non-UNKNOWN
+residue after deletion is the misrouting that exists before it. That is the sentence Raeesi and Roed
+(arXiv:2607.00605, §6.4) publish at twelve thousand deletions: prompt formulation moves the full
+baseline far more than the deletion residual.
+
+**5. The remedy makes the recorded deletion number worse on the medial template.** Under a BOS on the
+recorded weights, `shred_heldout_min` is 0.945 / 0.84 / 0.88 — now set by t9 (t9 `active_unknown`
+0.135–0.17). E-000017's kill criterion 5 (≥ 0.95) would still fire under `SO_BOS=1`, on a
+subject-medial phrasing. §31.38's "re-scoped to position 0" for that criterion is withdrawn.
+
+**6. Arm B was confirmatory, not predictive.** The pre-registration commit (`42818f4`) says the
+BOS-at-inference probe had been run on the E-000017-B checkpoint before B's two rows were written; only
+seeds 1–2 and arms C and D were blind. "Criteria fixed before the run" holds for C and D and for B's
+seeds 1–2, not for B's seed 0.
+
+**7. The price is the token's, not the prefix's — and E-000050-A seed 0 has all eight variants.** The
+recorded seed-0 weights, no training, 100 targets, all rows from `scratchpad/e50a/full.log` (the
+`none` and `bos` lines equal arms A and B seed 0 to printed precision):
+
+| prefix at position 0 | held-out subject-initial read / route | held-out medial (t9) read / route | held-out reading | trained reading | SHRED reaches worst held-out | broken-key UNKNOWN | mean generic KL |
+|---|---|---|---|---|---|---|---|
+| none (the record) | 0.39 / 0.54 | 0.96 / 0.97 | 0.7587 | 0.9312 | 0.920 | 0.630 | 3.647 |
+| `<\|endoftext\|>` | 0.99 / 1.00 | 0.79 / 0.64 | 0.9487 | 0.9719 | 0.945 | 0.520 | 3.920 |
+| `<\|endoftext\|>` + space | 0.98 / 0.97 | 0.80 / 0.62 | 0.9413 | 0.9650 | 0.935 | 0.615 | 3.826 |
+| newline | 0.99 / 1.00 | 0.86 / 0.69 | 0.9638 | 0.9925 | 0.945 | 0.540 | 3.800 |
+| "It is known that " (E-000039-A's text) | 0.99 / 0.99 | 0.69 / 0.45 | 0.9325 | 0.9906 | 0.980 | 0.680 | 3.527 |
+| the same text without its trailing space | 0.99 / 0.99 | 0.69 / 0.45 | 0.9338 | 0.9919 | 0.980 | 0.580 | 3.616 |
+| "Also" | 0.99 / 0.99 | 0.90 / 0.87 | 0.9700 | 0.9850 | 0.930 | 0.570 | 3.815 |
+| a lone space | 0.99 / 0.99 | **0.97 / 0.96** | **0.9938** | **0.9938** | **0.990** | 0.535 | 3.677 |
+
+Read by the rule E-000050-A registered for its three marker arms: BOS + space ≈ BOS (0.80 / 0.62 vs
+0.79 / 0.64), so the trained space-marker before the subject does not rescue t9 under a BOS; text
+without its space = text (0.69 / 0.45), so the marker is not what the text costs either; a lone space at
+position 0 costs nothing. The medial price therefore belongs to *which token* sits at position 0 — the
+BOS and the newline cost t9 most, a word less, a space not at all — and not to moving the subject off
+position 0 as such; §31.38's "a prefix is a trade for an adapter trained without one" is re-scoped to
+the BOS. On this seed the lone space reaches, with no training, held-out reading 0.9938 against C's
+0.9837, no t9 cost against C's regression, SHRED reach 0.990, and generic KL 3.677 against C's 4.170;
+C wins only broken-key refusal (0.97 vs 0.535). The space arm is confounded by construction — entity
+names carry a leading space, so every trained medial prompt contains the lone-space token immediately
+before the subject — and the BOS + space row says that bigram alone does not explain the ordering; it
+is one seed, and seeds 1–2 are running. An unrecorded 30-target probe from the audit (`scratchpad/audit50/probe.json`)
+adds that the BOS-trained seed-0 adapter, read *without* its BOS but with a space, "Also" or a newline
+at position 0, reads the subject-initial forms at 0.97–1.00: arm D's collapse is the empty position 0,
+not a dependence on the BOS token.
+
+**8. Citations §31.38 owed.** Youssef, Zhao, Schlötterer and Seifert (NAACL 2025, arXiv:2410.12586,
+§7): a bare `<BOS>` inserted at inference changes what GPT-2-XL and GPT-J read in an in-context editing
+setting (attention to the query 15% → 38%) and does nothing on Llama 3.1 — the bare-BOS form, at a
+different position. Barbero et al. (COLM 2025, arXiv:2504.02732, §5, Table 2): removing `<bos>` from a
+model trained with it collapses performance, and without it the sink forms at the first token
+regardless — arms D and A in kind, on their own pretrained models. Yang et al., Table 4: prefixed keys
+at edit time and an unprefixed prompt at test give efficacy 5.19% on GPT-2-XL — the nearer parent of
+arm D's shape than the `<s>` removal in A.2; and their A.4 sentence is "while position embedding plays a
+role, it is not the only determining factor", not the paraphrase §31.38 put in quotation marks. Ran-Milo,
+Ofek and Mendel (arXiv:2604.14722): the GPT-2 sink is built from the positional encoding through the
+first-layer MLP, a query bias and the key projection, and nullifying the BOS embedding leaves it at
+99.7% — consistent with, and not an explanation of, the space row above.
+
+**The sentence that survives, at the judge's size and the critic's trim.** On a frozen GPT-2 small
+reading an external status-gated addressable memory (the recorded E-000017-B adapter; three seeds,
+worst seed throughout; criteria committed before arms C and D were trained, B's rows after a seed-0
+probe), the held-out paraphrase failure lies almost entirely on the phrasings whose subject is token 0
+by the tokenizer — Yang et al.'s first-token diagnosis for a ROME weight edit, here on a memory's
+routing query with no weight edited — and is removed there by a token at inference, not by training: a
+bare `<|endoftext|>` prepended to weights trained without it raises held-out subject-initial reading
+and addressing from 0.37 / 0.54 to 0.97 / 0.98 with no weight changed; an adapter of the same design
+trained with the BOS and read without it reads those forms at ≤ 0.01 and routes them at ≤ 0.04 while
+its subject-medial forms stand at ≥ 0.95 / 0.97; the price of that BOS on the recorded weights is the
+one genuinely unseen subject-medial template, t9, 0.95 → 0.70 reading and 0.94 → 0.64 addressing, plus
++0.27 to +0.38 nats of mean generic-text KL to base on the same weights; and the record's held-out
+deletion number, 0.865, was an unconditional UNKNOWN rate on a subject-initial template the adapter
+read correctly at only 0.41–0.445 while active, with the other-entity rate the same before and after
+revocation and refusal conditional on a correct read at 0.976–1.000, so that number measured the
+adapter not reading the phrasing rather than knowledge surviving deletion — a re-reading of the
+E-000017-B row and §31.13, not a new deletion result.
+
+| row | worst seed (per seed) | the control that could have failed |
+|---|---|---|
+| A: held-out subject-initial read / route | 0.37 (0.39, 0.37, 0.45) / 0.54 (0.54, 0.56, 0.59), set by t11 | same weights, t9: 0.95 / 0.94; t10 1.00 |
+| A: record reproduced in-process | 0.72875 = E-000017-B's worst seed exactly; six checkpoint SHA-256 match | a reproduction check, not a control |
+| B: held-out subject-initial read / route | 0.97 (0.99, 0.97, 1.00) / 0.98 (1.00, 0.98, 0.99) | arm A on identical weights; seed 0 seen before registration |
+| D: held-out subject-initial read / route | ≤ 0.01 / ≤ 0.01 (t8 route up to 0.04) | arm C on identical weights 0.99 / 0.97; D's own t9 0.95–1.00 |
+| B: price on t9, read / route | 0.70 (0.79, 0.70, 0.74) / 0.64 (0.64, 0.72, 0.70) | t10 at 0.99–1.00 in every arm and seed |
+| B: price on generic text, mean KL, worst seed | 3.920 (B − A = +0.27, +0.38, +0.34) | base and adapter scored on the same BOS-prefixed ids |
+| A: the deletion number re-read | 0.865 unconditional on t11; other-entity 0.085–0.105 active, 0.065–0.105 revoked; conditional refusal 0.976–1.000 | `revoked_deleted_object` 0.0000 by construction and not counted |
+| C: reported, not headlined | held-out 0.9712; t9 below A in every seed; generic 4.224 FAIL; route 0.83 FAIL; medial 0.91 FAIL | the rule's third branch |
+| E-000050-A: prefix dependence, seed 0 only | the table in item 7 | seeds 1–2 pending; at risk, and named so |
+
+**Not claimed.** A mechanism ("sink" is Xiao, Sun, Gu and Ran-Milo's word, cited and not measured).
+That the fix is free, or that arm C is the memory's honest ceiling. That the price belongs to the BOS
+token as a property of prefixing (a text prefix costs t9 more, a lone space nothing, on one seed). That
+the failure is confined to position 0 (the control reads unseen t9 at 0.95 against trained 1.00, and
+its trained subject-initial forms at 0.75–0.83; "almost entirely" is the sentence). That the medial
+residue is semantic. Anything about E-000013 or E-000020 under a BOS (E-000050-A's smoke read
+E-000013's held-out override at 0.0000 with a BOS; the families are in the running job). Anything about
+pods.
+
+**Standing.** Eleven retractions. The recommendation reverts to §31.21's — normalise the prompt, do not
+train — with the token unnamed until E-000050-A's seeds 1–2 and its E-000013 / E-000020 families
+report; if the lone space holds across seeds, the training-free fix is a space and the BOS-trained
+substrate of E-000052 is the wrong instrument for a ceiling, though the right one for a like-for-like
+price.
 
 ### 31.8 Boundary
 
