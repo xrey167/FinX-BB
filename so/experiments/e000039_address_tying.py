@@ -451,6 +451,16 @@ def main(argv: Optional[List[str]] = None) -> Dict[str, Any]:
         d = decompose(gk, 1700 + seed, np.asarray(out["centre"]), args.n_targets, not args.no_oracle)
         m["heldout/route_hit_min"] = min(d[f"t{t}/heldout/route_hit"] for t in range(N_TRAIN, N_T))
         m["heldout/routing_share"] = d["heldout/routing_share"]
+        # the two collapse criteria are computed by decompose() and were never copied into the
+        # record, so the first run reported them as '-' (FAIL by absence). Copied now; the run that
+        # recorded them is an evaluation-only re-run from the saved checkpoints (ledger §31.37).
+        for k, v in d.items():
+            if (k.startswith("query_cos_between_fact/") or k == "address_collision"
+                    or "/heldout/" in k or k.startswith("prefixed/") or k.endswith("_route_hit")
+                    or k.endswith("_read")) and k not in m and isinstance(v, (int, float, bool)):
+                # the per-template held-out addressing and the prefix ceiling: the prediction was
+                # about the subject-initial held-out forms (t8, t11), so their numbers must be on record
+                m[k] = float(v)
         m["train_seconds"] = out["train_seconds"]; m["checkpoint_sha256"] = out["checkpoint_sha256"]
         per_seed.append(m)
     keys = [k for k in per_seed[0] if k not in ("seed", "checkpoint_sha256")]

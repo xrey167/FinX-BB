@@ -2664,6 +2664,54 @@ E-000047 for the pod objective where the failure exists; and the key-channel swe
 symlink arms, which has still never been run. None of these is a novelty; each is a number the target
 does not yet have.
 
+### 31.37 Tying the address across phrasings does not make the invariance intrinsic (2026-09-05, E-000039-B)
+
+E-000039 was written before this session's reviews and left half run: its decide phase (§31.24 —
+88.6% of the held-out paraphrase gap is addressing, and a neutral prefix lifts held-out addressing to
+0.98 and reading to 0.97 with no weight changed) and not its train phase. The train phase is the
+**symlink on phrasings**: an InfoNCE tie on the routing query `q` — the only phrasing-dependent tensor
+in the read path — between a subject-initial and a subject-medial rendering of the same question,
+added to E-000017-B's trainer at the same budget. The control is E-000017-B itself, tie weight 0. The
+prediction, fixed before the run and specific: the held-out subject-initial forms recover, because the
+tie spans the axis they differ on. The bar is the prefixed ceiling reached *without* the prefix: 0.95
+on held-out reading and addressing.
+
+Three seeds, 3000 steps, 2841–3910 s each. The tie was learned — tie loss 0.82 → 0.41, 0.70 → 0.60,
+0.92 → 0.41 over the run, minima 0.18–0.27 — and the trained phrasings read as before
+(`train/active_correct` 0.9131 against the control's 0.9119).
+
+| measure, worst seed | control (E-000017-B) | address tie (E-000039-B) | bar |
+|---|---|---|---|
+| held-out reading | 0.7288 | 0.7488 | ≥ 0.95 |
+| held-out addressing, `route_hit_min` | 0.5400 (E-000039-A, template 11) | 0.5200 | ≥ 0.95 |
+| addressing share of the held-out gap | 0.8818 | 0.8000 | — |
+| deletion reaches the worst held-out phrasing, SHRED / REVOKE | 0.8650 / 0.8650 | 0.8650 / 0.8650 | ≥ 0.95 |
+| generic-text KL to the base model | 3.6474 | 3.1971 | ≤ 3.65 |
+| broken-key UNKNOWN | 0.6300 | 0.6000 | ≥ 0.63 |
+| prefixed ceiling, no weight changed | 0.9700 read / 0.9800 route | — | — |
+
+**All five claim groups unsupported.** Reading moved by +0.02, addressing by −0.02, deletion
+propagation by exactly 0.0000. The tie changed the routing query's geometry on the pairs it was
+trained on and left the held-out phrasings where they were: an invariance trained on eight
+renderings does not reach a ninth whose difference is where the subject token sits, even when the
+training pairs were built to span that axis. Two instrument notes, recorded rather than smoothed:
+(i) two criteria (`query_cos_between_fact/read1`, `address_collision`) came back "−", because
+`decompose()` computes them and `main()` never copied them into the record — FAIL by absence, as
+registered; the record was fixed and an evaluation-only re-run from the saved checkpoints supplies
+them, with the per-template held-out addressing the prediction was about, in the addendum below;
+(ii) the 0.63 bar on broken-key UNKNOWN was set at the control's own value, so 0.6000 is a 0.03
+regression and not a collapse.
+
+**What it means for the target.** "Behaves like the model's own knowledge" fails on held-out
+phrasings (§31.36), the failure is addressing (§31.24), and this run shows the addressing cannot be
+symlinked *by training on the trained phrasings*. The pre-registered recommendation is now the
+finding: normalise the prompt in the read path — the prefix, which reaches 0.98 with no training —
+and carry that scope on the certificate; do not train. Prior art: paraphrase-consistency and
+query-invariance training are standard (GRACE's expand rule, contrastive dense retrieval), so the
+mechanism is owned; the negative is specific to a frozen LM's addressable memory whose failure is
+positional, and its control is a ceiling that the same weights demonstrably reach. A clean negative
+that could have come out the other way, and no claim.
+
 ### 31.8 Boundary
 
 CPU only, no GPU, no LLM above 124M parameters, synthetic worlds, single-token entities, two surface forms per relation, one session. Nothing here shows unlearning of facts already encoded in pretrained weights. Evidence levels recorded: E3–E4 for the synthetic system (F4 for SHRED with the verified gate, E-000010 — **on the value channel only**: E-000028 recovers the shredded object at 1.0000 through the ungated reverse key, where REVOKE and DELETE are at chance, so F4 for SHRED is a claim about answers, logits, hidden states and probes and not about routing); E5 as substrate for the frozen-GPT-2 experiment, with reading, composition, update and the copy bound supported and behavioural deletion not yet supported at the pre-registered thresholds.
