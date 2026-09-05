@@ -3574,7 +3574,57 @@ face of the geometry, also large enough for it to reject the current one, since 
 learned region and epochs are not a direction it was trained to resolve. If that holds, the version
 check cannot live in the learned reader on any architecture of this shape, and every design that
 promises attestation "at the point of neural consumption" reduces to a store-side check before
-materialisation. That is registered as E-000056 and not run.
+materialisation. That is E-000056, and §31.48 records
+both its answer and the fact that the answer needed no run: the gate is a pure function of the row's
+own marker, so a retained row's verdict is constant in time.
+
+### 31.48 Where the freshness check can live: a gate that is a pure function of the row cannot revoke it (2026-09-05, E-000056)
+
+§31.47 left one question from the parallel branch's audit open, and it is the only part of "attested at
+the point of neural consumption" that is about a *learned* component rather than about a database: can
+the reader's own acceptance function be made to reject a bank signed under a previous epoch, without
+being retrained?
+
+**The proposition, which settles it before any measurement.** `gate_logits` takes one argument, the
+row's own marker (`so/model.py:176`, `so/llm_adapter.py:200`). A retained bank carries its markers
+with it, unchanged. So the gate's verdict on a retained row is constant in time, and no signing
+schedule — epochs, rotating keys, shrinking leases, a generation number written into the marker — can
+make a row the gate accepted at write time stop being accepted later: nothing about the row or the
+gate has changed. A freshness predicate needs an input that changes between the write and the read,
+and the gate has none. Therefore the version check cannot live in this learned reader at all, and a
+design that promises attestation at the point of neural consumption must either give the reader live
+state — an epoch nonce mixed into every row at materialisation, which is the store touching every row,
+which *is* materialising the bank — or put the check in the store before materialisation. This is a
+property of a function signature, not a finding, and it is recorded as such: it makes the freshness
+clause of §31.47 a store-side clause, exactly where the composition result (Garg, Goldwasser and
+Vasudevan, Eurocrypt 2020) already puts it.
+
+**What was measured anyway, and the two rows that could have failed.** E-000056 runs on eleven
+recorded checkpoints across three families, trains nothing, and describes the instrument the
+proposition talks about — including the one geometric escape somebody could propose, that a
+disconnected accepting set would let a store cycle epochs through its components.
+
+| row (worst of eleven checkpoints) | observed |
+|---|---|
+| radial accept bands | 1 (every checkpoint) |
+| operational radius, chord distance | 0.840 – 0.890 |
+| profile monotone (accept, then reject, never back) | yes, every checkpoint |
+| tangential accept bands on great circles inside the cap | 1 (every checkpoint), accept fraction 1.000 |
+| epoch capacity, equidistant and inward schedules | 0 |
+| acceptance under two HMAC keys of the same content | 1.000 / 1.000, gap 0.000 |
+
+The accepting set of every trained gate here is a single monotone cap, so the escape does not exist
+even in the weak form. The row that could have failed is the last one: E-000053 measured that the
+frozen gate accepts content-derived markers as its own under **one** key, and if the gate discriminated
+keys inside the family that acceptance would have been a coincidence of that key. It does not: two
+different keyed hashes of the same content are accepted alike to three decimals, which is E-000053's
+result from the other side and closes it. The measurement also sharpens E-000029: the operational
+radius is 0.84–0.89 rather than the single 0.90, on eleven checkpoints instead of one family.
+
+The epoch rows are reported and not scored, because the proposition says they cannot come out
+otherwise; recording them under a criterion that cannot fail is the mistake §31.33 and §31.44 both
+caught, and it is avoided here by declaring it in the file before the run
+(`so/experiments/e000056_epoch_capacity.py`). Record: `so/results/e000056_epoch_capacity.{json,md}`.
 
 ### 31.8 Boundary
 
