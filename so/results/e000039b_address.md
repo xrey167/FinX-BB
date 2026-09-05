@@ -16,7 +16,7 @@
 | shred_heldout_min | >= 0.95 | 0.8650 | FAIL |
 | revoke_heldout_min | >= 0.95 | 0.8650 | FAIL |
 | heldout/revoked_deleted_object | <= 0.02 | 0.0000 | PASS |
-| query_cos_between_fact/read1 | <= 0.33 | - | FAIL |
-| address_collision | <= 0.02 | - | FAIL |
+| query_cos_between_fact/read1 | <= 0.33 | 0.1683 | PASS |
+| address_collision | <= 0.02 | 0.1125 | FAIL |
 | broken1_unknown | >= 0.63 | 0.6000 | FAIL |
 | generic/kl_to_base | <= 3.65 | 3.1971 | PASS |

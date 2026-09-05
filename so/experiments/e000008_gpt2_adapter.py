@@ -76,7 +76,20 @@ def query_text(q: Query, names: List[str], n_synonyms: int, template: Optional[i
     return f"The {inner} of {s} is"
 
 
+BOS_TEXT = "<|endoftext|>"
+
+
+def bos_enabled() -> bool:
+    """E-000050: GPT-2's tokenizer prepends no BOS, so a subject-initial prompt puts the subject at
+    position 0 -- the attention-sink position -- and the adapter's addressing reads the sink instead of
+    the subject. Set ``SO_BOS=1`` to prepend ``<|endoftext|>`` to every prompt this module encodes, at
+    training and at evaluation alike. Read at call time so an experiment can compare arms in-process."""
+    return os.environ.get("SO_BOS", "") == "1"
+
+
 def encode_texts(tok, texts: List[str]) -> Tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
+    if bos_enabled():
+        texts = [BOS_TEXT + t for t in texts]
     enc = tok(texts, return_tensors="pt", padding=True)
     last_idx = enc["attention_mask"].sum(1) - 1
     return enc["input_ids"], enc["attention_mask"], last_idx

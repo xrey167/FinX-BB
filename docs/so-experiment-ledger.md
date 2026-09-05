@@ -2712,6 +2712,29 @@ mechanism is owned; the negative is specific to a frozen LM's addressable memory
 positional, and its control is a ceiling that the same weights demonstrably reach. A clean negative
 that could have come out the other way, and no claim.
 
+**Addendum, the evaluation-only re-run (same checkpoints, nothing retrained).** The two criteria
+recorded as "−" now carry values, and the per-template held-out addressing the prediction was about is
+on record beside the control's:
+
+| measure, worst seed | control (E-000039-A on E-000017-B) | address tie (E-000039-B) | bar |
+|---|---|---|---|
+| routing-query cosine between different facts, read layer 10 | 0.2720 | 0.1683 | ≤ 0.33 |
+| address collision on held-out forms (share of targets sharing a cell) | 0.1000 | 0.1125 | ≤ 0.02 |
+| held-out route_hit, template 8 (subject-initial) | 0.66 | 0.67 | — |
+| held-out route_hit, template 11 (subject-initial) | 0.54 | 0.52 | — |
+| held-out route_hit, template 9 (subject-medial) | 0.94 | 0.97 | — |
+| held-out route_hit, template 10 (subject-medial) | 1.00 | 1.00 | — |
+| prefixed ceiling, read / route_hit, no weight changed | 0.97 / 0.98 | 0.97 / 0.97 | — |
+
+The tie did what it was asked at the level it was asked: the between-fact cosine of the routing query
+fell and the collapse criterion passes. It did not move a single held-out template: the two
+subject-initial forms sit at the control's numbers to within 0.03 and the two subject-medial forms
+were already at the ceiling. The address-collision row FAILS on both the control and the tie — it was
+registered against a bar the untouched model does not meet either, which makes it a property of the
+evaluation (a hundred targets over a thousand cells at these held-out forms) and not of the tie. The
+prefix still reaches 0.97 on the same weights. E-000050 (§31.38) says why: the failing templates are
+exactly those that put the subject at token position 0, and GPT-2's tokenizer prepends no BOS.
+
 ### 31.8 Boundary
 
 CPU only, no GPU, no LLM above 124M parameters, synthetic worlds, single-token entities, two surface forms per relation, one session. Nothing here shows unlearning of facts already encoded in pretrained weights. Evidence levels recorded: E3–E4 for the synthetic system (F4 for SHRED with the verified gate, E-000010 — **on the value channel only**: E-000028 recovers the shredded object at 1.0000 through the ungated reverse key, where REVOKE and DELETE are at chance, so F4 for SHRED is a claim about answers, logits, hidden states and probes and not about routing); E5 as substrate for the frozen-GPT-2 experiment, with reading, composition, update and the copy bound supported and behavioural deletion not yet supported at the pre-registered thresholds.

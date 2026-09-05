@@ -1,5 +1,11 @@
 {
   "aggregate": {
+    "address_collision": {
+      "max": 0.11249999999999999,
+      "mean": 0.105,
+      "min": 0.095,
+      "n": 3
+    },
     "broken1_unknown": {
       "max": 0.68,
       "mean": 0.6433333333333334,
@@ -52,6 +58,30 @@
       "max": 200.0,
       "mean": 200.0,
       "min": 200.0,
+      "n": 3
+    },
+    "prefixed/read_min": {
+      "max": 0.99,
+      "mean": 0.9833333333333334,
+      "min": 0.97,
+      "n": 3
+    },
+    "prefixed/route_hit_min": {
+      "max": 0.99,
+      "mean": 0.9766666666666666,
+      "min": 0.97,
+      "n": 3
+    },
+    "query_cos_between_fact/read0": {
+      "max": 0.33866000175476074,
+      "mean": 0.3254976073900859,
+      "min": 0.3183978497982025,
+      "n": 3
+    },
+    "query_cos_between_fact/read1": {
+      "max": 0.1682603359222412,
+      "mean": 0.1628778576850891,
+      "min": 0.1590695083141327,
       "n": 3
     },
     "revoke/template0_unknown": {
@@ -220,6 +250,234 @@
       "max": 0.975,
       "mean": 0.96,
       "min": 0.945,
+      "n": 3
+    },
+    "t0/prefixed_read": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "t0/prefixed_route_hit": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "t0/train/oracle_read": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "t1/train/oracle_read": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "t10/heldout/first_read_null": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "t10/heldout/oracle_read": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "t10/heldout/oracle_unknown": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 3
+    },
+    "t10/heldout/read": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "t10/heldout/route_hit": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "t11/heldout/first_read_null": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "t11/heldout/oracle_read": {
+      "max": 0.94,
+      "mean": 0.9133333333333334,
+      "min": 0.89,
+      "n": 3
+    },
+    "t11/heldout/oracle_unknown": {
+      "max": 0.11,
+      "mean": 0.08666666666666667,
+      "min": 0.06,
+      "n": 3
+    },
+    "t11/heldout/read": {
+      "max": 0.43,
+      "mean": 0.3933333333333333,
+      "min": 0.35,
+      "n": 3
+    },
+    "t11/heldout/route_hit": {
+      "max": 0.55,
+      "mean": 0.5333333333333333,
+      "min": 0.52,
+      "n": 3
+    },
+    "t11/prefixed_read": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "t11/prefixed_route_hit": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "t2/prefixed_read": {
+      "max": 0.99,
+      "mean": 0.9833333333333334,
+      "min": 0.97,
+      "n": 3
+    },
+    "t2/prefixed_route_hit": {
+      "max": 0.99,
+      "mean": 0.9766666666666666,
+      "min": 0.97,
+      "n": 3
+    },
+    "t2/train/oracle_read": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "t3/train/oracle_read": {
+      "max": 1.0,
+      "mean": 0.9966666666666667,
+      "min": 0.99,
+      "n": 3
+    },
+    "t4/train/oracle_read": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "t5/train/oracle_read": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "t6/prefixed_read": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "t6/prefixed_route_hit": {
+      "max": 1.0,
+      "mean": 0.9933333333333333,
+      "min": 0.99,
+      "n": 3
+    },
+    "t6/train/oracle_read": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "t7/train/oracle_read": {
+      "max": 1.0,
+      "mean": 0.9933333333333333,
+      "min": 0.99,
+      "n": 3
+    },
+    "t8/heldout/first_read_null": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "t8/heldout/oracle_read": {
+      "max": 0.99,
+      "mean": 0.9400000000000001,
+      "min": 0.91,
+      "n": 3
+    },
+    "t8/heldout/oracle_unknown": {
+      "max": 0.09,
+      "mean": 0.06,
+      "min": 0.01,
+      "n": 3
+    },
+    "t8/heldout/read": {
+      "max": 0.59,
+      "mean": 0.58,
+      "min": 0.57,
+      "n": 3
+    },
+    "t8/heldout/route_hit": {
+      "max": 0.78,
+      "mean": 0.7066666666666667,
+      "min": 0.67,
+      "n": 3
+    },
+    "t8/prefixed_read": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "t8/prefixed_route_hit": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "t9/heldout/first_read_null": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "t9/heldout/oracle_read": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "t9/heldout/oracle_unknown": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 3
+    },
+    "t9/heldout/read": {
+      "max": 0.99,
+      "mean": 0.98,
+      "min": 0.97,
+      "n": 3
+    },
+    "t9/heldout/route_hit": {
+      "max": 0.98,
+      "mean": 0.9733333333333333,
+      "min": 0.97,
       "n": 3
     },
     "template0_train/active_correct": {
@@ -901,7 +1159,7 @@
   "control": "E-000017-B (e000017b_templates8) \u2014 same trainer, same budget, tie weight 0.",
   "criteria": {
     "address_collision": {
-      "observed": null,
+      "observed": 0.11249999999999999,
       "op": "<=",
       "pass": false,
       "threshold": 0.02
@@ -937,9 +1195,9 @@
       "threshold": 0.95
     },
     "query_cos_between_fact/read1": {
-      "observed": null,
+      "observed": 0.1682603359222412,
       "op": "<=",
-      "pass": false,
+      "pass": true,
       "threshold": 0.33
     },
     "revoke_heldout_min": {
@@ -974,6 +1232,7 @@
   "experiment": "E-000039-B-address",
   "per_seed": [
     {
+      "address_collision": 0.095,
       "broken1_unknown": 0.6,
       "checkpoint_sha256": "2fce5e83f5793e3ac91040d33054da80f28996fc13a4aca4f98734a14f8fb041",
       "generic/kl_to_base": 3.0457842350006104,
@@ -984,6 +1243,10 @@
       "heldout/route_hit_min": 0.53,
       "heldout/routing_share": 0.9357798165137614,
       "n_targets": 200,
+      "prefixed/read_min": 0.99,
+      "prefixed/route_hit_min": 0.97,
+      "query_cos_between_fact/read0": 0.3183978497982025,
+      "query_cos_between_fact/read1": 0.16130372881889343,
       "revoke/template0_unknown": 0.955,
       "revoke/template10_unknown": 1.0,
       "revoke/template11_unknown": 0.885,
@@ -1013,6 +1276,44 @@
       "shred_hard/template9_unknown": 0.985,
       "shred_heldout_min": 0.885,
       "shred_train_min": 0.945,
+      "t0/prefixed_read": 1.0,
+      "t0/prefixed_route_hit": 1.0,
+      "t0/train/oracle_read": 1.0,
+      "t1/train/oracle_read": 1.0,
+      "t10/heldout/first_read_null": 1.0,
+      "t10/heldout/oracle_read": 1.0,
+      "t10/heldout/oracle_unknown": 0.0,
+      "t10/heldout/read": 1.0,
+      "t10/heldout/route_hit": 1.0,
+      "t11/heldout/first_read_null": 1.0,
+      "t11/heldout/oracle_read": 0.94,
+      "t11/heldout/oracle_unknown": 0.06,
+      "t11/heldout/read": 0.35,
+      "t11/heldout/route_hit": 0.53,
+      "t11/prefixed_read": 1.0,
+      "t11/prefixed_route_hit": 1.0,
+      "t2/prefixed_read": 0.99,
+      "t2/prefixed_route_hit": 0.97,
+      "t2/train/oracle_read": 1.0,
+      "t3/train/oracle_read": 0.99,
+      "t4/train/oracle_read": 1.0,
+      "t5/train/oracle_read": 1.0,
+      "t6/prefixed_read": 1.0,
+      "t6/prefixed_route_hit": 0.99,
+      "t6/train/oracle_read": 1.0,
+      "t7/train/oracle_read": 0.99,
+      "t8/heldout/first_read_null": 1.0,
+      "t8/heldout/oracle_read": 0.99,
+      "t8/heldout/oracle_unknown": 0.01,
+      "t8/heldout/read": 0.59,
+      "t8/heldout/route_hit": 0.78,
+      "t8/prefixed_read": 1.0,
+      "t8/prefixed_route_hit": 1.0,
+      "t9/heldout/first_read_null": 1.0,
+      "t9/heldout/oracle_read": 1.0,
+      "t9/heldout/oracle_unknown": 0.0,
+      "t9/heldout/read": 0.97,
+      "t9/heldout/route_hit": 0.97,
       "template0_train/active_correct": 0.805,
       "template0_train/active_other_entity": 0.01,
       "template0_train/active_unknown": 0.185,
@@ -1126,6 +1427,7 @@
       "train_seconds": 3910.1242158412933
     },
     {
+      "address_collision": 0.10750000000000001,
       "broken1_unknown": 0.68,
       "checkpoint_sha256": "085cde40ee27fcb914d38d5216b545f69e0165339f504abc1bfe93966da36de2",
       "generic/kl_to_base": 3.197061777114868,
@@ -1136,6 +1438,10 @@
       "heldout/route_hit_min": 0.52,
       "heldout/routing_share": 0.8380952380952382,
       "n_targets": 200,
+      "prefixed/read_min": 0.99,
+      "prefixed/route_hit_min": 0.99,
+      "query_cos_between_fact/read0": 0.3194349706172943,
+      "query_cos_between_fact/read1": 0.1682603359222412,
       "revoke/template0_unknown": 0.975,
       "revoke/template10_unknown": 1.0,
       "revoke/template11_unknown": 0.88,
@@ -1165,6 +1471,44 @@
       "shred_hard/template9_unknown": 0.99,
       "shred_heldout_min": 0.88,
       "shred_train_min": 0.975,
+      "t0/prefixed_read": 1.0,
+      "t0/prefixed_route_hit": 1.0,
+      "t0/train/oracle_read": 1.0,
+      "t1/train/oracle_read": 1.0,
+      "t10/heldout/first_read_null": 1.0,
+      "t10/heldout/oracle_read": 1.0,
+      "t10/heldout/oracle_unknown": 0.0,
+      "t10/heldout/read": 1.0,
+      "t10/heldout/route_hit": 1.0,
+      "t11/heldout/first_read_null": 1.0,
+      "t11/heldout/oracle_read": 0.91,
+      "t11/heldout/oracle_unknown": 0.09,
+      "t11/heldout/read": 0.4,
+      "t11/heldout/route_hit": 0.52,
+      "t11/prefixed_read": 1.0,
+      "t11/prefixed_route_hit": 1.0,
+      "t2/prefixed_read": 0.99,
+      "t2/prefixed_route_hit": 0.99,
+      "t2/train/oracle_read": 1.0,
+      "t3/train/oracle_read": 1.0,
+      "t4/train/oracle_read": 1.0,
+      "t5/train/oracle_read": 1.0,
+      "t6/prefixed_read": 1.0,
+      "t6/prefixed_route_hit": 0.99,
+      "t6/train/oracle_read": 1.0,
+      "t7/train/oracle_read": 0.99,
+      "t8/heldout/first_read_null": 1.0,
+      "t8/heldout/oracle_read": 0.92,
+      "t8/heldout/oracle_unknown": 0.08,
+      "t8/heldout/read": 0.57,
+      "t8/heldout/route_hit": 0.67,
+      "t8/prefixed_read": 1.0,
+      "t8/prefixed_route_hit": 1.0,
+      "t9/heldout/first_read_null": 1.0,
+      "t9/heldout/oracle_read": 1.0,
+      "t9/heldout/oracle_unknown": 0.0,
+      "t9/heldout/read": 0.98,
+      "t9/heldout/route_hit": 0.97,
       "template0_train/active_correct": 0.79,
       "template0_train/active_other_entity": 0.005,
       "template0_train/active_unknown": 0.205,
@@ -1278,6 +1622,7 @@
       "train_seconds": 2848.3997962474823
     },
     {
+      "address_collision": 0.11249999999999999,
       "broken1_unknown": 0.65,
       "checkpoint_sha256": "b3bb90b3d30ff08b5ea1ae0a0ede77c07b668ba8f1430a1707e1c07da9adaff4",
       "generic/kl_to_base": 3.078450918197632,
@@ -1288,6 +1633,10 @@
       "heldout/route_hit_min": 0.55,
       "heldout/routing_share": 0.8,
       "n_targets": 200,
+      "prefixed/read_min": 0.97,
+      "prefixed/route_hit_min": 0.97,
+      "query_cos_between_fact/read0": 0.33866000175476074,
+      "query_cos_between_fact/read1": 0.1590695083141327,
       "revoke/template0_unknown": 0.975,
       "revoke/template10_unknown": 1.0,
       "revoke/template11_unknown": 0.865,
@@ -1317,6 +1666,44 @@
       "shred_hard/template9_unknown": 0.98,
       "shred_heldout_min": 0.865,
       "shred_train_min": 0.96,
+      "t0/prefixed_read": 1.0,
+      "t0/prefixed_route_hit": 1.0,
+      "t0/train/oracle_read": 1.0,
+      "t1/train/oracle_read": 1.0,
+      "t10/heldout/first_read_null": 1.0,
+      "t10/heldout/oracle_read": 1.0,
+      "t10/heldout/oracle_unknown": 0.0,
+      "t10/heldout/read": 1.0,
+      "t10/heldout/route_hit": 1.0,
+      "t11/heldout/first_read_null": 1.0,
+      "t11/heldout/oracle_read": 0.89,
+      "t11/heldout/oracle_unknown": 0.11,
+      "t11/heldout/read": 0.43,
+      "t11/heldout/route_hit": 0.55,
+      "t11/prefixed_read": 1.0,
+      "t11/prefixed_route_hit": 1.0,
+      "t2/prefixed_read": 0.97,
+      "t2/prefixed_route_hit": 0.97,
+      "t2/train/oracle_read": 1.0,
+      "t3/train/oracle_read": 1.0,
+      "t4/train/oracle_read": 1.0,
+      "t5/train/oracle_read": 1.0,
+      "t6/prefixed_read": 1.0,
+      "t6/prefixed_route_hit": 1.0,
+      "t6/train/oracle_read": 1.0,
+      "t7/train/oracle_read": 1.0,
+      "t8/heldout/first_read_null": 1.0,
+      "t8/heldout/oracle_read": 0.91,
+      "t8/heldout/oracle_unknown": 0.09,
+      "t8/heldout/read": 0.58,
+      "t8/heldout/route_hit": 0.67,
+      "t8/prefixed_read": 1.0,
+      "t8/prefixed_route_hit": 1.0,
+      "t9/heldout/first_read_null": 1.0,
+      "t9/heldout/oracle_read": 1.0,
+      "t9/heldout/oracle_unknown": 0.0,
+      "t9/heldout/read": 0.99,
+      "t9/heldout/route_hit": 0.98,
       "template0_train/active_correct": 0.79,
       "template0_train/active_other_entity": 0.005,
       "template0_train/active_unknown": 0.205,
@@ -1430,6 +1817,6 @@
       "train_seconds": 2840.6163465976715
     }
   ],
-  "recorded_at": "2026-09-05T02:03:11+00:00",
+  "recorded_at": "2026-09-05T02:38:24+00:00",
   "title": "Tying the routing query across phrasings of the same fact"
 }
