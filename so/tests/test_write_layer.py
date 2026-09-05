@@ -74,11 +74,7 @@ def _prompt(B=3, T=7):
 def _cache_and_hidden(m, bank, ids, am, last):
     """Run the frozen core through the adapter and collect what it persists: hidden states and K/V."""
     out = {}
-    if bank is not None:
-        enc = m.encode_bank(bank)
-        m._ctx = {"keys": enc["keys"], "values": enc["values"], "allowed": enc["active"], "last_idx": last, "routing": []}
-    else:
-        m._ctx = None
+    m._ctx = m.make_ctx(bank, last) if bank is not None else None
     with torch.no_grad():
         o = m.lm(input_ids=ids, attention_mask=am, output_hidden_states=True, use_cache=True)
     m._ctx = None
@@ -198,6 +194,93 @@ def test_two_deferred_placements_see_identical_residuals_at_every_read():
     assert torch.equal(rc[:, 0], ra[:, 0]), "the first read is upstream of every write"
     assert not torch.equal(rc[:, 1], ra[:, 1]), "the in-place arm's second read sees its own first write"
     assert not torch.equal(fc, fd), "different write depths are different computations"
+
+
+def _ref_adapter():
+    cfg = AdapterConfig(read_layers=(1, 2), d_key=16, marker_dim=16, status_gated=True,
+                        reference_carrier=True, write_layer=N_LAYER - 1)
+    torch.manual_seed(1)
+    return KnowledgeAdapterLM(_lm(), cfg, list(range(10, 10 + N_ENT)), UNK).eval()
+
+
+def _ref_bank(seed=0):
+    b = _bank(seed)
+    b["resolved_idx"] = torch.arange(b["obj"].shape[0])
+    return b
+
+
+def test_reference_carrier_needs_a_write_layer():
+    with pytest.raises(ValueError):
+        _adapter(reference_carrier=True)
+
+
+def test_handles_are_knowledge_free_and_untrained():
+    m = _ref_adapter()
+    assert "handles" in dict(m.named_buffers()), "handles must be a buffer, not a trained parameter"
+    assert not any(n.endswith("handles") for n, _ in m.named_parameters())
+    # the handle table is a function of the row POSITION only: it cannot depend on a bank at all
+    b1, b2 = _ref_bank(0), _ref_bank(1)
+    assert not torch.equal(b1["obj"], b2["obj"])
+    before = m.handles.clone()
+    with torch.no_grad():
+        ids, am, last = _prompt()
+        m(b1, ids, am, last)
+        m(b2, ids, am, last)
+    assert torch.equal(before, m.handles)
+
+
+@pytest.mark.parametrize("op,mutate", [
+    ("update_payload", lambda b: b.__setitem__("obj", (b["obj"] + 1) % N_ENT)),
+    ("relink", lambda b: b.__setitem__("resolved_idx", torch.roll(b["resolved_idx"], 3))),
+    ("shred_markers", lambda b: b.__setitem__("marker", torch.zeros_like(b["marker"]))),
+])
+def test_lifecycle_operations_leave_every_persisted_tensor_bit_identical(op, mutate):
+    """The property the reference carrier exists for.
+
+    A handle names a row; it never carries the row's payload, the row it resolves to, or its marker.
+    So a payload UPDATE, an alias RELINK and a SHRED all leave the persisted K/V byte-for-byte
+    unchanged — no cache entry has to be invalidated, recomputed or lineage-tracked — while the answer
+    the model gives still changes, because the value is bound after the last cache-writing block.
+    """
+    m = _ref_adapter()
+    with torch.no_grad():
+        m.inject_gain.fill_(3.0)
+        m.bind_gain.fill_(3.0)
+    bank = _ref_bank(); ids, am, last = _prompt()
+    before = _cache_and_hidden(m, bank, ids, am, last)
+    after_bank = {k: (v.clone() if torch.is_tensor(v) else v) for k, v in bank.items()}
+    mutate(after_bank)
+    after = _cache_and_hidden(m, after_bank, ids, am, last)
+    for i in range(N_LAYER):
+        assert torch.equal(before["kv"][i][0], after["kv"][i][0]), f"{op} moved K of block {i}"
+        assert torch.equal(before["kv"][i][1], after["kv"][i][1]), f"{op} moved V of block {i}"
+    ar = torch.arange(ids.shape[0])
+    assert not torch.equal(before["logits"][ar, last], after["logits"][ar, last]), f"{op} changed nothing"
+
+
+def test_the_reference_carrier_actually_participates():
+    """What separates arm E from arm C: the handle rides through the frozen blocks.
+
+    Arm C's persisted state is identical to the no-memory forward — nothing of the memory takes part
+    in the frozen computation. Here the handle is injected in place at the read layers, so the K/V the
+    model persists genuinely differs from the no-memory forward, while still being independent of every
+    mutable field (the test above).
+    """
+    m = _ref_adapter()
+    with torch.no_grad():
+        m.inject_gain.fill_(3.0)
+    bank = _ref_bank(); ids, am, last = _prompt()
+    mem = _cache_and_hidden(m, bank, ids, am, last)
+    base = _cache_and_hidden(m, None, ids, am, last)
+    moved = max(float((a[0] - b[0]).abs().max()) for a, b in zip(mem["kv"], base["kv"]))
+    assert moved > 0.0, "the handle must participate, otherwise this is arm C with extra steps"
+
+    c = _adapter(write_layer=N_LAYER - 1)
+    with torch.no_grad():
+        c.inject_gain.fill_(3.0)
+    c_mem = _cache_and_hidden(c, _bank(), ids, am, last)
+    c_base = _cache_and_hidden(c, None, ids, am, last)
+    assert max(float((a[0] - b[0]).abs().max()) for a, b in zip(c_mem["kv"], c_base["kv"])) == 0.0
 
 
 def test_no_memory_forward_is_untouched_by_the_write_hook():

@@ -17,6 +17,9 @@ jobs:
       fail-fast: false
       matrix:
         include:
+          - { arm: E, seed: 0 }
+          - { arm: E, seed: 1 }
+          - { arm: E, seed: 2 }
           - { arm: D, seed: 0 }
           - { arm: D, seed: 1 }
           - { arm: D, seed: 2 }

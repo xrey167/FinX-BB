@@ -93,6 +93,16 @@ class AdapterConfig:
                                    # on an untied model it is the control arm that should fail.
     fallback: str = "unknown"      # 'unknown': a null / unsigned / revoked read emits ' unknown';
                                    # 'prior' (E-000013): it injects nothing, so the pretrained distribution returns
+    reference_carrier: bool = False # E-000084 arm E: what rides through the frozen blocks is a knowledge-free
+                                   # HANDLE for the addressed row, not the payload. Each row has a fixed random
+                                   # handle drawn at construction from a fixed generator; the read layers inject
+                                   # the routing-weighted handle in place, so it participates in the frozen
+                                   # computation exactly as a payload write would. At the write layer the handle
+                                   # is decoded back to a row distribution and bound to that row's RESOLVED value.
+                                   # The handles depend on row position only, so everything the model persists is
+                                   # a function of the prompt and the key namespace: UPDATE, RELINK, REVOKE and
+                                   # SHRED leave every K/V tensor bit-identical while still changing the answer.
+                                   # Requires write_layer. See the arm E rows of E-000084 for what is measured.
     write_layer: Optional[int] = None  # E-000084: decouple WHERE the memory is addressed from WHERE it is written.
                                    # None (every recorded experiment): each read layer injects its own read into
                                    # the residual stream in place. An integer L: the read layers still compute the
@@ -108,6 +118,8 @@ class AdapterConfig:
 
 
 class KnowledgeAdapterLM(nn.Module):
+    MAX_ROWS = 4096   # handle table size for cfg.reference_carrier; banks in every experiment are far smaller
+
     def __init__(self, lm, cfg: AdapterConfig, entity_token_ids: Sequence[int], unknown_token_id: int):
         super().__init__()
         self.lm = lm
@@ -168,6 +180,17 @@ class KnowledgeAdapterLM(nn.Module):
         if cfg.fallback == "prior":
             # "nothing found" -> no injection at all (fixed, not learnable: no constant shortcut can be learned)
             self.null_value = nn.Parameter(torch.zeros(len(cfg.read_layers), d), requires_grad=False)
+        if cfg.reference_carrier:
+            if cfg.write_layer is None:
+                raise ValueError("reference_carrier needs a write_layer: the handle is bound to a value there")
+            # Knowledge-free carriers: one fixed vector per ROW POSITION, drawn from a fixed generator and
+            # never trained, so nothing about a payload, a link target or a marker can enter them. Registered
+            # as a buffer so a checkpoint carries the same handles it was trained with.
+            g = torch.Generator().manual_seed(20260905)
+            self.register_buffer("handles", torch.randn(self.MAX_ROWS + 1, d, generator=g) * 0.02)
+            # The only learned part of the boundary: how to read a handle back out of the residual.
+            self.bind_q = nn.Sequential(nn.LayerNorm(d), nn.Linear(d, d))
+            self.bind_gain = nn.Parameter(torch.tensor(1.0))
         self.scale = nn.Parameter(torch.tensor(1.0))
         self._ctx: Optional[Dict] = None
         blocks = transformer_blocks(lm)
@@ -258,7 +281,15 @@ class KnowledgeAdapterLM(nn.Module):
             # (a mere attenuation would be undone by the RMS-matched injection downstream)
             values = payload * g + unk * (1 - g)
         allowed = bank["routable"] if (self.cfg.status_gated and "routable" in bank) else bank["active"]
-        return {"keys": keys, "values": values, "values_payload": payload, "gate": g.squeeze(-1), "active": allowed}
+        out = {"keys": keys, "values": values, "values_payload": payload, "gate": g.squeeze(-1), "active": allowed}
+        if self.cfg.reference_carrier:
+            # What a row BINDS to at the boundary is the value of the row it resolves to, so an alias binds
+            # to its pod's payload with that pod's gate, exactly as a dereference would have read it. The
+            # resolution itself is done store-side and handed in as `resolved_idx`; without it a row binds
+            # to its own value, which is the link-free case.
+            idx = bank.get("resolved_idx")
+            out["bind_values"] = values if idx is None else values[idx]
+        return out
 
     def _make_hook(self, read_index: int, layer: int):
         def hook(module, inputs, output):
@@ -304,6 +335,26 @@ class KnowledgeAdapterLM(nn.Module):
                     val = pd[:, :-1] @ values[:-1] + pd[:, -1:] * val
                     w_null = w_null * pd[:, -1:]  # the null share survives only through the passthroughs
                     ctx["routing"].append(pd)
+            if self.cfg.reference_carrier:
+                # E-000084 arm E. The routing distribution `p` is the ALIAS address: it is computed from the
+                # query and the cell keys, which are built from subject and relation only. Injecting the
+                # handles it selects therefore puts something in the residual — and so into every K/V tensor
+                # downstream — that participates in the frozen computation while being a function of the
+                # prompt and the key namespace alone. The dereference loop above still ran, so the routing
+                # supervision is unchanged; its resolved value is not used here, because resolution belongs
+                # to the boundary bind.
+                if self.cfg.n_deref == 0:
+                    ctx["routing"].append(p)      # the deref loop above records it when there is one
+                n_rows = ctx["keys"].shape[0]
+                hrows = torch.cat([self.handles[:n_rows], self.handles[self.MAX_ROWS:self.MAX_ROWS + 1]])
+                ref = self.o_proj[str(layer)](p @ hrows)
+                rms_here = hl.detach().pow(2).mean(-1, keepdim=True).sqrt()
+                rms_ref = ref.pow(2).mean(-1, keepdim=True).sqrt().clamp_min(1e-3 * rms_here + 1e-6)
+                ref = ref * (rms_here / rms_ref) * self.inject_gain[read_index]
+                delta = torch.zeros_like(h)
+                delta[ar, ctx["last_idx"]] = ref
+                h2 = h + delta
+                return (h2,) + tuple(output[1:]) if isinstance(output, tuple) else h2
             null_c = w_null * values[-1][None]        # the null column's share of the read
             cell_c = val - null_c                     # everything the cells contributed
             if self.cfg.two_channel_null:
@@ -362,13 +413,33 @@ class KnowledgeAdapterLM(nn.Module):
         """
         def hook(module, inputs, output):
             ctx = self._ctx
-            if ctx is None or not ctx.get("deferred"):
+            if ctx is None:
+                return None
+            if not self.cfg.reference_carrier and not ctx.get("deferred"):
                 return None
             h = output[0] if isinstance(output, tuple) else output
             B = h.shape[0]
             ar = torch.arange(B, device=h.device)
             hl = h[ar, ctx["last_idx"]]
             rms_h = hl.detach().pow(2).mean(-1, keepdim=True).sqrt()
+            if self.cfg.reference_carrier:
+                # Decode which handle the frozen blocks carried to this position, then bind it to that
+                # row's resolved value. This is the ONLY place a payload enters the computation, and it is
+                # after the last cache-writing attention, so no persisted tensor is a function of it.
+                n_rows = ctx["keys"].shape[0]
+                hrows = torch.cat([self.handles[:n_rows], self.handles[self.MAX_ROWS:self.MAX_ROWS + 1]])
+                scores = (self.bind_q(hl) @ hrows.t()) / (self.d ** 0.5)
+                allowed = torch.cat([ctx["allowed"], torch.ones(1, dtype=torch.bool, device=h.device)])
+                q = torch.softmax(scores.masked_fill(~allowed[None], float("-inf")), dim=-1)
+                ctx.setdefault("bind", []).append(q)
+                bind_values = torch.cat([ctx["bind_values"], self.null_value[-1][None]])
+                read = q @ bind_values
+                rms_r = read.pow(2).mean(-1, keepdim=True).sqrt().clamp_min(1e-3 * rms_h + 1e-6)
+                read = read * (rms_h / rms_r) * self.bind_gain
+                delta = torch.zeros_like(h)
+                delta[ar, ctx["last_idx"]] = read
+                h2 = h + delta
+                return (h2,) + tuple(output[1:]) if isinstance(output, tuple) else h2
             read = torch.stack(ctx["deferred"], dim=0).sum(dim=0) * rms_h       # (B, d)
             ctx["deferred"] = []
             delta = torch.zeros_like(h)
@@ -377,16 +448,27 @@ class KnowledgeAdapterLM(nn.Module):
             return (h2,) + tuple(output[1:]) if isinstance(output, tuple) else h2
         return hook
 
+    def make_ctx(self, bank: Dict[str, torch.Tensor], last_idx: torch.Tensor,
+                 cell_mask: Optional[torch.Tensor] = None) -> Dict:
+        """The context the read and write hooks consume for one memory-bearing forward.
+
+        Exposed because experiments that need the raw ``lm`` call — to see ``past_key_values``, which
+        ``forward`` does not return — have to build the same context, and building it by hand in each
+        place is how a hook silently lost its bind values twice.
+        """
+        enc = self.encode_bank(bank)
+        allowed = enc["active"] if cell_mask is None else enc["active"] & cell_mask
+        ctx = {"keys": enc["keys"], "values": enc["values"], "allowed": allowed,
+               "last_idx": last_idx, "routing": []}
+        if self.cfg.reference_carrier:
+            ctx["bind_values"] = enc["bind_values"]
+        return ctx
+
     # ------------------------------------------------------------------ forward
     def forward(self, bank: Optional[Dict[str, torch.Tensor]], input_ids: torch.Tensor, attention_mask: torch.Tensor,
                 last_idx: torch.Tensor, cell_mask: Optional[torch.Tensor] = None):
         """Returns (candidate logits (B, n_entities+1), full-vocab logits at the last token, routing (B, R, C+1), hidden (B, d))."""
-        if bank is not None:
-            enc = self.encode_bank(bank)
-            allowed = enc["active"] if cell_mask is None else enc["active"] & cell_mask
-            self._ctx = {"keys": enc["keys"], "values": enc["values"], "allowed": allowed, "last_idx": last_idx, "routing": []}
-        else:
-            self._ctx = None
+        self._ctx = None if bank is None else self.make_ctx(bank, last_idx, cell_mask)
         out = self.lm(input_ids=input_ids, attention_mask=attention_mask, output_hidden_states=True)
         ar = torch.arange(input_ids.shape[0], device=input_ids.device)
         full = out.logits[ar, last_idx]                                    # (B, V)

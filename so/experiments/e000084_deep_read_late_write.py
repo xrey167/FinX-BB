@@ -19,7 +19,7 @@ the experiment verifies on real prompts rather than assumes.  Arm A is the
 E-000081 configuration (write in place at 8 and 10), run on the same seeds as the
 capability anchor.
 
-Two outcomes, fixed before the run:
+Two outcomes were fixed before the run, and the second is what happened:
 
 * C passes the unchanged strict gate on every seed A passes: E-000083's failure
   was addressing depth alone; "read deep / write late" is the corrected cache-pure
@@ -30,10 +30,30 @@ Two outcomes, fixed before the run:
   and is in genuine tension with cache purity.  Then the depth/participation
   frontier is a live mechanism question rather than a tautology.
 
-Declared by construction (pipeline rows, not claim rows): arm C's persisted K/V
-and every block input are bit-identical to the no-memory forward (exposure 0.0);
-arm A's are not.  Claim rows: the four held-out templates, candidate-set and
-full-vocabulary, per seed, under the unchanged >= 0.95 bars.
+Run 33970654975 gave the second: arm C reached held-out candidate means of
+0.664 / 0.645 / 0.621 on seeds 0 / 1 / 2 with K/V exposure exactly 0.0, while arm A
+reached 0.955 / 0.990 on seeds 0 / 1.  Something has to ride through the frozen
+blocks; a memory that leaves no trace in them is not read back.
+
+Arms D and E follow from that.
+
+* D (write after block 10) answers a confound in C: C removes the payload from every
+  block that could process it AND removes the block-8 write from the input of the
+  block-10 read.  D keeps the second change and restores one block of processing.
+* E asks whether what rides has to be the KNOWLEDGE.  Each row gets a fixed random
+  handle; the read layers inject the routing-weighted handle in place, so it takes
+  part in the frozen computation exactly as a payload write would, and the value is
+  bound to the handle only after the last cache-writing block.  Handles are a
+  function of row position, so a payload UPDATE, an alias RELINK and a SHRED leave
+  every persisted tensor bit-identical while still changing the answer.  If E holds
+  the capability gate, participation and revocability stop trading off.
+
+Declared by construction (pipeline rows, not claim rows): C's persisted K/V and
+every block input are bit-identical to the no-memory forward (exposure 0.0) and
+A's are not; E's lifecycle exposure is 0.0 for UPDATE, RELINK and SHRED while its
+exposure against the no-memory forward is not.  Claim rows: the four held-out
+templates, candidate-set and full-vocabulary, per seed, under the unchanged
+>= 0.95 bars.
 
 This is a capability screen.  It makes no novelty claim and changes no CAVI
 semantics, threshold or attack battery.
@@ -61,6 +81,7 @@ ARMS = {
     "A": dict(read_layers=(8, 10), write_layer=None),   # E-000081: address and write at (8, 10)
     "C": dict(read_layers=(8, 10), write_layer=11),     # address at (8, 10), one write after block 11
     "D": dict(read_layers=(8, 10), write_layer=10),     # address at (8, 10), one write after block 10
+    "E": dict(read_layers=(8, 10), write_layer=11, reference_carrier=True),  # handles ride, value binds late
 }
 
 # Arm D exists because arm C changes two things at once, and the audit of run 33970654975 said so:
@@ -105,12 +126,7 @@ def exposure(gk: E8.GPT2Knowledge, bank, texts: List[str]) -> Dict[str, float]:
     ar = torch.arange(ids.shape[0])
 
     def run(with_bank: bool):
-        if with_bank:
-            enc = m.encode_bank(bank)
-            m._ctx = {"keys": enc["keys"], "values": enc["values"], "allowed": enc["active"],
-                      "last_idx": last, "routing": []}
-        else:
-            m._ctx = None
+        m._ctx = m.make_ctx(bank, last) if with_bank else None
         o = m.lm(input_ids=ids, attention_mask=am, output_hidden_states=True, use_cache=True)
         m._ctx = None
         return [t.clone() for t in _kv_tensors(o.past_key_values)], [h.clone() for h in o.hidden_states], o.logits.clone()
@@ -131,6 +147,42 @@ def exposure(gk: E8.GPT2Knowledge, bank, texts: List[str]) -> Dict[str, float]:
     }
 
 
+@torch.no_grad()
+def lifecycle_exposure(gk: E8.GPT2Knowledge, bank, texts: List[str]) -> Dict[str, float]:
+    """Does a lifecycle operation move anything the model persists?
+
+    The question arm E exists for. A payload UPDATE, an alias RELINK and a SHRED of every marker are
+    applied to the bank, and the persisted K/V is compared with the pre-operation cache on the same
+    prompts. Zero means no cached state has to be invalidated, recomputed or lineage-tracked when the
+    knowledge changes; the answer is still required to move, otherwise the memory is simply inert.
+    """
+    m = gk.model
+    ids, am, last = E8.encode_texts(gk.tok, texts)
+    ar = torch.arange(ids.shape[0])
+
+    def run_bank(b):
+        m._ctx = m.make_ctx(b, last)
+        o = m.lm(input_ids=ids, attention_mask=am, use_cache=True)
+        m._ctx = None
+        return [t.clone() for t in _kv_tensors(o.past_key_values)], o.logits[ar, last].clone()
+
+    kv0, lg0 = run_bank(bank)
+    out: Dict[str, float] = {}
+    n = int(bank["obj"].shape[0])
+    ops = {
+        "update_payload": lambda b: b.__setitem__("obj", (b["obj"] + 1) % int(gk.n_entities)),
+        "relink": lambda b: b.__setitem__("resolved_idx", torch.roll(b["resolved_idx"], max(1, n // 7))),
+        "shred_markers": lambda b: b.__setitem__("marker", torch.zeros_like(b["marker"])),
+    }
+    for name, mutate in ops.items():
+        mutated = {k: (v.clone() if torch.is_tensor(v) else v) for k, v in bank.items()}
+        mutate(mutated)
+        kv1, lg1 = run_bank(mutated)
+        out[f"{name}_kv_maxabs"] = max(float((a - b).abs().max()) for a, b in zip(kv0, kv1))
+        out[f"{name}_logit_maxabs"] = float((lg0 - lg1).abs().max())
+    return out
+
+
 def run(arm: str, seed: int, steps: int, consistency: float, alt_supervision: float,
         n_groups: int) -> Dict[str, Any]:
     torch.manual_seed(seed)
@@ -138,6 +190,7 @@ def run(arm: str, seed: int, steps: int, consistency: float, alt_supervision: fl
     cfg = AdapterConfig(
         read_layers=placement["read_layers"],
         write_layer=placement["write_layer"],
+        reference_carrier=placement.get("reference_carrier", False),
         status_gated=True,
         use_links=True,
         n_deref=E20.N_DEREF,
@@ -172,6 +225,7 @@ def run(arm: str, seed: int, steps: int, consistency: float, alt_supervision: fl
     # Exposure on the first 16 held-out alias prompts of template 9 (the historically strict form).
     texts = [E17.TEMPLATES12[r][9].format(s=gk.names[s]) for (s, r) in list(spec.alias_keys)[:16]]
     expo = exposure(gk, bank.tensors(), texts)
+    life = lifecycle_exposure(gk, bank.tensors(), texts)
 
     checks = {
         "strict_template9_real_symlink_gate": template9 >= 0.95,
@@ -186,13 +240,24 @@ def run(arm: str, seed: int, steps: int, consistency: float, alt_supervision: fl
         # placement leaves a light cone of participation_depth blocks, so its exposure must be nonzero.
         # Both must be material.
         "participation_depth": participation_depth,
-        "expected_kv_exposure_zero": participation_depth == 0,
+        "expected_kv_exposure_zero": participation_depth == 0 and not cfg.reference_carrier,
         "kv_exposure_is_zero": expo["kv_maxabs"] == 0.0 and expo["block_input_maxabs"] == 0.0,
         "memory_is_material": expo["last_logit_maxabs"] > 0.0,
+        # Arm E's defining property, and the one thing that separates it from every other arm: the
+        # persisted state must not move when the KNOWLEDGE changes, while the answer must.
+        "expected_lifecycle_exposure_zero": cfg.reference_carrier,
+        "lifecycle_exposure_is_zero": all(
+            life[f"{op}_kv_maxabs"] == 0.0 for op in ("update_payload", "relink", "shred_markers")),
+        "lifecycle_changes_the_answer": all(
+            life[f"{op}_logit_maxabs"] > 0.0 for op in ("update_payload", "relink", "shred_markers")),
     }
     by_construction["pipeline_ok"] = (
         by_construction["kv_exposure_is_zero"] == by_construction["expected_kv_exposure_zero"]
         and by_construction["memory_is_material"]
+        and (by_construction["lifecycle_exposure_is_zero"]
+             == by_construction["expected_lifecycle_exposure_zero"]
+             or not cfg.reference_carrier)
+        and (by_construction["lifecycle_changes_the_answer"] or not cfg.reference_carrier)
     )
     return {
         "arm": arm,
@@ -213,6 +278,8 @@ def run(arm: str, seed: int, steps: int, consistency: float, alt_supervision: fl
         "heldout_full_vocab_mean": float(np.mean(full_rates)),
         "heldout_full_vocab_min": float(np.min(full_rates)),
         "exposure": expo,
+        "lifecycle_exposure": life,
+        "reference_carrier": cfg.reference_carrier,
         "checks": checks,
         "by_construction": by_construction,
         "strict_pass": all(checks.values()),

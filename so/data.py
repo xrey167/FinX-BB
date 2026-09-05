@@ -19,6 +19,10 @@ import torch
 
 from .world import Query, UNKNOWN, World
 
+# How far a link chain is followed when resolving a row to its pod. E-000015 builds training banks
+# with chains no deeper than three, so this bounds the walk without truncating a legitimate chain.
+MAX_LINK_DEPTH = 4
+
 PAD_HOP = -1
 
 
@@ -65,6 +69,36 @@ class Bank:
     def size(self) -> int:
         return int(self.subject.shape[0])
 
+    def resolved_index(self) -> np.ndarray:
+        """For each row, the row its dereference ends at: a link row's pod, and itself for a fact row.
+
+        This is the store's own resolution, done with no model: ``trace_of_key`` already records the
+        path as row positions, and the link fields are followed only where it does not. E-000084's
+        reference carrier binds a row's handle to the value of the row this returns, so the alias to
+        pod step happens in the control plane and never enters the frozen computation.
+        """
+        n = self.size
+        out = np.arange(n)
+        if self.is_link is None:
+            return out
+        pos = {(int(s), int(r)): i for i, (s, r) in enumerate(zip(self.subject, self.relation))}
+        trace = self.trace_of_key or {}
+        for i in range(n):
+            tr = trace.get((int(self.subject[i]), int(self.relation[i])))
+            if tr:
+                out[i] = int(tr[-1])
+                continue
+            cur = i
+            for _ in range(MAX_LINK_DEPTH):
+                if not bool(self.is_link[cur]):
+                    break
+                nxt = pos.get((int(self.link_subject[cur]), int(self.link_relation[cur])))
+                if nxt is None or nxt == cur:
+                    break
+                cur = nxt
+            out[i] = cur
+        return out
+
     def tensors(self, device: str = "cpu") -> Dict[str, torch.Tensor]:
         return {
             "subject": torch.as_tensor(self.subject, dtype=torch.long, device=device),
@@ -81,6 +115,7 @@ class Bank:
                                             else np.zeros(self.size, dtype=np.int64), dtype=torch.long, device=device),
             "link_relation": torch.as_tensor(self.link_relation if self.link_relation is not None
                                              else np.zeros(self.size, dtype=np.int64), dtype=torch.long, device=device),
+            "resolved_idx": torch.as_tensor(self.resolved_index(), dtype=torch.long, device=device),
         }
 
 
