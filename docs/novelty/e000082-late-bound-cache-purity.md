@@ -132,6 +132,38 @@ Fresh 2025–2026 search materially strengthens the ordinary baseline:
 - Existing PAMSPEC/MemTX/generational-handle/cache-invalidation results remain
   prior-art constraints from the earlier CAVI audit.
 
+### Direct patent collision: learned side-channel knowledge intervention
+
+A targeted patent search found **US20260105279A1**, priority 2024-10-15,
+published 2026-04-16, assigned to ETRI. It is pending; this note is not a legal
+or patentability opinion.
+
+The disclosure is materially close to any broad claim of learning *where* or
+*whether* updated external knowledge should intervene inside a frozen residual
+foundation model:
+
+- a knowledge-control unit is separated from the neural network;
+- an updated-knowledge adapter coexists with frozen primitive-model weights;
+- a side-channel controls combination/non-combination and reflection strength;
+- the combination can return the primitive model output unchanged when false;
+- adapters/combination units can exist across residual blocks or a selected
+  subset;
+- residual-block locations are represented as an array of reflection degrees;
+- the representation-combination strength can itself be learned;
+- token-level intervention can change during autoregressive generation.
+
+Relevant claims include claim 1 (separate knowledge-control unit + side-channel
+combination with an updated-knowledge adapter), claims 6–8 (learned combination
+strength and exact primitive-model output on non-combination), and claim 10
+(iterative layer-wise selective combination during inference).
+
+Source: https://patents.google.com/patent/US20260105279A1/en
+
+The patent text does **not** appear to mention cache/KV state, deletion,
+revocation, lineage or lifecycle-repair cost. Therefore it does not by itself
+falsify the still-narrow candidate below, but it kills a broader framing such as
+“learned layer placement/side-channel intervention for mutable knowledge.”
+
 Primary references searched:
 
 - https://arxiv.org/abs/2602.02579
@@ -141,9 +173,7 @@ Primary references searched:
 - https://aclanthology.org/2026.acl-long.760/
 - https://arxiv.org/abs/2608.12419
 - https://arxiv.org/abs/2609.03201
-
-This is not a patentability opinion. A targeted patent search remains required
-before any promotion.
+- https://patents.google.com/patent/US20260105279A1/en
 
 ## Consequence for the novelty target
 
@@ -152,14 +182,25 @@ before any promotion.
 for reducing cache repair if final-only/fixed compartmentalized memory can
 achieve the same capability and lifecycle guarantees.
 
+The ETRI patent adds a second mandatory exclusion: **learning layer-wise
+knowledge intervention or a side-channel combination policy is not itself the
+novelty target.** Any surviving contribution must be specifically tied to the
+lifecycle of persistent neural state and must beat equivalent fixed and learned
+intervention baselines.
+
 The live question is now empirical:
 
 1. Can a real trained symlink reader retain >=0.95 held-out/full-vocabulary
    capability when moved to the final cache-pure block?
 2. If not, what minimum earlier/deeper computation is required for capability?
-3. Can a learned persistent-state placement achieve that capability while
-   minimizing lifecycle-contaminated state better than the strongest fixed
-   placement/compartment baseline?
+3. Can an execution policy trained explicitly against *measured future
+   lifecycle repair cost* produce less contaminated persistent state at matched
+   capability/safety than (a) fixed final/compartment placement and (b) a
+   learned side-channel/layer intervention policy with no lifecycle objective?
+
+Only question 3 remains a plausible research-novelty candidate, and it must also
+survive a further targeted prior-art/patent search for lifecycle-cost-aware
+neural state placement.
 
 E-000083 directly tests question 1 on the historically failing seed before any
 3-seed qualification run.
