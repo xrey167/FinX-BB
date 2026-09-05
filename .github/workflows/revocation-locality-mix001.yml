@@ -1,0 +1,73 @@
+name: RL-MIX-001 cache interaction screen
+on:
+  push:
+    branches: [research/revocation-locality-mix001]
+    paths:
+      - research/revocation_locality/coalition_probe.py
+      - .github/workflows/revocation-locality-mix001.yml
+permissions:
+  contents: read
+  actions: read
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - model: openai-community/gpt2
+            name: gpt2
+          - model: EleutherAI/pythia-70m
+            name: pythia70m
+    env:
+      OMP_NUM_THREADS: '2'
+      MKL_NUM_THREADS: '2'
+      TOKENIZERS_PARALLELISM: 'false'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Record current Actions and artifact inventory
+        if: matrix.name == 'gpt2'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p mix001
+          python - <<'PY'
+          import json, os, urllib.request
+          base = 'https://api.github.com/repos/xrey167/FinX-BB/'
+          def get(path):
+              req = urllib.request.Request(base + path, headers={'Authorization':'Bearer ' + os.environ['GH_TOKEN'], 'Accept':'application/vnd.github+json'})
+              with urllib.request.urlopen(req, timeout=30) as f: return json.load(f)
+          runs = get('actions/runs?per_page=100')['workflow_runs']
+          rows = []
+          for i, r in enumerate(runs):
+              row = {k:r.get(k) for k in ('id','name','head_branch','head_sha','status','conclusion','created_at','updated_at','html_url','run_attempt')}
+              jobs = get('actions/runs/' + str(r['id']) + '/jobs?per_page=100')['jobs']
+              row['jobs'] = [{k:j.get(k) for k in ('id','name','status','conclusion')} for j in jobs]
+              if i < 12:
+                  row['artifacts'] = [{k:a.get(k) for k in ('id','name','digest','size_in_bytes','expired')} for a in get('actions/runs/' + str(r['id']) + '/artifacts?per_page=100')['artifacts']]
+              rows.append(row)
+          with open('mix001/actions_inventory.json','w') as f: json.dump(rows,f,indent=2)
+          print('\n'.join(f"{r['id']} {r['name']}: {r['status']}/{r['conclusion']}" for r in rows))
+          PY
+      - name: Install pinned CPU dependencies
+        run: |
+          python -m pip install torch==2.8.0 --index-url https://download.pytorch.org/whl/cpu
+          python -m pip install transformers==4.45.2 numpy==2.2.6 safetensors==0.6.2
+          mkdir -p mix001
+          python -m pip freeze > mix001/environment.txt
+          cp research/revocation_locality/coalition_probe.py mix001/
+          cp .github/workflows/revocation-locality-mix001.yml mix001/workflow.yml
+          sha256sum mix001/coalition_probe.py > mix001/source.sha256
+      - name: Validate transform and run all coalitions
+        run: |
+          python research/revocation_locality/coalition_probe.py --selftest --model '${{ matrix.model }}' --seeds 0 1 2 --rms 0.1 1.0 4.0 --output mix001/result.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: rl-mix001-${{ matrix.name }}-${{ github.run_id }}
+          path: mix001/
+          retention-days: 30
