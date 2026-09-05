@@ -11,7 +11,7 @@ from __future__ import annotations
 import argparse
 import json
 from pathlib import Path
-from typing import Any, Dict, Iterable, Tuple
+from typing import Any, Dict, Tuple
 
 import numpy as np
 
@@ -47,8 +47,14 @@ def _implementation_cell(m: int) -> Dict[str, Any]:
 
 
 def _segmentation_cell(m: int, length: int = 4096) -> Dict[str, Any]:
-    # Unique positions, distributed from token 0 through the final token.
-    positions = np.rint(np.linspace(0, length - 1, m)).astype(int)
+    # The preregistration requires every cell to contain the adversarial final-token
+    # read. np.linspace(start, stop, 1) returns start, so handle m=1 explicitly.
+    # For m>1, unique positions are distributed from token 0 through the final token.
+    positions = (
+        np.asarray([length - 1], dtype=int)
+        if m == 1
+        else np.rint(np.linspace(0, length - 1, m)).astype(int)
+    )
     suffix = np.asarray([length - int(pos) for pos in positions], dtype=np.int64)
     coarse = np.full(m, length, dtype=np.int64)
     ratio = coarse / suffix
@@ -116,11 +122,13 @@ def _tiny_gpt2_control(seed: int, seq_len: int = 32, read_pos: int = 24) -> Dict
 
     def run(amplitude: float):
         handles = []
+
         def inject(module, args, output):
             h = output[0] if isinstance(output, tuple) else output
             h2 = h.clone()
             h2[:, read_pos, :] += float(amplitude) * direction.to(h2)
             return (h2,) + tuple(output[1:]) if isinstance(output, tuple) else h2
+
         handles.append(model.transformer.h[1].register_forward_hook(inject))
         try:
             with torch.no_grad():
