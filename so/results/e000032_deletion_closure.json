@@ -1,0 +1,1123 @@
+{
+  "aggregate": {
+    "canonical/certified_deletion_seconds": {
+      "max": 0.4979835796356201,
+      "mean": 0.4803092924753825,
+      "min": 0.45512975692749025,
+      "n": 3
+    },
+    "canonical/closure_search_seconds": {
+      "max": 0.028164968490600586,
+      "mean": 0.027276926040649418,
+      "min": 0.02587444305419922,
+      "n": 3
+    },
+    "canonical/control_model_forwards": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "canonical/control_reachable_before": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "canonical/fact_closure_max": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "canonical/fact_closure_mean": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "canonical/fact_closure_min": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "canonical/fact_closure_optimal_rate": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "canonical/instrument_control_seconds": {
+      "max": 0.12562536239624023,
+      "mean": 0.10192315419514975,
+      "min": 0.06530963897705078,
+      "n": 3
+    },
+    "canonical/mediation_consistent": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "canonical/mediation_encoding_invariant": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 3
+    },
+    "canonical/mediation_output_invariant": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 3
+    },
+    "canonical/model_encodes_per_deletion": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "canonical/model_evaluations_per_deletion": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "canonical/model_evaluations_whole_closure": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "canonical/model_forwards_per_deletion": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 3
+    },
+    "canonical/one_record_address_store_absent": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 3
+    },
+    "canonical/one_record_fact_certified": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "canonical/one_record_payload_absent": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "canonical/one_record_payload_store_absent": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "canonical/one_record_retained_in_store": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "canonical/one_record_still_readable": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 3
+    },
+    "canonical/per_fact_seconds": {
+      "max": 0.6236089420318603,
+      "mean": 0.5822324466705323,
+      "min": 0.520439395904541,
+      "n": 3
+    },
+    "canonical/per_key_closure_max": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "canonical/per_key_closure_mean": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "canonical/predicted_still_readable": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 3
+    },
+    "canonical/prediction_error": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 3
+    },
+    "canonical/prediction_error_max": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 3
+    },
+    "canonical/read_before_deletion": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "canonical/whole_closure_fact_certified": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "canonical/whole_closure_still_readable": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 3
+    },
+    "control/interface_identical": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "control/n_keys": {
+      "max": 1050.0,
+      "mean": 1050.0,
+      "min": 1050.0,
+      "n": 3
+    },
+    "control/read_before_deletion": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "duplicated/certified_deletion_seconds": {
+      "max": 0.4721540451049805,
+      "mean": 0.4669531059265137,
+      "min": 0.46267900466918943,
+      "n": 3
+    },
+    "duplicated/closure_search_seconds": {
+      "max": 0.041101322174072266,
+      "mean": 0.03897926648457845,
+      "min": 0.035036506652832033,
+      "n": 3
+    },
+    "duplicated/control_model_forwards": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "duplicated/control_reachable_before": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "duplicated/fact_closure_max": {
+      "max": 3.0,
+      "mean": 3.0,
+      "min": 3.0,
+      "n": 3
+    },
+    "duplicated/fact_closure_mean": {
+      "max": 3.0,
+      "mean": 3.0,
+      "min": 3.0,
+      "n": 3
+    },
+    "duplicated/fact_closure_min": {
+      "max": 3.0,
+      "mean": 3.0,
+      "min": 3.0,
+      "n": 3
+    },
+    "duplicated/fact_closure_optimal_rate": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "duplicated/instrument_control_seconds": {
+      "max": 0.05478476524353027,
+      "mean": 0.04782305081685384,
+      "min": 0.04319835662841797,
+      "n": 3
+    },
+    "duplicated/mediation_consistent": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "duplicated/mediation_encoding_invariant": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 3
+    },
+    "duplicated/mediation_output_invariant": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 3
+    },
+    "duplicated/model_encodes_per_deletion": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "duplicated/model_evaluations_per_deletion": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "duplicated/model_evaluations_whole_closure": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "duplicated/model_forwards_per_deletion": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 3
+    },
+    "duplicated/one_record_address_store_absent": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "duplicated/one_record_fact_certified": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 3
+    },
+    "duplicated/one_record_payload_absent": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "duplicated/one_record_payload_store_absent": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "duplicated/one_record_retained_in_store": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "duplicated/one_record_still_readable": {
+      "max": 0.6666666666666667,
+      "mean": 0.6666666666666666,
+      "min": 0.6666666666666667,
+      "n": 3
+    },
+    "duplicated/per_fact_seconds": {
+      "max": 0.5174637699127197,
+      "mean": 0.5147761567433675,
+      "min": 0.5115122985839844,
+      "n": 3
+    },
+    "duplicated/per_key_closure_max": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "duplicated/per_key_closure_mean": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "duplicated/predicted_still_readable": {
+      "max": 0.6666666666666667,
+      "mean": 0.6666666666666666,
+      "min": 0.6666666666666667,
+      "n": 3
+    },
+    "duplicated/prediction_error": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 3
+    },
+    "duplicated/prediction_error_max": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 3
+    },
+    "duplicated/read_before_deletion": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "duplicated/whole_closure_fact_certified": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "duplicated/whole_closure_still_readable": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 3
+    },
+    "gap/certificates_per_record": {
+      "max": 3.0,
+      "mean": 3.0,
+      "min": 3.0,
+      "n": 3
+    },
+    "mixed/certified_deletion_seconds": {
+      "max": 0.47386110305786133,
+      "mean": 0.46790034612019854,
+      "min": 0.464531888961792,
+      "n": 3
+    },
+    "mixed/closure_search_seconds": {
+      "max": 0.036921091079711914,
+      "mean": 0.033118336995442706,
+      "min": 0.029817323684692382,
+      "n": 3
+    },
+    "mixed/control_model_forwards": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "mixed/control_reachable_before": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "mixed/fact_closure_max": {
+      "max": 2.0,
+      "mean": 2.0,
+      "min": 2.0,
+      "n": 3
+    },
+    "mixed/fact_closure_mean": {
+      "max": 2.0,
+      "mean": 2.0,
+      "min": 2.0,
+      "n": 3
+    },
+    "mixed/fact_closure_min": {
+      "max": 2.0,
+      "mean": 2.0,
+      "min": 2.0,
+      "n": 3
+    },
+    "mixed/fact_closure_optimal_rate": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "mixed/instrument_control_seconds": {
+      "max": 0.044812278747558595,
+      "mean": 0.04170728365580242,
+      "min": 0.04014854431152344,
+      "n": 3
+    },
+    "mixed/mediation_consistent": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "mixed/mediation_encoding_invariant": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 3
+    },
+    "mixed/mediation_output_invariant": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 3
+    },
+    "mixed/model_encodes_per_deletion": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "mixed/model_evaluations_per_deletion": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "mixed/model_evaluations_whole_closure": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "mixed/model_forwards_per_deletion": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 3
+    },
+    "mixed/one_record_address_store_absent": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 3
+    },
+    "mixed/one_record_fact_certified": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 3
+    },
+    "mixed/one_record_payload_absent": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "mixed/one_record_payload_store_absent": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "mixed/one_record_retained_in_store": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "mixed/one_record_still_readable": {
+      "max": 0.33333333333333337,
+      "mean": 0.3333333333333333,
+      "min": 0.33333333333333337,
+      "n": 3
+    },
+    "mixed/per_fact_seconds": {
+      "max": 0.5186733818054199,
+      "mean": 0.5096076297760009,
+      "min": 0.5046804332733155,
+      "n": 3
+    },
+    "mixed/per_key_closure_max": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "mixed/per_key_closure_mean": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "mixed/predicted_still_readable": {
+      "max": 0.33333333333333337,
+      "mean": 0.3333333333333333,
+      "min": 0.33333333333333337,
+      "n": 3
+    },
+    "mixed/prediction_error": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 3
+    },
+    "mixed/prediction_error_max": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 3
+    },
+    "mixed/read_before_deletion": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "mixed/whole_closure_fact_certified": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "mixed/whole_closure_still_readable": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 3
+    },
+    "n_groups": {
+      "max": 25.0,
+      "mean": 25.0,
+      "min": 25.0,
+      "n": 3
+    }
+  },
+  "arms": [
+    "canonical",
+    "mixed",
+    "duplicated"
+  ],
+  "criteria": {
+    "claim_supported": true,
+    "criteria": {
+      "canonical/control_reachable_before": {
+        "observed": 1.0,
+        "op": ">=",
+        "pass": true,
+        "threshold": 1.0
+      },
+      "canonical/fact_closure_max": {
+        "observed": 1.0,
+        "op": "<=",
+        "pass": true,
+        "threshold": 1.0
+      },
+      "canonical/fact_closure_optimal_rate": {
+        "observed": 1.0,
+        "op": ">=",
+        "pass": true,
+        "threshold": 1.0
+      },
+      "canonical/mediation_consistent": {
+        "observed": 1.0,
+        "op": ">=",
+        "pass": true,
+        "threshold": 1.0
+      },
+      "canonical/one_record_fact_certified": {
+        "observed": 1.0,
+        "op": ">=",
+        "pass": true,
+        "threshold": 1.0
+      },
+      "canonical/one_record_payload_store_absent": {
+        "observed": 1.0,
+        "op": ">=",
+        "pass": true,
+        "threshold": 1.0
+      },
+      "canonical/one_record_retained_in_store": {
+        "observed": 1.0,
+        "op": ">=",
+        "pass": true,
+        "threshold": 1.0
+      },
+      "canonical/one_record_still_readable": {
+        "observed": 0.0,
+        "op": "<=",
+        "pass": true,
+        "threshold": 0.1
+      },
+      "canonical/per_key_closure_max": {
+        "observed": 1.0,
+        "op": "<=",
+        "pass": true,
+        "threshold": 1.0
+      },
+      "canonical/prediction_error": {
+        "observed": 0.0,
+        "op": "<=",
+        "pass": true,
+        "threshold": 0.05
+      },
+      "canonical/whole_closure_fact_certified": {
+        "observed": 1.0,
+        "op": ">=",
+        "pass": true,
+        "threshold": 1.0
+      },
+      "control/interface_identical": {
+        "observed": 1.0,
+        "op": ">=",
+        "pass": true,
+        "threshold": 1.0
+      },
+      "control/read_before_deletion": {
+        "observed": 1.0,
+        "op": ">=",
+        "pass": true,
+        "threshold": 0.9
+      },
+      "duplicated/control_reachable_before": {
+        "observed": 1.0,
+        "op": ">=",
+        "pass": true,
+        "threshold": 1.0
+      },
+      "duplicated/fact_closure_min": {
+        "observed": 3.0,
+        "op": ">=",
+        "pass": true,
+        "threshold": 3.0
+      },
+      "duplicated/fact_closure_optimal_rate": {
+        "observed": 1.0,
+        "op": ">=",
+        "pass": true,
+        "threshold": 1.0
+      },
+      "duplicated/mediation_consistent": {
+        "observed": 1.0,
+        "op": ">=",
+        "pass": true,
+        "threshold": 1.0
+      },
+      "duplicated/one_record_fact_certified": {
+        "observed": 0.0,
+        "op": "<=",
+        "pass": true,
+        "threshold": 0.0
+      },
+      "duplicated/one_record_payload_store_absent": {
+        "observed": 1.0,
+        "op": ">=",
+        "pass": true,
+        "threshold": 1.0
+      },
+      "duplicated/one_record_still_readable": {
+        "observed": 0.6666666666666667,
+        "op": ">=",
+        "pass": true,
+        "threshold": 0.6
+      },
+      "duplicated/per_key_closure_max": {
+        "observed": 1.0,
+        "op": "<=",
+        "pass": true,
+        "threshold": 1.0
+      },
+      "duplicated/prediction_error": {
+        "observed": 0.0,
+        "op": "<=",
+        "pass": true,
+        "threshold": 0.05
+      },
+      "duplicated/whole_closure_fact_certified": {
+        "observed": 1.0,
+        "op": ">=",
+        "pass": true,
+        "threshold": 1.0
+      },
+      "duplicated/whole_closure_still_readable": {
+        "observed": 0.0,
+        "op": "<=",
+        "pass": true,
+        "threshold": 0.1
+      },
+      "mixed/fact_closure_max": {
+        "observed": 2.0,
+        "op": "<=",
+        "pass": true,
+        "threshold": 2.0
+      },
+      "mixed/fact_closure_mean": {
+        "observed": 2.0,
+        "op": ">=",
+        "pass": true,
+        "threshold": 2.0
+      },
+      "mixed/mediation_consistent": {
+        "observed": 1.0,
+        "op": ">=",
+        "pass": true,
+        "threshold": 1.0
+      },
+      "mixed/one_record_fact_certified": {
+        "observed": 0.0,
+        "op": "<=",
+        "pass": true,
+        "threshold": 0.0
+      },
+      "mixed/prediction_error": {
+        "observed": 0.0,
+        "op": "<=",
+        "pass": true,
+        "threshold": 0.05
+      }
+    }
+  },
+  "environment": {
+    "device": "cpu",
+    "numpy": "2.2.6",
+    "platform": "Linux-6.18.44-fc-v24-x86_64-with-glibc2.39",
+    "python": "3.11.15",
+    "threads": "4",
+    "torch": "2.14.0+cpu"
+  },
+  "experiment": "E-000032",
+  "n_groups": 25,
+  "per_seed": [
+    {
+      "canonical/certified_deletion_seconds": 0.45512975692749025,
+      "canonical/closure_search_seconds": 0.02587444305419922,
+      "canonical/control_model_forwards": 1.0,
+      "canonical/control_reachable_before": 1.0,
+      "canonical/fact_closure_max": 1.0,
+      "canonical/fact_closure_mean": 1.0,
+      "canonical/fact_closure_min": 1.0,
+      "canonical/fact_closure_optimal_rate": 1.0,
+      "canonical/instrument_control_seconds": 0.06530963897705078,
+      "canonical/mediation_consistent": 1.0,
+      "canonical/mediation_encoding_invariant": 0.0,
+      "canonical/mediation_output_invariant": 0.0,
+      "canonical/model_encodes_per_deletion": 1.0,
+      "canonical/model_evaluations_per_deletion": 1.0,
+      "canonical/model_evaluations_whole_closure": 1.0,
+      "canonical/model_forwards_per_deletion": 0.0,
+      "canonical/one_record_address_store_absent": 0.0,
+      "canonical/one_record_fact_certified": 1.0,
+      "canonical/one_record_payload_absent": 1.0,
+      "canonical/one_record_payload_store_absent": 1.0,
+      "canonical/one_record_retained_in_store": 1.0,
+      "canonical/one_record_still_readable": 0.0,
+      "canonical/per_fact_seconds": 0.520439395904541,
+      "canonical/per_key_closure_max": 1.0,
+      "canonical/per_key_closure_mean": 1.0,
+      "canonical/per_key_n": 75,
+      "canonical/predicted_still_readable": 0.0,
+      "canonical/prediction_error": 0.0,
+      "canonical/prediction_error_max": 0.0,
+      "canonical/read_before_deletion": 1.0,
+      "canonical/whole_closure_fact_certified": 1.0,
+      "canonical/whole_closure_still_readable": 0.0,
+      "checkpoint_sha256": "104f5c4549a0a57ea7e31fd0dad4c83324478e8cc330419329ac927018d9b456",
+      "control/interface_identical": 1.0,
+      "control/n_keys": 1050,
+      "control/read_before_deletion": 1.0,
+      "duplicated/certified_deletion_seconds": 0.46267900466918943,
+      "duplicated/closure_search_seconds": 0.04079997062683106,
+      "duplicated/control_model_forwards": 1.0,
+      "duplicated/control_reachable_before": 1.0,
+      "duplicated/fact_closure_max": 3.0,
+      "duplicated/fact_closure_mean": 3.0,
+      "duplicated/fact_closure_min": 3.0,
+      "duplicated/fact_closure_optimal_rate": 1.0,
+      "duplicated/instrument_control_seconds": 0.05478476524353027,
+      "duplicated/mediation_consistent": 1.0,
+      "duplicated/mediation_encoding_invariant": 0.0,
+      "duplicated/mediation_output_invariant": 0.0,
+      "duplicated/model_encodes_per_deletion": 1.0,
+      "duplicated/model_evaluations_per_deletion": 1.0,
+      "duplicated/model_evaluations_whole_closure": 1.0,
+      "duplicated/model_forwards_per_deletion": 0.0,
+      "duplicated/one_record_address_store_absent": 1.0,
+      "duplicated/one_record_fact_certified": 0.0,
+      "duplicated/one_record_payload_absent": 1.0,
+      "duplicated/one_record_payload_store_absent": 1.0,
+      "duplicated/one_record_retained_in_store": 1.0,
+      "duplicated/one_record_still_readable": 0.6666666666666667,
+      "duplicated/per_fact_seconds": 0.5174637699127197,
+      "duplicated/per_key_closure_max": 1.0,
+      "duplicated/per_key_closure_mean": 1.0,
+      "duplicated/per_key_n": 75,
+      "duplicated/predicted_still_readable": 0.6666666666666667,
+      "duplicated/prediction_error": 0.0,
+      "duplicated/prediction_error_max": 0.0,
+      "duplicated/read_before_deletion": 1.0,
+      "duplicated/whole_closure_fact_certified": 1.0,
+      "duplicated/whole_closure_still_readable": 0.0,
+      "gap/certificates_per_record": 3.0,
+      "keys_per_group": 3,
+      "mixed/certified_deletion_seconds": 0.464531888961792,
+      "mixed/closure_search_seconds": 0.036921091079711914,
+      "mixed/control_model_forwards": 1.0,
+      "mixed/control_reachable_before": 1.0,
+      "mixed/fact_closure_max": 2.0,
+      "mixed/fact_closure_mean": 2.0,
+      "mixed/fact_closure_min": 2.0,
+      "mixed/fact_closure_optimal_rate": 1.0,
+      "mixed/instrument_control_seconds": 0.04014854431152344,
+      "mixed/mediation_consistent": 1.0,
+      "mixed/mediation_encoding_invariant": 0.0,
+      "mixed/mediation_output_invariant": 0.0,
+      "mixed/model_encodes_per_deletion": 1.0,
+      "mixed/model_evaluations_per_deletion": 1.0,
+      "mixed/model_evaluations_whole_closure": 1.0,
+      "mixed/model_forwards_per_deletion": 0.0,
+      "mixed/one_record_address_store_absent": 0.0,
+      "mixed/one_record_fact_certified": 0.0,
+      "mixed/one_record_payload_absent": 1.0,
+      "mixed/one_record_payload_store_absent": 1.0,
+      "mixed/one_record_retained_in_store": 1.0,
+      "mixed/one_record_still_readable": 0.33333333333333337,
+      "mixed/per_fact_seconds": 0.5046804332733155,
+      "mixed/per_key_closure_max": 1.0,
+      "mixed/per_key_closure_mean": 1.0,
+      "mixed/per_key_n": 75,
+      "mixed/predicted_still_readable": 0.33333333333333337,
+      "mixed/prediction_error": 0.0,
+      "mixed/prediction_error_max": 0.0,
+      "mixed/read_before_deletion": 1.0,
+      "mixed/whole_closure_fact_certified": 1.0,
+      "mixed/whole_closure_still_readable": 0.0,
+      "n_alias_per_group": 2,
+      "n_entities": 256,
+      "n_groups": 25,
+      "seconds": 119.67969155311584,
+      "seed": 0
+    },
+    {
+      "canonical/certified_deletion_seconds": 0.4878145408630371,
+      "canonical/closure_search_seconds": 0.028164968490600586,
+      "canonical/control_model_forwards": 1.0,
+      "canonical/control_reachable_before": 1.0,
+      "canonical/fact_closure_max": 1.0,
+      "canonical/fact_closure_mean": 1.0,
+      "canonical/fact_closure_min": 1.0,
+      "canonical/fact_closure_optimal_rate": 1.0,
+      "canonical/instrument_control_seconds": 0.1148344612121582,
+      "canonical/mediation_consistent": 1.0,
+      "canonical/mediation_encoding_invariant": 0.0,
+      "canonical/mediation_output_invariant": 0.0,
+      "canonical/model_encodes_per_deletion": 1.0,
+      "canonical/model_evaluations_per_deletion": 1.0,
+      "canonical/model_evaluations_whole_closure": 1.0,
+      "canonical/model_forwards_per_deletion": 0.0,
+      "canonical/one_record_address_store_absent": 0.0,
+      "canonical/one_record_fact_certified": 1.0,
+      "canonical/one_record_payload_absent": 1.0,
+      "canonical/one_record_payload_store_absent": 1.0,
+      "canonical/one_record_retained_in_store": 1.0,
+      "canonical/one_record_still_readable": 0.0,
+      "canonical/per_fact_seconds": 0.6026490020751953,
+      "canonical/per_key_closure_max": 1.0,
+      "canonical/per_key_closure_mean": 1.0,
+      "canonical/per_key_n": 75,
+      "canonical/predicted_still_readable": 0.0,
+      "canonical/prediction_error": 0.0,
+      "canonical/prediction_error_max": 0.0,
+      "canonical/read_before_deletion": 1.0,
+      "canonical/whole_closure_fact_certified": 1.0,
+      "canonical/whole_closure_still_readable": 0.0,
+      "checkpoint_sha256": "a680a8772571d78de57257308e5ea3ff07f20469858007c827f638f766e8267e",
+      "control/interface_identical": 1.0,
+      "control/n_keys": 1050,
+      "control/read_before_deletion": 1.0,
+      "duplicated/certified_deletion_seconds": 0.4721540451049805,
+      "duplicated/closure_search_seconds": 0.041101322174072266,
+      "duplicated/control_model_forwards": 1.0,
+      "duplicated/control_reachable_before": 1.0,
+      "duplicated/fact_closure_max": 3.0,
+      "duplicated/fact_closure_mean": 3.0,
+      "duplicated/fact_closure_min": 3.0,
+      "duplicated/fact_closure_optimal_rate": 1.0,
+      "duplicated/instrument_control_seconds": 0.04319835662841797,
+      "duplicated/mediation_consistent": 1.0,
+      "duplicated/mediation_encoding_invariant": 0.0,
+      "duplicated/mediation_output_invariant": 0.0,
+      "duplicated/model_encodes_per_deletion": 1.0,
+      "duplicated/model_evaluations_per_deletion": 1.0,
+      "duplicated/model_evaluations_whole_closure": 1.0,
+      "duplicated/model_forwards_per_deletion": 0.0,
+      "duplicated/one_record_address_store_absent": 1.0,
+      "duplicated/one_record_fact_certified": 0.0,
+      "duplicated/one_record_payload_absent": 1.0,
+      "duplicated/one_record_payload_store_absent": 1.0,
+      "duplicated/one_record_retained_in_store": 1.0,
+      "duplicated/one_record_still_readable": 0.6666666666666667,
+      "duplicated/per_fact_seconds": 0.5153524017333985,
+      "duplicated/per_key_closure_max": 1.0,
+      "duplicated/per_key_closure_mean": 1.0,
+      "duplicated/per_key_n": 75,
+      "duplicated/predicted_still_readable": 0.6666666666666667,
+      "duplicated/prediction_error": 0.0,
+      "duplicated/prediction_error_max": 0.0,
+      "duplicated/read_before_deletion": 1.0,
+      "duplicated/whole_closure_fact_certified": 1.0,
+      "duplicated/whole_closure_still_readable": 0.0,
+      "gap/certificates_per_record": 3.0,
+      "keys_per_group": 3,
+      "mixed/certified_deletion_seconds": 0.47386110305786133,
+      "mixed/closure_search_seconds": 0.03261659622192383,
+      "mixed/control_model_forwards": 1.0,
+      "mixed/control_reachable_before": 1.0,
+      "mixed/fact_closure_max": 2.0,
+      "mixed/fact_closure_mean": 2.0,
+      "mixed/fact_closure_min": 2.0,
+      "mixed/fact_closure_optimal_rate": 1.0,
+      "mixed/instrument_control_seconds": 0.044812278747558595,
+      "mixed/mediation_consistent": 1.0,
+      "mixed/mediation_encoding_invariant": 0.0,
+      "mixed/mediation_output_invariant": 0.0,
+      "mixed/model_encodes_per_deletion": 1.0,
+      "mixed/model_evaluations_per_deletion": 1.0,
+      "mixed/model_evaluations_whole_closure": 1.0,
+      "mixed/model_forwards_per_deletion": 0.0,
+      "mixed/one_record_address_store_absent": 0.0,
+      "mixed/one_record_fact_certified": 0.0,
+      "mixed/one_record_payload_absent": 1.0,
+      "mixed/one_record_payload_store_absent": 1.0,
+      "mixed/one_record_retained_in_store": 1.0,
+      "mixed/one_record_still_readable": 0.33333333333333337,
+      "mixed/per_fact_seconds": 0.5186733818054199,
+      "mixed/per_key_closure_max": 1.0,
+      "mixed/per_key_closure_mean": 1.0,
+      "mixed/per_key_n": 75,
+      "mixed/predicted_still_readable": 0.33333333333333337,
+      "mixed/prediction_error": 0.0,
+      "mixed/prediction_error_max": 0.0,
+      "mixed/read_before_deletion": 1.0,
+      "mixed/whole_closure_fact_certified": 1.0,
+      "mixed/whole_closure_still_readable": 0.0,
+      "n_alias_per_group": 2,
+      "n_entities": 256,
+      "n_groups": 25,
+      "seconds": 124.37845873832703,
+      "seed": 1
+    },
+    {
+      "canonical/certified_deletion_seconds": 0.4979835796356201,
+      "canonical/closure_search_seconds": 0.027791366577148438,
+      "canonical/control_model_forwards": 1.0,
+      "canonical/control_reachable_before": 1.0,
+      "canonical/fact_closure_max": 1.0,
+      "canonical/fact_closure_mean": 1.0,
+      "canonical/fact_closure_min": 1.0,
+      "canonical/fact_closure_optimal_rate": 1.0,
+      "canonical/instrument_control_seconds": 0.12562536239624023,
+      "canonical/mediation_consistent": 1.0,
+      "canonical/mediation_encoding_invariant": 0.0,
+      "canonical/mediation_output_invariant": 0.0,
+      "canonical/model_encodes_per_deletion": 1.0,
+      "canonical/model_evaluations_per_deletion": 1.0,
+      "canonical/model_evaluations_whole_closure": 1.0,
+      "canonical/model_forwards_per_deletion": 0.0,
+      "canonical/one_record_address_store_absent": 0.0,
+      "canonical/one_record_fact_certified": 1.0,
+      "canonical/one_record_payload_absent": 1.0,
+      "canonical/one_record_payload_store_absent": 1.0,
+      "canonical/one_record_retained_in_store": 1.0,
+      "canonical/one_record_still_readable": 0.0,
+      "canonical/per_fact_seconds": 0.6236089420318603,
+      "canonical/per_key_closure_max": 1.0,
+      "canonical/per_key_closure_mean": 1.0,
+      "canonical/per_key_n": 75,
+      "canonical/predicted_still_readable": 0.0,
+      "canonical/prediction_error": 0.0,
+      "canonical/prediction_error_max": 0.0,
+      "canonical/read_before_deletion": 1.0,
+      "canonical/whole_closure_fact_certified": 1.0,
+      "canonical/whole_closure_still_readable": 0.0,
+      "checkpoint_sha256": "07b0a97f4681dc8718beed086b7956090e4ec10dc86b6f4ef6f8dcc058e74240",
+      "control/interface_identical": 1.0,
+      "control/n_keys": 1050,
+      "control/read_before_deletion": 1.0,
+      "duplicated/certified_deletion_seconds": 0.4660262680053711,
+      "duplicated/closure_search_seconds": 0.035036506652832033,
+      "duplicated/control_model_forwards": 1.0,
+      "duplicated/control_reachable_before": 1.0,
+      "duplicated/fact_closure_max": 3.0,
+      "duplicated/fact_closure_mean": 3.0,
+      "duplicated/fact_closure_min": 3.0,
+      "duplicated/fact_closure_optimal_rate": 1.0,
+      "duplicated/instrument_control_seconds": 0.04548603057861328,
+      "duplicated/mediation_consistent": 1.0,
+      "duplicated/mediation_encoding_invariant": 0.0,
+      "duplicated/mediation_output_invariant": 0.0,
+      "duplicated/model_encodes_per_deletion": 1.0,
+      "duplicated/model_evaluations_per_deletion": 1.0,
+      "duplicated/model_evaluations_whole_closure": 1.0,
+      "duplicated/model_forwards_per_deletion": 0.0,
+      "duplicated/one_record_address_store_absent": 1.0,
+      "duplicated/one_record_fact_certified": 0.0,
+      "duplicated/one_record_payload_absent": 1.0,
+      "duplicated/one_record_payload_store_absent": 1.0,
+      "duplicated/one_record_retained_in_store": 1.0,
+      "duplicated/one_record_still_readable": 0.6666666666666667,
+      "duplicated/per_fact_seconds": 0.5115122985839844,
+      "duplicated/per_key_closure_max": 1.0,
+      "duplicated/per_key_closure_mean": 1.0,
+      "duplicated/per_key_n": 75,
+      "duplicated/predicted_still_readable": 0.6666666666666667,
+      "duplicated/prediction_error": 0.0,
+      "duplicated/prediction_error_max": 0.0,
+      "duplicated/read_before_deletion": 1.0,
+      "duplicated/whole_closure_fact_certified": 1.0,
+      "duplicated/whole_closure_still_readable": 0.0,
+      "gap/certificates_per_record": 3.0,
+      "keys_per_group": 3,
+      "mixed/certified_deletion_seconds": 0.46530804634094236,
+      "mixed/closure_search_seconds": 0.029817323684692382,
+      "mixed/control_model_forwards": 1.0,
+      "mixed/control_reachable_before": 1.0,
+      "mixed/fact_closure_max": 2.0,
+      "mixed/fact_closure_mean": 2.0,
+      "mixed/fact_closure_min": 2.0,
+      "mixed/fact_closure_optimal_rate": 1.0,
+      "mixed/instrument_control_seconds": 0.040161027908325195,
+      "mixed/mediation_consistent": 1.0,
+      "mixed/mediation_encoding_invariant": 0.0,
+      "mixed/mediation_output_invariant": 0.0,
+      "mixed/model_encodes_per_deletion": 1.0,
+      "mixed/model_evaluations_per_deletion": 1.0,
+      "mixed/model_evaluations_whole_closure": 1.0,
+      "mixed/model_forwards_per_deletion": 0.0,
+      "mixed/one_record_address_store_absent": 0.0,
+      "mixed/one_record_fact_certified": 0.0,
+      "mixed/one_record_payload_absent": 1.0,
+      "mixed/one_record_payload_store_absent": 1.0,
+      "mixed/one_record_retained_in_store": 1.0,
+      "mixed/one_record_still_readable": 0.33333333333333337,
+      "mixed/per_fact_seconds": 0.5054690742492676,
+      "mixed/per_key_closure_max": 1.0,
+      "mixed/per_key_closure_mean": 1.0,
+      "mixed/per_key_n": 75,
+      "mixed/predicted_still_readable": 0.33333333333333337,
+      "mixed/prediction_error": 0.0,
+      "mixed/prediction_error_max": 0.0,
+      "mixed/read_before_deletion": 1.0,
+      "mixed/whole_closure_fact_certified": 1.0,
+      "mixed/whole_closure_still_readable": 0.0,
+      "n_alias_per_group": 2,
+      "n_entities": 256,
+      "n_groups": 25,
+      "seconds": 125.31728053092957,
+      "seed": 2
+    }
+  ],
+  "recorded_at": "2026-09-04T23:00:31+00:00",
+  "seeds": [
+    0,
+    1,
+    2
+  ],
+  "title": "the deletion closure of a store, and the certificate that composes with it",
+  "trains_nothing": true
+}

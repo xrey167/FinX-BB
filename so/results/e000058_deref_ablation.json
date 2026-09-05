@@ -1,0 +1,623 @@
+{
+  "aggregate": {
+    "DEREF/alias_max": {
+      "max": 0.98,
+      "mean": 0.96,
+      "min": 0.95,
+      "n": 3
+    },
+    "DEREF/alias_min": {
+      "max": 0.87,
+      "mean": 0.8583333333333334,
+      "min": 0.84,
+      "n": 3
+    },
+    "DEREF/direct_min": {
+      "max": 0.9033333333333333,
+      "mean": 0.8722222222222222,
+      "min": 0.82,
+      "n": 3
+    },
+    "DEREF/t0/alias": {
+      "max": 0.98,
+      "mean": 0.9500000000000001,
+      "min": 0.93,
+      "n": 3
+    },
+    "DEREF/t0/direct": {
+      "max": 1.0,
+      "mean": 0.9988888888888888,
+      "min": 0.9966666666666667,
+      "n": 3
+    },
+    "DEREF/t1/alias": {
+      "max": 0.89,
+      "mean": 0.8666666666666667,
+      "min": 0.84,
+      "n": 3
+    },
+    "DEREF/t1/direct": {
+      "max": 0.9933333333333333,
+      "mean": 0.9788888888888888,
+      "min": 0.97,
+      "n": 3
+    },
+    "DEREF/t10/alias": {
+      "max": 0.975,
+      "mean": 0.9483333333333334,
+      "min": 0.93,
+      "n": 3
+    },
+    "DEREF/t10/direct": {
+      "max": 0.9966666666666667,
+      "mean": 0.9955555555555556,
+      "min": 0.9933333333333333,
+      "n": 3
+    },
+    "DEREF/t11/alias": {
+      "max": 0.97,
+      "mean": 0.945,
+      "min": 0.925,
+      "n": 3
+    },
+    "DEREF/t11/direct": {
+      "max": 0.9966666666666667,
+      "mean": 0.9944444444444445,
+      "min": 0.9933333333333333,
+      "n": 3
+    },
+    "DEREF/t2/alias": {
+      "max": 0.975,
+      "mean": 0.9533333333333333,
+      "min": 0.935,
+      "n": 3
+    },
+    "DEREF/t2/direct": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "DEREF/t3/alias": {
+      "max": 0.965,
+      "mean": 0.9333333333333335,
+      "min": 0.91,
+      "n": 3
+    },
+    "DEREF/t3/direct": {
+      "max": 1.0,
+      "mean": 0.9988888888888888,
+      "min": 0.9966666666666667,
+      "n": 3
+    },
+    "DEREF/t4/alias": {
+      "max": 0.98,
+      "mean": 0.96,
+      "min": 0.95,
+      "n": 3
+    },
+    "DEREF/t4/direct": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "DEREF/t5/alias": {
+      "max": 0.975,
+      "mean": 0.9483333333333333,
+      "min": 0.93,
+      "n": 3
+    },
+    "DEREF/t5/direct": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "DEREF/t6/alias": {
+      "max": 0.975,
+      "mean": 0.9566666666666666,
+      "min": 0.945,
+      "n": 3
+    },
+    "DEREF/t6/direct": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "DEREF/t7/alias": {
+      "max": 0.945,
+      "mean": 0.9183333333333333,
+      "min": 0.905,
+      "n": 3
+    },
+    "DEREF/t7/direct": {
+      "max": 1.0,
+      "mean": 0.9988888888888888,
+      "min": 0.9966666666666667,
+      "n": 3
+    },
+    "DEREF/t8/alias": {
+      "max": 0.965,
+      "mean": 0.9416666666666668,
+      "min": 0.93,
+      "n": 3
+    },
+    "DEREF/t8/direct": {
+      "max": 0.9966666666666667,
+      "mean": 0.9944444444444445,
+      "min": 0.9933333333333333,
+      "n": 3
+    },
+    "DEREF/t9/alias": {
+      "max": 0.87,
+      "mean": 0.8616666666666667,
+      "min": 0.85,
+      "n": 3
+    },
+    "DEREF/t9/direct": {
+      "max": 0.9033333333333333,
+      "mean": 0.8722222222222222,
+      "min": 0.82,
+      "n": 3
+    },
+    "NODEREF/alias_max": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 3
+    },
+    "NODEREF/alias_min": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 3
+    },
+    "NODEREF/direct_min": {
+      "max": 0.9033333333333333,
+      "mean": 0.8744444444444444,
+      "min": 0.8233333333333334,
+      "n": 3
+    },
+    "NODEREF/t0/alias": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 3
+    },
+    "NODEREF/t0/direct": {
+      "max": 1.0,
+      "mean": 0.9988888888888888,
+      "min": 0.9966666666666667,
+      "n": 3
+    },
+    "NODEREF/t1/alias": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 3
+    },
+    "NODEREF/t1/direct": {
+      "max": 0.9933333333333333,
+      "mean": 0.9866666666666667,
+      "min": 0.9833333333333333,
+      "n": 3
+    },
+    "NODEREF/t10/alias": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 3
+    },
+    "NODEREF/t10/direct": {
+      "max": 0.9966666666666667,
+      "mean": 0.9955555555555556,
+      "min": 0.9933333333333333,
+      "n": 3
+    },
+    "NODEREF/t11/alias": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 3
+    },
+    "NODEREF/t11/direct": {
+      "max": 0.9966666666666667,
+      "mean": 0.9944444444444445,
+      "min": 0.9933333333333333,
+      "n": 3
+    },
+    "NODEREF/t2/alias": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 3
+    },
+    "NODEREF/t2/direct": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "NODEREF/t3/alias": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 3
+    },
+    "NODEREF/t3/direct": {
+      "max": 1.0,
+      "mean": 0.9988888888888888,
+      "min": 0.9966666666666667,
+      "n": 3
+    },
+    "NODEREF/t4/alias": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 3
+    },
+    "NODEREF/t4/direct": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "NODEREF/t5/alias": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 3
+    },
+    "NODEREF/t5/direct": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "NODEREF/t6/alias": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 3
+    },
+    "NODEREF/t6/direct": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "NODEREF/t7/alias": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 3
+    },
+    "NODEREF/t7/direct": {
+      "max": 1.0,
+      "mean": 0.9988888888888888,
+      "min": 0.9966666666666667,
+      "n": 3
+    },
+    "NODEREF/t8/alias": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 3
+    },
+    "NODEREF/t8/direct": {
+      "max": 0.9966666666666667,
+      "mean": 0.9955555555555556,
+      "min": 0.9933333333333333,
+      "n": 3
+    },
+    "NODEREF/t9/alias": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 3
+    },
+    "NODEREF/t9/direct": {
+      "max": 0.9033333333333333,
+      "mean": 0.8744444444444444,
+      "min": 0.8233333333333334,
+      "n": 3
+    },
+    "alias_drop_min": {
+      "max": 0.87,
+      "mean": 0.8583333333333334,
+      "min": 0.84,
+      "n": 3
+    },
+    "direct_drop_max": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 3
+    },
+    "n_alias": {
+      "max": 200.0,
+      "mean": 200.0,
+      "min": 200.0,
+      "n": 3
+    },
+    "n_deref_trained": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "n_direct": {
+      "max": 300.0,
+      "mean": 300.0,
+      "min": 300.0,
+      "n": 3
+    },
+    "seconds": {
+      "max": 328.7456114292145,
+      "mean": 321.27992701530457,
+      "min": 315.6675958633423,
+      "n": 3
+    }
+  },
+  "control": "the same checkpoints as E-000052, read with cfg.n_deref set to 0 at inference; no weight is changed and the FACT rows are untouched",
+  "criteria": {
+    "claim_supported": false,
+    "criteria": {
+      "DEREF/alias_min": {
+        "observed": 0.84,
+        "op": ">=",
+        "pass": true,
+        "threshold": 0.8
+      },
+      "DEREF/direct_min": {
+        "observed": 0.82,
+        "op": ">=",
+        "pass": false,
+        "threshold": 0.9
+      },
+      "alias_drop_min": {
+        "observed": 0.84,
+        "op": ">=",
+        "pass": true,
+        "threshold": 0.5
+      },
+      "direct_drop_max": {
+        "observed": 0.0,
+        "op": "<=",
+        "pass": true,
+        "threshold": 0.05
+      }
+    }
+  },
+  "decision_rule": "Worst seed over three, every template. UNREADABLE if the trained arm does not reproduce the battery (alias below 0.80 or direct below 0.90) or if the ablation costs direct reading more than 0.05 at any template -- then the arm is destructive rather than surgical and nothing about pointers can be read from it. With both holding: MEASURED if alias reading falls by at least 0.50 at every template -- the dereference slot is what resolves the pointer, and the claim's attribution stops being architectural. REFUTED if alias reading survives the ablation (drop below 0.50 at any template) -- something other than the dereference hop is resolving the alias, and the claim credits the wrong component and must say so. The magnitudes are recorded whatever the reading. Fixed before the run.",
+  "environment": {
+    "device": "cpu",
+    "numpy": "2.2.6",
+    "platform": "Linux-6.18.44-fc-v24-x86_64-with-glibc2.39",
+    "python": "3.11.15",
+    "threads": "1",
+    "torch": "2.14.0+cpu"
+  },
+  "evidence_level": "E5",
+  "evidence_level_meaning": "Transformer evidence",
+  "experiment": "E-000058",
+  "per_seed": [
+    {
+      "DEREF/alias_max": 0.95,
+      "DEREF/alias_min": 0.84,
+      "DEREF/direct_min": 0.8933333333333333,
+      "DEREF/t0/alias": 0.94,
+      "DEREF/t0/direct": 1.0,
+      "DEREF/t1/alias": 0.84,
+      "DEREF/t1/direct": 0.9933333333333333,
+      "DEREF/t10/alias": 0.94,
+      "DEREF/t10/direct": 0.9933333333333333,
+      "DEREF/t11/alias": 0.94,
+      "DEREF/t11/direct": 0.9966666666666667,
+      "DEREF/t2/alias": 0.95,
+      "DEREF/t2/direct": 1.0,
+      "DEREF/t3/alias": 0.925,
+      "DEREF/t3/direct": 1.0,
+      "DEREF/t4/alias": 0.95,
+      "DEREF/t4/direct": 1.0,
+      "DEREF/t5/alias": 0.93,
+      "DEREF/t5/direct": 1.0,
+      "DEREF/t6/alias": 0.95,
+      "DEREF/t6/direct": 1.0,
+      "DEREF/t7/alias": 0.905,
+      "DEREF/t7/direct": 1.0,
+      "DEREF/t8/alias": 0.93,
+      "DEREF/t8/direct": 0.9966666666666667,
+      "DEREF/t9/alias": 0.85,
+      "DEREF/t9/direct": 0.8933333333333333,
+      "NODEREF/alias_max": 0.0,
+      "NODEREF/alias_min": 0.0,
+      "NODEREF/direct_min": 0.8966666666666666,
+      "NODEREF/t0/alias": 0.0,
+      "NODEREF/t0/direct": 1.0,
+      "NODEREF/t1/alias": 0.0,
+      "NODEREF/t1/direct": 0.9933333333333333,
+      "NODEREF/t10/alias": 0.0,
+      "NODEREF/t10/direct": 0.9933333333333333,
+      "NODEREF/t11/alias": 0.0,
+      "NODEREF/t11/direct": 0.9966666666666667,
+      "NODEREF/t2/alias": 0.0,
+      "NODEREF/t2/direct": 1.0,
+      "NODEREF/t3/alias": 0.0,
+      "NODEREF/t3/direct": 1.0,
+      "NODEREF/t4/alias": 0.0,
+      "NODEREF/t4/direct": 1.0,
+      "NODEREF/t5/alias": 0.0,
+      "NODEREF/t5/direct": 1.0,
+      "NODEREF/t6/alias": 0.0,
+      "NODEREF/t6/direct": 1.0,
+      "NODEREF/t7/alias": 0.0,
+      "NODEREF/t7/direct": 1.0,
+      "NODEREF/t8/alias": 0.0,
+      "NODEREF/t8/direct": 0.9966666666666667,
+      "NODEREF/t9/alias": 0.0,
+      "NODEREF/t9/direct": 0.8966666666666666,
+      "alias_drop_min": 0.84,
+      "checkpoint_sha256": "a1eb39aeba94575293f247905771473d94f35cc8cc1970d0d8c6f068b374bc7f",
+      "direct_drop_max": 0.0,
+      "n_alias": 200,
+      "n_deref_trained": 1,
+      "n_direct": 300,
+      "seconds": 328.7456114292145,
+      "seed": 0
+    },
+    {
+      "DEREF/alias_max": 0.98,
+      "DEREF/alias_min": 0.865,
+      "DEREF/direct_min": 0.82,
+      "DEREF/t0/alias": 0.98,
+      "DEREF/t0/direct": 0.9966666666666667,
+      "DEREF/t1/alias": 0.89,
+      "DEREF/t1/direct": 0.9733333333333334,
+      "DEREF/t10/alias": 0.975,
+      "DEREF/t10/direct": 0.9966666666666667,
+      "DEREF/t11/alias": 0.97,
+      "DEREF/t11/direct": 0.9933333333333333,
+      "DEREF/t2/alias": 0.975,
+      "DEREF/t2/direct": 1.0,
+      "DEREF/t3/alias": 0.965,
+      "DEREF/t3/direct": 0.9966666666666667,
+      "DEREF/t4/alias": 0.98,
+      "DEREF/t4/direct": 1.0,
+      "DEREF/t5/alias": 0.975,
+      "DEREF/t5/direct": 1.0,
+      "DEREF/t6/alias": 0.975,
+      "DEREF/t6/direct": 1.0,
+      "DEREF/t7/alias": 0.945,
+      "DEREF/t7/direct": 0.9966666666666667,
+      "DEREF/t8/alias": 0.965,
+      "DEREF/t8/direct": 0.9933333333333333,
+      "DEREF/t9/alias": 0.865,
+      "DEREF/t9/direct": 0.82,
+      "NODEREF/alias_max": 0.0,
+      "NODEREF/alias_min": 0.0,
+      "NODEREF/direct_min": 0.8233333333333334,
+      "NODEREF/t0/alias": 0.0,
+      "NODEREF/t0/direct": 0.9966666666666667,
+      "NODEREF/t1/alias": 0.0,
+      "NODEREF/t1/direct": 0.9833333333333333,
+      "NODEREF/t10/alias": 0.0,
+      "NODEREF/t10/direct": 0.9966666666666667,
+      "NODEREF/t11/alias": 0.0,
+      "NODEREF/t11/direct": 0.9933333333333333,
+      "NODEREF/t2/alias": 0.0,
+      "NODEREF/t2/direct": 1.0,
+      "NODEREF/t3/alias": 0.0,
+      "NODEREF/t3/direct": 0.9966666666666667,
+      "NODEREF/t4/alias": 0.0,
+      "NODEREF/t4/direct": 1.0,
+      "NODEREF/t5/alias": 0.0,
+      "NODEREF/t5/direct": 1.0,
+      "NODEREF/t6/alias": 0.0,
+      "NODEREF/t6/direct": 1.0,
+      "NODEREF/t7/alias": 0.0,
+      "NODEREF/t7/direct": 0.9966666666666667,
+      "NODEREF/t8/alias": 0.0,
+      "NODEREF/t8/direct": 0.9933333333333333,
+      "NODEREF/t9/alias": 0.0,
+      "NODEREF/t9/direct": 0.8233333333333334,
+      "alias_drop_min": 0.865,
+      "checkpoint_sha256": "fd16d4f5501fe8fd7506c1c5b0cb5ae9fc57c6b84ed33329300d717436f5e2ed",
+      "direct_drop_max": 0.0,
+      "n_alias": 200,
+      "n_deref_trained": 1,
+      "n_direct": 300,
+      "seconds": 315.6675958633423,
+      "seed": 1
+    },
+    {
+      "DEREF/alias_max": 0.95,
+      "DEREF/alias_min": 0.87,
+      "DEREF/direct_min": 0.9033333333333333,
+      "DEREF/t0/alias": 0.93,
+      "DEREF/t0/direct": 1.0,
+      "DEREF/t1/alias": 0.87,
+      "DEREF/t1/direct": 0.97,
+      "DEREF/t10/alias": 0.93,
+      "DEREF/t10/direct": 0.9966666666666667,
+      "DEREF/t11/alias": 0.925,
+      "DEREF/t11/direct": 0.9933333333333333,
+      "DEREF/t2/alias": 0.935,
+      "DEREF/t2/direct": 1.0,
+      "DEREF/t3/alias": 0.91,
+      "DEREF/t3/direct": 1.0,
+      "DEREF/t4/alias": 0.95,
+      "DEREF/t4/direct": 1.0,
+      "DEREF/t5/alias": 0.94,
+      "DEREF/t5/direct": 1.0,
+      "DEREF/t6/alias": 0.945,
+      "DEREF/t6/direct": 1.0,
+      "DEREF/t7/alias": 0.905,
+      "DEREF/t7/direct": 1.0,
+      "DEREF/t8/alias": 0.93,
+      "DEREF/t8/direct": 0.9933333333333333,
+      "DEREF/t9/alias": 0.87,
+      "DEREF/t9/direct": 0.9033333333333333,
+      "NODEREF/alias_max": 0.0,
+      "NODEREF/alias_min": 0.0,
+      "NODEREF/direct_min": 0.9033333333333333,
+      "NODEREF/t0/alias": 0.0,
+      "NODEREF/t0/direct": 1.0,
+      "NODEREF/t1/alias": 0.0,
+      "NODEREF/t1/direct": 0.9833333333333333,
+      "NODEREF/t10/alias": 0.0,
+      "NODEREF/t10/direct": 0.9966666666666667,
+      "NODEREF/t11/alias": 0.0,
+      "NODEREF/t11/direct": 0.9933333333333333,
+      "NODEREF/t2/alias": 0.0,
+      "NODEREF/t2/direct": 1.0,
+      "NODEREF/t3/alias": 0.0,
+      "NODEREF/t3/direct": 1.0,
+      "NODEREF/t4/alias": 0.0,
+      "NODEREF/t4/direct": 1.0,
+      "NODEREF/t5/alias": 0.0,
+      "NODEREF/t5/direct": 1.0,
+      "NODEREF/t6/alias": 0.0,
+      "NODEREF/t6/direct": 1.0,
+      "NODEREF/t7/alias": 0.0,
+      "NODEREF/t7/direct": 1.0,
+      "NODEREF/t8/alias": 0.0,
+      "NODEREF/t8/direct": 0.9966666666666667,
+      "NODEREF/t9/alias": 0.0,
+      "NODEREF/t9/direct": 0.9033333333333333,
+      "alias_drop_min": 0.87,
+      "checkpoint_sha256": "d021ce2f5aa253791cc56a910b78040fd3128da3e67c3846b47bdda0e37bbab5",
+      "direct_drop_max": 0.0,
+      "n_alias": 200,
+      "n_deref_trained": 1,
+      "n_direct": 300,
+      "seconds": 319.42657375335693,
+      "seed": 2
+    }
+  ],
+  "quick": false,
+  "recorded_at": "2026-09-05T19:08:56+00:00",
+  "seeds": [
+    0,
+    1,
+    2
+  ],
+  "templates": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11
+  ],
+  "title": "ablating the dereference slot: is it what resolves the pointer?",
+  "trains_nothing": true
+}

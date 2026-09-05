@@ -1,0 +1,348 @@
+{
+  "aggregate": {
+    "T": {
+      "max": 2.95,
+      "mean": 2.95,
+      "min": 2.95,
+      "n": 1
+    },
+    "T_over_U": {
+      "max": 2.75,
+      "mean": 2.75,
+      "min": 2.75,
+      "n": 1
+    },
+    "U": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 1
+    },
+    "broadcast": {
+      "max": 0.34375,
+      "mean": 0.34375,
+      "min": 0.34375,
+      "n": 1
+    },
+    "broadcast_identity": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 1
+    },
+    "broadcast_random": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 1
+    },
+    "corr_TU_broadcast": {
+      "max": -0.9703654957809964,
+      "mean": -0.9703654957809964,
+      "min": -0.9703654957809964,
+      "n": 1
+    },
+    "fanout_mean": {
+      "max": 2.5,
+      "mean": 2.5,
+      "min": 2.5,
+      "n": 1
+    },
+    "gap_exists": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 1
+    },
+    "n_entities": {
+      "max": 10.0,
+      "mean": 10.0,
+      "min": 10.0,
+      "n": 1
+    },
+    "n_u_achieved": {
+      "max": 4.0,
+      "mean": 4.0,
+      "min": 4.0,
+      "n": 1
+    },
+    "residue": {
+      "max": 0.8375,
+      "mean": 0.8375,
+      "min": 0.8375,
+      "n": 1
+    },
+    "u_rate": {
+      "max": 0.325,
+      "mean": 0.325,
+      "min": 0.325,
+      "n": 1
+    }
+  },
+  "criteria": {
+    "claim_supported": false,
+    "criteria": {
+      "T_over_U": {
+        "observed": 2.75,
+        "op": ">=",
+        "pass": true,
+        "threshold": 1.2
+      },
+      "broadcast": {
+        "observed": 0.34375,
+        "op": ">=",
+        "pass": true,
+        "threshold": 0.2
+      },
+      "broadcast_identity": {
+        "observed": 0.0,
+        "op": "<=",
+        "pass": true,
+        "threshold": 0.05
+      },
+      "broadcast_random": {
+        "observed": 0.0,
+        "op": "<=",
+        "pass": true,
+        "threshold": 0.15
+      },
+      "gap_exists": {
+        "observed": 1.0,
+        "op": ">=",
+        "pass": true,
+        "threshold": 0.6
+      },
+      "residue": {
+        "observed": 0.8375,
+        "op": ">=",
+        "pass": true,
+        "threshold": 0.2
+      },
+      "u_rate": {
+        "observed": 0.325,
+        "op": ">=",
+        "pass": false,
+        "threshold": 0.5
+      }
+    }
+  },
+  "decision_rule": "T > U for most entities -> the store's law has an activation-space form once T is counted on READERS rather than on rows, and the residue is the dangling reference. T = U throughout -> one swap redirects every reader, the carrier is a true pod, and erasure in a representation is traceless in one move, which would be a stronger result than the one predicted and is recorded as such. A negative correlation between T/U and broadcast is predicted; positive or flat falsifies the identification of broadcast with a reference count. Fixed before the run.",
+  "environment": {
+    "device": "cpu",
+    "numpy": "2.4.6",
+    "platform": "Linux-6.18.44-fc-v24-x86_64-with-glibc2.39",
+    "python": "3.11.15",
+    "threads": "2",
+    "torch": "2.14.0+cpu"
+  },
+  "evidence_level": "E5",
+  "evidence_level_meaning": "Transformer evidence",
+  "experiment": "E-000045",
+  "layer": 7,
+  "model": "gpt2",
+  "recorded_at": "2026-09-04T22:20:09+00:00",
+  "result": {
+    "T": 2.95,
+    "T_over_U": 2.75,
+    "U": 1.0,
+    "broadcast": 0.34375,
+    "broadcast_identity": 0.0,
+    "broadcast_random": 0.0,
+    "corr_TU_broadcast": -0.9703654957809964,
+    "fanout_mean": 2.5,
+    "gap_exists": 1.0,
+    "layer": 7,
+    "n_entities": 10,
+    "n_u_achieved": 4,
+    "per_entity": [
+      {
+        "T": 2.25,
+        "T_over_U": 2.25,
+        "U": 1.0,
+        "broadcast": 0.375,
+        "broadcast_identity": 0.0,
+        "broadcast_random": 0.0,
+        "entity": "Japan",
+        "fanout": 2,
+        "n_comparisons": 4,
+        "predicates": [
+          "capital",
+          "language"
+        ],
+        "residue": 0.625,
+        "u_achieved": 1.0,
+        "u_rate": 0.5
+      },
+      {
+        "T": 3.0,
+        "T_over_U": 3.0,
+        "U": 1.0,
+        "broadcast": 0.0,
+        "broadcast_identity": 0.0,
+        "broadcast_random": 0.0,
+        "entity": "Italy",
+        "fanout": 2,
+        "n_comparisons": 4,
+        "predicates": [
+          "capital",
+          "language"
+        ],
+        "residue": 1.0,
+        "u_achieved": 0.0,
+        "u_rate": 0.0
+      },
+      {
+        "T": 3.25,
+        "T_over_U": 3.25,
+        "U": 1.0,
+        "broadcast": 0.25,
+        "broadcast_identity": 0.0,
+        "broadcast_random": 0.0,
+        "entity": "Germany",
+        "fanout": 3,
+        "n_comparisons": 2,
+        "predicates": [
+          "capital",
+          "continent",
+          "language"
+        ],
+        "residue": 0.75,
+        "u_achieved": 1.0,
+        "u_rate": 0.5
+      },
+      {
+        "T": 3.0,
+        "T_over_U": 3.0,
+        "U": 1.0,
+        "broadcast": 0.0,
+        "broadcast_identity": 0.0,
+        "broadcast_random": 0.0,
+        "entity": "Russia",
+        "fanout": 2,
+        "n_comparisons": 4,
+        "predicates": [
+          "capital",
+          "language"
+        ],
+        "residue": 1.0,
+        "u_achieved": 0.0,
+        "u_rate": 0.0
+      },
+      {
+        "T": 1.5,
+        "T_over_U": 1.5,
+        "U": 1.0,
+        "broadcast": 0.75,
+        "broadcast_identity": 0.0,
+        "broadcast_random": 0.0,
+        "entity": "China",
+        "fanout": 2,
+        "n_comparisons": 4,
+        "predicates": [
+          "capital",
+          "language"
+        ],
+        "residue": 0.25,
+        "u_achieved": 1.0,
+        "u_rate": 1.0
+      },
+      {
+        "T": 4.0,
+        "T_over_U": 4.0,
+        "U": 1.0,
+        "broadcast": 0.0,
+        "broadcast_identity": 0.0,
+        "broadcast_random": 0.0,
+        "entity": "Greece",
+        "fanout": 3,
+        "n_comparisons": 2,
+        "predicates": [
+          "capital",
+          "continent",
+          "language"
+        ],
+        "residue": 1.0,
+        "u_achieved": 0.0,
+        "u_rate": 0.0
+      },
+      {
+        "T": 3.0,
+        "T_over_U": 3.0,
+        "U": 1.0,
+        "broadcast": 0.0,
+        "broadcast_identity": 0.0,
+        "broadcast_random": 0.0,
+        "entity": "Poland",
+        "fanout": 2,
+        "n_comparisons": 4,
+        "predicates": [
+          "continent",
+          "language"
+        ],
+        "residue": 1.0,
+        "u_achieved": 0.0,
+        "u_rate": 0.0
+      },
+      {
+        "T": 2.5,
+        "T_over_U": 2.5,
+        "U": 1.0,
+        "broadcast": 0.25,
+        "broadcast_identity": 0.0,
+        "broadcast_random": 0.0,
+        "entity": "Mexico",
+        "fanout": 2,
+        "n_comparisons": 4,
+        "predicates": [
+          "capital",
+          "language"
+        ],
+        "residue": 0.75,
+        "u_achieved": 0.0,
+        "u_rate": 0.25
+      },
+      {
+        "T": 4.0,
+        "T_over_U": 4.0,
+        "U": 1.0,
+        "broadcast": 0.0,
+        "broadcast_identity": 0.0,
+        "broadcast_random": 0.0,
+        "entity": "Sweden",
+        "fanout": 3,
+        "n_comparisons": 2,
+        "predicates": [
+          "capital",
+          "continent",
+          "language"
+        ],
+        "residue": 1.0,
+        "u_achieved": 1.0,
+        "u_rate": 1.0
+      },
+      {
+        "T": 3.0,
+        "T_over_U": 3.0,
+        "U": 1.0,
+        "broadcast": 0.0,
+        "broadcast_identity": 0.0,
+        "broadcast_random": 0.0,
+        "entity": "Norway",
+        "fanout": 2,
+        "n_comparisons": 4,
+        "predicates": [
+          "continent",
+          "language"
+        ],
+        "residue": 1.0,
+        "u_achieved": 0.0,
+        "u_rate": 0.0
+      }
+    ],
+    "residue": 0.8375,
+    "seconds": 133.79899978637695,
+    "u_rate": 0.325
+  },
+  "title": "U and T in a representation, counted on readers instead of on rows",
+  "trains_nothing": true
+}

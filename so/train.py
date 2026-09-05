@@ -1,0 +1,184 @@
+"""Resampled-world training for the Mini-Transformer.
+
+Each step draws a fresh synthetic world with random lifecycle states and a
+batch of queries.  Loss = answer cross-entropy + ``route_weight`` × routing
+cross-entropy (the control plane knows which cell holds which fact, so the
+routing target is available by construction; the ablation family measures
+what happens without it).
+"""
+
+from __future__ import annotations
+
+import math
+import time
+from dataclasses import asdict, dataclass, field
+from typing import Dict, List, Optional
+
+import numpy as np
+import torch
+import torch.nn.functional as F
+
+from .data import Bank, bank_from_world, encode_queries, sample_training_queries
+from .model import ModelConfig, MutableKnowledgeTransformer
+from .carrier import ablation_loss, privacy_loss
+from .pod import pod_private, pod_queries
+from .world import World
+
+
+@dataclass
+class TrainConfig:
+    seed: int = 0
+    n_steps: int = 3000
+    batch_size: int = 128
+    lr: float = 1e-3
+    weight_decay: float = 0.01
+    warmup: int = 200
+    n_entities: int = 256
+    n_relations: int = 4
+    n_synonyms: int = 2
+    n_cells_min: int = 700
+    n_cells_max: int = 1000
+    p_revoked: float = 0.10
+    p_shred: float = 0.05
+    p_stale: float = 0.05
+    train_noise: float = 0.03
+    route_weight: float = 0.5
+    gate_weight: float = 0.0         # E-000009: BCE(gate logits, marker validity) — signature verification loss
+    # E-000038: shaping the carrier so that removing it removes the fact, and only the fact.
+    # PRIVACY pushes the per-object read directions towards mutual near-orthogonality, hinged at the
+    # Welch bound so it never fights the answer loss over a margin that provably does not exist.
+    # ABLATION trains against the certificate itself: with the carrier projected out, the model must
+    # answer UNKNOWN, while every other row of the same batch keeps its ordinary loss under the same
+    # projection -- which is what stops the model simply learning to play dead when it detects one.
+    carrier_privacy: float = 0.0
+    carrier_ablation: float = 0.0
+    # E-000044: the POD objective, on the hidden state the readout actually consumes rather than on a
+    # weight tensor. POD pulls every access path of one fact onto one carrier, so the deletion closure
+    # is 1 instead of the number of ways the fact can be asked; PRIVATE pushes the carriers of
+    # different facts apart, hinged at the larger of the Welch bound and the centring floor, so that
+    # removing one leaves the others standing. E-000043 measured that a model has the room for both
+    # and takes neither, which is what makes this a training objective rather than a limit.
+    pod_weight: float = 0.0
+    private_weight: float = 0.0
+    pod_facts: int = 24              # facts per pod batch; every surface form of each is included
+    pod_every: int = 1               # compute the pod terms every N steps
+    gate_balanced: bool = False      # E-000010: weight signed and unsigned markers equally (unsigned are ~5% of cells)
+    mix: Dict[str, float] = field(default_factory=lambda: {"fwd1": 0.40, "fwd2": 0.25, "fwd3": 0.20, "rev1": 0.15})
+    fixed_world: bool = False        # E-000002: train on ONE world so that facts can be memorised
+    log_every: int = 250
+
+    def to_dict(self) -> Dict:
+        return asdict(self)
+
+
+def make_centre(seed: int, marker_dim: int) -> np.ndarray:
+    rng = np.random.default_rng(10_000 + seed)
+    c = rng.normal(size=marker_dim)
+    return c / np.linalg.norm(c)
+
+
+def lr_at(step: int, cfg: TrainConfig) -> float:
+    if step < cfg.warmup:
+        return cfg.lr * (step + 1) / cfg.warmup
+    progress = (step - cfg.warmup) / max(1, cfg.n_steps - cfg.warmup)
+    return cfg.lr * 0.5 * (1 + math.cos(math.pi * progress))
+
+
+def routing_loss(routing: torch.Tensor, route: torch.Tensor, has_null_cell: bool = True) -> torch.Tensor:
+    """Cross-entropy of the routing distribution against the cell (or null) it should read.
+
+    Without a null cell there is no column to route "nothing found" to, so those hops are ignored.
+    """
+    B, H, C1 = routing.shape
+    target = route.clone()
+    if not has_null_cell:
+        target[target == -1] = -2
+    ignore = target == -2
+    target[target == -1] = C1 - 1           # null cell is the last column
+    target[ignore] = 0
+    logp = torch.log(routing.clamp_min(1e-9)).reshape(B * H, C1)
+    nll = F.nll_loss(logp, target.reshape(-1), reduction="none").reshape(B, H)
+    keep = ~ignore
+    return (nll * keep).sum() / keep.sum().clamp_min(1)
+
+
+def train(model_cfg: ModelConfig, cfg: TrainConfig, world_override: Optional[World] = None,
+          verbose: bool = True) -> Dict:
+    torch.manual_seed(cfg.seed)
+    rng = np.random.default_rng(cfg.seed)
+    model = MutableKnowledgeTransformer(model_cfg)
+    centre = make_centre(cfg.seed, model_cfg.marker_dim)
+    opt = torch.optim.AdamW(model.parameters(), lr=cfg.lr, weight_decay=cfg.weight_decay)
+    fixed = world_override
+    if cfg.fixed_world and fixed is None:
+        fixed = World.sample(rng, cfg.n_entities, cfg.n_relations, cfg.n_cells_max, cfg.n_synonyms)
+    history: List[Dict] = []
+    t0 = time.time()
+    model.train()
+    for step in range(cfg.n_steps):
+        if fixed is not None:
+            # same lifecycle-state sampling as the re-sampled regime: only the WORLD is held fixed
+            world = fixed
+            bank = bank_from_world(rng, world, centre, cfg.p_revoked, cfg.p_shred, cfg.p_stale)
+        else:
+            n_cells = int(rng.integers(cfg.n_cells_min, cfg.n_cells_max + 1))
+            world = World.sample(rng, cfg.n_entities, cfg.n_relations, n_cells, cfg.n_synonyms)
+            bank = bank_from_world(rng, world, centre, cfg.p_revoked, cfg.p_shred, cfg.p_stale)
+        queries = sample_training_queries(rng, world, bank, cfg.batch_size, cfg.mix)
+        batch = encode_queries(queries, bank, world, model_cfg.max_hops)
+        for g in opt.param_groups:
+            g["lr"] = lr_at(step, cfg)
+        tensors = bank.tensors()
+        logits, routing, extras = model(tensors, batch.mode, batch.start, batch.rels, batch.hop_valid,
+                                        noise=cfg.train_noise)
+        loss_ans = F.cross_entropy(logits, batch.target)
+        loss = loss_ans
+        if model_cfg.use_routing and cfg.route_weight > 0:
+            loss = loss + cfg.route_weight * routing_loss(routing, batch.route, model_cfg.use_null_cell)
+        if model_cfg.use_routing and model_cfg.use_marker_gate and cfg.gate_weight > 0 and extras.get("gate_logits") is not None:
+            valid = tensors["marker_valid"].float()
+            per_cell = F.binary_cross_entropy_with_logits(extras["gate_logits"], valid, reduction="none")
+            if cfg.gate_balanced:
+                n_pos, n_neg = valid.sum().clamp_min(1), (1 - valid).sum().clamp_min(1)
+                gate_loss = 0.5 * (per_cell * valid).sum() / n_pos + 0.5 * (per_cell * (1 - valid)).sum() / n_neg
+            else:
+                gate_loss = per_cell.mean()
+            loss = loss + cfg.gate_weight * gate_loss
+        carrier_stats: Dict[str, float] = {}
+        if (cfg.pod_weight > 0 or cfg.private_weight > 0) and step % cfg.pod_every == 0:
+            # A pod loss needs several ACCESS PATHS of one fact in the same batch, and an ordinary
+            # training batch almost never contains two, so the pod batch is built deliberately.
+            picks = rng.choice(len(world.facts), size=min(cfg.pod_facts, len(world.facts)),
+                               replace=False)
+            chosen = [(int(world.facts[i].subject), int(world.facts[i].relation)) for i in picks]
+            pq, fact_ids = pod_queries(world, chosen, rng)
+            pbatch = encode_queries(pq, bank, world, model_cfg.max_hops)
+            _, _, pextras = model(tensors, pbatch.mode, pbatch.start, pbatch.rels, pbatch.hop_valid,
+                                  noise=cfg.train_noise)
+            lp, lpr, pstats = pod_private(pextras["hidden"], fact_ids)
+            loss = loss + cfg.pod_weight * lp + cfg.private_weight * lpr
+            carrier_stats.update(pstats)
+        if cfg.carrier_privacy > 0:
+            pl, st = privacy_loss(model)
+            loss = loss + cfg.carrier_privacy * pl
+            carrier_stats.update(st)
+        if cfg.carrier_ablation > 0 and extras.get("hidden") is not None:
+            al, st = ablation_loss(model, extras["hidden"], batch.target, model_cfg.n_entities)
+            loss = loss + cfg.carrier_ablation * al
+            carrier_stats.update(st)
+        opt.zero_grad(set_to_none=True)
+        loss.backward()
+        torch.nn.utils.clip_grad_norm_(model.parameters(), 1.0)
+        opt.step()
+        if (step + 1) % cfg.log_every == 0 or step == 0:
+            acc = (logits.argmax(-1) == batch.target).float().mean().item()
+            rec = {**carrier_stats,
+                   "step": step + 1, "loss": float(loss.item()), "answer_loss": float(loss_ans.item()),
+                   "batch_acc": acc, "elapsed_s": time.time() - t0}
+            history.append(rec)
+            if verbose:
+                print(f"  step {step + 1:5d}  loss {rec['loss']:.4f}  ans {rec['answer_loss']:.4f}  acc {acc:.3f}  "
+                      f"{rec['elapsed_s']:.0f}s", flush=True)
+    model.eval()
+    return {"model": model, "centre": centre, "history": history, "train_config": cfg.to_dict(),
+            "model_config": model_cfg.to_dict(), "fixed_world": fixed, "train_seconds": time.time() - t0}

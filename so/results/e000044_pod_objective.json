@@ -1,0 +1,328 @@
+{
+  "aggregate": {
+    "A/accuracy": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "A/address_over_content": {
+      "max": 0.2503202309579744,
+      "mean": 0.1974133937160433,
+      "min": 0.17057592238415964,
+      "n": 3
+    },
+    "A/closure": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "A/collateral": {
+      "max": 1.0,
+      "mean": 0.9982638893028101,
+      "min": 0.9947916679084301,
+      "n": 3
+    },
+    "A/excess_address": {
+      "max": 0.3087823854759336,
+      "mean": 0.24837554136498108,
+      "min": 0.2048591640467445,
+      "n": 3
+    },
+    "A/excess_content": {
+      "max": 0.06014104676626933,
+      "mean": 0.0509621476489378,
+      "min": 0.03428324166258487,
+      "n": 3
+    },
+    "A/excess_deletion": {
+      "max": 0.06014104676626933,
+      "mean": 0.0509621476489378,
+      "min": 0.03428324166258487,
+      "n": 3
+    },
+    "A/excess_full": {
+      "max": 0.2932463634759187,
+      "mean": 0.2399269230249855,
+      "min": 0.19912366457283498,
+      "n": 3
+    },
+    "A/null_full": {
+      "max": 0.28335679483910403,
+      "mean": 0.28335679483910403,
+      "min": 0.28335679483910403,
+      "n": 3
+    },
+    "A/overlap_full": {
+      "max": 0.5766031583150227,
+      "mean": 0.5232837178640896,
+      "min": 0.482480459411939,
+      "n": 3
+    },
+    "A/pressure": {
+      "max": 0.125,
+      "mean": 0.125,
+      "min": 0.125,
+      "n": 3
+    },
+    "A/silenced_rate": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "B/accuracy": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "B/address_over_content": {
+      "max": 0.22413310716995818,
+      "mean": 0.18463912377078992,
+      "min": 0.15705915913567878,
+      "n": 3
+    },
+    "B/closure": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "B/collateral": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "B/excess_address": {
+      "max": 0.26669819286714,
+      "mean": 0.21715078645696242,
+      "min": 0.18055714362611372,
+      "n": 3
+    },
+    "B/excess_content": {
+      "max": 0.04256508569718184,
+      "mean": 0.03251166268617251,
+      "min": 0.023497984490434942,
+      "n": 3
+    },
+    "B/excess_deletion": {
+      "max": 0.04256508569718184,
+      "mean": 0.03251166268617251,
+      "min": 0.023497984490434942,
+      "n": 3
+    },
+    "B/excess_full": {
+      "max": 0.24607043862342837,
+      "mean": 0.19981973547902374,
+      "min": 0.16304347043236095,
+      "n": 3
+    },
+    "B/null_full": {
+      "max": 0.28335679483910403,
+      "mean": 0.28335679483910403,
+      "min": 0.28335679483910403,
+      "n": 3
+    },
+    "B/overlap_full": {
+      "max": 0.5294272334625324,
+      "mean": 0.48317653031812774,
+      "min": 0.446400265271465,
+      "n": 3
+    },
+    "B/pressure": {
+      "max": 0.125,
+      "mean": 0.125,
+      "min": 0.125,
+      "n": 3
+    },
+    "B/silenced_rate": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "accuracy_ratio": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "closure_drop": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 3
+    },
+    "collateral_gain": {
+      "max": 0.0052083320915699005,
+      "mean": 0.001736110697189967,
+      "min": 0.0,
+      "n": 3
+    },
+    "excess_address_drop": {
+      "max": 0.04208419260879359,
+      "mean": 0.031224754908018664,
+      "min": 0.024302020420630788,
+      "n": 3
+    },
+    "excess_full_drop": {
+      "max": 0.047175924852490336,
+      "mean": 0.040107187545961785,
+      "min": 0.03608019414047403,
+      "n": 3
+    }
+  },
+  "criteria": {
+    "claim_supported": false,
+    "criteria": {
+      "A/accuracy": {
+        "observed": 1.0,
+        "op": ">=",
+        "pass": true,
+        "threshold": 0.6
+      },
+      "accuracy_ratio": {
+        "observed": 1.0,
+        "op": ">=",
+        "pass": true,
+        "threshold": 0.95
+      },
+      "collateral_gain": {
+        "observed": 0.0,
+        "op": ">=",
+        "pass": false,
+        "threshold": 0.05
+      },
+      "excess_full_drop": {
+        "observed": 0.03608019414047403,
+        "op": ">=",
+        "pass": false,
+        "threshold": 0.1
+      }
+    }
+  },
+  "decision_rule": "excess_full_drop >= 0.10 with accuracy_ratio >= 0.95 -> allocation is trainable and E-000043's verdict has its constructive half. A drop that only arrives with accuracy_ratio below 0.95 -> the dimensions were not free and the capacity reading was closer to right. No drop -> allocation is not trainable by this objective, and the diagnosis stands without a remedy. Fixed before the run.",
+  "environment": {
+    "device": "cpu",
+    "numpy": "2.4.6",
+    "platform": "Linux-6.18.44-fc-v24-x86_64-with-glibc2.39",
+    "python": "3.11.15",
+    "threads": "4",
+    "torch": "2.14.0+cpu"
+  },
+  "evidence_level": "E4",
+  "evidence_level_meaning": "Controlled neural-network evidence",
+  "experiment": "E-000044",
+  "per_seed": [
+    {
+      "A/accuracy": 1.0,
+      "A/address_over_content": 0.17134402780599584,
+      "A/closure": 1.0,
+      "A/collateral": 1.0,
+      "A/excess_address": 0.23148507457226516,
+      "A/excess_content": 0.06014104676626933,
+      "A/excess_deletion": 0.06014104676626933,
+      "A/excess_full": 0.22741074102620285,
+      "A/null_full": 0.28335679483910403,
+      "A/overlap_full": 0.5107675358653069,
+      "A/pressure": 0.125,
+      "A/silenced_rate": 1.0,
+      "B/accuracy": 1.0,
+      "B/address_over_content": 0.17272510500673283,
+      "B/closure": 1.0,
+      "B/collateral": 1.0,
+      "B/excess_address": 0.20419702287763355,
+      "B/excess_content": 0.03147191787090074,
+      "B/excess_deletion": 0.03147191787090074,
+      "B/excess_full": 0.19034529738128186,
+      "B/null_full": 0.28335679483910403,
+      "B/overlap_full": 0.4737020922203859,
+      "B/pressure": 0.125,
+      "B/silenced_rate": 1.0,
+      "accuracy_ratio": 1.0,
+      "closure_drop": 0.0,
+      "collateral_gain": 0.0,
+      "excess_address_drop": 0.02728805169463161,
+      "excess_full_drop": 0.03706544364492098,
+      "seed": 0
+    },
+    {
+      "A/accuracy": 1.0,
+      "A/address_over_content": 0.17057592238415964,
+      "A/closure": 1.0,
+      "A/collateral": 1.0,
+      "A/excess_address": 0.2048591640467445,
+      "A/excess_content": 0.03428324166258487,
+      "A/excess_deletion": 0.03428324166258487,
+      "A/excess_full": 0.19912366457283498,
+      "A/null_full": 0.28335679483910403,
+      "A/overlap_full": 0.482480459411939,
+      "A/pressure": 0.125,
+      "A/silenced_rate": 1.0,
+      "B/accuracy": 1.0,
+      "B/address_over_content": 0.15705915913567878,
+      "B/closure": 1.0,
+      "B/collateral": 1.0,
+      "B/excess_address": 0.18055714362611372,
+      "B/excess_content": 0.023497984490434942,
+      "B/excess_deletion": 0.023497984490434942,
+      "B/excess_full": 0.16304347043236095,
+      "B/null_full": 0.28335679483910403,
+      "B/overlap_full": 0.446400265271465,
+      "B/pressure": 0.125,
+      "B/silenced_rate": 1.0,
+      "accuracy_ratio": 1.0,
+      "closure_drop": 0.0,
+      "collateral_gain": 0.0,
+      "excess_address_drop": 0.024302020420630788,
+      "excess_full_drop": 0.03608019414047403,
+      "seed": 1
+    },
+    {
+      "A/accuracy": 1.0,
+      "A/address_over_content": 0.2503202309579744,
+      "A/closure": 1.0,
+      "A/collateral": 0.9947916679084301,
+      "A/excess_address": 0.3087823854759336,
+      "A/excess_content": 0.05846215451795919,
+      "A/excess_deletion": 0.05846215451795919,
+      "A/excess_full": 0.2932463634759187,
+      "A/null_full": 0.28335679483910403,
+      "A/overlap_full": 0.5766031583150227,
+      "A/pressure": 0.125,
+      "A/silenced_rate": 1.0,
+      "B/accuracy": 1.0,
+      "B/address_over_content": 0.22413310716995818,
+      "B/closure": 1.0,
+      "B/collateral": 1.0,
+      "B/excess_address": 0.26669819286714,
+      "B/excess_content": 0.04256508569718184,
+      "B/excess_deletion": 0.04256508569718184,
+      "B/excess_full": 0.24607043862342837,
+      "B/null_full": 0.28335679483910403,
+      "B/overlap_full": 0.5294272334625324,
+      "B/pressure": 0.125,
+      "B/silenced_rate": 1.0,
+      "accuracy_ratio": 1.0,
+      "closure_drop": 0.0,
+      "collateral_gain": 0.0052083320915699005,
+      "excess_address_drop": 0.04208419260879359,
+      "excess_full_drop": 0.047175924852490336,
+      "seed": 2
+    }
+  ],
+  "pod_weight": 1.0,
+  "private_weight": 1.0,
+  "recorded_at": "2026-09-04T22:43:52+00:00",
+  "seconds": 5068.965423107147,
+  "seeds": [
+    0,
+    1,
+    2
+  ],
+  "steps": 700,
+  "title": "training the pod objective: is the allocation failure fixable, and at what price"
+}

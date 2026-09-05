@@ -1,0 +1,1464 @@
+{
+  "aggregate": {
+    "alternative_path": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "direct": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "hop2": {
+      "max": 1.0,
+      "mean": 0.9993333333333334,
+      "min": 0.998,
+      "n": 3
+    },
+    "hop2_broken_unknown": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "hop3": {
+      "max": 1.0,
+      "mean": 0.9946666666666667,
+      "min": 0.99,
+      "n": 3
+    },
+    "hop3_broken_unknown": {
+      "max": 0.97,
+      "mean": 0.9566666666666667,
+      "min": 0.95,
+      "n": 3
+    },
+    "locality": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "locality_targets_correct": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "locality_undo_exact": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "provenance": {
+      "max": 1.0,
+      "mean": 0.9999393939393939,
+      "min": 0.9998181818181818,
+      "n": 3
+    },
+    "replay_deviation": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 3
+    },
+    "resign": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "restore": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "reverse": {
+      "max": 1.0,
+      "mean": 0.9977777777777778,
+      "min": 0.9966666666666667,
+      "n": 3
+    },
+    "revoke": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "rollback": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "shred": {
+      "max": 1.0,
+      "mean": 0.9966666666666667,
+      "min": 0.99,
+      "n": 3
+    },
+    "update": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "update_derived": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "update_rollback": {
+      "max": 1.0,
+      "mean": 0.9995238095238096,
+      "min": 0.9985714285714286,
+      "n": 3
+    }
+  },
+  "aggregate_attacks_hard": {
+    "active/direct_acc": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "active/direct_unknown": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 3
+    },
+    "active/forced_choice_win": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "active/gate_invalid_max": {
+      "max": NaN,
+      "mean": NaN,
+      "min": NaN,
+      "n": 3
+    },
+    "active/gate_invalid_mean": {
+      "max": NaN,
+      "mean": NaN,
+      "min": NaN,
+      "n": 3
+    },
+    "active/gate_valid_mean": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "active/gated_value_contribution": {
+      "max": 14.134871482849121,
+      "mean": 13.939631144205729,
+      "min": 13.714646339416504,
+      "n": 3
+    },
+    "active/multihop_unknown": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 3
+    },
+    "active/paraphrase_unknown": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 3
+    },
+    "active/probe_top1": {
+      "max": 0.954,
+      "mean": 0.9460000000000001,
+      "min": 0.936,
+      "n": 3
+    },
+    "active/probe_top5": {
+      "max": 0.954,
+      "mean": 0.9460000000000001,
+      "min": 0.936,
+      "n": 3
+    },
+    "active/reverse_unknown": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 3
+    },
+    "active/routing_mass_on_target": {
+      "max": 0.9958028197288513,
+      "mean": 0.9953076640764872,
+      "min": 0.994978666305542,
+      "n": 3
+    },
+    "active/true_obj_mean_rank": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 3
+    },
+    "active/true_obj_top1_among_entities": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "dependency/collateral_bypass_acc_after_closure": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "dependency/derivable_recovery_after_closure": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 3
+    },
+    "dependency/derivable_recovery_after_revoke_K3": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "dependency/direct_unknown_after_revoke_K3": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "dependency/n_triples": {
+      "max": 30.0,
+      "mean": 30.0,
+      "min": 30.0,
+      "n": 3
+    },
+    "probe_calibration_top1": {
+      "max": 0.9626315789473684,
+      "mean": 0.9570175438596492,
+      "min": 0.9515789473684211,
+      "n": 3
+    },
+    "probe_calibration_top5": {
+      "max": 0.9626315789473684,
+      "mean": 0.9570175438596492,
+      "min": 0.9515789473684211,
+      "n": 3
+    },
+    "restored/direct_acc": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "revoke/direct_acc": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 3
+    },
+    "revoke/direct_unknown": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "revoke/forced_choice_win": {
+      "max": 0.542,
+      "mean": 0.53,
+      "min": 0.52,
+      "n": 3
+    },
+    "revoke/gate_invalid_max": {
+      "max": NaN,
+      "mean": NaN,
+      "min": NaN,
+      "n": 3
+    },
+    "revoke/gate_invalid_mean": {
+      "max": NaN,
+      "mean": NaN,
+      "min": NaN,
+      "n": 3
+    },
+    "revoke/gate_valid_mean": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "revoke/gated_value_contribution": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 3
+    },
+    "revoke/multihop_unknown": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "revoke/paraphrase_unknown": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "revoke/probe_top1": {
+      "max": 0.002,
+      "mean": 0.0013333333333333333,
+      "min": 0.0,
+      "n": 3
+    },
+    "revoke/probe_top5": {
+      "max": 0.004,
+      "mean": 0.0033333333333333335,
+      "min": 0.002,
+      "n": 3
+    },
+    "revoke/reverse_unknown": {
+      "max": 0.9950980392156863,
+      "mean": 0.9947231885428819,
+      "min": 0.9942528735632183,
+      "n": 3
+    },
+    "revoke/routing_mass_on_target": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 3
+    },
+    "revoke/true_obj_mean_rank": {
+      "max": 1261.652,
+      "mean": 1248.718,
+      "min": 1242.228,
+      "n": 3
+    },
+    "revoke/true_obj_top1_among_entities": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 3
+    },
+    "shred/direct_acc": {
+      "max": 0.004,
+      "mean": 0.002,
+      "min": 0.0,
+      "n": 3
+    },
+    "shred/direct_unknown": {
+      "max": 1.0,
+      "mean": 0.9979999999999999,
+      "min": 0.996,
+      "n": 3
+    },
+    "shred/forced_choice_win": {
+      "max": 0.544,
+      "mean": 0.5273333333333333,
+      "min": 0.502,
+      "n": 3
+    },
+    "shred/gate_invalid_max": {
+      "max": 1.0,
+      "mean": 0.6666666666666666,
+      "min": 0.0,
+      "n": 3
+    },
+    "shred/gate_invalid_mean": {
+      "max": 0.005988024175167084,
+      "mean": 0.002662674756720662,
+      "min": 0.0,
+      "n": 3
+    },
+    "shred/gate_valid_mean": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "shred/gated_value_contribution": {
+      "max": 0.05976782366633415,
+      "mean": 0.029005412633220356,
+      "min": 0.0,
+      "n": 3
+    },
+    "shred/multihop_unknown": {
+      "max": 1.0,
+      "mean": 0.9986282578875172,
+      "min": 0.9974279835390947,
+      "n": 3
+    },
+    "shred/paraphrase_unknown": {
+      "max": 1.0,
+      "mean": 0.9979999999999999,
+      "min": 0.996,
+      "n": 3
+    },
+    "shred/probe_top1": {
+      "max": 0.006,
+      "mean": 0.0033333333333333335,
+      "min": 0.002,
+      "n": 3
+    },
+    "shred/probe_top5": {
+      "max": 0.01,
+      "mean": 0.006000000000000001,
+      "min": 0.004,
+      "n": 3
+    },
+    "shred/reverse_unknown": {
+      "max": 1.0,
+      "mean": 0.998272884283247,
+      "min": 0.9948186528497409,
+      "n": 3
+    },
+    "shred/routing_mass_on_target": {
+      "max": 0.9958028197288513,
+      "mean": 0.9953076640764872,
+      "min": 0.994978666305542,
+      "n": 3
+    },
+    "shred/true_obj_mean_rank": {
+      "max": 1273.826,
+      "mean": 1245.912,
+      "min": 1219.3,
+      "n": 3
+    },
+    "shred/true_obj_top1_among_entities": {
+      "max": 0.004,
+      "mean": 0.002,
+      "min": 0.0,
+      "n": 3
+    }
+  },
+  "aggregate_attacks_soft": {
+    "active/direct_acc": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "active/direct_unknown": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 3
+    },
+    "active/forced_choice_win": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "active/gate_invalid_max": {
+      "max": NaN,
+      "mean": NaN,
+      "min": NaN,
+      "n": 3
+    },
+    "active/gate_invalid_mean": {
+      "max": NaN,
+      "mean": NaN,
+      "min": NaN,
+      "n": 3
+    },
+    "active/gate_valid_mean": {
+      "max": 0.9976515173912048,
+      "mean": 0.9974550207455953,
+      "min": 0.9970923662185669,
+      "n": 3
+    },
+    "active/gated_value_contribution": {
+      "max": 14.101286888122559,
+      "mean": 13.903958638509115,
+      "min": 13.682439804077148,
+      "n": 3
+    },
+    "active/multihop_unknown": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 3
+    },
+    "active/paraphrase_unknown": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 3
+    },
+    "active/probe_top1": {
+      "max": 0.954,
+      "mean": 0.9460000000000001,
+      "min": 0.936,
+      "n": 3
+    },
+    "active/probe_top5": {
+      "max": 0.954,
+      "mean": 0.9460000000000001,
+      "min": 0.936,
+      "n": 3
+    },
+    "active/reverse_unknown": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 3
+    },
+    "active/routing_mass_on_target": {
+      "max": 0.9958028197288513,
+      "mean": 0.9953076640764872,
+      "min": 0.994978666305542,
+      "n": 3
+    },
+    "active/true_obj_mean_rank": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 3
+    },
+    "active/true_obj_top1_among_entities": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "dependency/collateral_bypass_acc_after_closure": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "dependency/derivable_recovery_after_closure": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 3
+    },
+    "dependency/derivable_recovery_after_revoke_K3": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "dependency/direct_unknown_after_revoke_K3": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "dependency/n_triples": {
+      "max": 30.0,
+      "mean": 30.0,
+      "min": 30.0,
+      "n": 3
+    },
+    "probe_calibration_top1": {
+      "max": 0.9626315789473684,
+      "mean": 0.9570175438596492,
+      "min": 0.9515789473684211,
+      "n": 3
+    },
+    "probe_calibration_top5": {
+      "max": 0.9626315789473684,
+      "mean": 0.9570175438596492,
+      "min": 0.9515789473684211,
+      "n": 3
+    },
+    "restored/direct_acc": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "revoke/direct_acc": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 3
+    },
+    "revoke/direct_unknown": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "revoke/forced_choice_win": {
+      "max": 0.542,
+      "mean": 0.53,
+      "min": 0.52,
+      "n": 3
+    },
+    "revoke/gate_invalid_max": {
+      "max": NaN,
+      "mean": NaN,
+      "min": NaN,
+      "n": 3
+    },
+    "revoke/gate_invalid_mean": {
+      "max": NaN,
+      "mean": NaN,
+      "min": NaN,
+      "n": 3
+    },
+    "revoke/gate_valid_mean": {
+      "max": 0.9976515173912048,
+      "mean": 0.9974550207455953,
+      "min": 0.9970923662185669,
+      "n": 3
+    },
+    "revoke/gated_value_contribution": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 3
+    },
+    "revoke/multihop_unknown": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "revoke/paraphrase_unknown": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "revoke/probe_top1": {
+      "max": 0.002,
+      "mean": 0.0013333333333333333,
+      "min": 0.0,
+      "n": 3
+    },
+    "revoke/probe_top5": {
+      "max": 0.004,
+      "mean": 0.0033333333333333335,
+      "min": 0.002,
+      "n": 3
+    },
+    "revoke/reverse_unknown": {
+      "max": 0.9950980392156863,
+      "mean": 0.9947231885428819,
+      "min": 0.9942528735632183,
+      "n": 3
+    },
+    "revoke/routing_mass_on_target": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 3
+    },
+    "revoke/true_obj_mean_rank": {
+      "max": 1261.662,
+      "mean": 1248.7173333333333,
+      "min": 1242.228,
+      "n": 3
+    },
+    "revoke/true_obj_top1_among_entities": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 3
+    },
+    "shred/direct_acc": {
+      "max": 0.004,
+      "mean": 0.0013333333333333333,
+      "min": 0.0,
+      "n": 3
+    },
+    "shred/direct_unknown": {
+      "max": 1.0,
+      "mean": 0.9986666666666667,
+      "min": 0.996,
+      "n": 3
+    },
+    "shred/forced_choice_win": {
+      "max": 0.536,
+      "mean": 0.5226666666666667,
+      "min": 0.498,
+      "n": 3
+    },
+    "shred/gate_invalid_max": {
+      "max": 0.9932973980903625,
+      "mean": 0.6984446148077647,
+      "min": 0.4682733118534088,
+      "n": 3
+    },
+    "shred/gate_invalid_mean": {
+      "max": 0.00745026208460331,
+      "mean": 0.004641470266506076,
+      "min": 0.0031674327328801155,
+      "n": 3
+    },
+    "shred/gate_valid_mean": {
+      "max": 0.9976514577865601,
+      "mean": 0.9974557161331177,
+      "min": 0.9970945715904236,
+      "n": 3
+    },
+    "shred/gated_value_contribution": {
+      "max": 0.07859519124031067,
+      "mean": 0.05668870856364568,
+      "min": 0.04473840445280075,
+      "n": 3
+    },
+    "shred/multihop_unknown": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "shred/paraphrase_unknown": {
+      "max": 1.0,
+      "mean": 0.9986666666666667,
+      "min": 0.996,
+      "n": 3
+    },
+    "shred/probe_top1": {
+      "max": 0.006,
+      "mean": 0.004,
+      "min": 0.002,
+      "n": 3
+    },
+    "shred/probe_top5": {
+      "max": 0.01,
+      "mean": 0.006666666666666667,
+      "min": 0.004,
+      "n": 3
+    },
+    "shred/reverse_unknown": {
+      "max": 1.0,
+      "mean": 0.998272884283247,
+      "min": 0.9948186528497409,
+      "n": 3
+    },
+    "shred/routing_mass_on_target": {
+      "max": 0.9958028197288513,
+      "mean": 0.9953076640764872,
+      "min": 0.994978666305542,
+      "n": 3
+    },
+    "shred/true_obj_mean_rank": {
+      "max": 1286.79,
+      "mean": 1259.9279999999999,
+      "min": 1237.808,
+      "n": 3
+    },
+    "shred/true_obj_top1_among_entities": {
+      "max": 0.004,
+      "mean": 0.002,
+      "min": 0.0,
+      "n": 3
+    }
+  },
+  "attacks_hard": [
+    {
+      "active/direct_acc": 1.0,
+      "active/direct_unknown": 0.0,
+      "active/forced_choice_win": 1.0,
+      "active/gate_invalid_max": NaN,
+      "active/gate_invalid_mean": NaN,
+      "active/gate_valid_mean": 1.0,
+      "active/gated_value_contribution": 14.134871482849121,
+      "active/multihop_unknown": 0.0,
+      "active/paraphrase_unknown": 0.0,
+      "active/probe_top1": 0.948,
+      "active/probe_top5": 0.948,
+      "active/reverse_unknown": 0.0,
+      "active/routing_mass_on_target": 0.9951415061950684,
+      "active/true_obj_mean_rank": 0.0,
+      "active/true_obj_top1_among_entities": 1.0,
+      "dependency/collateral_bypass_acc_after_closure": 1.0,
+      "dependency/derivable_recovery_after_closure": 0.0,
+      "dependency/derivable_recovery_after_revoke_K3": 1.0,
+      "dependency/direct_unknown_after_revoke_K3": 1.0,
+      "dependency/n_triples": 30,
+      "probe_calibration_top1": 0.9568421052631579,
+      "probe_calibration_top5": 0.9568421052631579,
+      "restored/direct_acc": 1.0,
+      "revoke/direct_acc": 0.0,
+      "revoke/direct_unknown": 1.0,
+      "revoke/forced_choice_win": 0.542,
+      "revoke/gate_invalid_max": NaN,
+      "revoke/gate_invalid_mean": NaN,
+      "revoke/gate_valid_mean": 1.0,
+      "revoke/gated_value_contribution": 0.0,
+      "revoke/multihop_unknown": 1.0,
+      "revoke/paraphrase_unknown": 1.0,
+      "revoke/probe_top1": 0.0,
+      "revoke/probe_top5": 0.002,
+      "revoke/reverse_unknown": 0.9942528735632183,
+      "revoke/routing_mass_on_target": 0.0,
+      "revoke/true_obj_mean_rank": 1242.274,
+      "revoke/true_obj_top1_among_entities": 0.0,
+      "seed": 0,
+      "shred/direct_acc": 0.002,
+      "shred/direct_unknown": 0.998,
+      "shred/forced_choice_win": 0.536,
+      "shred/gate_invalid_max": 1.0,
+      "shred/gate_invalid_mean": 0.0020000000949949026,
+      "shred/gate_valid_mean": 1.0,
+      "shred/gated_value_contribution": 0.027248414233326912,
+      "shred/multihop_unknown": 0.9984567901234568,
+      "shred/paraphrase_unknown": 0.998,
+      "shred/probe_top1": 0.002,
+      "shred/probe_top5": 0.004,
+      "shred/reverse_unknown": 1.0,
+      "shred/routing_mass_on_target": 0.9951415061950684,
+      "shred/true_obj_mean_rank": 1244.61,
+      "shred/true_obj_top1_among_entities": 0.002
+    },
+    {
+      "active/direct_acc": 1.0,
+      "active/direct_unknown": 0.0,
+      "active/forced_choice_win": 1.0,
+      "active/gate_invalid_max": 1.0,
+      "active/gate_invalid_mean": 1.0,
+      "active/gate_valid_mean": 1.0,
+      "active/gated_value_contribution": 13.714646339416504,
+      "active/multihop_unknown": 0.0,
+      "active/paraphrase_unknown": 0.0,
+      "active/probe_top1": 0.936,
+      "active/probe_top5": 0.936,
+      "active/reverse_unknown": 0.0,
+      "active/routing_mass_on_target": 0.994978666305542,
+      "active/true_obj_mean_rank": 0.0,
+      "active/true_obj_top1_among_entities": 1.0,
+      "dependency/collateral_bypass_acc_after_closure": 1.0,
+      "dependency/derivable_recovery_after_closure": 0.0,
+      "dependency/derivable_recovery_after_revoke_K3": 1.0,
+      "dependency/direct_unknown_after_revoke_K3": 1.0,
+      "dependency/n_triples": 30,
+      "probe_calibration_top1": 0.9515789473684211,
+      "probe_calibration_top5": 0.9515789473684211,
+      "restored/direct_acc": 1.0,
+      "revoke/direct_acc": 0.0,
+      "revoke/direct_unknown": 1.0,
+      "revoke/forced_choice_win": 0.528,
+      "revoke/gate_invalid_max": 1.0,
+      "revoke/gate_invalid_mean": 1.0,
+      "revoke/gate_valid_mean": 1.0,
+      "revoke/gated_value_contribution": 0.0,
+      "revoke/multihop_unknown": 1.0,
+      "revoke/paraphrase_unknown": 1.0,
+      "revoke/probe_top1": 0.002,
+      "revoke/probe_top5": 0.004,
+      "revoke/reverse_unknown": 0.9948186528497409,
+      "revoke/routing_mass_on_target": 0.0,
+      "revoke/true_obj_mean_rank": 1261.652,
+      "revoke/true_obj_top1_among_entities": 0.0,
+      "seed": 1,
+      "shred/direct_acc": 0.004,
+      "shred/direct_unknown": 0.996,
+      "shred/forced_choice_win": 0.502,
+      "shred/gate_invalid_max": 1.0,
+      "shred/gate_invalid_mean": 0.005988024175167084,
+      "shred/gate_valid_mean": 1.0,
+      "shred/gated_value_contribution": 0.05976782366633415,
+      "shred/multihop_unknown": 0.9974279835390947,
+      "shred/paraphrase_unknown": 0.996,
+      "shred/probe_top1": 0.006,
+      "shred/probe_top5": 0.01,
+      "shred/reverse_unknown": 0.9948186528497409,
+      "shred/routing_mass_on_target": 0.994978666305542,
+      "shred/true_obj_mean_rank": 1273.826,
+      "shred/true_obj_top1_among_entities": 0.004
+    },
+    {
+      "active/direct_acc": 1.0,
+      "active/direct_unknown": 0.0,
+      "active/forced_choice_win": 1.0,
+      "active/gate_invalid_max": NaN,
+      "active/gate_invalid_mean": NaN,
+      "active/gate_valid_mean": 1.0,
+      "active/gated_value_contribution": 13.969375610351562,
+      "active/multihop_unknown": 0.0,
+      "active/paraphrase_unknown": 0.0,
+      "active/probe_top1": 0.954,
+      "active/probe_top5": 0.954,
+      "active/reverse_unknown": 0.0,
+      "active/routing_mass_on_target": 0.9958028197288513,
+      "active/true_obj_mean_rank": 0.0,
+      "active/true_obj_top1_among_entities": 1.0,
+      "dependency/collateral_bypass_acc_after_closure": 1.0,
+      "dependency/derivable_recovery_after_closure": 0.0,
+      "dependency/derivable_recovery_after_revoke_K3": 1.0,
+      "dependency/direct_unknown_after_revoke_K3": 1.0,
+      "dependency/n_triples": 30,
+      "probe_calibration_top1": 0.9626315789473684,
+      "probe_calibration_top5": 0.9626315789473684,
+      "restored/direct_acc": 1.0,
+      "revoke/direct_acc": 0.0,
+      "revoke/direct_unknown": 1.0,
+      "revoke/forced_choice_win": 0.52,
+      "revoke/gate_invalid_max": NaN,
+      "revoke/gate_invalid_mean": NaN,
+      "revoke/gate_valid_mean": 1.0,
+      "revoke/gated_value_contribution": 0.0,
+      "revoke/multihop_unknown": 1.0,
+      "revoke/paraphrase_unknown": 1.0,
+      "revoke/probe_top1": 0.002,
+      "revoke/probe_top5": 0.004,
+      "revoke/reverse_unknown": 0.9950980392156863,
+      "revoke/routing_mass_on_target": 0.0,
+      "revoke/true_obj_mean_rank": 1242.228,
+      "revoke/true_obj_top1_among_entities": 0.0,
+      "seed": 2,
+      "shred/direct_acc": 0.0,
+      "shred/direct_unknown": 1.0,
+      "shred/forced_choice_win": 0.544,
+      "shred/gate_invalid_max": 0.0,
+      "shred/gate_invalid_mean": 0.0,
+      "shred/gate_valid_mean": 1.0,
+      "shred/gated_value_contribution": 0.0,
+      "shred/multihop_unknown": 1.0,
+      "shred/paraphrase_unknown": 1.0,
+      "shred/probe_top1": 0.002,
+      "shred/probe_top5": 0.004,
+      "shred/reverse_unknown": 1.0,
+      "shred/routing_mass_on_target": 0.9958028197288513,
+      "shred/true_obj_mean_rank": 1219.3,
+      "shred/true_obj_top1_among_entities": 0.0
+    }
+  ],
+  "attacks_soft": [
+    {
+      "active/direct_acc": 1.0,
+      "active/direct_unknown": 0.0,
+      "active/forced_choice_win": 1.0,
+      "active/gate_invalid_max": NaN,
+      "active/gate_invalid_mean": NaN,
+      "active/gate_valid_mean": 0.9976211786270142,
+      "active/gated_value_contribution": 14.101286888122559,
+      "active/multihop_unknown": 0.0,
+      "active/paraphrase_unknown": 0.0,
+      "active/probe_top1": 0.948,
+      "active/probe_top5": 0.948,
+      "active/reverse_unknown": 0.0,
+      "active/routing_mass_on_target": 0.9951415061950684,
+      "active/true_obj_mean_rank": 0.0,
+      "active/true_obj_top1_among_entities": 1.0,
+      "dependency/collateral_bypass_acc_after_closure": 1.0,
+      "dependency/derivable_recovery_after_closure": 0.0,
+      "dependency/derivable_recovery_after_revoke_K3": 1.0,
+      "dependency/direct_unknown_after_revoke_K3": 1.0,
+      "dependency/n_triples": 30,
+      "probe_calibration_top1": 0.9568421052631579,
+      "probe_calibration_top5": 0.9568421052631579,
+      "restored/direct_acc": 1.0,
+      "revoke/direct_acc": 0.0,
+      "revoke/direct_unknown": 1.0,
+      "revoke/forced_choice_win": 0.542,
+      "revoke/gate_invalid_max": NaN,
+      "revoke/gate_invalid_mean": NaN,
+      "revoke/gate_valid_mean": 0.9976211786270142,
+      "revoke/gated_value_contribution": 0.0,
+      "revoke/multihop_unknown": 1.0,
+      "revoke/paraphrase_unknown": 1.0,
+      "revoke/probe_top1": 0.0,
+      "revoke/probe_top5": 0.002,
+      "revoke/reverse_unknown": 0.9942528735632183,
+      "revoke/routing_mass_on_target": 0.0,
+      "revoke/true_obj_mean_rank": 1242.262,
+      "revoke/true_obj_top1_among_entities": 0.0,
+      "seed": 0,
+      "shred/direct_acc": 0.0,
+      "shred/direct_unknown": 1.0,
+      "shred/forced_choice_win": 0.534,
+      "shred/gate_invalid_max": 0.6337631344795227,
+      "shred/gate_invalid_mean": 0.0031674327328801155,
+      "shred/gate_valid_mean": 0.9976211190223694,
+      "shred/gated_value_contribution": 0.04473840445280075,
+      "shred/multihop_unknown": 1.0,
+      "shred/paraphrase_unknown": 1.0,
+      "shred/probe_top1": 0.002,
+      "shred/probe_top5": 0.004,
+      "shred/reverse_unknown": 1.0,
+      "shred/routing_mass_on_target": 0.9951415061950684,
+      "shred/true_obj_mean_rank": 1255.186,
+      "shred/true_obj_top1_among_entities": 0.002
+    },
+    {
+      "active/direct_acc": 1.0,
+      "active/direct_unknown": 0.0,
+      "active/forced_choice_win": 1.0,
+      "active/gate_invalid_max": 0.9932973980903625,
+      "active/gate_invalid_mean": 0.9932973980903625,
+      "active/gate_valid_mean": 0.9976515173912048,
+      "active/gated_value_contribution": 13.682439804077148,
+      "active/multihop_unknown": 0.0,
+      "active/paraphrase_unknown": 0.0,
+      "active/probe_top1": 0.936,
+      "active/probe_top5": 0.936,
+      "active/reverse_unknown": 0.0,
+      "active/routing_mass_on_target": 0.994978666305542,
+      "active/true_obj_mean_rank": 0.0,
+      "active/true_obj_top1_among_entities": 1.0,
+      "dependency/collateral_bypass_acc_after_closure": 1.0,
+      "dependency/derivable_recovery_after_closure": 0.0,
+      "dependency/derivable_recovery_after_revoke_K3": 1.0,
+      "dependency/direct_unknown_after_revoke_K3": 1.0,
+      "dependency/n_triples": 30,
+      "probe_calibration_top1": 0.9515789473684211,
+      "probe_calibration_top5": 0.9515789473684211,
+      "restored/direct_acc": 1.0,
+      "revoke/direct_acc": 0.0,
+      "revoke/direct_unknown": 1.0,
+      "revoke/forced_choice_win": 0.528,
+      "revoke/gate_invalid_max": 0.9932973980903625,
+      "revoke/gate_invalid_mean": 0.9932973980903625,
+      "revoke/gate_valid_mean": 0.9976515173912048,
+      "revoke/gated_value_contribution": 0.0,
+      "revoke/multihop_unknown": 1.0,
+      "revoke/paraphrase_unknown": 1.0,
+      "revoke/probe_top1": 0.002,
+      "revoke/probe_top5": 0.004,
+      "revoke/reverse_unknown": 0.9948186528497409,
+      "revoke/routing_mass_on_target": 0.0,
+      "revoke/true_obj_mean_rank": 1261.662,
+      "revoke/true_obj_top1_among_entities": 0.0,
+      "seed": 1,
+      "shred/direct_acc": 0.004,
+      "shred/direct_unknown": 0.996,
+      "shred/forced_choice_win": 0.498,
+      "shred/gate_invalid_max": 0.9932973980903625,
+      "shred/gate_invalid_mean": 0.00745026208460331,
+      "shred/gate_valid_mean": 0.9976514577865601,
+      "shred/gated_value_contribution": 0.07859519124031067,
+      "shred/multihop_unknown": 1.0,
+      "shred/paraphrase_unknown": 0.996,
+      "shred/probe_top1": 0.006,
+      "shred/probe_top5": 0.01,
+      "shred/reverse_unknown": 0.9948186528497409,
+      "shred/routing_mass_on_target": 0.994978666305542,
+      "shred/true_obj_mean_rank": 1286.79,
+      "shred/true_obj_top1_among_entities": 0.004
+    },
+    {
+      "active/direct_acc": 1.0,
+      "active/direct_unknown": 0.0,
+      "active/forced_choice_win": 1.0,
+      "active/gate_invalid_max": NaN,
+      "active/gate_invalid_mean": NaN,
+      "active/gate_valid_mean": 0.9970923662185669,
+      "active/gated_value_contribution": 13.928149223327637,
+      "active/multihop_unknown": 0.0,
+      "active/paraphrase_unknown": 0.0,
+      "active/probe_top1": 0.954,
+      "active/probe_top5": 0.954,
+      "active/reverse_unknown": 0.0,
+      "active/routing_mass_on_target": 0.9958028197288513,
+      "active/true_obj_mean_rank": 0.0,
+      "active/true_obj_top1_among_entities": 1.0,
+      "dependency/collateral_bypass_acc_after_closure": 1.0,
+      "dependency/derivable_recovery_after_closure": 0.0,
+      "dependency/derivable_recovery_after_revoke_K3": 1.0,
+      "dependency/direct_unknown_after_revoke_K3": 1.0,
+      "dependency/n_triples": 30,
+      "probe_calibration_top1": 0.9626315789473684,
+      "probe_calibration_top5": 0.9626315789473684,
+      "restored/direct_acc": 1.0,
+      "revoke/direct_acc": 0.0,
+      "revoke/direct_unknown": 1.0,
+      "revoke/forced_choice_win": 0.52,
+      "revoke/gate_invalid_max": NaN,
+      "revoke/gate_invalid_mean": NaN,
+      "revoke/gate_valid_mean": 0.9970923662185669,
+      "revoke/gated_value_contribution": 0.0,
+      "revoke/multihop_unknown": 1.0,
+      "revoke/paraphrase_unknown": 1.0,
+      "revoke/probe_top1": 0.002,
+      "revoke/probe_top5": 0.004,
+      "revoke/reverse_unknown": 0.9950980392156863,
+      "revoke/routing_mass_on_target": 0.0,
+      "revoke/true_obj_mean_rank": 1242.228,
+      "revoke/true_obj_top1_among_entities": 0.0,
+      "seed": 2,
+      "shred/direct_acc": 0.0,
+      "shred/direct_unknown": 1.0,
+      "shred/forced_choice_win": 0.536,
+      "shred/gate_invalid_max": 0.4682733118534088,
+      "shred/gate_invalid_mean": 0.0033067159820348024,
+      "shred/gate_valid_mean": 0.9970945715904236,
+      "shred/gated_value_contribution": 0.04673252999782562,
+      "shred/multihop_unknown": 1.0,
+      "shred/paraphrase_unknown": 1.0,
+      "shred/probe_top1": 0.004,
+      "shred/probe_top5": 0.006,
+      "shred/reverse_unknown": 1.0,
+      "shred/routing_mass_on_target": 0.9958028197288513,
+      "shred/true_obj_mean_rank": 1237.808,
+      "shred/true_obj_top1_among_entities": 0.0
+    }
+  ],
+  "chance_levels": {
+    "forced_choice": 0.5,
+    "mean_rank": 1279.5,
+    "probe_top1": 0.000390625
+  },
+  "claim": "At ten times the bank size (and a ten times larger entity vocabulary) the core still reads, composes and traces the right cell, reproduces every lifecycle operation, and after SHRED with hard verification the reconstruction attacks stay within the thresholds set for a 2,560-entity vocabulary (probe / top-1 at most 0.02 with 100 targets, mean rank at least 1100 of 1279.5, forced choice at most 0.6).",
+  "claim_supported": true,
+  "config": {
+    "eval": {
+      "n_2hop": 500,
+      "n_3hop": 500,
+      "n_alt_pairs": 100,
+      "n_alt_structures": 25,
+      "n_broken": 100,
+      "n_cells": 10000,
+      "n_entities": 2560,
+      "n_lifecycle": 100,
+      "n_locality_multihop": 300,
+      "n_locality_revokes": 50,
+      "n_locality_updates": 100,
+      "n_relations": 4,
+      "n_rev": 300,
+      "n_synonyms": 2
+    },
+    "model": {
+      "d_ff": 256,
+      "d_model": 128,
+      "hard_gate": false,
+      "marker_dim": 16,
+      "max_hops": 3,
+      "n_core_layers": 2,
+      "n_entities": 2560,
+      "n_heads": 4,
+      "n_relations": 4,
+      "n_surface": 8,
+      "use_marker_gate": true,
+      "use_null_cell": true,
+      "use_routing": true
+    },
+    "seeds": [
+      0,
+      1,
+      2
+    ],
+    "steps": 3000,
+    "train": {
+      "gate_balanced": true,
+      "gate_weight": 5.0,
+      "n_cells_max": 10000,
+      "n_cells_min": 7000,
+      "n_entities": 2560
+    }
+  },
+  "criteria": {
+    "alternative_path": {
+      "observed": 1.0,
+      "op": ">=",
+      "pass": true,
+      "threshold": 0.95
+    },
+    "direct": {
+      "observed": 1.0,
+      "op": ">=",
+      "pass": true,
+      "threshold": 0.98
+    },
+    "hard/active/direct_acc": {
+      "observed": 1.0,
+      "op": ">=",
+      "pass": true,
+      "threshold": 0.98
+    },
+    "hard/restored/direct_acc": {
+      "observed": 1.0,
+      "op": ">=",
+      "pass": true,
+      "threshold": 0.98
+    },
+    "hard/shred/direct_unknown": {
+      "observed": 0.996,
+      "op": ">=",
+      "pass": true,
+      "threshold": 0.98
+    },
+    "hard/shred/forced_choice_win": {
+      "observed": 0.544,
+      "op": "<=",
+      "pass": true,
+      "threshold": 0.56
+    },
+    "hard/shred/gated_value_contribution": {
+      "observed": 0.05976782366633415,
+      "op": "<=",
+      "pass": true,
+      "threshold": 0.1
+    },
+    "hard/shred/probe_top1": {
+      "observed": 0.006,
+      "op": "<=",
+      "pass": true,
+      "threshold": 0.006
+    },
+    "hard/shred/true_obj_mean_rank": {
+      "observed": 1219.3,
+      "op": ">=",
+      "pass": true,
+      "threshold": 1150.0
+    },
+    "hard/shred/true_obj_top1_among_entities": {
+      "observed": 0.004,
+      "op": "<=",
+      "pass": true,
+      "threshold": 0.006
+    },
+    "hop2": {
+      "observed": 0.998,
+      "op": ">=",
+      "pass": true,
+      "threshold": 0.95
+    },
+    "hop2_broken_unknown": {
+      "observed": 1.0,
+      "op": ">=",
+      "pass": true,
+      "threshold": 0.95
+    },
+    "hop3": {
+      "observed": 0.99,
+      "op": ">=",
+      "pass": true,
+      "threshold": 0.9
+    },
+    "locality": {
+      "observed": 1.0,
+      "op": ">=",
+      "pass": true,
+      "threshold": 0.99
+    },
+    "provenance": {
+      "observed": 0.9998181818181818,
+      "op": ">=",
+      "pass": true,
+      "threshold": 0.95
+    },
+    "replay_deviation": {
+      "observed": 0.0,
+      "op": "<=",
+      "pass": true,
+      "threshold": 0
+    },
+    "resign": {
+      "observed": 1.0,
+      "op": ">=",
+      "pass": true,
+      "threshold": 0.98
+    },
+    "restore": {
+      "observed": 1.0,
+      "op": ">=",
+      "pass": true,
+      "threshold": 0.98
+    },
+    "reverse": {
+      "observed": 0.9966666666666667,
+      "op": ">=",
+      "pass": true,
+      "threshold": 0.95
+    },
+    "revoke": {
+      "observed": 1.0,
+      "op": ">=",
+      "pass": true,
+      "threshold": 0.98
+    },
+    "rollback": {
+      "observed": 1.0,
+      "op": ">=",
+      "pass": true,
+      "threshold": 0.98
+    },
+    "shred": {
+      "observed": 0.99,
+      "op": ">=",
+      "pass": true,
+      "threshold": 0.95
+    },
+    "update": {
+      "observed": 1.0,
+      "op": ">=",
+      "pass": true,
+      "threshold": 0.98
+    }
+  },
+  "deletion_level": "F4",
+  "deletion_level_meaning": "Representational removal",
+  "deletion_level_targeted": "F4",
+  "environment": {
+    "device": "cpu",
+    "numpy": "2.2.6",
+    "platform": "Linux-6.18.44-fc-v24-x86_64-with-glibc2.39",
+    "python": "3.11.15",
+    "threads": "2",
+    "torch": "2.14.0+cpu"
+  },
+  "evidence_level": "E4",
+  "evidence_level_meaning": "Controlled neural-network evidence",
+  "experiment": "E-000014",
+  "not_claimed": "A same-task scale-up of E-000001-B: the entity vocabulary is 2,560 instead of 256, so the task is harder in two ways at once (bank size and read-out classes). Nothing about approximate retrieval or banks beyond 10,000 cells; the synthetic boundary applies.",
+  "per_seed": [
+    {
+      "alternative_path": 1.0,
+      "checkpoint_sha256": "aa4f74732fbef59283102ce8b4c4c103aac85f76753e18a504f66a2ec70afdbe",
+      "direct": 1.0,
+      "direct_unknown_rate": 0.0,
+      "eval_world_seed": 1400,
+      "hop2": 1.0,
+      "hop2_broken_unknown": 1.0,
+      "hop3": 1.0,
+      "hop3_broken_unknown": 0.95,
+      "locality": 1.0,
+      "locality_targets_correct": 1.0,
+      "locality_undo_exact": 1.0,
+      "n_cells": 10000,
+      "noise": {
+        "0.00": 1.0,
+        "0.24": 0.9984
+      },
+      "provenance": 1.0,
+      "replay_deviation": 0,
+      "resign": 1.0,
+      "restore": 1.0,
+      "reverse": 0.9966666666666667,
+      "revoke": 1.0,
+      "rollback": 1.0,
+      "scaling": {
+        "1000": {
+          "direct": 1.0,
+          "routing_max_mass_mean": 0.9950262308120728,
+          "routing_max_mass_min": 0.9180112481117249
+        },
+        "10000": {
+          "direct": 1.0,
+          "routing_max_mass_mean": 0.9947917461395264,
+          "routing_max_mass_min": 0.915298581123352
+        },
+        "3000": {
+          "direct": 1.0,
+          "routing_max_mass_mean": 0.9949659705162048,
+          "routing_max_mass_min": 0.9294072985649109
+        }
+      },
+      "seed": 0,
+      "shred": 1.0,
+      "train_seconds": 1205.0660688877106,
+      "update": 1.0,
+      "update_derived": 1.0,
+      "update_rollback": 1.0
+    },
+    {
+      "alternative_path": 1.0,
+      "checkpoint_sha256": "bdbc4a47b7b74d39cb765827f8772592d10bb12b352c6266d34e2b5d811e0632",
+      "direct": 1.0,
+      "direct_unknown_rate": 0.0,
+      "eval_world_seed": 1401,
+      "hop2": 1.0,
+      "hop2_broken_unknown": 1.0,
+      "hop3": 0.994,
+      "hop3_broken_unknown": 0.97,
+      "locality": 1.0,
+      "locality_targets_correct": 1.0,
+      "locality_undo_exact": 1.0,
+      "n_cells": 10000,
+      "noise": {
+        "0.00": 1.0,
+        "0.24": 0.9983
+      },
+      "provenance": 1.0,
+      "replay_deviation": 0,
+      "resign": 1.0,
+      "restore": 1.0,
+      "reverse": 0.9966666666666667,
+      "revoke": 1.0,
+      "rollback": 1.0,
+      "scaling": {
+        "1000": {
+          "direct": 1.0,
+          "routing_max_mass_mean": 0.9945945143699646,
+          "routing_max_mass_min": 0.9258663058280945
+        },
+        "10000": {
+          "direct": 1.0,
+          "routing_max_mass_mean": 0.9949917197227478,
+          "routing_max_mass_min": 0.9221565127372742
+        },
+        "3000": {
+          "direct": 1.0,
+          "routing_max_mass_mean": 0.9948838949203491,
+          "routing_max_mass_min": 0.9287925362586975
+        }
+      },
+      "seed": 1,
+      "shred": 0.99,
+      "train_seconds": 1179.327154636383,
+      "update": 1.0,
+      "update_derived": 1.0,
+      "update_rollback": 0.9985714285714286
+    },
+    {
+      "alternative_path": 1.0,
+      "checkpoint_sha256": "e9b81b88e3222f9df875349cc701f8d9c86ec014cb4935e7e189bf432af9062e",
+      "direct": 1.0,
+      "direct_unknown_rate": 0.0,
+      "eval_world_seed": 1402,
+      "hop2": 0.998,
+      "hop2_broken_unknown": 1.0,
+      "hop3": 0.99,
+      "hop3_broken_unknown": 0.95,
+      "locality": 1.0,
+      "locality_targets_correct": 1.0,
+      "locality_undo_exact": 1.0,
+      "n_cells": 10000,
+      "noise": {
+        "0.00": 1.0,
+        "0.24": 0.9985
+      },
+      "provenance": 0.9998181818181818,
+      "replay_deviation": 0,
+      "resign": 1.0,
+      "restore": 1.0,
+      "reverse": 1.0,
+      "revoke": 1.0,
+      "rollback": 1.0,
+      "scaling": {
+        "1000": {
+          "direct": 1.0,
+          "routing_max_mass_mean": 0.9955611824989319,
+          "routing_max_mass_min": 0.9323338866233826
+        },
+        "10000": {
+          "direct": 1.0,
+          "routing_max_mass_mean": 0.9955199360847473,
+          "routing_max_mass_min": 0.9449237585067749
+        },
+        "3000": {
+          "direct": 1.0,
+          "routing_max_mass_mean": 0.9954417943954468,
+          "routing_max_mass_min": 0.9557717442512512
+        }
+      },
+      "seed": 2,
+      "shred": 1.0,
+      "train_seconds": 1170.0259447097778,
+      "update": 1.0,
+      "update_derived": 1.0,
+      "update_rollback": 1.0
+    }
+  ],
+  "recorded_at": "2026-09-03T05:58:10+00:00",
+  "threshold_note": "Core thresholds (0.98 / 0.95 / 0.90) are lower than E-000001-B's (0.99 / 0.98 / 0.95) because the task is harder in two ways at once: ten times the bank and a ten times larger read-out vocabulary. Attack thresholds are binomially derived for 500 targets at chance 1/2560.",
+  "title": "Addressing at 10,000 cells (2,560 entities), verified gate"
+}
