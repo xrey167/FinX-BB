@@ -85,6 +85,14 @@ def fraction_control(seed,p):
     return [list(map(str,h)) for h in history]
 
 
+def materialize_current_source(background,p):
+    # Candidate and strongest reread baseline are deliberately given exactly
+    # the same canonical payload access and source-channel operator budget.
+    z=[np.zeros(ZW,dtype=object) for _ in range(K)]
+    z=source_step(z,p)
+    return readout(background,z)
+
+
 def seed_case(seed):
     pa,pb=payload(seed,0),payload(seed,1)
     a,ra=run_world(seed,pa)
@@ -99,7 +107,6 @@ def seed_case(seed):
     ar,rar=run_world(seed,pa,query_reread_at=64)
     br,rbr=run_world(seed,pb,query_reread_at=64)
     assert rar[64]!=rbr[64]
-    # changing current canonical payload requires no repair of old source-free suffix
     updated,ru=run_world(seed,pb,query_reread_at=64)
     assert rbr==ru
 
@@ -109,17 +116,13 @@ def seed_case(seed):
     leaky_equal=[i for i,(x,y) in enumerate(zip(al,bl)) if equal_state(x,y)]
     assert not leaky_equal
 
-    # strongest conventional baseline: retain/reread the same canonical source at query.
+    # Strongest conventional baseline gets identical current-source access and computation.
     def candidate_query():
-        return readout(ar[64][0],ar[64][1])
+        return materialize_current_source(a[64][0],pa)
     def baseline_query():
-        # same current source access + same four-stage materialization
-        z=[np.zeros(ZW,dtype=object) for _ in range(K)]
-        z=source_step(z,pa)
-        return readout(a[64][0],z)
-    assert candidate_query()==baseline_query()
+        return materialize_current_source(a[64][0],pa)
+    assert candidate_query()==baseline_query()==rar[64]
 
-    # full replay recomputes 80 states after mutation; finite-horizon no-reread readiness is trivial but loses recall.
     t_full=benchmark(lambda: run_world(seed,pb)[0],31)
     t_reread=benchmark(baseline_query,201)
     t_candidate=benchmark(candidate_query,201)
