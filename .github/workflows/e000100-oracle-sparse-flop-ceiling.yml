@@ -1,0 +1,52 @@
+name: E000100 oracle sparse FLOP ceiling
+on:
+  push:
+    branches: [research/e000051-clean-bystanders]
+    paths:
+      - 'so/experiments/e000100_oracle_sparse_flop_ceiling.py'
+      - 'docs/novelty/e000100-oracle-sparse-flop-ceiling-preregister.md'
+      - '.github/workflows/e000100-oracle-sparse-flop-ceiling.yml'
+  workflow_dispatch:
+jobs:
+  ceiling:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 90
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - label: distilgpt2
+            model: distilgpt2
+          - label: pythia70m
+            model: EleutherAI/pythia-70m
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+          cache-dependency-path: so/requirements.txt
+      - name: Install CPU dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install torch --index-url https://download.pytorch.org/whl/cpu
+          python -m pip install -r so/requirements.txt
+      - name: Compile registered source
+        run: python -m py_compile so/experiments/e000100_oracle_sparse_flop_ceiling.py
+      - name: E-000100 oracle sparse FLOP ceiling
+        run: |
+          mkdir -p ci-e100
+          python -m so.experiments.e000100_oracle_sparse_flop_ceiling \
+            --model '${{ matrix.model }}' --seeds 10 11 12 --n-contexts 64 \
+            --seq-len 16 --payload-rms 2.0 --results-dir ci-e100 \
+            | tee ci-e100/stdout.txt
+      - name: Hash evidence
+        run: |
+          sha256sum docs/novelty/e000100-oracle-sparse-flop-ceiling-preregister.md \
+            so/experiments/e000100_oracle_sparse_flop_ceiling.py \
+            > ci-e100/source-sha256.txt
+          find ci-e100 -maxdepth 1 -name '*.json' -print0 | sort -z | xargs -0 -r sha256sum > ci-e100/result-sha256.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: e000100-${{ matrix.label }}
+          path: ci-e100/
