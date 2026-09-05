@@ -1,0 +1,50 @@
+name: E000094 noninterference late-binding reduction
+
+on:
+  push:
+    branches: [research/e000051-clean-bystanders]
+    paths:
+      - 'docs/novelty/e000094-noninterference-late-binding-reduction.md'
+      - 'so/experiments/e000094_noninterference_late_binding_reduction.py'
+      - 'so/tests/test_e000094_noninterference_late_binding_reduction.py'
+      - '.github/workflows/e000094-noninterference-late-binding-reduction.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  reduction:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install test dependency
+        run: python -m pip install pytest
+      - name: Compile
+        run: python -m py_compile so/experiments/e000094_noninterference_late_binding_reduction.py
+      - name: Run focused regressions
+        run: python -m pytest -q so/tests/test_e000094_noninterference_late_binding_reduction.py
+      - name: Run registered exhaustive reduction
+        run: |
+          mkdir -p ci-e94
+          python -m so.experiments.e000094_noninterference_late_binding_reduction \
+            --seed-count 32 --contexts 12 --queries 10 --results-dir ci-e94 \
+            | tee ci-e94/stdout.txt
+      - name: Hash evidence
+        if: always()
+        run: |
+          sha256sum docs/novelty/e000094-noninterference-late-binding-reduction.md \
+            so/experiments/e000094_noninterference_late_binding_reduction.py \
+            so/tests/test_e000094_noninterference_late_binding_reduction.py \
+            > ci-e94/source-sha256.txt
+          find ci-e94 -maxdepth 1 -name '*.json' -print0 | sort -z | xargs -0 -r sha256sum > ci-e94/result-sha256.txt
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: e000094-noninterference-late-binding-reduction
+          path: ci-e94/
+          if-no-files-found: error
