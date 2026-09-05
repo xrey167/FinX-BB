@@ -105,9 +105,16 @@ def run_seed(seed: int, templates: List[int], threads: int, verbose: bool = True
 
 
 # Worst seed. Fixed before the run.
+#
+# MIS-SET BAR, recorded rather than adjusted (ledger 31.54). ``DEREF/direct_min >= 0.90`` demands more
+# than the substrate delivers: E-000052's own worst direct cell is 0.8200, at t9, so this bar fires on
+# a reproduction that is in fact exact. It is left as written, its firing is reported, and the row that
+# carries the ablation's validity is ``direct_drop_max <= 0.05`` -- the ablation must not break ordinary
+# reading -- which is measured at 0.0000. Changing a bar after seeing the run is the move this
+# programme retracted eleven sentences for; the bar stays, the note goes here.
 CRITERIA: Dict[str, Tuple[str, float]] = {
     "DEREF/alias_min": (">=", 0.80),        # V: the trained arm reproduces the battery's alias row
-    "DEREF/direct_min": (">=", 0.90),       # V: and its direct row
+    "DEREF/direct_min": (">=", 0.90),       # V: mis-set, see above; the battery's own worst cell is 0.8200
     "direct_drop_max": ("<=", 0.05),        # THE CONTROL: the ablation must not break ordinary reading
     "alias_drop_min": (">=", 0.50),         # THE ROW: without the slot, the pointer is not resolved
 }
