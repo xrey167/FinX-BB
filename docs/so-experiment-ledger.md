@@ -3509,6 +3509,73 @@ The record's own reading, fixed before the run: **artefact, for reading but not 
 `e13_override_and_revert_on_heldout` not supported. Record:
 `so/results/e000050a_bos_artefact.{json,md}`.
 
+### 31.47 A second agent audited this architecture; its two findings, checked against the code, and the premise the certificate ladder had never stated (2026-09-05)
+
+A parallel agent works the same seam on branches `research/*` of this repository (its experiments run
+in GitHub Actions; its claim documents are in `docs/novelty/` on `research/cavi-continuation-audit`).
+It calls its object **CAVI-N**, *neural-consumption continuity for causally attested versioned
+indirection*, and it has already excluded most of its own first framing against an IETF Internet-Draft
+(PAMSPEC, persistent memory in agentic systems, 19 July 2026), which specifies canonical memory
+objects, immutable versions, versioned relationship objects, an authoritative state plane,
+non-authoritative derived representations, expected-version concurrency and propagation of deletion to
+derived state. Its own documents say that canonical identity, versioned pointers, authoritative
+versus derived state, freshness metadata, cache invalidation, tombstones and provenance therefore
+cannot carry a claim. That is the same discipline this ledger runs, and it left two candidates. Both
+were checked here against this repository's code.
+
+**Candidate one — the stale export.** A bank exported before a SHRED, replayed afterwards, still
+answers with the deleted object, because the exported tensors carry no live generation the reader
+could check (their E-000066). This is true here and it is true by construction: `bank_from_store`
+materialises arrays, `forward` consumes them, and a copy handed out before a deletion is a copy. Their
+own docstring says as much ("this behavior is expected from snapshots in general"). What it is worth
+is not a finding but a **premise this ladder had stated only in prose**: `certify_encoding` says "the
+forward is therefore a deterministic function of (encoding, query)" and no test held it. It does now
+(`so/tests/test_snapshot_premise.py`, four tests): mutating the store after materialisation — SHRED,
+REVOKE, BLANK, EVICT — moves not one bit of a forward over the already-materialised bank; the same
+store re-exported does move it. So every certificate in `so/audit.py` is a statement about **one
+export**, for every query, and never about copies already in someone's hands. Nothing in §31.14,
+§31.30 or §31.32 is withdrawn; the certificates were always computed on a named bank. The sentence
+they license is "no query distinguishes the payload values in this export", not "the fact is gone from
+the world", and that qualifier is now pinned by a test rather than by prose.
+
+**Candidate two — the torn read, and why this substrate cannot have it.** Their E-000075 measures a
+mutation committing *between* two neural read sites of one forward, producing logits that match
+neither the all-old nor the all-rejected reference (10.67 and 0.0029 max-abs from the two), and closes
+it with a forward-wide authority snapshot that reproduces the all-old reference exactly. Read against
+this code, the hazard is a property of their remedy, not of the architecture it audits:
+`KnowledgeAdapterLM.forward` calls `encode_bank` **once** (`so/llm_adapter.py:333`) and stashes the
+result in `self._ctx`; both read-layer hooks consume only that stash and the bank never re-enters, so
+no mutation can linearise between the read sites of one inference. Counted, on the two-read-layer
+adapter and on the synthetic reader: one materialisation per forward
+(`test_the_two_read_site_adapter_also_reads_the_store_once_per_forward`). Their per-read-site
+revalidation is what made the forward non-atomic, and their forward-wide snapshot is what gave the
+atomicity back. The baseline had it already; what the baseline does not have is any revalidation at
+all.
+
+**What that leaves, stated plainly.** Put the two candidates together and they compose into a single
+engineering requirement: *materialise the bank fresh, once, per inference.* Revalidating a cached bank
+against the live store at the consumption site costs a store read per consumption, which is what
+materialising it costs, so the cache buys nothing it did not already spend — unless the validation is
+strictly cheaper than the fetch, which is the regime where leases, generation numbers and
+expected-version checks were invented (NFS file handles and `ESTALE`, Sandberg et al. 1985; leases,
+Gray and Cheriton 1989; optimistic validation, Kung and Robinson 1981; revocation by indirection,
+Redell 1974 — which *is* the versioned symlink). This ledger's own composition result says the same
+thing from the other side: the store-side and reader-side clauses are separate (Garg, Goldwasser and
+Vasudevan, Eurocrypt 2020; §31.35), and freshness belongs to the store clause, not to the learned
+reader.
+
+**The one question in it that is not owned, and that this substrate can answer.** Can the *learned*
+acceptance function host the freshness predicate at all? The reader's gate is a trained network with a
+measured acceptance boundary (E-000029: 0.90, not the declared 0.35), and E-000053 measured that a
+frozen gate accepts a bank re-signed under a different marker *scheme* as its own (acceptance 1.000,
+KL ≤ 0.0001) — so the marker family is negotiable without retraining. Whether an *epoch* is: a
+rotation of the marker centre large enough for the frozen gate to reject the previous epoch is, on the
+face of the geometry, also large enough for it to reject the current one, since the gate is one
+learned region and epochs are not a direction it was trained to resolve. If that holds, the version
+check cannot live in the learned reader on any architecture of this shape, and every design that
+promises attestation "at the point of neural consumption" reduces to a store-side check before
+materialisation. That is registered as E-000056 and not run.
+
 ### 31.8 Boundary
 
 CPU only, no GPU, no LLM above 124M parameters, synthetic worlds, single-token entities, two surface forms per relation, one session. Nothing here shows unlearning of facts already encoded in pretrained weights. Evidence levels recorded: E3–E4 for the synthetic system (F4 for SHRED with the verified gate, E-000010 — **on the value channel only**: E-000028 recovers the shredded object at 1.0000 through the ungated reverse key, where REVOKE and DELETE are at chance, so F4 for SHRED is a claim about answers, logits, hidden states and probes and not about routing); E5 as substrate for the frozen-GPT-2 experiment, with reading, composition, update and the copy bound supported and behavioural deletion not yet supported at the pre-registered thresholds.
