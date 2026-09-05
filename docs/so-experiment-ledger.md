@@ -2991,6 +2991,67 @@ marker channel), the two-clause store/reader structure (Garg, Goldwasser and Vas
 half is queued behind E-000050 and decides whether a frozen language model's adapter, which routes
 with the same dense softmax, carries the same two channels.
 
+### 31.42 After the artefact: what the seam still holds, and what closed with it (2026-09-05)
+
+With E-000050 (§31.38) and E-000051 (§31.41) in hand, an eleven-agent workflow constructed the three
+experiments those two results made possible, refuted each result sentence twice, and landed a run
+order. Two survive as measurements; one closes as a tautology, and it is the one that carried the
+J-space half of the idea.
+
+**J-space addressing closes — a tautology of the adapter's keying.** The design: is the subject of a
+query recoverable from the J-lens coordinates of the last-token residual at the read layers, and can a
+pointer memory be keyed on those coordinates with no training, inheriting their paraphrase invariance?
+Both refuters (0.8 each) read it against `so/llm_adapter.py` and found the learned address already is
+that object: the routing score is `q_proj(q_ln(h_l[last])) · k_proj(ln_key(W_in[s] + rel_emb[r]))`, and on
+GPT-2 `W_in` is `W_U`, so the trained query is a learned affine readout of the subject's unembedding
+row from the last-position residual plus a relation term; the "training-free J-space address"
+`⟨ln_f(h), J_lᵀ W_U[s]⟩` has the same bilinear form with the learned maps replaced by the identity or
+`J`, and `encode_bank` keys one cell per exact (subject, relation), so a one-hot address on the argmax
+subject and relation coordinates is a dictionary lookup on the decode. What would remain is a
+per-layer calibration of subject decodability at the answer position — Merullo et al.'s argument-
+formation stage under forced choice, with McDougall's L10H7 predicting the layer-10 drop — bounded by
+the recorded cos(v_u, w_u) = 0.858 at layer 8 and the identity at layer 10. Not run. With §31.39 (the
+J-space *write* is by construction) and §31.40 (the J-lens *carrier* is owned and nearly the
+unembedding row), this is the third and last reading of "J space" at the seam, and it closes the
+same way: what the adapter does is already a J-space object, and naming it does not make a result.
+
+**E-000053 — history-independent markers, a ledger row and not a claim.** The refuters flagged the
+positive sentence as by construction: with equal content (E-000046), equal markers (the option and its
+unit test) and the same row order, CASCADE(p) and NEVER(p) export bit-identical banks and a reader that
+never consumes `kid` returns identical outputs, so CASCADE-versus-NEVER at chance is Hartline et al.'s
+canonical-representation-implies-SHI composed with a deterministic reader. The implementation is kept
+and the by-construction clause is declared before the run (`so/experiments/e000053_hi_markers_reader.py`:
+M1 is a pipeline check). What can fail: whether the frozen reader's *learned* gate accepts a re-signed
+bank as its own (R1 — the gate was trained on generator-drawn markers; the derived ones are a
+different sample of the same family), whether the row-count floor and the residue AUCs stay where
+E-000051 put them (R2, M2), and the side effect that identical content now carries identical markers
+(S1). The option is on record (`MVCCStore(content_markers=True)`, default off, 269 tests). Running.
+
+**E-000052 — the pointer battery on the BOS-trained symlink adapter, narrowed.** One refuter left it
+standing ("what Raeesi and Roed name as future work and nobody runs"); the other found most of its
+positive sentence to be a predicted transport of rows the repository already holds. The residue both
+leave, and the only content the run will carry: (i) the reader's **price** for the pointer in the BOS
+regime — `cost_of_sharing` and `cost_of_link_training` over all twelve phrasings against the BOS-trained
+link-free adapter, the one number whose sign nobody here can predict (E-000025's 0.0954 sits 0.005 under
+its bar); (ii) the **SET NULL row** — a blanked alias is a self-referencing link the adapter never saw,
+and E-000051 read one of two as a wrong entity on GPT-2 — as the wrong-entity rate at every phrasing;
+(iii) the **subject-medial held-out residue** E-000050 left at 0.91 read / 0.83 route, at t9 and t10,
+in the lifecycle rows whose failure is an answered entity. The completeness critic then corrected the
+pre-registration in five places, carried into the script when it is written: the reproduction anchor
+is restricted to trained templates (t10 was both anchor and claim row); its tolerance is the recorded
+seed spread, not 0.05; "anchor fails" and "bar fails while the anchor holds" are separate outcomes, so
+a negative can fire at trained templates; the medial-template `≤` rows are scored only where
+`alias_direct ≥ 0.80`, since a routing miss passes every one of them for free; and only the
+wrong-entity rate is a claim row for BLANK, the UNKNOWN rate being validity. The substrate — the
+E-000020 trainer unchanged with a BOS on every prompt — is training behind E-000051's GPT-2 half.
+Everything in it is a measurement; the mechanism is SQL-92's, the remedy is Yang et al.'s, and the
+design is Raeesi and Roed's future work.
+
+**Standing.** Twenty repetitions of the request, seven sweeps, ten retractions. What the seam holds
+after this entry is three measurements in flight (E-000051 on the GPT-2 reader, E-000052, E-000053),
+one instrument finding with a field-level question attached (E-000050 and its re-analysis), and no
+mechanism. The J-space half is closed on all three readings.
+
 ### 31.8 Boundary
 
 CPU only, no GPU, no LLM above 124M parameters, synthetic worlds, single-token entities, two surface forms per relation, one session. Nothing here shows unlearning of facts already encoded in pretrained weights. Evidence levels recorded: E3–E4 for the synthetic system (F4 for SHRED with the verified gate, E-000010 — **on the value channel only**: E-000028 recovers the shredded object at 1.0000 through the ungated reverse key, where REVOKE and DELETE are at chance, so F4 for SHRED is a claim about answers, logits, hidden states and probes and not about routing); E5 as substrate for the frozen-GPT-2 experiment, with reading, composition, update and the copy bound supported and behavioural deletion not yet supported at the pre-registered thresholds.
