@@ -1,0 +1,75 @@
+name: E000087 promoted seed0 integration
+
+on:
+  push:
+    branches: [research/e000051-clean-bystanders]
+    paths:
+      - '.github/workflows/e000087-seed0-promoted-integration.yml'
+  workflow_dispatch:
+
+jobs:
+  seed0-cavi:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 120
+    env:
+      SO_BOS: '1'
+      SO_THREADS: '2'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+          cache-dependency-path: so/requirements.txt
+      - name: Install CPU dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install torch --index-url https://download.pytorch.org/whl/cpu
+          python -m pip install -r so/requirements.txt
+      - name: Strict seed0 CAVI battery
+        run: |
+          mkdir -p ci-e87/cavi
+          python -m so.experiments.e000084_consistent_reader_cavi \
+            --seeds 0 --steps 3000 --groups 100 \
+            --consistency 0.2 --alt-supervision 0.5 \
+            --threads 2 --results-dir ci-e87/cavi
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: e000087-seed0-cavi
+          path: ci-e87/cavi/
+
+  seed0-derived:
+    strategy:
+      fail-fast: false
+      matrix:
+        mode: [hidden, router_payload]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 120
+    env:
+      SO_BOS: '1'
+      SO_THREADS: '2'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+          cache-dependency-path: so/requirements.txt
+      - name: Install CPU dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install torch --index-url https://download.pytorch.org/whl/cpu
+          python -m pip install -r so/requirements.txt
+      - name: Strict seed0 downstream replay battery
+        run: |
+          mkdir -p ci-e87/${{ matrix.mode }}
+          python -m so.experiments.e000085_consistent_reader_derived_state \
+            --mode '${{ matrix.mode }}' --seed 0 \
+            --steps 3000 --groups 100 --consistency 0.2 --alt-supervision 0.5 \
+            --threads 2 --results-dir ci-e87/${{ matrix.mode }}
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: e000087-seed0-${{ matrix.mode }}
+          path: ci-e87/${{ matrix.mode }}/
