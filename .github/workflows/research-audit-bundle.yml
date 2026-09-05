@@ -19,7 +19,7 @@ jobs:
           python-version: '3.13'
       - name: Export immutable source and public offline dependencies
         run: |
-          mkdir -p audit-bundle/wheels
+          mkdir -p audit-bundle/wheels model-parts
           git archive --format=tar.gz -o audit-bundle/source.tar.gz HEAD
           git rev-parse HEAD > audit-bundle/source-commit.txt
           python -m pip download --only-binary=:all: --dest audit-bundle/wheels 'transformers==5.16.1'
@@ -35,11 +35,27 @@ jobs:
           PY
           find audit-bundle -type f ! -path '*/.cache/*' -print0 | sort -z | xargs -0 sha256sum > audit-bundle-sha256.txt
           cp audit-bundle-sha256.txt audit-bundle/SHA256SUMS
+          split -b 300M -d audit-bundle/gpt2/model.safetensors model-parts/model.safetensors.part-
+          rm audit-bundle/gpt2/model.safetensors
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: research-offline-audit-bundle
+          name: research-offline-source-wheels
           path: audit-bundle/
+          compression-level: 0
+          retention-days: 3
+          if-no-files-found: error
+      - uses: actions/upload-artifact@v4
+        with:
+          name: research-offline-model-part-00
+          path: model-parts/model.safetensors.part-00
+          compression-level: 0
+          retention-days: 3
+          if-no-files-found: error
+      - uses: actions/upload-artifact@v4
+        with:
+          name: research-offline-model-part-01
+          path: model-parts/model.safetensors.part-01
           compression-level: 0
           retention-days: 3
           if-no-files-found: error
