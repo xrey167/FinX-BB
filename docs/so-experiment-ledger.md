@@ -4046,6 +4046,55 @@ first claim lasted six hours before its own audit cut it to a third of its size;
 §31.52 carry correction notes at the site of every wrong number, and the pull request no longer leads
 with the withdrawn version.
 
+### 31.54 The control the claim should have carried: switching off the dereference slot takes aliased reading to exactly zero, at every phrasing (2026-09-05, E-000058)
+
+§31.53's twelfth finding was that the claim credited "a trained depth-1 dereference slot" with
+resolving the pointer while never ablating it. The slot is directly supervised
+(`e000020_symlink_gpt2.py:50-53`), so the credit was architectural attribution. This is the missing
+arm. It trains nothing: `cfg.n_deref = 0` at inference removes exactly the second query built from the
+value just read (`so/llm_adapter.py:270-285`) and touches no weight.
+
+| template | alias, slot on | alias, slot off | direct, slot on | direct, slot off |
+|---|---|---|---|---|
+| t0 | 0.9300 | **0.0000** | 0.9967 | 0.9967 |
+| t1 | 0.8400 | **0.0000** | 0.9700 | 0.9833 |
+| t2 | 0.9350 | **0.0000** | 1.0000 | 1.0000 |
+| t3 | 0.9100 | **0.0000** | 0.9967 | 0.9967 |
+| t4 | 0.9500 | **0.0000** | 1.0000 | 1.0000 |
+| t5 | 0.9300 | **0.0000** | 1.0000 | 1.0000 |
+| t6 | 0.9450 | **0.0000** | 1.0000 | 1.0000 |
+| t7 | 0.9050 | **0.0000** | 0.9967 | 0.9967 |
+| t8 | 0.9300 | **0.0000** | 0.9933 | 0.9933 |
+| t9 | 0.8500 | **0.0000** | 0.8200 | 0.8233 |
+| t10 | 0.9300 | **0.0000** | 0.9933 | 0.9933 |
+| t11 | 0.9250 | **0.0000** | 0.9933 | 0.9933 |
+
+Worst seed per cell, three seeds, 200 alias reads and 600 direct reads per template per seed: 7,200
+alias reads with the slot off, and not one of them returns the target's object. Direct reading moves by
+**0.0000** at every template, and is marginally *higher* without the slot at t1 and t9 (0.9700 →
+0.9833, 0.8200 → 0.8233), which is what one expects when a spurious second hop can no longer fire on a
+FACT row.
+
+**It could have come out otherwise, and that is the point.** `v_link` is a learned projection of the
+target's key (`so/llm_adapter.py:220-228`). Nothing forced the model to keep it an address: it could
+have learned to make `v_link(target_key)` approximate the target's object embedding, resolving the
+pointer inside the value projection and leaving the hop decorative. Then alias reading would have
+survived the ablation and the claim would have credited the wrong component. It did not survive, at
+any template, on any seed.
+
+**A bar of mine was mis-set, and it stays mis-set.** `DEREF/direct_min ≥ 0.90` fires at 0.8200. That is
+not a failure of the reproduction: E-000052's own worst direct cell is 0.8200, at t9, so the trained
+arm reproduces the battery exactly and the bar simply demanded more than the substrate delivers. The
+row that carries the ablation's validity is `direct_drop_max ≤ 0.05`, measured at 0.0000. Adjusting a
+bar after seeing the run is the move eleven of this ledger's retractions exist for; the bar is left as
+written, its firing is reported, and a note sits beside it in the module.
+
+**What this licenses, and what it does not.** The claim's attribution stops being architectural: the
+aliased read is the dereference hop, measured, with a control that could have failed and a surgical
+check that passed exactly. It is a **control, not a finding** — ablating a component to attribute a
+behaviour to it is the oldest move there is, and the slot is E-000015's own design. Record:
+`so/results/e000058_deref_ablation.{json,md}`.
+
 ### 31.8 Boundary
 
 CPU only, no GPU, no LLM above 124M parameters, synthetic worlds, single-token entities, two surface forms per relation, one session. Nothing here shows unlearning of facts already encoded in pretrained weights. Evidence levels recorded: E3–E4 for the synthetic system (F4 for SHRED with the verified gate, E-000010 — **on the value channel only**: E-000028 recovers the shredded object at 1.0000 through the ungated reverse key, where REVOKE and DELETE are at chance, so F4 for SHRED is a claim about answers, logits, hidden states and probes and not about routing); E5 as substrate for the frozen-GPT-2 experiment, with reading, composition, update and the copy bound supported and behavioural deletion not yet supported at the pre-registered thresholds.

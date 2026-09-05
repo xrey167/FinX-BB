@@ -23,20 +23,24 @@ read with the correction note at its head.
 > position 0 is left to the subject, on the *recorded* checkpoints; the seven medial phrasings,
 > including the floor cell, place the subject off position 0 by construction and have no such control.
 
-Two things make it a measurement rather than a definition:
+**One measured quantity, two controls that could have failed.** The price is not an independent
+second result: the copy arm is pinned at 0.9888 to 0.9929, so 0.088 is the aliased read expressed
+against a ceiling. What makes the read a measurement rather than a definition is the pair of controls.
 
-- **The store does not resolve it.** `MVCCStore.bank()` exports an alias row carrying the target's
-  key and a constant placeholder in place of an object, and says so at `so/mvcc.py:522-525`: *"A link
-  row carries the TARGET'S KEY, not its payload and not its state: whether that key is held by a
-  signed, active, existing cell is exactly what the model has to discover."* The frozen model must
-  route to the alias, read out the key, re-query the key table through its dereference slot
-  (`so/llm_adapter.py:262-285`), and read the target's value.
+- **The store does not resolve it.** `MVCCStore.bank()` exports an alias row carrying the target's key
+  and a constant placeholder in place of an object, and says so at `so/mvcc.py:522-525`: *"A link row
+  carries the TARGET'S KEY, not its payload and not its state: whether that key is held by a signed,
+  active, existing cell is exactly what the model has to discover."*
+- **The dereference hop is what does it, ablated and measured.** Switching the slot off at inference,
+  no weight changed, takes aliased reading from 0.8400 to 0.9500 down to **0.0000 at every one of the
+  twelve templates**, across 7,200 alias reads, while direct reading moves by 0.0000 (E-000058,
+  §31.54). It could have survived: `v_link` is learned, and the model could have baked resolution into
+  the value projection instead of the hop.
 - **It fails when the instrument is wrong, on the half where that can happen.** The read on the
   *recorded* checkpoints (`e000020_gpt2`, a different artefact from the `e000020_gpt2_bos` measured
   here), at three of its five templates, gives 0.2933 to 0.5633 direct and 0.30 to 0.50 through an
-  alias with the subject at position 0. Its two subject-medial templates read 0.8700 through an alias
-  bare and do not collapse. Occupying position 0 with a single space, no weight changed, restores the
-  initial half.
+  alias with the subject at position 0. Its two subject-medial templates read 0.8700 bare and do not
+  collapse.
 
 ---
 
