@@ -145,7 +145,9 @@ falls. This executes their design, not their test.
    coefficient-matched live row (§31.50).
 6. **Not scale.** GPT-2 small (124M), CPU only, a synthetic world, single-token entities, twelve
    templates, three seeds. Nothing here is evidence about a production model, real subjects or free
-   text.
+   text. Two-token subjects have been measured once, on the *reading* harness only, and cost that
+   adapter nothing (§31.55); no alias, pod or lifecycle row in this document has ever been run on
+   anything but single-token entities, so that result does not extend to the sentence above.
 7. **Not a claim about J space.** The J-space reading of this adapter is closed on all three of its
    readings — the write is by construction, the carrier is owned, the addressing is a tautology of the
    keying (§31.39, §31.40, §31.42).

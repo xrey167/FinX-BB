@@ -3202,7 +3202,7 @@ subjects. The literature search was two targeted queries plus the census's own l
 `rephrase_prompt` provenance as EasyEdit's `counterfact-edit.json` is inferred from field names; GPT-J
 padding is untested.
 
-**The cheapest decisive measurement, registered as E-000054 and not run.** The critic's, not the
+**The cheapest decisive measurement, registered as E-000054 — since run, and its prediction refuted (§31.55).** The critic's, not the
 workflow's: the proposed thousand-edit EasyEdit run would again be 99% multi-token-subject cases, the
 condition E-000050 never tested. Inside this repository the question — is the adapter's failure the
 single-token collapse condition, or subject-at-0 in general — costs a change to the subject surface
@@ -3216,6 +3216,16 @@ option, if the published harness must be touched, is about two hundred EasyEdit 
 GPT-2-XL — the 77 collapse cases plus the normal cases whose rephrase is subject-initial — with and
 without an evaluation-time `<|endoftext|>`, split by the rephrase prompt's own subject position;
 it needs ROME's layer-covariance statistics and a GPU this box does not have.
+
+*Outcome, added 2026-09-05.* E-000054 ran on three seeds and the prediction's first clause is false:
+the product-code surface does **not** fail at the initial templates without a BOS. It reads 0.91 / 0.90
+held-out subject-initial bare, against 0.37 / 0.54 for the single-token record on the same trainer and
+templates, and the second-token surface reads 1.00 / 0.97. The residue on the product code is 0.03 to
+0.04 against its own subject-medial rows, one fifteenth of the single-token collapse, and a lone space
+removes it. So the 80% census condition — a multi-token subject whose first token sits at the sink —
+costs this adapter nothing, and the failing case is the 0.36% single-token case this section's critic
+had already isolated. The "Not claimed" line below that declined exactly this generalisation was
+right, and is now measured rather than merely withheld. §31.55.
 
 **Standing.** Twenty repetitions of the request, eight sweeps, ten retractions and one landing
 narrowed by its own critic. The field question attached to §31.38 is answered as far as a census can
@@ -4098,3 +4108,71 @@ behaviour to it is the oldest move there is, and the slot is E-000015's own desi
 ### 31.8 Boundary
 
 CPU only, no GPU, no LLM above 124M parameters, synthetic worlds, single-token entities, two surface forms per relation, one session. Nothing here shows unlearning of facts already encoded in pretrained weights. Evidence levels recorded: E3–E4 for the synthetic system (F4 for SHRED with the verified gate, E-000010 — **on the value channel only**: E-000028 recovers the shredded object at 1.0000 through the ungated reverse key, where REVOKE and DELETE are at chance, so F4 for SHRED is a claim about answers, logits, hidden states and probes and not about routing); E5 as substrate for the frozen-GPT-2 experiment, with reading, composition, update and the copy bound supported and behavioural deletion not yet supported at the pre-registered thresholds.
+
+### 31.55 The registered prediction failed: a two-token subject at position 0 is read, so E-000050's collapse is the single-token case and the census's 80% condition costs this adapter nothing (2026-09-05, E-000054)
+
+§31.43 closed by registering the cheapest measurement that could separate two readings of §31.38's
+instrument finding — is the adapter's subject-initial failure *position 0*, or *a single-token subject
+at position 0* — and it wrote down the prediction that could fail: "the product-code surface fails at
+the initial templates without a BOS and recovers with one, the second-token surface does not fail, and
+the medial residue is unchanged by either." The run is E-000054. Three seeds, 3000 steps per surface
+and seed, E-000050-B's trainer and keys and objects untouched; the only thing that changes is the
+string a subject is rendered as. **The first clause is refuted.** The product-code surface does not
+fail. Record: `so/results/e000054_two_token_subjects.{json,md}`.
+
+| surface, held-out, worst seed | subject-initial read / route, bare | subject-medial read / route, bare | initial, `<\|endoftext\|>` at inference | initial, a lone space | medial, `<\|endoftext\|>` | medial, a lone space |
+|---|---|---|---|---|---|---|
+| single token (E-000050-A, the record) | **0.37 / 0.54** | 0.95 / 0.94 | 0.97 / 0.98 | 0.97 / 0.98 | 0.70 / 0.64 | 0.94 / 0.95 |
+| two tokens, 16 × 16 product code (identity needs both) | **0.91 / 0.90** | 0.94 / 0.90 | 0.99 / 0.99 | 0.99 / 0.99 | 0.74 / 0.69 | 0.93 / 0.90 |
+| two tokens, identity in the second alone | **1.00 / 0.97** | 0.97 / 0.96 | 0.99 / 0.97 | 1.00 / 0.98 | 0.90 / 0.85 | 0.97 / 0.97 |
+
+Both learnability rows pass (trained subject-medial read 0.98 on both surfaces), so the rule's VOID
+branch does not fire and the rows are read. The pre-registered criterion that carries the finding is
+`product/N/heldout_initial/read_min <= 0.5`, and it is **0.92** — the single row of the eight that
+FAILs, and it fails in the direction that answers the question. Per seed the product surface reads
+0.92 / 0.91 / 0.92 subject-initially against 0.95 / 0.96 / 0.94 medially: a residue of 0.03 to 0.04,
+in the same direction as the single-token collapse and about one fifteenth of its size (0.58). The
+second-token surface has no residue at all — 1.00 initial against 0.97 to 0.99 medial, the initial
+forms reading *higher*.
+
+**What this settles, and it narrows §31.38 for the third time.** The condition the census measured at
+80.18% of CounterFact's efficacy prompts, 82.35% of MCF's and 70.6% of MQuAKE's cloze forms is a
+*multi-token* subject whose first token sits at the sink. That is exactly the product surface, and this
+adapter reads it at 0.91 bare. The failing case is the one §31.43's critic had already isolated by
+reading `select_entities` — subject-initial **and** single-token, Yang et al.'s collapse condition,
+80 of 21,919 CounterFact prompts (0.36%). §31.43 answered the field question by census and declined
+the general claim in its "Not claimed" list ("that E-000050's failure is a property of GPT-2 reading
+subject-initial prompts in general rather than of this adapter's learned routing on single-token
+subjects"). That decline is now a measurement rather than a caution, and it was the right decline.
+
+**The dissociation §31.46 found, on a substrate it was not measured on.** §31.46 separated a
+*positional* recovery from a *lexical* price. E-000054 puts a second variable through it — how much of
+the subject's identity sits at position 0 — and the two halves come apart again, in opposite ways.
+The benefit of a `<|endoftext|>` collapses with the identity at stake: **+0.60** on the single-token
+surface, **+0.08** on the product code, **−0.01** on the second-token surface. The price on the
+subject-medial forms does not collapse with it: **−0.25**, **−0.20**, **−0.07**. So on a two-token
+subject the BOS is a *bad* trade, and on a subject whose first token is redundant it is a pure loss.
+A lone space stays what §31.46 measured it to be: it buys whatever there is to buy (product initial
+0.91 → 0.99) and costs 0.02 or less medially either way, on both surfaces and all three seeds.
+
+**Reported, not scored, as registered.** The trained subject-initial rows, the space arm's medial
+price, and every lifecycle row. For the record the lifecycle rows move with the reading and not against
+it: bare, the product surface's SHRED and REVOKE reach the worst held-out phrasing at 0.9600 and the
+second surface's at 0.9950, both over kill criterion 5's 0.95 bar, and under a lone space they are
+0.9600 and 1.0000. Address collision is 0.02 or below bare on the product surface and 0.00 to 0.0125
+on the second — against 0.1000 for the single-token record. The locality failure is untouched, as
+always: mean generic-text KL 3.73 to 3.92 nats against a 0.05 bar.
+
+**Not claimed.** That the pointer battery survives two-token subjects — E-000054 is the *reading*
+harness (E-000017-B's trainer, §31.38's substrate), not the symlink harness, and no alias, pod or
+lifecycle-through-a-LINK-row measurement in §§31.51–31.54 has ever been run on anything but
+single-token entities. That the product code is a hard case for a real subject: it is sixteen by
+sixteen over a synthetic vocabulary, and a real multi-token name distributes identity differently.
+That published editing numbers are or are not contaminated — that question closed in §31.43 with no
+finding, and this run only removes the one route by which this repository's own artefact could have
+reached them. That the 0.03 residue on the product code is nothing: it is small, it is consistent
+across three seeds, and a lone space removes it.
+
+**Standing.** A prediction registered in the ledger, run, and refuted in its own first clause, with
+nothing to retract because nothing had been claimed on it. Twelve retractions, and this is not the
+thirteenth.
