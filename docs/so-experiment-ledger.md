@@ -2735,6 +2735,66 @@ evaluation (a hundred targets over a thousand cells at these held-out forms) and
 prefix still reaches 0.97 on the same weights. E-000050 (§31.38) says why: the failing templates are
 exactly those that put the subject at token position 0, and GPT-2's tokenizer prepends no BOS.
 
+### 31.38 The held-out paraphrase gap is the position-0 token, and a BOS at training time closes its subject-initial half for free (2026-09-05, E-000050)
+
+The probe that opened this (§31.37's end): GPT-2's tokenizer prepends no BOS, so a template that begins
+with the subject makes the subject the position-0 token — the attention-sink position, whose residual
+is a fixed direction — and the adapter's routing query reads the sink instead of the subject. Four arms
+on E-000017-B's configuration, three seeds, criteria and a decision rule fixed before the run
+(`so/experiments/e000050_bos_trained.py`); the BOS-trained arm trains the same adapter with the same
+trainer and budget (2628–2907 s per seed) with `<|endoftext|>` on every prompt. Worst seed everywhere.
+
+| arm | held-out reading | held-out subject-initial, read / route | held-out subject-medial, read / route | trained reading | SHRED reaches the worst held-out phrasing | broken-key UNKNOWN | generic-text KL to base (max) |
+|---|---|---|---|---|---|---|---|
+| A — recorded weights, no BOS (the record) | 0.7288 | 0.37 / 0.54 | 0.95 / 0.94 | 0.9119 | 0.8650 | 0.6300 | 3.647 |
+| B — recorded weights, BOS at inference | 0.9175 | 0.97 / 0.98 | 0.70 / 0.64 | 0.9719 | 0.8400 | 0.5200 | 3.920 |
+| C — BOS-trained weights, BOS | 0.9712 | 0.99 / 0.97 | 0.91 / 0.83 | 0.9956 | 0.9900 | 0.9350 | 4.224 |
+| D — BOS-trained weights, no BOS (reverse control) | 0.4975 | 0.00 / 0.00 | 0.95 / 0.97 | 0.6225 | 1.0000 | 0.9500 | 3.802 |
+
+**What the four arms establish, each against a control that could have failed.** Arm A reproduces the
+record in-process (0.7288 = §31.37's control). Arm B is the artefact reading on the recorded weights: a
+BOS at inference lifts the subject-initial held-out forms from 0.37–0.45 to 0.97–1.00 with no weight
+changed, and costs the subject-medial ones (0.95 → 0.70–0.79) — the registered prediction that a
+prefix is a trade for an adapter trained without one, which held. Arm D is the reverse control: the
+BOS-trained adapter read *without* its BOS loses the subject-initial forms completely (0.00–0.01) while
+the medial ones stand at 0.95–1.00 — position 0 is the cause, in both directions. Arm C is the claim:
+trained with a BOS, held-out reading 0.9712 (bar 0.95, PASS), subject-initial held-out 0.99 / 0.97
+(PASS), trained phrasings 0.9956 (PASS), one SHRED or REVOKE reaching the worst held-out phrasing at
+0.9900 against the control's 0.8650 (PASS), broken-key UNKNOWN 0.935 against the control's 0.63 (PASS),
+and two rows FAIL: subject-medial held-out reading 0.91 with addressing 0.83 (bars 0.95), and
+generic-text injection 4.22 nats against the control's 3.65.
+
+**The decision rule fires two of its branches, and the record keeps both.** The subject-initial half
+of the held-out paraphrase failure — the half that fired E-000017's kill criterion, produced
+E-000025's bimodality, drove E-000026's template selection and defeated E-000039-B's tie — is the
+position-0 token and nothing else; a BOS at training time closes it at no price on the trained
+phrasings and with deletion propagating to phrasings the memory never saw. The subject-medial half is
+*not* closed: a residual gap of about 0.05–0.10 in reading and 0.12–0.17 in addressing on the two
+medial held-out forms remains after the artefact is removed, and that residue is where the paraphrase
+problem of this memory now lives. And the BOS-trained adapter injects more where no key matches
+(generic KL 3.65 → 4.22): the locality bar this repository set at 0.05 nats was failed by every
+adapter it has trained, and by this one by more.
+
+**What is owned, and what is not.** The mechanism is Xiao et al. (2023), Sun et al. (2024), Gu et al.
+(ICLR 2025: the sink follows position 0, not the token), and the field's prepend-BOS convention
+(TransformerLens). The diagnosis-and-remedy chain — subject at token 0 on a GPT-2-family model breaks
+the key a locate-and-edit method reads, any prefix repairs it, Llama's `<s>` prevents it — is Yang et
+al., "The Fall of ROME" (Findings of EMNLP 2024), for a weight edit, and is cited first. What was not
+published is the measurement on an external addressable memory's paraphrase generalisation and
+deletion propagation, with a bare BOS, both at inference (a trade) and at training (free on the
+initial half), with the reverse control; and two of its numbers correct the sweep's own refuters: the
+BOS is not "absent as a gain on medial templates" at inference (they fall) and E-000013's held-out
+override failure does not move under it (E-000050-A, in progress) — so the target's "behaves like own
+knowledge: no" row is re-scoped, not reversed.
+
+**What is re-scoped in the record.** Every held-out number measured without a BOS on a subject-initial
+template now carries this section: E-000017-B's kill criterion (fired on templates 8 and 11, both
+subject-initial), E-000025's twelve-template table (rows 0, 2, 6, 8, 11), E-000026's template rule,
+E-000039-A's "88.6% of the gap is addressing" (the addressing share *is* the position-0 share),
+E-000039-B, and the target table's second row in §31.36. None of those numbers is wrong; each was a
+measurement of an adapter reading a sink. The instrument switch (`SO_BOS=1` in `encode_texts`, read at
+call time) is on for every run from here.
+
 ### 31.39 The J-space pod is by construction in this adapter, and the one measurement that survived is predicted by §31.38 (2026-09-05)
 
 A fifteen-agent workflow was asked for the training-free measurements at the symlink / J-space / pod
