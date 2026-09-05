@@ -15,23 +15,13 @@ class LastTokenGPT2Adapter(KnowledgeAdapterLM):
     def forward(self, bank, input_ids, attention_mask, last_idx, cell_mask=None):
         if getattr(self.lm.config, "model_type", None) != "gpt2":
             raise TypeError("LastTokenGPT2Adapter is explicitly GPT-2-only")
-        if bank is not None:
-            enc = self.encode_bank(bank)
-            allowed = enc["active"] if cell_mask is None else enc["active"] & cell_mask
-            self._ctx = {"keys": enc["keys"], "values": enc["values"],
-                         "allowed": allowed, "last_idx": last_idx, "routing": []}
-        else:
-            self._ctx = None
-        try:
+        with self._memory_request(bank, last_idx, cell_mask) as ctx:
             out = self.lm.transformer(input_ids=input_ids, attention_mask=attention_mask,
                                       use_cache=False, return_dict=True)
             ar = torch.arange(input_ids.shape[0], device=input_ids.device)
             hidden = out.last_hidden_state[ar, last_idx]
             full = self.lm.lm_head(hidden)
             cand = full[:, self.candidate_ids]
-            ctx = self._ctx
             routing = torch.stack(ctx["routing"], dim=1) if ctx is not None and ctx["routing"] else None
             self.last_query = torch.stack(ctx["query"], dim=1) if ctx is not None and ctx.get("query") else None
             return cand, full, routing, hidden
-        finally:
-            self._ctx = None
