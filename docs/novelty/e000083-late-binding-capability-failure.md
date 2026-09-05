@@ -73,24 +73,30 @@ Both preregistered outcomes above were too coarse, and the arm that discriminate
 | A | in place at 8 and 10 | 3 and 1 | 1 | 0.990 | 0.960 | **pass** |
 | A | in place at 8 and 10 | 3 and 1 | 2 | 0.9838 | 0.960 | **pass** |
 | C | once after block 11 | 0 | 0 / 1 / 2 | 0.664 / 0.645 / 0.621 | 0.270–0.290 | fail |
-| D | once after block 10 | 1 | 0 | 0.615 | 0.270 | fail |
+| D | once after block 10 | 1 | 0 / 1 / 2 | 0.615 / 0.624 / 0.600 | 0.260–0.320 | fail |
 
 Arm A: runs 33970654975 and 33982958930, artifacts verified (`e000084-armA-seed2`, SHA-256
-`846eff99f46ca72669f81362861903dd357690ebb8ef6f0f532c0eba3f64c0e0`). Arm D seed 0: run 33982958930,
-artifact `e000084-armD-seed0`, SHA-256 `fa08feb006ae6b872f170f7aaeb7fc598c16ebeddea763fa036ae72eb490e779`.
-Seeds 1 and 2 of arm D are still running; one seed is not a result, and this row is provisional.
+`846eff99f46ca72669f81362861903dd357690ebb8ef6f0f532c0eba3f64c0e0`). Arm D: run 33982958930,
+artifacts `e000084-armD-seed0/1/2`, SHA-256 `fa08feb006ae6b872f170f7aaeb7fc598c16ebeddea763fa036ae72eb490e779`,
+`e24e8fe1f6f70ef3124ff805b99a86f507a3273d185afa063add693ab95d730e`,
+`c20d4cb4fccb91271227c0871f2fad5e067b0c27c0a8184e3284d7c35c896ae0`, each checked against the digest
+GitHub reports before the file was read.
 
-**Restoring one block of processing recovers nothing.** Arm D sits at 0.615, inside arm C's range and
-nowhere near arm A. So "the frozen blocks after the write must process the payload", the second
-preregistered outcome, is not what the data says either — one block of processing is worth nothing
-here, and the write in arm D still reaches every downstream K/V (exposure 6.30).
+**Restoring one block of processing recovers nothing, on all three seeds.** Arm D lands at
+0.615 / 0.624 / 0.600 — inside arm C's range, in fact marginally below it on every seed, and nowhere
+near arm A — while still writing at block 10 and reaching every downstream K/V (exposure 6.30–6.88).
+So the second preregistered outcome, "the frozen blocks after the write must process the payload", is
+not what the data says either. Both branches of the dichotomy this document wrote down are wrong.
 
-What separates A from both C and D is the other thing C changed: in arm A the block-8 write is
-already in the residual when the block-10 read computes its routing query. C and D both remove that,
-and a contract test pins that they address bit-identically at every routing slot. On the evidence so
-far the operative factor is **the first write's feedback into the second read**, not the depth of
-processing after a write — which is a different mechanism from the one this document predicted, and
-it needs arm D's remaining seeds before it is more than a two-point reading.
+**What the experiment cannot yet separate, stated rather than glossed.** Arm A differs from C and D in
+two ways at once, and arm D only removes one of them. In A the block-8 write is already in the
+residual when the block-10 read computes its routing query — a feedback path that C and D both remove,
+and a contract test pins that C and D address bit-identically at every routing slot. But in A the
+first read's payload also gets three blocks of processing, where D gives one. So the two surviving
+explanations are **the routing feedback** and **a depth threshold above one block**, and these three
+arms cannot tell them apart. Separating them needs an arm with per-read write placement: keep the
+block-8 write in place, defer only the block-10 read. That is not implemented, and until it is, this
+document claims only the negative — depth one is worth nothing — and not a mechanism.
 
 ## What is not claimed
 
