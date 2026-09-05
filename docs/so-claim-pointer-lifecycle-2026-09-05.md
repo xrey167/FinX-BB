@@ -74,6 +74,17 @@ Records: `so/results/e000052_symlink_bos_battery.{json,md}`,
 
 ---
 
+### What the pre-registration itself said the run would carry
+
+Worth stating, because it is the one place where the record and the audit agree exactly. E-000052's
+docstring, written before its substrate existed, declares that only three things in its table are
+content and that *"everything else in the table is a reproduction of E-000026 / E-000050 and is
+labelled so"*: **(P)** the reader's price for the pointer, called *"the one number whose sign nobody
+here can predict"*; **(N)** the SET NULL wrong-entity rate; and **(T)** the two subject-medial held-out
+rows. The audit then removed (N), because the rule gates it on a neighbour that failed, and removed
+the shared-update half of (T), because it is the aliased read. What is left standing is (P) and the
+aliased read itself — which is what this document now claims, and nothing else.
+
 ## The boundary: what is owned, and by whom
 
 - **The mechanism is old and is not claimed.** A name that resolves to a record rather than carrying a
