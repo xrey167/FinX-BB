@@ -11,26 +11,42 @@ seeds, 100 pods per seed, training nothing. It compared lifecycle states of a po
 five-fold cross-validated Mann-Whitney AUC on queries **that are not about the pod** — class (ii)
 bystanders, class (iii) generic text. The null band at n = 200 is about 0.42–0.58.
 
-| arm (positive vs reference) | what actually changed | AUC (ii) | max KL (ii) | top-1 agree (ii) |
-|---|---|---:|---:|---:|
-| `cascade` vs `never` | a **complete deletion** | **0.869** | **0.000** | **1.000** |
-| `blank` vs `cascade` | SET NULL on an alias, 2 residue rows | 0.791 | 4.486 | 0.999 |
-| `dangle` vs `cascade` | object evicted, 2 tombstone rows | 0.876 | 3.962 | 0.999 |
-| `blank` vs `never` | as above | 0.890 | 4.486 | 0.999 |
-| `dangle` vs `never` | as above | 0.925 | 3.961 | 0.999 |
-| `perm` vs `perm2` | nothing (summation order) — the float floor | 0.482 | 0.000 | 1.000 |
-| **`add2` vs `perm`** | **two fresh live rows. NO deletion.** | **0.977** | 0.310 | 0.999 |
+Per seed, so that the AUC and the behavioural change can be read against each other:
 
-Read the first row and the last row together.
+| arm (positive vs reference) | what actually changed | AUC (ii), seeds 0/1/2 | max KL (ii), nats | top-1 agree (ii) |
+|---|---|---|---|---:|
+| `perm` vs `perm2` | **nothing** — summation order only | 0.455 / 0.493 / 0.497 | 2.8e-11 … 1.3e-10 | 1.000 |
+| `cascade` vs `never` | a **complete deletion** | 0.888 / 0.883 / 0.836 | 7.3e-06 / 8.1e-07 / 1.2e-04 | **1.000** |
+| `blank` vs `cascade` | SET NULL on an alias, 2 residue rows | 0.773 / 0.829 / 0.770 | 2.59 / 4.49 / 1.63 | 0.999 |
+| `dangle` vs `cascade` | object evicted, 2 tombstone rows | 0.843 / 0.911 / 0.875 | 1.77 / 3.96 / 1.95 | 0.999 |
+| **`add2` vs `perm`** | **two fresh live rows. NO deletion.** | 0.961 / **1.000** / 0.971 | 9.7e-04 / 3.5e-03 / 0.31 | 1.000 / 1.000 / 0.999 |
 
-**A complete deletion is separable at 0.869 while the reader's output distribution is bit-identical**
-— max KL exactly 0.000, top-1 agreement exactly 1.000. Nothing about the model's behaviour changed.
-The detector is not reading a trace of the deleted fact; there is no behavioural trace to read.
+**The probe is calibrated.** On `perm` the two banks differ only by summation order — max KL ~1e-10,
+numerically the same distribution — and the same cross-validated probe sits at 0.455–0.497. It does
+not manufacture separation. Every number below is therefore signal, not overfitting.
 
-**An intervention that deletes nothing is separable at 0.977, and at 1.0000 on the worst seed.** The
-programme's own pre-registered criterion `gpt2/add2/auc_ii <= 0.6` is recorded **FAIL at 1.0000**, and
-`add2/auc_iii <= 0.6` **FAIL at 0.9651**. Adding two live rows that touch nothing, and that leave
-top-1 agreement at 0.999, is more detectable than deleting the fact.
+**A complete deletion is separable at 0.836–0.888 with no behavioural change to read.** The largest KL
+over all bystander queries is between **8.1e-07 and 1.2e-04 nats** and top-1 agreement is **exactly
+1.000** on every seed. The detector is operating three to five orders of magnitude below this
+programme's own locality bar of 0.05 nats. There is no behavioural trace of the deleted fact; the
+detector fires anyway.
+
+**An intervention that deletes nothing fires harder.** `add2` adds two live rows that touch no query,
+and is separable at 0.961–1.000. The programme's own pre-registered criterion `gpt2/add2/auc_ii <= 0.6`
+is recorded **FAIL at 1.0000**, and `add2/auc_iii <= 0.6` **FAIL at 0.9651**.
+
+**And across arms the score is not a function of behavioural change at all:**
+
+| arm | max KL (nats) | AUC |
+|---|---:|---:|
+| `perm` | ~1e-10 | 0.47 |
+| `cascade` (a complete deletion) | ~1e-05 | **0.87** |
+| `add2` (no deletion) | ~1e-03 | **0.96** |
+| `blank` (leaks entities) | **2.6** | 0.77 |
+
+The arm that moves the model most (`blank`, up to 4.5 nats) scores below the arm that moves it least
+of the three real interventions (`cascade`, 1e-5 nats). A statistic that ranks interventions in an
+order uncorrelated with their effect on the model is not measuring the model.
 
 ## The law
 
@@ -42,7 +58,8 @@ kind of thing:
   pass-through bias is `log(n_cells)`. This is a property of dense routing, not of history. It is what
   `add2` measures, and it does **not** close: under content-derived markers `add2` stays at 0.94–1.00.
 - **F2 · PROVENANCE / WRITE ORDER.** The marker draw position is a write-order channel. It is what
-  `cascade` vs `never` measures at 0.869 with KL 0.000. It **does** close: E-000053 re-signs markers
+  `cascade` vs `never` measures at 0.836–0.888 with a max KL of 1e-04 nats or less. It **does** close:
+  E-000053 re-signs markers
   from an HMAC of row content and `cascade` vs `never` falls to **exactly 0.500 on all three classes**,
   with the frozen reader accepting the re-signed bank without retraining (gate acceptance 1.000,
   KL ≤ 1e-4, top-1 agreement 1.000, accuracy moved by ≤ 0.01).
@@ -93,9 +110,9 @@ Mann-Whitney, cross-validation, or nuisance-floor subtraction as statistical tec
 What is claimed as new is narrow: **on a substrate where deletion ground truth is exact, the
 off-target detectability of a memory lifecycle operation is carried by the store's cardinality and
 write order rather than by residual knowledge — demonstrated by a complete deletion that is separable
-at 0.869 with a bit-identical output distribution, and by a non-deletion control that is separable at
-1.0000 — and one of the two channels closes to exactly chance under content-derived markers while the
-other does not.**
+at 0.836–0.888 while the largest output divergence over the scored queries is 1.2e-04 nats and top-1
+agreement is exactly 1.000, and by a non-deletion control that is separable at up to 1.0000 — and one
+of the two channels closes to exactly chance under content-derived markers while the other does not.**
 
 ## Why this substrate can say it and the field's cannot
 
