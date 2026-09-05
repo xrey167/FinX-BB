@@ -1,0 +1,49 @@
+name: E000051 clean bystanders
+
+on:
+  push:
+    branches:
+      - research/e000051-clean-bystanders
+  workflow_dispatch:
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 360
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+          cache-dependency-path: so/requirements.txt
+      - name: Install CPU dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install torch --index-url https://download.pytorch.org/whl/cpu
+          python -m pip install -r so/requirements.txt
+      - name: Unit tests
+        run: python -m pytest so/tests -q
+      - name: Verify bystander selection helper
+        run: |
+          python - <<'PY'
+          from so.experiments.e000051b_clean_bystanders import clean_other_pod_aliases
+          groups = [((i, 0), [(i, 1), (i, 2)]) for i in range(100)]
+          for target, aliases in groups:
+              picked = clean_other_pod_aliases(groups, target, 2)
+              assert set(picked).isdisjoint({target, *aliases}), (target, picked)
+              assert len(picked) == 4
+          print('100/100 target pods: bystander alias set disjoint')
+          PY
+      - name: E-000051-B synthetic smoke
+        env:
+          SO_THREADS: '2'
+        run: |
+          mkdir -p ci-results
+          python -m so.experiments.e000051b_clean_bystanders --quick --readers syn --seeds 0 --n-pods 6 --threads 2 --results-dir ci-results
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: e000051-clean-results
+          path: ci-results/
+          if-no-files-found: warn
