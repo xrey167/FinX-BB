@@ -245,53 +245,115 @@ def test_a_handle_is_a_function_of_the_identity_alone():
     assert torch.allclose(m.handles_for(ids[2:3]), h[2:3], atol=1e-7, rtol=0)
 
 
-def test_reordering_the_store_leaves_every_persisted_tensor_bit_identical():
-    """Keying by identity, not by position, is what makes this true.
+def _mutate(bank, kind, n_ent=N_ENT):
+    """The lifecycle and namespace mutations a store actually performs."""
+    d = {k: (v.clone() if torch.is_tensor(v) else v) for k, v in bank.items()}
+    n = d["obj"].shape[0]
+    if kind == "update_payload":
+        d["obj"] = (d["obj"] + 1) % n_ent
+    elif kind == "shred_markers":
+        d["marker"] = torch.zeros_like(d["marker"])
+    elif kind == "relink":
+        d["resolved_idx"] = torch.roll(d["resolved_idx"], max(1, n // 7))
+    elif kind == "revoke_unroutable":
+        d["routable"] = torch.zeros_like(d["routable"])
+    elif kind == "delete_and_compact":
+        keep = torch.ones(n, dtype=torch.bool); keep[0] = False
+        d = {k: (v[keep] if torch.is_tensor(v) and v.shape[:1] == (n,) else v) for k, v in d.items()}
+        d["resolved_idx"] = torch.clamp(d["resolved_idx"] - 1, min=0)
+    elif kind == "reorder":
+        g = torch.Generator().manual_seed(7)
+        perm = torch.randperm(n, generator=g)
+        inverse = torch.empty_like(perm); inverse[perm] = torch.arange(n)
+        d = {k: (v[perm] if torch.is_tensor(v) and v.shape[:1] == (n,) else v) for k, v in d.items()}
+        d["resolved_idx"] = inverse[bank["resolved_idx"][perm]]
+    else:
+        raise ValueError(kind)
+    return d
 
-    A store that reorders, compacts or grows its rows changes every row position. If a handle were the
-    row's position, a reference already written into a cache would silently come to name a different
-    pod — a different pod's value, not a rounding difference. Keyed by identity, the same identities
-    addressed in a different order produce the same persisted state.
 
-    This one is NUMERICAL, not bit-exact, and the difference from the lifecycle rows is the point.
-    Permuting rows reorders the softmax denominator and the handle mixture, so float32 reduces the
-    same sums in a different order: measured at 7.5e-08 on the cache here. The lifecycle invariance
-    above is exactly 0.0 because there the tensors are literally unchanged.
+# What each arm's persisted state is actually invariant under. Measured, then pinned — including the
+# rows where the reference carrier is NOT invariant, so this instrument can fail.
+#
+# The correction this table records: the lifecycle invariance is bought by the WRITE PLACEMENT, not by
+# the carrier. Arm C, which injects nothing before the final block, is invariant under every mutation
+# here. The carrier participates, and pays for that participation with invariance under exactly the
+# mutations that change the routing namespace. Its only possible advantage over arm C is capability.
+VALUE_EDITS = ["update_payload", "shred_markers", "relink"]
+NAMESPACE_EDITS = ["revoke_unroutable", "delete_and_compact"]
+
+
+@pytest.mark.parametrize("kind", VALUE_EDITS)
+def test_value_edits_leave_the_carrier_cache_bit_identical(kind):
+    m = _ref_adapter()
+    with torch.no_grad():
+        m.inject_gain.fill_(3.0); m.bind_gain.fill_(3.0)
+    bank = _ref_bank(); ids, am, last = _prompt()
+    before = _cache_and_hidden(m, bank, ids, am, last)
+    after = _cache_and_hidden(m, _mutate(bank, kind), ids, am, last)
+    for i in range(N_LAYER):
+        assert torch.equal(before["kv"][i][0], after["kv"][i][0]), f"{kind} moved K of block {i}"
+        assert torch.equal(before["kv"][i][1], after["kv"][i][1]), f"{kind} moved V of block {i}"
+    ar = torch.arange(ids.shape[0])
+    assert not torch.equal(before["logits"][ar, last], after["logits"][ar, last]), f"{kind} changed nothing"
+
+
+@pytest.mark.parametrize("kind", NAMESPACE_EDITS)
+def test_namespace_edits_DO_move_the_carrier_cache(kind):
+    """The claim this refutes, kept as a test so it cannot be re-asserted by accident.
+
+    The document once said a DELETE "affects only references to that identity". It does not. What the
+    read layers inject is a routing mixture normalised over every routable key plus null, so removing a
+    row, or making one unroutable, renormalises the mixture for prompts that never addressed it. The
+    handle is identity-keyed and so cannot REBIND, but the persisted state still moves.
     """
     m = _ref_adapter()
     with torch.no_grad():
-        m.inject_gain.fill_(3.0)
+        m.inject_gain.fill_(3.0); m.bind_gain.fill_(3.0)
     bank = _ref_bank(); ids, am, last = _prompt()
     before = _cache_and_hidden(m, bank, ids, am, last)
+    after = _cache_and_hidden(m, _mutate(bank, kind), ids, am, last)
+    moved = max(float((before["kv"][i][j] - after["kv"][i][j]).abs().max())
+                for i in range(N_LAYER) for j in (0, 1))
+    assert moved > 1e-6, (f"{kind} left the cache unchanged; if this now passes, the carrier has become "
+                          f"namespace-invariant and the recorded claim boundary must be widened")
 
-    n = bank["obj"].shape[0]
-    g = torch.Generator().manual_seed(7)
-    perm = torch.randperm(n, generator=g)
-    inverse = torch.empty_like(perm)
-    inverse[perm] = torch.arange(n)
-    permuted = {}
-    for k, v in bank.items():
-        permuted[k] = v[perm].clone() if torch.is_tensor(v) and v.shape[:1] == (n,) else v
-    # resolved_idx holds POSITIONS, so it must be renumbered into the new layout, not just reordered
-    permuted["resolved_idx"] = inverse[bank["resolved_idx"][perm]]
-    after = _cache_and_hidden(m, permuted, ids, am, last)
 
-    TOL = 1e-6      # two orders of magnitude above the measured 7.5e-08, still far below any semantic change
-    kv_moved = max(float((before["kv"][i][j] - after["kv"][i][j]).abs().max())
-                   for i in range(N_LAYER) for j in (0, 1))
-    assert kv_moved < TOL, f"reordering moved the cache by {kv_moved:.3e}, which is a rebinding, not rounding"
-    ar = torch.arange(ids.shape[0])
-    answer_moved = float((before["logits"][ar, last] - after["logits"][ar, last]).abs().max())
-    assert answer_moved < TOL, f"reordering changed the answer by {answer_moved:.3e}"
-    # and the contrast that makes this meaningful: a payload UPDATE moves the cache by EXACTLY zero
-    # while moving the answer, so the two invariances are different in kind and are reported as such.
-    updated = {k: (v.clone() if torch.is_tensor(v) else v) for k, v in bank.items()}
-    updated["obj"] = (updated["obj"] + 1) % N_ENT
-    upd = _cache_and_hidden(m, updated, ids, am, last)
+@pytest.mark.parametrize("kind", VALUE_EDITS + NAMESPACE_EDITS + ["reorder"])
+def test_the_late_write_arm_is_invariant_under_every_mutation(kind):
+    """Arm C, the baseline, dominates the carrier on invariance — measured, not argued.
+
+    Nothing about the bank reaches a cache-writing block in arm C, so its persisted state is a function
+    of the prompt alone and no store mutation of any kind moves it, while the answer still changes.
+    This is why the carrier cannot claim the invariance as its own contribution.
+    """
+    m = _adapter(write_layer=N_LAYER - 1)
+    with torch.no_grad():
+        m.inject_gain.fill_(3.0)
+    bank = _bank(); ids, am, last = _prompt()
+    before = _cache_and_hidden(m, bank, ids, am, last)
+    after = _cache_and_hidden(m, _mutate(bank, kind), ids, am, last)
     for i in range(N_LAYER):
-        assert torch.equal(before["kv"][i][0], upd["kv"][i][0])
-        assert torch.equal(before["kv"][i][1], upd["kv"][i][1])
-    assert float((before["logits"][ar, last] - upd["logits"][ar, last]).abs().max()) > TOL
+        assert torch.equal(before["kv"][i][0], after["kv"][i][0]), f"{kind} moved K of block {i}"
+        assert torch.equal(before["kv"][i][1], after["kv"][i][1]), f"{kind} moved V of block {i}"
+
+
+def test_reordering_the_store_does_not_rebind_the_carrier():
+    """Identity keying, stated at the strength it actually holds: numerical, and permutation only.
+
+    Permuting a fixed row set leaves the persisted state numerically unchanged (float32 reduction
+    order), which is what rules out the ABA rebinding that position keying would have caused. It does
+    NOT extend to compaction or growth: those change the routing namespace and are covered above.
+    """
+    m = _ref_adapter()
+    with torch.no_grad():
+        m.inject_gain.fill_(3.0); m.bind_gain.fill_(3.0)
+    bank = _ref_bank(); ids, am, last = _prompt()
+    before = _cache_and_hidden(m, bank, ids, am, last)
+    after = _cache_and_hidden(m, _mutate(bank, "reorder"), ids, am, last)
+    moved = max(float((before["kv"][i][j] - after["kv"][i][j]).abs().max())
+                for i in range(N_LAYER) for j in (0, 1))
+    assert moved < 1e-6, f"reordering moved the cache by {moved:.3e}, which is a rebinding, not rounding"
 
 
 def test_a_handle_for_a_removed_identity_does_not_name_a_surviving_row():

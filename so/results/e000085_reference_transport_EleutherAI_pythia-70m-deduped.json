@@ -1,0 +1,55 @@
+{
+  "experiment": "E-000085",
+  "question": "is an injected knowledge-free handle linearly recoverable at the boundary of a frozen model?",
+  "rows": [
+    {
+      "model": "EleutherAI/pythia-70m-deduped",
+      "read_layers": [
+        3,
+        4
+      ],
+      "n_blocks": 6,
+      "n_ids": 256,
+      "n_prompts": 16,
+      "rms_scale": 1.0,
+      "seed": 0,
+      "train_top1": 0.57861328125,
+      "heldout_prompt_top1": 0.0078125,
+      "clean_control_top1": 0.00390625,
+      "chance": 0.00390625
+    },
+    {
+      "model": "EleutherAI/pythia-70m-deduped",
+      "read_layers": [
+        3,
+        4
+      ],
+      "n_blocks": 6,
+      "n_ids": 256,
+      "n_prompts": 16,
+      "rms_scale": 4.0,
+      "seed": 0,
+      "train_top1": 1.0,
+      "heldout_prompt_top1": 0.97216796875,
+      "clean_control_top1": 0.00390625,
+      "chance": 0.00390625
+    },
+    {
+      "model": "EleutherAI/pythia-70m-deduped",
+      "read_layers": [
+        3,
+        4
+      ],
+      "n_blocks": 6,
+      "n_ids": 256,
+      "n_prompts": 16,
+      "rms_scale": 16.0,
+      "seed": 0,
+      "train_top1": 1.0,
+      "heldout_prompt_top1": 1.0,
+      "clean_control_top1": 0.00390625,
+      "chance": 0.00390625
+    }
+  ],
+  "not_claimed": "no capability result, no novelty claim; a frozen-weights diagnostic with a closed-form readout"
+}
