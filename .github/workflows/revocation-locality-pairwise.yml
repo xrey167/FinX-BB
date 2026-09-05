@@ -1,0 +1,50 @@
+name: RL-MIX-002 pairwise interaction cache
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [research/revocation-locality-pairwise]
+    paths:
+      - 'research/revocation_locality/pairwise_cache_probe.py'
+      - '.github/workflows/revocation-locality-pairwise.yml'
+
+jobs:
+  pairwise:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 75
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - model: openai-community/gpt2
+            slug: gpt2
+            revision: 607a30d783dfa663caf39e06633721c8d4cfcd7e
+          - model: EleutherAI/pythia-70m
+            slug: pythia70m
+            revision: a39f36b100fe8a5377810d56c3f4789b9c53ac42
+    env:
+      OMP_NUM_THREADS: '2'
+      MKL_NUM_THREADS: '2'
+      TOKENIZERS_PARALLELISM: 'false'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install pinned CPU dependencies
+        run: |
+          python -m pip install torch==2.8.0 --index-url https://download.pytorch.org/whl/cpu
+          python -m pip install transformers==4.45.2 numpy==2.2.6 safetensors==0.6.2
+      - name: Run polynomial pairwise cache baseline
+        run: |
+          mkdir -p pairwise
+          python research/revocation_locality/pairwise_cache_probe.py \
+            --model '${{ matrix.model }}' --revision '${{ matrix.revision }}' \
+            --seeds 0 1 2 --rms 1.0 4.0 --sources 4 8 \
+            --output pairwise/result.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: rl-mix002-${{ matrix.slug }}-${{ github.run_id }}
+          path: pairwise/
+          retention-days: 30
