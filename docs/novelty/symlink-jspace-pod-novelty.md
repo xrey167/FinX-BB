@@ -1,51 +1,108 @@
 # Symlink J-Space Pod — novelty thesis and falsification plan
 
-Status: research hypothesis, not a novelty or patentability claim.
+Status: research hypothesis, **not** a novelty or patentability claim.
 Date: 2026-09-05
 
-## Problem
-Current editing systems increasingly separate addressing and storage (SERAC, WISE, REP, DKME), use modular memories/adapters (MECA, MindBridge, iReVa), or externalize knowledge into detachable memory tokens (Knowledge Externalization, ICLR 2026). Anthropic's J-space work identifies a sparse, vocabulary-linked, broadcast workspace in intermediate residual representations. None of those facts alone makes our current pod/symlink design novel.
+## The prior-art boundary is now explicit
 
-## Candidate technical novelty: Workspace-Native Indirection (WNI)
+The broad ingredients are **not** ours and must never be claimed individually:
 
-Treat a knowledge edit as a versioned object graph rather than as a parameter update or a retrieved text record:
+- **Canonical records + aliases/pointers:** database normalization/indirection is old; Raeesi & Roed (2026) explicitly propose canonicalization at write time with aliases/paraphrases stored as pointers into one canonical record for limited-memory LMs. `so/closure.py` therefore already states: *the pod is not a new idea*.
+- **MVCC/versioning:** established database technology. Our `MVCCStore` is an application of that idea to a knowledge layer, not a claim to MVCC.
+- **External/editable memories:** SERAC, WISE, MindBridge, iReVa, MECA and Knowledge Externalization all establish modular or external knowledge/edit memory as prior art.
+- **Address/storage decoupling:** DKME (ACL Findings 2026) explicitly separates semantic addressing from partitioned memory storage. Decoupling by itself is not novel.
+- **Scope classification/routing:** SERAC-lineage editors and WISE already route queries to edit memories. The August 2026 INLAY negative result further shows that many editing benchmarks cannot even measure abstention without explicit negative queries; our evaluation must include withheld-edit and generic negatives.
+- **J-space/Jacobian Lens:** Gurnee et al. (Anthropic, 6 July 2026) introduce the Jacobian lens and show a sparse verbalizable/broadcast workspace. J-space itself is not ours.
+- **Representation deletion/closure:** this repository already studies workspace closure and J-lens support certificates (`E-000037`, `E-000042`). A J-space deletion probe alone is therefore not the new claim either.
 
-1. **Canonical Pod** — one mutable/deletable canonical knowledge object owns the payload and lifecycle state.
-2. **Symlink aliases** — surface forms, paraphrases, relations and dependent references carry no duplicate payload; they resolve to a stable pod identity through an explicit indirection layer.
-3. **J-space address contract** — the router is trained/constructed against a sparse J-space/workspace signature (or a distilled approximation), not merely a raw hidden-state semantic key. The signature defines the *scope* in which the pod may activate.
-4. **Two-stage resolve/broadcast** — query -> workspace signature -> symlink/pod ID -> payload -> controlled residual/J-space injection. Addressing, identity, storage, and broadcast are distinct objects.
-5. **Deletion by reachability closure** — DELETE/SHRED invalidates the canonical pod and its capability/epoch; aliases cannot retain payload. A certificate enumerates every reachable alias/pointer and proves that no live route resolves to the deleted epoch.
-6. **Counterfactual workspace certificate** — before/after deletion, J-lens/J-space probes test whether the deleted concept can still be summoned into the broadcast workspace, in addition to output-level refusal and key/reconstruction attacks.
-7. **MVCC/version semantics** — edits create pod versions/epochs. Symlinks resolve only to the current committed epoch; rollback and revocation do not rewrite unrelated model weights.
+References used to fix this boundary:
 
-The potentially publishable claim is therefore not 'external memory', 'routing', 'pods', 'symlinks', or 'J-space' individually. It is the **combination of explicit canonical identity + pointer-only aliases + workspace-native scope/addressing + versioned deletion closure + workspace-level deletion verification**.
+- SERAC: Mitchell et al., ICML 2022, *Memory-Based Model Editing at Scale*.
+- WISE: Wang et al., arXiv:2405.14768 / NeurIPS-era lifelong editing work.
+- DKME: Zheng et al., Findings ACL 2026, `https://aclanthology.org/2026.findings-acl.792/`.
+- Knowledge Externalization: Li et al., ICLR 2026, `https://proceedings.iclr.cc/paper_files/paper/2026/hash/7e9c2053258b1bdd32ff2654802cd594-Abstract-Conference.html`.
+- Anthropic workspace/J-lens: Gurnee et al., 2026, `https://transformer-circuits.pub/2026/workspace/`.
+- Scope-benchmark negative result / INLAY: Singh, arXiv:2608.26292 (26 Aug 2026).
 
-## Why this might be technically distinct
+## Narrow candidate technical novelty: Workspace-Native Versioned Indirection (WNVI)
 
-- Parameter editors (ROME/MEMIT) mutate weights and do not provide canonical object identity/pointer closure.
-- Memory editors (SERAC/WISE/DKME/REP) address edits but generally treat memory entries/partitions as the edit substrate rather than a versioned object graph with pointer-only aliases and deletion reachability certificates.
-- Modular/externalized approaches (MECA, MindBridge, iReVa, Knowledge Externalization) provide detachable/editable modules or tokens, but that is not the same as one canonical payload with explicit alias indirection and closure-based deletion semantics.
-- J-space work is primarily a representation/readout/broadcast result; using a J-space signature as an edit scope/address ABI and as a deletion-verification surface is a separate hypothesis that must be demonstrated.
+The candidate is no longer “pods + symlinks + J-space.” That wording is too broad. The narrower architecture under test is a **causal workspace address ABI connected to an identity-preserving, versioned indirection graph, with a two-surface deletion certificate**:
 
-These distinctions require a formal prior-art search before any novelty/patentability claim.
+1. **One canonical knowledge identity.** A pod has a stable identity and owns the payload plus lifecycle/version state. Linguistic aliases do not own payload copies.
+2. **Pointer-only access graph.** Surface forms/aliases resolve to pod identity (or an epoch-qualified capability), so UPDATE/REVOKE/ROLLBACK act on identity rather than on every phrase-specific storage location.
+3. **Workspace-native scope/address ABI.** The *permission and address signal* is derived from a causal J-space/workspace signature (or a distilled surrogate proven equivalent), not merely a generic semantic embedding. This signal is trained/evaluated on explicit positive **and negative** scope queries.
+4. **Resolve, then broadcast.** The architecture separates: `(workspace scope/address) -> (pod identity/epoch) -> (canonical payload) -> (controlled broadcast/injection)`. Address, identity, storage, and broadcast are independently testable objects.
+5. **Version/generation safety.** Aliases resolve the currently committed generation; stale capabilities cannot revive a revoked/deleted generation. Rollback is explicit version selection, not implicit stale-pointer behavior.
+6. **Reachability certificate.** Store-side closure proves no live pointer/path resolves to the invalid generation under a declared workload.
+7. **Causal workspace certificate.** Model-side J-space/J-lens interventions test whether the deleted pod can still be *summoned/broadcast* through aliases or paraphrases. Output refusal alone is insufficient; a refitted/probe or counterfactual workspace attack must also fail.
+8. **Composition theorem/contract target.** The eventual technical claim must be compositional: if the pointer graph has closure 1 for the target pod and the workspace scope/broadcast certificate passes, then one lifecycle operation changes every alias while unrelated pods remain invariant within preregistered locality bounds.
+
+The possible research contribution is therefore the **cross-layer contract** between a causal neural workspace and a database-like versioned object identity — not either layer by itself.
+
+## Evidence already established inside this repository
+
+These are substrate facts, not novelty proofs:
+
+- `E-000020`: explicit symlink cells and dereference reads work in a frozen-GPT2 adapter and can propagate one canonical update through aliases.
+- `E-000032` / `so.closure`: fact-level deletion resilience/closure distinguishes duplicated storage from a canonical pod and carries a certified lower bound when derivations permit it.
+- `E-000037`: store closure and workspace closure are different quantities; a canonical record does not imply one neural carrier.
+- `E-000042`: J-lens support can be subjected to explicit causal ablation and post-ablation probe checks; readout blinding is not accepted as deletion.
+- `E-000044`: a “pod objective” explores allocation of one fact’s access paths toward shared representational carriers; this is related but does not implement WNVI.
+- `E-000050..060`: the current performance line isolates scope/locality as the hard seam. `E-000060` tests an explicit scope-before-routing state machine rather than soft post-hoc gating.
+
+### Newly registered substrate controls
+
+The earlier draft reserved E-000055..058, but those IDs were consumed by the performance/locality line. The novelty track therefore starts at **E-000061**.
+
+- **E-000061 — pod closure scaling control.** Duplicated payload rows vs one canonical FACT + pointer-only LINK aliases across growing fan-out. Must show `O(k)` logical edit/erasure operations for duplication versus `O(1)` canonical payload mutation/eviction while every alias loses reachability. This is a control for a known indirection benefit, not novelty.
+- **E-000064 — versioned symlink lifecycle audit.** UPDATE/ROLLBACK/REVOKE/SHRED/EVICT/RESTORE/DELETE must be observed consistently by every alias without relinking, and aliases must remain payload-free. Again, a substrate contract, not novelty.
 
 ## Breakthrough experiment family
 
-### E-000055 — Symlink closure advantage
-Compare duplicated alias records vs canonical pod + pointer-only aliases at equal fact coverage. Perform UPDATE, REVOKE and SHRED on the canonical fact. Measure unseen-paraphrase propagation, stale-alias leakage, deleted-object recovery, unrelated KL, and edit cost as alias count grows. Required signature: deletion/update cost approximately independent of alias count for the symlink design while duplicated-record baselines grow with alias count, with no accuracy/locality loss.
+### E-000062 — causal J-space address ABI
 
-### E-000056 — J-space address ABI
-On an open model supported by Jacobian Lens, compare routing keys from raw residual state, conventional semantic embeddings, and sparse J-space signatures. Train only on a subset of paraphrases. Required signature: J-space routing improves the robustness-specificity frontier on unseen paraphrases and generic prose, not merely mean accuracy.
+On an open model with the repository’s Jacobian Lens implementation, compare scope/address keys built from:
 
-### E-000057 — Workspace deletion certificate
-After SHRED, attack the deleted concept through direct queries, unseen paraphrases, aliases, multi-hop prompts, prefix/suffix perturbations, key-channel reconstruction, and J-space 'summon' probes. Required signature: output leakage and workspace reactivation both fall to preregistered null/control levels while neighboring pods remain stable.
+A. raw residual state,
+B. matched-dimensional random/residual projection,
+C. conventional semantic/output-aligned controls,
+D. a sparse J-space signature.
 
-### E-000058 — Versioned symlink semantics
-Create fact v1 -> v2 -> revoked -> restored sequences with concurrent aliases. Required signature: every alias observes the committed epoch, no stale payload survives SHRED, rollback restores only an explicitly retained version, and unrelated pods remain invariant.
+Training sees only a subset of paraphrases. Evaluation includes disjoint held-out paraphrases **and explicit negatives**: withheld-edit questions of the same form plus generic prose. Thresholds are selected on training/validation negatives only. A J-space ABI claim requires a preregistered improvement in the worst-split robustness-specificity frontier, not merely higher mean classification accuracy. A representation that only predicts the answer token but does not reject out-of-scope facts does not pass.
 
-## Strong claim only if all four survive
-If E-000055..058 survive multiple seeds/models and strong baselines, the defensible research claim becomes:
+### E-000063 — composed Workspace-Pod deletion certificate
 
-> A workspace-native, versioned knowledge-object architecture can give an LLM one canonical mutable knowledge identity whose many linguistic access paths are pointer-like rather than payload-bearing, allowing edits and deletion to propagate through an explicit closure while J-space defines and audits the neural broadcast scope.
+Take the explicit symlink GPT-2 adapter (`E-000020`) rather than a standalone natural-fact probe. For one canonical pod with multiple aliases, perform one lifecycle operation and attack through direct keys, unseen paraphrases, aliases, multi-hop prompts, prefix/suffix perturbations, key-channel reconstruction, and causal J-space “summon”/support probes. Compare:
 
-That is the novelty target. Until the experiments and prior-art search are complete, label it a candidate technical novelty, not a proven first or a patentable invention.
+- output-only deletion,
+- store reachability closure,
+- workspace/J-space reactivation,
+- unrelated-pod collateral.
+
+The interesting result is a **composition** result: one canonical lifecycle operation closes every pointer path and every certified workspace broadcast route without editing unrelated model weights. If J-space adds no information beyond the existing output/key battery, the J-space part of WNVI is weakened.
+
+### E-000065 — first end-to-end WNVI prototype
+
+Only if E-000062 supports J-space as a useful scope/address coordinate system: route an external edit with a J-space-derived address/scope signal to an epoch-qualified symlink, resolve one canonical pod, then broadcast the payload through a controlled injection. Compare against the same memory with raw-residual/semantic routing and against the existing soft router. The benchmark must contain positive and negative scope examples.
+
+### E-000066 — stale capability / generation attack
+
+Attempt to revive a superseded or deleted pod generation using saved alias addresses, old link versions, rollback paths, replayed bank tensors, cached workspace signatures and crafted prompts. Passing means stale handles cannot cause the model to consume a non-current generation unless an explicit authorized rollback/restore operation reactivates it.
+
+## Strong claim only if the composition survives
+
+A defensible research claim would require all of the following, on multiple seeds and more than one public backbone where feasible:
+
+- canonical pointer closure and temporal semantics pass;
+- J-space scope/addressing beats strong matched controls on held-out positives **and negatives**;
+- one pod lifecycle operation propagates through unseen linguistic access paths;
+- store reachability and causal workspace/J-space certificates both pass;
+- key/reconstruction/stale-generation attacks fail;
+- unrelated pods and generic text stay within fixed locality bounds;
+- comparisons against SERAC/WISE/DKME-style semantic routing establish that the gain is from the workspace-native/versioned-indirection contract rather than generic external memory.
+
+Only then would the research-level claim be:
+
+> **A workspace-native versioned-indirection architecture can bind many linguistic access paths to one canonical mutable knowledge identity, use a causal workspace signature as the scope/address contract, and compose pointer-reachability with workspace-level causal verification so that a single lifecycle operation propagates across aliases without leaving a live stale generation or broadcast route.**
+
+That is the novelty target. It is still a hypothesis, not a claim of legal patent novelty or “first ever,” until the experiments and a professional prior-art search support it.
