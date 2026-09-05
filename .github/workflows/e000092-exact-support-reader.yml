@@ -1,0 +1,47 @@
+name: E000092 exact-support real-reader
+on:
+  push:
+    branches: [research/e000092-exact-support-reader]
+    paths:
+      - 'so/experiments/e000092_exact_support_reader.py'
+      - 'docs/novelty/e000092-preregister.md'
+      - '.github/workflows/e000092-exact-support-reader.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  exact-support:
+    strategy:
+      fail-fast: false
+      matrix:
+        seed: [0, 1, 2]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 80
+    env:
+      SO_BOS: '1'
+      SO_THREADS: '2'
+      OMP_NUM_THREADS: '2'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+          cache-dependency-path: so/requirements.txt
+      - name: Install CPU dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install torch --index-url https://download.pytorch.org/whl/cpu
+          python -m pip install -r so/requirements.txt
+      - name: Run exact-support feasibility seed
+        run: |
+          mkdir -p ci-e92
+          python -m so.experiments.e000092_exact_support_reader \
+            --seeds ${{ matrix.seed }} --steps 3000 --groups 100 --threads 2 \
+            --results-dir ci-e92
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: e000092-exact-support-s${{ matrix.seed }}
+          path: ci-e92/
+          if-no-files-found: warn
