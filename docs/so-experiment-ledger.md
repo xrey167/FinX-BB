@@ -2799,6 +2799,75 @@ in this adapter the pod's object-keying in the model's verbalizable basis is wha
 the training objective aligns, and the sweep that was asked to find its unowned measurement found
 three tautologies and one experiment whose answer the tokenisation finding already supplies.
 
+### 31.40 The design sweep: what a result sentence at the seam could still be, and what it cannot (2026-09-05)
+
+An eighteen-agent workflow was asked, for the fifteenth repetition of the request, to design the
+experiment at the symlink / J-space / pod seam whose *result sentence* would be unowned — mechanisms
+being conceded — with two adversarial refuters per sentence, a code-reading feasibility check per
+design, a landing and a completeness critic. It ran across the subagent limit and was resumed from
+cache; every agent completed. Four designs, and the verdict on each:
+
+**The J-lens vector as the pod's carrier — refuted twice, and geometrically thin.** Replace the
+value a cell injects (the trained `v_proj(W_U[u])`) by the object's J-lens vector at matched
+injection RMS and measure held-out override under forced addressing. Stripped of the adapter's name
+the sentence is Hernandez et al.'s linear relational embeddings, Fig. 5 (a Jacobian direction beats
+the decoder row, template-stable), FishBack (the Jacobian-pullback direction on GPT-2 small with its
+off-target KL at matched effect), the workspace paper's own swap across sixteen templates, and
+"Memory Injections" (unembedding rows written into GPT-2 small as an external memory). Feasibility
+confirmed the geometry the refuters predicted: at read layer 10 the paper's J-lens vector *is*
+`W_U[u]` (cos 1.000, one block from the output), at layer 8 cos 0.858 — so "J space" is a thin variant
+of the unembedding row on these read layers, and the genuinely different direction (the post-`ln_f`
+atom, cos 0.06) is the degenerate one §31.39 recorded. One more confound the reviews had not seen:
+E-000013's worst held-out phrasing, template 3 "{s}'s capital city is", is subject-initial — the
+position-0 case E-000050 is testing — so the "transport share" this design would attribute to the
+carrier sits on a prompt whose subject occupies the attention sink. Not run. With §31.39 (the
+J-space pod is by construction) this closes the J-space half of the idea from both sides: as a
+reading of the adapter it is a tautology of the code, and as a carrier it is owned and nearly the
+unembedding row.
+
+**The paired-arm ledger — a tautology of `bank()`, twice.** Every headline clause (the reverse key
+survives SHRED and closes under EVICT/DELETE; the dangling alias discloses and rebinds; BLANK carries
+neither key nor object) is what `bank()` exports by construction and E-000015/E-000026/E-000035
+already measured. Feasibility found the run as specified would take ~40 h, and that the address
+sweep's chance level was mis-stated (124 free keys in the GPT-2 world, not 1023). Not run.
+
+**The residue against the reader — survived one refuter, and is narrow.** After a pod's object is
+evicted, do the two live rows that `ON DELETE SET NULL` (BLANK) or `NO ACTION` (a dangling link)
+leave behind change a frozen reader's answers on queries *not about the pod* — a query-only adversary
+holding one system and no snapshot, against a CASCADE bank that differs in exactly those rows, a
+never-wrote store, and a two-fresh-rows control? Nobody has read a SET NULL or NO ACTION pointer
+residue through a reader against a never-held reference off the pod; the CASCADE-versus-never cell is
+Ramesh (arXiv:2607.27539, LiRA at chance) and the adversary shape is Chen et al. (arXiv:2506.14003).
+The landing ranked it first and the critic then found three defects that block it as specified: the
+calibration controls (a permuted bank, a bank with two added rows) were one bank per seed, so a
+standardised probe separates two point masses at AUC 1.0 and the control fails by construction; the
+"dangling alias answers UNKNOWN" row is E-000026's `delete_target/alias_unknown` under a new name,
+because `bank()` exports the same key for an evicted target as for a deleted one; and the smoke that
+was said to exercise every call never built the never-wrote store, the controls, the feature vector,
+the probe or an AUC. The landing's own expectation is a calibrated null — "the reader's off-pod
+outputs carry the number of rows, not the history" — and its lifecycle finding (a BLANKed,
+self-referencing row was never in the training distribution; GPT-2 answered one of two blanked
+aliases with a wrong entity in the smoke) is an engineering fix, not a claim. Recorded as **E-000051,
+not yet run**: per-pod controls, the identity row dropped, a real smoke, and only after E-000050 has
+released the box.
+
+**The clean-deletion frontier, trimmed — survived one refuter; owned in its headline.** "Damage
+governed by n/d" is Guo's Theorem 3.14 and Larimar's Table 4 owns the memory-side load curve; the
+composite measurement — per-bystander damage of a pre-readout minimal projection against the number
+of facts at fixed width, against the number of access paths, and weights-versus-cells under one attack
+currency with a random floor — is unmeasured, and a flat result would retire every load sentence in
+this ledger. Feasibility: the trainer has no to-criterion stop, the oblique eraser and the free
+rank-k search do not exist, sklearn is absent, and the honest cost is ~7 h on a free box. Recorded as
+**E-000048-R, not yet run**, after E-000051.
+
+**What this leaves of the request.** After sixteen repetitions, six sweeps and ten retractions: the
+symlink is a store design pattern that SQL-92 implements and Raeesi and Roed name as future work; the
+J-space reading of the pod is a tautology of this adapter and, as a carrier, the unembedding row; the
+pod objective moved a statistic on the wrong substrate and the address tie moved nothing; the
+tokenisation finding (E-000050) is Yang et al.'s diagnosis transported to an external memory, with its
+own price. The two experiments that remain unowned are calibrated-null-shaped, and both say so before
+they run.
+
 ### 31.8 Boundary
 
 CPU only, no GPU, no LLM above 124M parameters, synthetic worlds, single-token entities, two surface forms per relation, one session. Nothing here shows unlearning of facts already encoded in pretrained weights. Evidence levels recorded: E3–E4 for the synthetic system (F4 for SHRED with the verified gate, E-000010 — **on the value channel only**: E-000028 recovers the shredded object at 1.0000 through the ungated reverse key, where REVOKE and DELETE are at chance, so F4 for SHRED is a claim about answers, logits, hidden states and probes and not about routing); E5 as substrate for the frozen-GPT-2 experiment, with reading, composition, update and the copy bound supported and behavioural deletion not yet supported at the pre-registered thresholds.
