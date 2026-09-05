@@ -56,10 +56,12 @@ def _forward(model, blocks, layer: int, ids: torch.Tensor, payload: torch.Tensor
 
 def _lm_head_logits(model, final_hidden: torch.Tensor) -> torch.Tensor:
     # HF causal-LM hidden_states[-1] is the state consumed by the output head for the tested families.
-    dev = next(model.parameters()).device
-    h = final_hidden.to(dev)
+    # Reconstructed states are stored in fp32 on CPU for measurement, but some backbones expose
+    # an fp16 output head even on CPU. Cast only for the head application, then return fp32 metrics.
+    head = model.get_output_embeddings()
+    dev = head.weight.device
+    h = final_hidden.to(device=dev, dtype=head.weight.dtype)
     with torch.no_grad():
-        head = model.get_output_embeddings()
         y = head(h)
     return y.detach().float().cpu()
 
