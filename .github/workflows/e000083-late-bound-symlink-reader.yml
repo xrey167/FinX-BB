@@ -1,0 +1,46 @@
+name: E000083 late-bound symlink reader
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [research/e000082-revocation-local-persistence]
+    paths:
+      - 'so/experiments/e000083_late_bound_symlink_reader.py'
+      - '.github/workflows/e000083-late-bound-symlink-reader.yml'
+
+jobs:
+  seed2-screen:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 180
+    strategy:
+      fail-fast: false
+      matrix:
+        consistency: [0.05, 0.15, 0.30]
+    env:
+      SO_THREADS: '2'
+      SO_BOS: '1'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+          cache-dependency-path: so/requirements.txt
+      - name: Install CPU dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install torch --index-url https://download.pytorch.org/whl/cpu
+          python -m pip install -r so/requirements.txt
+      - name: Run final-block real-symlink capability screen
+        continue-on-error: true
+        run: |
+          mkdir -p ci-e83
+          python -m so.experiments.e000083_late_bound_symlink_reader \
+            --seeds 2 --steps 3000 --groups 100 \
+            --consistency '${{ matrix.consistency }}' --alt-supervision 0.5 \
+            --threads 2 --results-dir ci-e83
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: e000083-c${{ matrix.consistency }}
+          path: ci-e83/
