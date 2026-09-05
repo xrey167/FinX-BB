@@ -59,6 +59,7 @@ def train_symlink_consistent(
     *,
     consistency: float,
     alt_supervision: float = 0.5,
+    bind_supervision: float = 0.0,
     batch_size: int = 32,
     consistency_rows: int = 8,
     route_weight: float = 1.0,
@@ -113,6 +114,20 @@ def train_symlink_consistent(
         cand, _, routing, _ = model(tensors, ids, am, last)
         loss_ans = F.cross_entropy(cand, target)
         loss_route = routing_loss(routing, route)
+
+        # E-000084 arm E only (bind_supervision > 0, default off, so every earlier configuration is
+        # unchanged). The reference carrier has one addressing decision the other arms do not: at the
+        # boundary it must decide WHICH row the handle it transported names. In arms A/C/D every
+        # addressing slot is supervised by `loss_route`; leaving this one unsupervised handicaps arm E
+        # rather than testing it, and the first arm E run showed exactly that failure — a boundary
+        # distribution that never concentrated, an answer independent of the payload, and 0.0 correct.
+        # The target is the row the query resolves to: the last dereference slot, or the resolve slot
+        # where the dereference was a passthrough because the row was not a pointer.
+        loss_bind = cand.sum() * 0
+        if bind_supervision > 0 and getattr(model, "last_bind", None) is not None:
+            last_deref, last_resolve = route[:, -1], route[:, -2]
+            bind_target = torch.where(last_deref >= 0, last_deref, last_resolve)
+            loss_bind = routing_loss(model.last_bind, bind_target[:, None])
 
         valid = tensors["marker_valid"].float()
         per_cell = F.binary_cross_entropy_with_logits(
@@ -169,7 +184,7 @@ def train_symlink_consistent(
                 paired = len(idx_list)
 
         if route_only:
-            loss = loss_route + gate_weight * loss_gate
+            loss = loss_route + gate_weight * loss_gate + bind_supervision * loss_bind
         else:
             loss = (
                 loss_ans
@@ -177,6 +192,7 @@ def train_symlink_consistent(
                 + gate_weight * loss_gate
                 + alt_supervision * loss_alt
                 + consistency * loss_cons
+                + bind_supervision * loss_bind
             )
         opt.zero_grad(set_to_none=True)
         loss.backward()
@@ -188,6 +204,7 @@ def train_symlink_consistent(
                 "step": step + 1,
                 "loss": float(loss.item()),
                 "answer_loss": float(loss_ans.item()),
+                "bind_loss": float(loss_bind.item()),
                 "route_loss": float(loss_route.item()),
                 "gate_loss": float(loss_gate.item()),
                 "alt_supervised_loss": float(loss_alt.item()),
