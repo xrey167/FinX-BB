@@ -17,7 +17,7 @@ from pathlib import Path
 from typing import Any
 import torch
 
-PROTOCOL = "RL-MIX-001-v1"
+PROTOCOL = "RL-MIX-001-v1.1-cache-compat"
 
 
 def mobius(table: torch.Tensor) -> torch.Tensor:
@@ -90,7 +90,7 @@ def blocks_of(model):
 
 
 @torch.inference_mode()
-def prefill(model, prompt, payloads, mask, read_layers, positions):
+def prefill(model, prompt, payloads, mask, read_layers, positions, return_logits=False):
     handles, counts = [], []
     for index in read_layers:
         counts.append(0)
@@ -105,19 +105,25 @@ def prefill(model, prompt, payloads, mask, read_layers, positions):
             return (new,) + output[1:] if isinstance(output, tuple) else new
         handles.append(blocks_of(model)[index].register_forward_hook(hook))
     try:
-        out = model(input_ids=prompt, use_cache=True)
+        out = model(input_ids=prompt, use_cache=not return_logits)
     finally:
         for handle in handles:
             handle.remove()
     if counts != [1] * len(read_layers):
         raise RuntimeError(f"read sites not executed exactly once: {counts}")
+    if return_logits:
+        return out.logits[0, -1].double()
     return pack(legacy_cache(out.past_key_values))
 
 
 @torch.inference_mode()
 def decode(model, flat, layout, continuation, length):
     past = unpack(flat, layout)
-    # Transformers 4.45.2 accepts legacy tuples for both GPT2 and GPT-NeoX.
+    # GPT-NeoX 4.45.2 requires Cache with use_cache=False. Rebuild on each
+    # decode because DynamicCache.update mutates its tensors during execution.
+    if hasattr(model, "gpt_neox"):
+        from transformers.cache_utils import DynamicCache
+        past = DynamicCache.from_legacy_cache(past)
     out = model(input_ids=continuation, past_key_values=past,
                 attention_mask=torch.ones((1, length+1), dtype=torch.long),
                 use_cache=False)
@@ -151,6 +157,13 @@ def run_case(model, model_name, revision, seed, rms, n_sources=4):
     full = (1 << n_sources) - 1
     targets = [full ^ (1 << source) for source in range(n_sources)]
     gold = [decode(model, row, layout, continuation, prompt.shape[1]) for row in table]
+    # Independent control: replay must match a no-cache full forward, not
+    # merely another call through the same reconstruction/decode function.
+    extended = torch.cat([prompt, continuation], dim=1)
+    native_errors = []
+    for mask in range(1 << n_sources):
+        full_logits = prefill(model, extended, values, mask, read_layers, positions, return_logits=True)
+        native_errors.append(float((gold[mask] - full_logits).abs().max()))
     rows = []
     for order in range(1, n_sources+1):
         cache_errors, logit_errors, kls, top1 = [], [], [], []
@@ -192,6 +205,8 @@ def run_case(model, model_name, revision, seed, rms, n_sources=4):
               "prefill_table_seconds": prefill_seconds,
               "coefficient_rms_by_order": coefficient_rms, "orders": rows,
               "direct_unary_subtraction": direct_subtraction,
+              "native_cached_vs_full_forward_maxabs": summarize(native_errors),
+              "native_cached_vs_full_forward_control_pass": max(native_errors) < 5e-4,
               "full_lattice_reconstruction_control_pass": full_error < 5e-4 and exact_small,
               "note": "Controlled injected payloads, not learned alias reads. Seeds vary inputs/payloads, not training. KL here is dense-cache approximation KL, NOT generic-language KL or deleted-fact leakage."}
     return record
@@ -250,7 +265,8 @@ def main():
             dest.write_text(json.dumps(rec, indent=2))
             print(json.dumps({"seed": seed, "rms": rms, "control": row["full_lattice_reconstruction_control_pass"],
                               "unary_maxkl": row["orders"][0]["kl_to_dense_current"]["max"]}), flush=True)
-    if not all(x["full_lattice_reconstruction_control_pass"] for x in rec["rows"]):
+    if not all(x["full_lattice_reconstruction_control_pass"] and
+               x["native_cached_vs_full_forward_control_pass"] for x in rec["rows"]):
         raise SystemExit("invalid reconstruction control; no inference may be drawn")
 
 if __name__ == "__main__":
