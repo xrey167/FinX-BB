@@ -288,3 +288,17 @@ def test_an_active_cell_object_does_move_the_adapter_values_but_not_its_keys():
         enc, enc2 = m.encode_bank(b), m.encode_bank(b2)
     assert torch.equal(enc["keys"], enc2["keys"])
     assert not torch.allclose(enc["values"], enc2["values"], atol=1e-5)
+
+
+# ------------------------------------------------------------------ E-000049: the query-eraser wrapper
+
+def test_wrap_query_in_off_mode_leaves_the_forward_bit_identical():
+    """E-000049's instrument check in miniature: wrapping q_ln as Sequential(Eraser, q_ln) with the
+    eraser off must change nothing -- candidates, routing and the recorded query are bit-identical."""
+    from so.experiments.e000049_template_nullspace_addressing import wrap_query
+    m = _adapter(status_gated=True); b = _bank(); ids, am, last = _prompt()
+    with torch.no_grad():
+        c0, _, r0, _ = m(b, ids, am, last); q0 = m.last_query.clone()
+        wrap_query(m)
+        c1, _, r1, _ = m(b, ids, am, last); q1 = m.last_query
+    assert torch.equal(c0, c1) and torch.equal(r0, r1) and torch.equal(q0, q1)
