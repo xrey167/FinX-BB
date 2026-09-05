@@ -14,9 +14,10 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from enum import Enum
-from typing import Dict, Optional
+from typing import Callable, Dict, Optional
 
 import numpy as np
+import torch
 
 
 class Scope(str, Enum):
@@ -178,3 +179,54 @@ class CAVIAuthority:
         if p is None or not p.live:
             raise KeyError(f"pod {pod_id} is not live")
         return p
+
+
+class NeuralConsumptionGuard:
+    """Refresh live row authority at each neural-memory read site.
+
+    A caller-computed ``cell_mask`` still has a resolve->consume TOCTOU gap.  This guard attaches a
+    *pre-hook* to the same transformer blocks used by ``KnowledgeAdapterLM``.  Immediately before each
+    adapter read hook executes, it asks independent live authority for a new mask and replaces the
+    model context's allowed rows with ``base_allowed & live_mask``.  Cached resolver outputs and cached
+    export-time masks therefore cannot authorize a later read.
+
+    The callback returns a bool vector aligned with the already-materialized Bank rows.  It may be a
+    full CAVI alias+pod check or a baseline such as pod-only checking.  The mechanism is intentionally
+    generic so experiments can compare policies without changing trained weights.
+    """
+    def __init__(self, adapter, mask_fn: Callable[[], np.ndarray | torch.Tensor]):
+        # Local import avoids making the authority layer depend on a particular model family at import time.
+        from so.llm_adapter import transformer_blocks
+        self.adapter = adapter
+        self.mask_fn = mask_fn
+        blocks = transformer_blocks(adapter.lm)
+        self._handles = [blocks[l].register_forward_pre_hook(self._pre_hook) for l in adapter.cfg.read_layers]
+
+    def _pre_hook(self, module, inputs):
+        ctx = self.adapter._ctx
+        if ctx is None:
+            return None
+        base = ctx.get("_cavi_base_allowed")
+        if base is None:
+            base = ctx["allowed"].clone()
+            ctx["_cavi_base_allowed"] = base
+        live = self.mask_fn()
+        if not torch.is_tensor(live):
+            live = torch.as_tensor(live, dtype=torch.bool, device=base.device)
+        else:
+            live = live.to(device=base.device, dtype=torch.bool)
+        if live.ndim != 1 or live.numel() != base.numel():
+            raise ValueError(f"live mask shape {tuple(live.shape)} does not match {tuple(base.shape)}")
+        ctx["allowed"] = base & live
+        return None
+
+    def close(self) -> None:
+        for h in self._handles:
+            h.remove()
+        self._handles.clear()
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc, tb):
+        self.close()
