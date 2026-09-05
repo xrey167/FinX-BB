@@ -3788,9 +3788,9 @@ agent-memory instantiation. The GPT-2 half is not run.
 E-000052 was pre-registered in §31.42 before its substrate existed, narrowed by a critic in five
 places, and its SET NULL row was disclosed as likely to fail. It ran on the BOS-trained symlink
 adapter (three seeds, three thousand steps each, twelve phrasings, the full lifecycle through every
-alias). Thirteen of fourteen pre-registered criteria pass.
+alias). Thirteen of fourteen pre-registered criteria pass, and the record's own verdict is `criteria.claim_supported = False`.
 
-| template | direct | alias | dup | one UPDATE reaches the alias | SHRED → UNKNOWN | DELETE → UNKNOWN | BLANK → some entity | RELINK reads | no BOS: alias |
+| template | direct | alias | dup | one UPDATE reaches the alias | SHRED → UNKNOWN | DELETE → UNKNOWN | BLANK → some entity | RELINK **to the same target** reads | no BOS: alias |
 |---|---|---|---|---|---|---|---|---|---|
 | t0 initial, trained | 1.0000 | 0.9200 | 1.0000 | 0.9450 | 1.0000 | 1.0000 | 0.0000 | 0.9200 | 0.0150 |
 | t1 medial, trained | 0.9767 | 0.8150 | 0.9950 | 0.8250 | 1.0000 | 0.9950 | 0.0000 | 0.8400 | 0.9100 |
@@ -3812,21 +3812,28 @@ prints the most favourable seed at the seven subject-medial templates.] Worst se
 n = 200 alias reads per template per seed, so the 0.8150 worst cell carries a
 95% Clopper-Pearson interval of 0.754 to 0.866, and eight of the twelve templates are trained forms
 while t10 is the trained t0 under a fixed prefix (verified: `TEMPLATES12[0][10] == E39.PREFIX +
-TEMPLATES12[0][0]`), leaving three genuinely novel phrasings. The reader's **price for the pointer**, against a link-free adapter trained on
-the same budget and scored across all twelve phrasings (E-000025's protocol): `cost_of_sharing`
-**0.0879** against its 0.10 bar (0.0944 on trained templates, 0.0750 on held-out ones), and
-`cost_of_link_training` **0.0054** against 0.25. The **reverse control** fires exactly as registered:
-read without the BOS it was trained with, the same adapter answers a subject-initial alias at
-0.0050–0.0100 while its subject-medial ones stand at 0.9150–0.9550 — position 0, in both directions,
-on the pointer battery.
+TEMPLATES12[0][0]`), leaving three genuinely novel phrasings. The **cost of sharing** is a
+within-reader contrast, `dup_mean − alias_mean` with **both arms scored by the link adapter**
+(`e000052_symlink_bos_battery.py:130-141`; E-000025's own comment says "same adapter"):
+**0.0879** against its 0.10 bar, a bar E-000025 discloses was set knowing the alias cells at templates
+1, 8 and 9. Only `cost_of_link_training` involves the link-free adapter, at **0.0054** against 0.25,
+and it cannot fail with 46x headroom. The 200 alias reads per cell are 100 target rows through two
+aliases each in one world per seed, so a binomial interval on the 0.8150 floor is anti-conservative
+and the independent replicates are three worlds. The **reverse control** fires on the half where it
+can: read without the BOS it was trained with, the same adapter answers a subject-initial alias at
+0.0050–0.0100, while its medial ones read 0.7450 to 0.9550 across seeds and do not collapse (the
+pre-registered criterion covers only the held-out medial pair, at 0.9150).
 
 **The row that was expected to fail, and did not.** §31.42 disclosed before the run that BLANK — `ON
 DELETE SET NULL` performed by hand, a self-referencing row the adapter never trained on — read as a
 wrong entity in 0.15–0.30 of cases in the script's smoke and in 0.175 on the GPT-2 residue reader
 (§31.45), and left its 0.05 bar where it was. On the corrected substrate a blanked alias answers with
-an entity in **0.0000** at eleven of twelve phrasings and 0.0100 at t9, answers UNKNOWN at 0.99–1.00,
-and answers with the *deleted object* at exactly 0.0000 at every phrasing. The SET NULL failure was
-the sink, not the operation. The single FAIL is a validity row beside it: a blanked alias's sibling
+an entity in **0.0000** at eleven of twelve phrasings and 0.0100 at t9, answers UNKNOWN at 0.99–1.00, which is the
+arithmetic complement of the same row. But the rule fixed before the run gates this row on its
+neighbours, and `sibling_readable` came in at 0.7900 against its 0.80 bar, so **under this
+experiment's own pre-registration the SET NULL row is not readable**: it is reported, not claimed
+(§31.53). The deleted-object row at 0.0000 cannot fail, and the pre-registration excluded rows of that
+kind. The single FAIL is a validity row beside it: a blanked alias's sibling
 stays readable at 0.7900 against a 0.80 bar at t1, 0.83–0.97 elsewhere.
 
 **And it needs no retraining.** E-000050-A's symlink arm ran the same family on the *recorded*
@@ -3841,10 +3848,10 @@ checkpoints, evaluation only, three seeds, under three prompts (worst seed):
 
 So the whole battery is available on the recorded weights, with no training at all, by occupying
 position 0 with a single space — and unlike the BOS it costs the subject-medial phrasing nothing
-(§31.46). One SHRED leaves every alias UNKNOWN at 0.9950–1.0000 under every prompt.
+(§31.46). One SHRED leaves every alias UNKNOWN at 0.9950–1.0000 under every prompt, **including the bare column where the same alias reads 0.2933 to 0.5000**: the row passes where the reader cannot read, which is why §31.53 demotes it.
 
 Records: `so/results/e000052_symlink_bos_battery.{json,md}`,
-`scratchpad/e50a/space20/e000050a_bos_artefact.{json,md}`. What is *not* in these tables: locality.
+`so/results/e000050a_symlink_prefix.{json,md}`. What is *not* in these tables: locality.
 The adapter injects 3.4–4.2 nats on generic text against a 0.05 bar (§31.36, §31.46), and the parallel
 branch's independent implementation fails the same bar at 3.65–5.23 (§31.49). A pointer that reads,
 updates and deletes correctly at every phrasing still speaks when it is not asked.
@@ -3890,7 +3897,10 @@ landed. On the corrected substrate the SET NULL row reads **0.0000** at eleven o
 (§31.51). The failure was the attention sink, not the operation, so the paper is not carried by it;
 what carries it is the positive battery and its price.
 
-**The claim, made at last and at its size.** [Withdrawn to a third of this size six hours later; §31.53 is the retraction and holds the surviving sentence.] `docs/so-claim-pointer-lifecycle-2026-09-05.md`. On a
+**The claim, made at last and at its size.** [WITHDRAWN the same day. The sentence that stood here
+claimed seven lifecycle rows; §31.53 is the retraction, lists twelve findings with their file and
+line, and holds the surviving sentence. It is not reprinted, so that nobody reads the withdrawn
+version as the record.] `docs/so-claim-pointer-lifecycle-2026-09-05.md`. On a
 frozen GPT-2 small reading an external multi-version store whose access keys are LINK rows pointing at
 one object, the pointer's semantics survive the neural read at every one of twelve phrasings — aliased
 read ≥ 0.82, one UPDATE reaching every alias ≥ 0.82, one SHRED or DELETE leaving every alias UNKNOWN
@@ -3912,8 +3922,10 @@ largest open failure. Held-out override of a pretrained fact: 0.0000, under ever
 Traceless deletion: no (§31.35, §31.45). Scale: 124M parameters, a synthetic world, single-token
 entities, three seeds. And J space, closed on all three readings (§31.42).
 
-Eleven retractions precede this. It is the first sentence in the programme that survived a sweep
-designed to kill it, and it survived by being smaller than every sentence that came before.
+Eleven retractions preceded this one. It did not survive: a three-lens audit and a completeness
+critic, run against it the same day, produced twelve findings and cut it to a third of its size
+(§31.53). The programme's first claim became its twelfth retraction within hours, which is the rule
+working and not the rule failing.
 
 ### 31.53 Twelfth retraction, and it is this morning's claim: five of its seven rows do not survive their own audit (2026-09-05)
 
@@ -3975,6 +3987,48 @@ edit must reach every alias" as an evaluation axis, at the parametric tier. And 
 sentence names a *test* — re-running their audit on the modified database and measuring whether the
 retrieval-artifact rate falls — which this battery does not perform. The claim executes their design,
 not their test.
+
+
+**Five more, found by the completeness critic after the three lenses finished, none of them raised
+before.**
+
+**8. The RELINK row does not relink to a new target.** `lifecycle_extra` blanks the first alias of
+every pod and then runs `st.relink(kids[a], kids[t])` over `zip(first, targets)`, where `targets` are
+those same pods' own targets, scoring against `truth_first`, the original target's object
+(`e000052_symlink_bos_battery.py:89-107`). The operation measured is **blank, then restore the same
+binding**. "RELINK reads the new target" is false in the claim table, in §31.51's column header and in
+the script's own header; all three are corrected.
+
+**9. The control is vacuous at the cell the claim floors on.** Seven of the twelve templates are
+subject-medial, so the subject is never at position 0 and the position-0 control cannot apply there.
+The floor, 0.8150, is at t1, a medial trained template, where arm D reads 0.745 to 0.910 without the
+BOS: no collapse. The control exercises the five subject-initial templates; the evidence cited for it
+exercises three of them, on a different checkpoint.
+
+**10. The interval was computed on clustered trials.** The 200 alias reads per cell are 100 target
+rows read through two aliases each, both dereferencing the same target row through the same gate, in
+one world per seed (`E20.EVAL`). Clopper–Pearson at n = 200 assumes 200 independent trials; there are
+at most 100 independent units per cell and three independent worlds in the battery. The quoted 0.754
+to 0.866 is anti-conservative and "n = 200" overstates the design.
+
+**11. The surviving bar is not blind at three of its own cells.** E-000025 discloses it
+(`e000025_template_rescoring.py:137-141`): *"three of the sixty cells of this table were already
+visible … (alias at templates 1, 8 and 9), and the thresholds below were chosen knowing them … a
+confirmation of a reading of existing numbers, not an independent prediction."* Template 1 is this
+claim's floor cell; templates 8 and 9 are two of its three genuinely novel phrasings. E-000052
+inherits that 0.10 bar and clears it by 0.012.
+
+**12. The component the sentence credits was never ablated.** The dereference slot is directly
+supervised (`e000020_symlink_gpt2.py:50-53`), as is the gate (`:117-120`), and no `n_deref = 0` arm
+was run on the same link store. Crediting "a trained depth-1 dereference slot" is architectural
+attribution, not measurement. What is measured is link-store against copy-store on one adapter, which
+is the price.
+
+**And one defence that had to go.** §31.51 argued the update row is a property of the read because it
+"failed at 0.8850 against a 0.90 bar in E-000026". Per seed there, alias reads 0.5000 / 0.8600 /
+0.8700 and update reads 0.5350 / 0.8650 / 0.8850: the update row is the alias row plus 0.005 to 0.035
+in every seed, and it "failed" only because its bar was 0.90 where the alias bar was 0.80. The same
+number against a different threshold is not evidence for a distinction.
 
 **What survives, and it is one sentence.** *On a frozen GPT-2 small reading an external store in
 which an access key is a LINK row carrying only another row's key rather than a copy of its object, a

@@ -10,11 +10,18 @@ read with the correction note at its head.
 ## The sentence
 
 > On a frozen GPT-2 small reading an external store in which an access key is a **LINK row carrying
-> only another row's key**, rather than a copy of its object, a trained depth-1 dereference slot
-> resolves the pointer at all twelve phrasings of the template set: **0.8150 to 0.9400**, worst of
-> three seeds, n = 200 alias reads per phrasing per seed, so the worst cell's 95% Clopper–Pearson
-> interval is 0.754 to 0.866. Reading through the pointer costs **the same adapter 0.088** of accuracy
-> against reading the same keys as duplicated copies, and 0.046 and 0.056 on the other two seeds.
+> only another row's key** rather than a copy of its object, one adapter, its routing and dereference
+> slots directly supervised, reads through the pointer at all twelve phrasings of a fixed template
+> set: **0.8150 to 0.9400**, worst of three seeds. Nine of those twelve are labelled reproductions in
+> this experiment's own pre-registration; on the three genuinely novel phrasings the range is 0.8300
+> to 0.9250. Each cell is 200 alias reads clustered on 100 target rows in a single world per seed, so
+> a binomial interval on the floor is anti-conservative and three worlds are the independent
+> replicates. Reading through the pointer costs **this same adapter 0.088** of accuracy against
+> reading the same keys as duplicated copies, and 0.046 and 0.056 on the other two seeds, against a
+> 0.10 bar that E-000025 discloses was set knowing the alias cells at templates 1, 8 and 9, the floor
+> cell included. The five subject-initial phrasings collapse to 0.30 to 0.50 through an alias when
+> position 0 is left to the subject, on the *recorded* checkpoints; the seven medial phrasings,
+> including the floor cell, place the subject off position 0 by construction and have no such control.
 
 Two things make it a measurement rather than a definition:
 
@@ -24,9 +31,12 @@ Two things make it a measurement rather than a definition:
   signed, active, existing cell is exactly what the model has to discover."* The frozen model must
   route to the alias, read out the key, re-query the key table through its dereference slot
   (`so/llm_adapter.py:262-285`), and read the target's value.
-- **It fails when the instrument is wrong.** The identical read on the recorded checkpoints, with the
-  subject on GPT-2's attention sink at prompt position 0, gives 0.30 to 0.50. Occupying position 0
-  with a single space, no weight changed, restores it.
+- **It fails when the instrument is wrong, on the half where that can happen.** The read on the
+  *recorded* checkpoints (`e000020_gpt2`, a different artefact from the `e000020_gpt2_bos` measured
+  here), at three of its five templates, gives 0.2933 to 0.5633 direct and 0.30 to 0.50 through an
+  alias with the subject at position 0. Its two subject-medial templates read 0.8700 through an alias
+  bare and do not collapse. Occupying position 0 with a single space, no weight changed, restores the
+  initial half.
 
 ---
 
@@ -35,10 +45,10 @@ Two things make it a measurement rather than a definition:
 | row | worst seed | 95% interval | status |
 |---|---|---|---|
 | aliased read, all twelve phrasings | 0.8150 – 0.9400 | 0.754 – 0.866 at the floor | **the claim** |
-| the same read with the subject at position 0 | 0.30 – 0.50 | — | **the control that could have failed** |
-| cost of sharing, same adapter, alias against duplicate | 0.0879 (0.0462, 0.0563 on the other seeds) | — | **the claim** |
+| the same read with the subject at position 0 | 0.30 – 0.50 | — | **the control that could have failed** — at the five subject-initial phrasings only; vacuous at the seven medial ones, the 0.8150 floor cell included |
+| cost of sharing, same adapter, alias against duplicate | 0.0879 (0.0462, 0.0563 on the other seeds) | — | **the claim**, against a 0.10 bar E-000025 set knowing templates 1, 8 and 9 |
 | one UPDATE reaches every alias | 0.8200 – 0.9550 | — | demoted: the aliased read re-run, r = 0.910 against it |
-| RELINK reads the new target | 0.8200 – 0.9400 | — | demoted: r = 0.980 against the aliased read |
+| RELINK **back to the same target** reads it again | 0.8200 – 0.9400 | — | demoted: `lifecycle_extra` relinks each blanked alias to its own original target and scores the original object; it is blank-then-restore, not a relink to a new target; r = 0.980 against the aliased read |
 | SHRED or DELETE leaves every alias UNKNOWN | 0.9950 – 1.0000 | — | demoted: forced by the exporter and the gate; passes at 0.95+ where the reader reads at 0.30 |
 | the deleted object returns | 0.0000 | — | demoted: cannot fail, and the pre-registration excludes such rows |
 | BLANK answers with an entity | 0.0100 at t9 | 0.001 – 0.036 | reported, not claimed: the rule gates it on a neighbour row that failed at 0.79 against 0.80 |
@@ -47,23 +57,16 @@ Two things make it a measurement rather than a definition:
 The record's own verdict on the battery is `criteria.claim_supported = False`: thirteen of fourteen
 pre-registered criteria pass, and one fails.
 
-### Why the update row is a property of the read, not of the store
+### Where the resolution happens
 
-The obvious objection to the load-bearing row is that the store resolves the alias and the model only
-reads the answer. It does not. `MVCCStore.bank()` exports an alias row carrying **the target's key**,
-never the target's object, and the code says so at `so/mvcc.py:522-525`:
-
-> *A link row carries the TARGET'S KEY, not its payload and not its state: whether that key is held by
-> a signed, active, existing cell is exactly what the model has to discover.* `obj` *is a constant
-> placeholder for link rows (never the target's object).*
-
-So after one UPDATE to the target, **the alias row's exported bytes do not change at all**. Only the
-target row's payload does. For the alias to answer with the new object the frozen model must route to
-the alias row, read out the target's key, re-query the key table through its dereference slot
-(`so/llm_adapter.py:262-285`), and read the target's current value. That chain is learned, and it
-fails: at 0.2950 to 0.5350 with the subject on the attention sink, and at 0.8850 against a 0.90 bar in
-the earlier battery (E-000026). The duplication arm at 0.0000 is the store's arithmetic; the reach at
-0.82 to 0.955 is not.
+`MVCCStore.bank()` exports an alias row carrying the target's key and a constant placeholder in place
+of an object (`so/mvcc.py:522-525`), so the store does not hand the reader the answer. That makes the
+*aliased read* a property of the read. It does not make UPDATE-reach one: the reader is stateless,
+re-encoding the bank on every call, so a post-update bank is structurally identical to one that always
+held the new object, and update minus alias is +0.012 with r = 0.910 over 36 cells. The earlier
+argument here, that E-000026's update row "failed at 0.8850 against a 0.90 bar", was wrong: per seed
+the update row is the alias row plus 0.005 to 0.035, and it failed only because its bar was 0.90 where
+the alias bar was 0.80.
 
 Records: `so/results/e000052_symlink_bos_battery.{json,md}`,
 `so/results/e000050a_symlink_prefix.{json,md}`, `so/results/e000050a_bos_artefact.{json,md}`,
@@ -167,8 +170,14 @@ smaller than these intervals.
 
 - Twelve templates of two surface forms per relation is not "every phrasing" in any general sense; it
   is every phrasing in a fixed, typed set.
-- The price, 0.088, is against *this* link-free control at *this* budget. A better-trained link-free
-  adapter would raise it.
+- The price is a within-reader contrast, alias against duplicate on one adapter, and its reference arm
+  is pinned at ceiling (dup mean 0.9888 to 0.9929), so it carries little beyond the aliased read
+  itself.
+- Neither the dereference slot nor the gate was ablated: both are directly supervised, and no
+  `n_deref = 0` arm was run on the same link store, so crediting the slot is architectural attribution
+  rather than measurement.
+- Nine of the twelve phrasings are labelled reproductions in the experiment's own pre-registration, so
+  "all twelve phrasings" re-imports rows that pre-registration excluded from the claim.
 - The single failing validity row (a blanked alias's sibling readable at 0.79 against 0.80) is
   unexplained and is recorded rather than argued away.
 - Three seeds of one architecture on one frozen model. E-000019's fresh-seed protocol is the standing

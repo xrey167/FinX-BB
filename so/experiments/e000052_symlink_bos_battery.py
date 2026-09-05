@@ -84,7 +84,13 @@ def world_and_stores(gk, seed: int, centre: np.ndarray):
 
 def lifecycle_extra(gk, seed: int, centre: np.ndarray, template: int) -> Dict[str, float]:
     """BLANK the first alias of every pod (SET NULL by hand), read it, its sibling and its target; then
-    RELINK it back and read again. Fresh world and store per call."""
+    RELINK it back to THE SAME target and read again. Fresh world and store per call.
+
+    NOTE (ledger 31.53): the relink restores the original binding -- ``zip(first, targets)`` pairs each
+    blanked alias with its own pod's target and the answer is scored against ``truth_first``, that
+    target's object. This row is blank-then-restore, NOT a relink to a new target, and it must not be
+    reported as one.
+    """
     world, spec, st, kids = world_and_stores(gk, seed, centre)
     first = [ks[0] for _, ks in spec.groups]
     second = [ks[1] for _, ks in spec.groups]
@@ -309,7 +315,7 @@ def main(argv: Optional[List[str]] = None) -> Dict[str, Any]:
           "the link-free adapter. The D column takes the worst seed in the direction the control is "
           "supposed to move, which is low at subject-initial templates and high at medial ones.", "",
           ledger.table(["template", "direct", "alias", "dup", "UPDATE reaches alias", "SHRED → unknown",
-                        "DELETE → unknown", "BLANK → some entity", "RELINK reads", "D: alias, no BOS"], rows), "",
+                        "DELETE → unknown", "BLANK → some entity", "RELINK to the SAME target reads", "D: alias, no BOS"], rows), "",
           ledger.table(["price (P), BOS regime", "train", "held out", "all"],
                        [[q, w(f"P/train/{q}", True), w(f"P/heldout/{q}", True), w(f"P/all/{q}", True)]
                         for q in ("cost_of_sharing", "cost_of_link_training")]), "",
