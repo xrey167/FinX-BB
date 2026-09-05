@@ -42,7 +42,6 @@ def _teacher_probe(gk, centre: np.ndarray, seed: int, groups: int) -> Dict[str, 
 
 
 def _freeze_for_calibration(model) -> List[torch.nn.Parameter]:
-    # Everything is frozen first. Only payload/output calibration may move.
     for p in model.parameters():
         p.requires_grad_(False)
     trainable: List[torch.nn.Parameter] = []
@@ -53,14 +52,16 @@ def _freeze_for_calibration(model) -> List[torch.nn.Parameter]:
             trainable.append(p)
     model.inject_gain.requires_grad_(True)
     trainable.append(model.inject_gain)
-    # Keep semantic address, pointer representation/deref, status/marker validity,
-    # and the frozen LM untouched. null_value stays frozen as part of UNKNOWN semantics.
     return trainable
 
 
 def _calibrate(gk, seed: int, steps: int, groups: int, lr: float = 8e-4, batch_size: int = 32) -> Dict[str, Any]:
     model = gk.model
     params = _freeze_for_calibration(model)
+    # Eval mode is deliberate: the frozen pretrained core/address function must not
+    # acquire dropout noise while value-side parameters are calibrated. Eval mode
+    # does not disable gradients for the explicitly unfrozen calibration tensors.
+    model.eval()
     opt = torch.optim.AdamW(params, lr=lr, weight_decay=0.01)
     tcfg = TrainConfig(seed=seed, n_steps=steps, lr=lr, warmup=50)
     rng = np.random.default_rng(197000 + seed)
@@ -68,7 +69,6 @@ def _calibrate(gk, seed: int, steps: int, groups: int, lr: float = 8e-4, batch_s
     t0 = time.time()
     mix = {"fwd1": .7, "fwd2": .3}
     for step in range(steps):
-        model.train()
         n_base = int(rng.integers(500, 701))
         world, spec = E15.sample_alias_world(rng, n_base, groups, 2, gk.n_entities, 4, E20.N_TRAIN_TEMPLATES)
         bank = E15.bank_with_links(rng, world, spec, np.asarray(gk._e97b_centre), .20, .10, .05, .05)
@@ -92,7 +92,6 @@ def _calibrate(gk, seed: int, steps: int, groups: int, lr: float = 8e-4, batch_s
                    "elapsed_s": time.time() - t0}
             history.append(rec)
             print(rec, flush=True)
-    model.eval()
     return {"history": history, "seconds": time.time() - t0}
 
 
@@ -110,7 +109,6 @@ def run(seed: int, teacher_steps: int, calibration_steps: int, groups: int) -> D
         return {"seed": seed, "teacher": teacher, "precondition": False, "calibrated": False,
                 "breakthrough": False, "novelty_claim": False, "decision": "blocked_by_E97A_equivalent_gate"}
 
-    # Exactify execution only after teacher qualification.
     E92.install_exact_support(gk.model)
     gk._e97b_centre = centre
     before = E92._eval_world(gk, centre, seed, max(100, groups))
