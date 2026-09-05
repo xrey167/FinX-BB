@@ -291,7 +291,10 @@ class Setting:
             return [(k, t) for k in keys for t in GPT2_TEMPLATES], np.array([p.obj] * (len(keys) * len(GPT2_TEMPLATES)))
         if cls == "ii":
             i0 = self.base_pos[p.target]
-            after = [self.base_keys[j] for j in range(i0 + 1, min(i0 + 1 + N_AFTER, len(self.base_keys)))]
+            # the N_AFTER base rows written immediately after p's target (their markers shift in NEVER(p));
+            # cyclic so every pod has exactly the same number of class-(ii) queries -- a pod whose target
+            # is among the last base facts otherwise had fewer, and np.stack refused the feature matrix
+            after = [self.base_keys[(i0 + 1 + j) % len(self.base_keys)] for j in range(N_AFTER)]
             keys = list(self.bystander_base) + list(self.other_pod_aliases) + after
             objs = np.array([w.index[k] for k in keys])
             if self.reader == "syn":
@@ -506,6 +509,11 @@ def main(argv: Optional[List[str]] = None) -> Dict[str, Any]:
         for seed in args.seeds:
             print(f"=== {reader} seed {seed}: {args.n_pods} pods ===", flush=True)
             per.append(run_reader_seed(reader, seed, args.n_pods, args.threads, args.n_hardgate))
+            if args.results_dir:                       # partial results survive a later crash
+                import json as _json
+                os.makedirs(args.results_dir, exist_ok=True)
+                with open(os.path.join(args.results_dir, f"e000051_{reader}_seed{seed}.json"), "w") as f:
+                    _json.dump(per[-1], f, indent=1, default=float)
     # aggregate per reader over seeds, keyed reader/measure
     rows_by_reader: Dict[str, List[Dict[str, float]]] = {}
     for m in per:
