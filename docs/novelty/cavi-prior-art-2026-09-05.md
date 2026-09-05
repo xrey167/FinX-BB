@@ -1,99 +1,139 @@
 # CAVI prior-art and falsification boundary — 2026-09-05
 
-This note narrows the research claim. It is **not** a novelty or patentability opinion. Individual
-ingredients below are treated as prior art unless a composed property survives direct baselines.
+This note narrows the research claim. It is **not** a novelty or patentability opinion. Individual ingredients below are treated as prior art unless a narrower neural-execution property survives direct baselines.
+
+## Decisive collision: PAMSPEC
+
+The 19 July 2026 IETF Internet-Draft `draft-infantado-agent-memory-architecture-00` (**Architecture and Data Model for Persistent Memory in Agentic Systems / PAMSPEC**) materially falsifies the broad CAVI composition as a novelty target.
+
+PAMSPEC already specifies:
+
+- persistent Memory Objects with stable logical identity;
+- immutable logical Memory Versions;
+- independently identified, typed and versioned Relationship Objects;
+- explicit scope, lifecycle, availability, retention and validation state;
+- an authoritative Persistent State Plane separate from a transient Compute Plane;
+- embeddings, generated summaries, ranking caches and retrieval caches as **non-authoritative derived state**;
+- expected-version optimistic concurrency;
+- authorization/scope evaluation while traversing relationships;
+- deletion/redaction propagation concerns for derived indexes/caches.
+
+So **canonical object + versioned pointer/relationship + authoritative-vs-derived state + freshness/cache invalidation is no longer a defensible CAVI novelty**, even as a high-level composition. PAMSPEC is an Internet-Draft/work in progress rather than a final standard, but it is enough to kill that broad research novelty framing.
 
 ## Confirmed nearby work
 
 | Work | What it already covers | Consequence for CAVI |
 |---|---|---|
-| STALE (arXiv:2605.06527, 2026-05-07) | stale-memory detection, state resolution, premise resistance, write-side state adjudication (CUPMem) | “detect stale memory” is not new |
+| PAMSPEC (Infantado & Leroux, Internet-Draft, 2026-07-19) | canonical versioned Memory Objects; versioned relationships; authoritative vs derived state; scope-aware traversal; stale derived caches/indexes; expected-version concurrency | broad CAVI object/version/pointer/derived-state composition is prior-art-collided |
+| STALE (arXiv:2605.06527, 2026-05-07) | stale-memory detection, state resolution, premise resistance, write-side state adjudication | “detect stale memory” is not new |
+| TEPA (arXiv:2608.07429) | explicit validity/revocation of superseded evidence memory | revocable memory validity is not new |
+| FreshCache (arXiv:2607.04281) | freshness-risk gating for cached LLM retrieval reuse | freshness-aware cache reuse is not new |
+| SleepGate (arXiv:2603.14517) | conflict/temporal tagging and eviction/compression of stale KV associations | stale neural/cache material is an established problem class |
 | MemTX (arXiv:2607.23929, 2026-07-27) | snapshot-isolated belief transactions, validity/provenance, validate-and-commit, cascade repair | transactions/MVCC/validity/commit discipline are not new |
-| Commit-Time Authorization (arXiv:2607.10487, 2026-07-11) | freshness/binding/eligibility revalidation at durable-effect commit boundary; CommitGuard | freshness witnesses, epochs and final-boundary authorization are not new |
+| Commit-Time Authorization (arXiv:2607.10487, 2026-07-11) | freshness/binding/eligibility revalidation at a later durable-effect boundary | final-boundary freshness authorization is not new in itself |
 | DKME (Findings ACL 2026.792) | decoupled semantic addressing + partitioned knowledge-memory storage | address/storage separation is not new |
 | SERAC | external counterfactual memory + learned scope classifier | external memory + scope routing is not new |
 | WISE | dual parametric memory, routing, sharding for lifelong editing | modular/sharded edit memory is not new |
 | Knowledge Externalization (ICLR 2026) | removable/editable external memory tokens and reversible knowledge restoration | externalized editable knowledge objects are not new |
 | J-Access (arXiv:2608.11408) | Jacobian-lens audit of residual knowledge; optimizing the audit causes evasion | J-space/J-lens stays an independent audit, never a training target |
-| generational handles / slot maps | index+generation stale-handle rejection and ABA protection at dereference | incarnation counters and stale-handle rejection are standard systems techniques |
-| VERLIB / versioned pointers | versioned shared pointers and atomic/snapshot-consistent loads | “versioned pointer” and snapshot semantics are not new |
+| generational handles / versioned pointers / MVCC / linearizability | stale-handle rejection, ABA protection, versioned loads and atomic read/update semantics | incarnation/version checks and atomicity are standard systems techniques |
 | crypto-shredding / secure deletion | key destruction and versioned secure-deletion graphs | HMACs, keys, epochs, key erasure and “crypto shred” are not new |
-| canonical pointer/reference systems | canonical objects, aliases/pointers, generations, dangling references | pointers, canonical ids, refcounts and generation counters are not new individually |
 
 Sources used in this update:
+- https://ftp.kaist.ac.kr/ietf/draft-infantado-agent-memory-architecture-00.html
 - https://arxiv.org/abs/2605.06527
+- https://arxiv.org/abs/2608.07429
+- https://arxiv.org/abs/2607.04281
+- https://arxiv.org/abs/2603.14517
 - https://arxiv.org/abs/2607.23929
 - https://arxiv.org/abs/2607.10487
 - https://aclanthology.org/2026.findings-acl.792/
 - https://proceedings.iclr.cc/paper_files/paper/2026/hash/7e9c2053258b1bdd32ff2654802cd594-Abstract-Conference.html
 - https://arxiv.org/abs/2608.11408
-- https://www.csd.cmu.edu/sites/default/files/phd-thesis/CMU-CS-23-125.pdf
-- https://docs.rs/renew-memory/latest/renew_memory/struct.Handle.html
-- https://www.syssec.ethz.ch/publications/2013-11-04-secure-data-deletion-from-persistent-media-20-500-11850-74089/
 
-## Remaining candidate composed property
+## Remaining candidate: CAVI-N
 
-The defensible target is deliberately narrower than “versioned memory”, “safe handles”, or “symlink pods”:
+`CAVI` remains the implementation umbrella. The only live novelty subclaim is **CAVI-N / neural-consumption continuity**:
 
-> **Causally Attested Versioned Indirection (CAVI):** a neural-memory consumption protocol in which
-> pointer-only aliases and canonical knowledge pods are independently versioned; cached resolution and
-> serialized neural-memory material are non-authoritative; both the reference binding and referent
-> incarnation/reachability are revalidated adjacent to actual neural consumption; out-of-scope requests
-> take an exact no-memory BYPASS while in-scope stale/missing references take UNKNOWN; and an independent
-> causal/J-lens audit checks deletion without being optimized.
+> Memory-derived neural material — Bank rows, routing distributions, route selections, resolved payload vectors, cached activations and serialized intermediate tensors — does not become self-authorizing after a valid resolve. Its original authority lineage, bound to the exact reference/alias incarnation and referent/pod incarnation, remains revocable and is revalidated at any later *actual neural injection/consumption site*. Invalid lineage collapses to exact no-memory execution; fresh current-generation state remains usable. Independent J-space/J-lens is audit-only.
 
-The candidate novelty is therefore not the pointer check. It is the **neural-memory execution contract**
-and its composed guarantee across linguistic alias resolution, canonical mutable knowledge, stale exported
-neural tensors, live consumption, explicit scope semantics, and independent causal deletion attestation.
-This remains interesting only if that composition yields a measurable property simpler baselines cannot match.
+The claim is interesting only if the **tensor boundary creates a real stale-knowledge resurrection** that PAMSPEC-style derived-state classification, a simple pod/version tag, ordinary cache invalidation and cached commit-time authorization do not already close.
 
 ## Critical falsification matrix
 
 ### F1 — alias relink while both pods stay live
 
-A cached alias A→P is captured. A is relinked to Q, while P and Q remain live and P's incarnation is
-unchanged.
+Capture state derived from alias `A -> P`. Relink `A -> Q` while `P` and `Q` remain live and `P`'s incarnation is unchanged.
 
-- no guard: should replay A→P
-- commit/export-time authorization only: should replay A→P after a resolve→mutate→consume race
-- pod-only consume-time version check: should replay A→P because P is still current
-- full CAVI alias+pod consume validation: must reject the old A binding
+- no guard: stale `A -> P` state should remain replayable if the threat is real;
+- cached commit/export-time authorization: should remain stale after resolve→mutate→consume;
+- pod-only version check: should still approve because `P` remains current;
+- full reference+referent lineage at neural consumption: must reject the old `A -> P` derivation.
 
-If a simple pod-only check rejects this attack just as reliably without separately validating alias
-binding, the claimed CAVI distinction is falsified.
+If a simple pod/version check performs identically, CAVI-N is falsified.
 
-### F2 — canonical pod update / SHRED / DELETE / ABA
+### F2 — neural-derived-state bearer attack
 
-Old serialized rows and old resolver witnesses must fail after incarnation change, including delete +
-recreate under the same logical identity. Pod-only/generational-handle checks are expected to pass this
-control; CAVI cannot claim these controls as unique.
+After a legitimate live memory read, serialize and later replay each layer independently:
 
-### F3 — exact scope semantics
+- exported Bank row;
+- router/routing distribution;
+- selected route/index;
+- resolved payload vector;
+- post-read hidden activation.
 
-- BYPASS: no-memory path must be exactly the base path (no learned null injection)
-- RESOLVE: current alias+pod remains usable
-- UNKNOWN: an in-scope stale/missing reference does not silently become BYPASS
+Replay with `bank=None` after authority changes. If stale neural material cannot resurrect stale behavior, there is no reason to add lineage machinery downstream of ordinary cache invalidation.
 
-### F4 — bystander preservation
+### F3 — ABA / rollback / restore
 
-Invalidating one alias/pod must not discard the entire Bank. Fresh unrelated pods must remain consumable.
-This is why E-000069's whole-Bank rejection is a control rather than the final CAVI mechanism.
+Old derived state must stay dead after delete/shred + restore/recreate under the same logical identity. Generational handles are expected to solve plain referent ABA; CAVI-N only gets credit for reference+referent or neural-derived-state cases that stronger ordinary baselines miss.
 
-### F5 — cached/serialized/racy access paths
+### F4 — exact scope semantics
 
-Test old resolver output, serialized tensors, old aliases, rollback/restore, ABA, concurrent relink/update,
-and mutation in the resolve→inject gap. The final validation must occur at the neural memory read boundary,
-not merely when the Bank is exported.
+- `BYPASS`: exactly the no-memory base path;
+- `RESOLVE`: current lineage remains usable;
+- `UNKNOWN`: in-scope stale/missing reference does not silently become BYPASS.
 
-### F6 — systems-equivalent baseline
+### F5 — race / linearization
 
-Implement the strongest ordinary systems baseline honestly: a generational/versioned referent handle checked
-at consumption, plus commit-time authorization. The only CAVI-specific win that counts is a failure mode
-caused by **reference rebinding / neural-memory materialization / scope composition** that this baseline cannot
-close without becoming functionally equivalent to dual reference+referent validation at neural consumption.
+Mutation in the resolve→inject gap and true concurrent reference/object updates must not allow stale derived state to cross the neural consumption point. Locking itself is not novel; the question is whether the *neural consumption linearization point* is a necessary correctness boundary.
+
+### F6 — ordinary-systems-equivalent baseline
+
+Implement the strongest honest baseline:
+
+- PAMSPEC-like authoritative/derived separation;
+- cache invalidation/version tags;
+- generational referent handle;
+- commit-time authorization;
+- normal concurrency/linearizability controls.
+
+CAVI-N survives only if a real stale neural derivation remains dangerous under that baseline and exact reference+referent authority-lineage validation at neural consumption closes it.
+
+### F7 — independent audit
+
+E-000063 J-space/J-lens measurements are independent audit only. They must use NEVER-memory controls and never participate in optimization/routing/authorization.
+
+## Current attack sequence
+
+- **E-000066** — stale exported Bank replay: vulnerability reproduced 20/20.
+- **E-000068** — live-incarnation one-use capability: control passed 5/5; known primitive, not novelty.
+- **E-000070** — real trained symlink neural consumption, full lineage vs pod-only/commit baselines.
+- **E-000071** — actual read-hook TOCTOU/linearization attack.
+- **E-000073** — serialized post-read hidden-state replay with `bank=None`, plus relink/ABA/race controls.
+- **E-000074** — serialized routing distribution + resolved payload replay with `bank=None`, plus full vs pod-only vs commit-time baselines.
+- **E-000072** — staged scope/performance line; J-space routing remains removed.
+- **E-000063** — independent NEVER-controlled causal workspace audit.
 
 ## Promotion rule
 
-E-000070/E-000071 are only screening experiments. A positive result is promoted to multiple seeds, another
-pretrained model, joint performance bars, E-000063 composed certificate integration, and reconstruction /
-J-Access-style independent audits. No individual positive row is a novelty claim.
+No screening result is a novelty claim. CAVI-N can be promoted only if:
+
+1. stale neural derived state demonstrably resurrects stale knowledge;
+2. full alias+pod lineage at neural consumption closes it;
+3. pod/version, ordinary cache invalidation/version tags and cached commit-time authorization are materially weaker on a pre-registered case;
+4. fresh current-generation capability remains intact;
+5. the result survives >=3 seeds and >1 public backbone/materially distinct model setting;
+6. rollback/restore, old-alias, serialized tensor, cached router/payload and concurrent replay attacks pass;
+7. exact BYPASS/locality and E-000063 independent J-lens audit pass;
+8. a final targeted search does not find prior art for lineage-carrying neural intermediate state with consumption-time revocation/revalidation.
