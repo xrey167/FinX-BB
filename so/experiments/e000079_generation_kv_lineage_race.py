@@ -44,7 +44,6 @@ from __future__ import annotations
 
 import argparse
 import json
-import math
 import threading
 import time
 from pathlib import Path
@@ -53,7 +52,6 @@ from typing import Any, Dict, List
 
 import numpy as np
 import torch
-import torch.nn.functional as F
 from transformers import AutoModelForCausalLM
 
 from so.cavi_snapshot import ForwardSnapshotConsumptionGuard
@@ -65,8 +63,6 @@ def _replace_hidden(output: Any, hidden: torch.Tensor) -> Any:
         return (hidden,) + tuple(output[1:])
     if torch.is_tensor(output):
         return hidden
-    # Modern HF model blocks used here return tensors/tuples. Fail loudly rather
-    # than silently not injecting on an unknown backbone contract.
     raise TypeError(f"unsupported block output type: {type(output).__name__}")
 
 
@@ -92,8 +88,6 @@ def run(model_name: str, seed: int, payload_rms: float) -> Dict[str, object]:
     blocks = transformer_blocks(model)
     if len(blocks) < 5:
         raise ValueError(f"{model_name}: need >=5 decoder blocks, got {len(blocks)}")
-    # Leave at least one downstream block after the final memory read so it can
-    # materialise KV from the injected residual after the authority lock releases.
     read_layers = (1, min(3, len(blocks) - 2))
     if read_layers[0] == read_layers[1]:
         read_layers = (0, len(blocks) - 2)
@@ -114,7 +108,6 @@ def run(model_name: str, seed: int, payload_rms: float) -> Dict[str, object]:
     lock = threading.RLock()
     authority = {"live": True, "generation": 1, "mutation_ns": None}
     mutated = threading.Event()
-    downstream_seen = threading.Event()
     timing = {"downstream_ns": None, "prefill_return_ns": None}
     adapter = SimpleNamespace(
         lm=model,
@@ -123,8 +116,6 @@ def run(model_name: str, seed: int, payload_rms: float) -> Dict[str, object]:
     )
     injection_count = {"n": 0}
 
-    # Register the real memory writes BEFORE the guard, matching KnowledgeAdapterLM
-    # construction followed later by ForwardSnapshotConsumptionGuard construction.
     inject_handles = []
     for layer in read_layers:
         def inject(module, inputs, output, _layer=layer):
@@ -151,11 +142,15 @@ def run(model_name: str, seed: int, payload_rms: float) -> Dict[str, object]:
             mutated.set()
 
     mutator_box: Dict[str, threading.Thread] = {}
+    trigger_once = {"fired": False}
 
-    # Registered AFTER guard._end on the final read layer: by the time this hook
-    # runs the current E-000078 lock has been released. Wait for the mutation to
-    # make the race deterministic, then let later blocks run.
+    # Registered AFTER guard._end on the final read layer. Fire only for the one
+    # memory-bearing prefill: later no-memory cache/control forwards must not
+    # mutate authority or overwrite the timing witness.
     def trigger_after_last_read(module, inputs, output):
+        if trigger_once["fired"] or adapter._ctx is None:
+            return None
+        trigger_once["fired"] = True
         th = threading.Thread(target=mutate, daemon=True)
         mutator_box["thread"] = th
         th.start()
@@ -166,16 +161,14 @@ def run(model_name: str, seed: int, payload_rms: float) -> Dict[str, object]:
     trigger_handle = blocks[read_layers[-1]].register_forward_hook(trigger_after_last_read)
 
     def mark_downstream(module, inputs):
-        timing["downstream_ns"] = time.perf_counter_ns()
-        downstream_seen.set()
+        if timing["downstream_ns"] is None and trigger_once["fired"]:
+            timing["downstream_ns"] = time.perf_counter_ns()
         return None
 
     downstream_handle = blocks[read_layers[-1] + 1].register_forward_pre_hook(mark_downstream)
 
     try:
         with torch.no_grad():
-            # Old generation is read atomically at two sites. The mutation commits
-            # immediately after the final read, before downstream cache materialisation.
             live_prefill = model(input_ids=prompt_ids, use_cache=True)
             timing["prefill_return_ns"] = time.perf_counter_ns()
         th = mutator_box.get("thread")
@@ -188,7 +181,6 @@ def run(model_name: str, seed: int, payload_rms: float) -> Dict[str, object]:
         if stale_past is None:
             raise RuntimeError(f"{model_name} did not return past_key_values")
 
-        # REVOKED/current state. No neural-memory read occurs in either continuation.
         adapter._ctx = None
         full_mask = torch.ones((1, prompt_ids.shape[1] + 1), dtype=torch.long)
         with torch.no_grad():
@@ -198,12 +190,8 @@ def run(model_name: str, seed: int, payload_rms: float) -> Dict[str, object]:
                 past_key_values=stale_past,
                 use_cache=True,
             )
-            # Current-state gold: recompute the whole context after revoke.
             full_ids = torch.cat([prompt_ids, continuation_id], dim=1)
             fresh_current = model(input_ids=full_ids, attention_mask=full_mask, use_cache=True)
-
-            # Control: a cache built under the current (no-memory) state should agree
-            # with full recomputation to normal numerical tolerance.
             clean_prefill = model(input_ids=prompt_ids, use_cache=True)
             clean_cont = model(
                 input_ids=continuation_id,
@@ -226,6 +214,7 @@ def run(model_name: str, seed: int, payload_rms: float) -> Dict[str, object]:
 
         checks = {
             "two_memory_reads_one_forward": injection_count["n"] == 2,
+            "single_lifecycle_mutation": int(authority["generation"]) == 2,
             "mutation_committed": bool(mutated.is_set()),
             "mutation_after_guard_before_downstream": (
                 mutation_ns is not None and downstream_ns is not None and mutation_ns <= downstream_ns
