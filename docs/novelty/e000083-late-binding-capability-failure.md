@@ -63,6 +63,35 @@ E-000084 (`so/experiments/e000084_deep_read_late_write.py`, `AdapterConfig.write
 the two: arm C keeps the query and the dereference chain at blocks 8 and 10, injects nothing there,
 and writes the summed read once after block 11; arm A is the E-000081 placement on the same seeds.
 
+## What E-000084 then measured, including against this document's own preregistration
+
+Both preregistered outcomes above were too coarse, and the arm that discriminates says so.
+
+| Arm | Write placement | Blocks of processing after the write | Seed | Held-out candidate mean | Worst template | Gate |
+|---|---|---:|---:|---:|---:|---|
+| A | in place at 8 and 10 | 3 and 1 | 0 | 0.955 | 0.935 (full-vocab) | fail |
+| A | in place at 8 and 10 | 3 and 1 | 1 | 0.990 | 0.960 | **pass** |
+| A | in place at 8 and 10 | 3 and 1 | 2 | 0.9838 | 0.960 | **pass** |
+| C | once after block 11 | 0 | 0 / 1 / 2 | 0.664 / 0.645 / 0.621 | 0.270–0.290 | fail |
+| D | once after block 10 | 1 | 0 | 0.615 | 0.270 | fail |
+
+Arm A: runs 33970654975 and 33982958930, artifacts verified (`e000084-armA-seed2`, SHA-256
+`846eff99f46ca72669f81362861903dd357690ebb8ef6f0f532c0eba3f64c0e0`). Arm D seed 0: run 33982958930,
+artifact `e000084-armD-seed0`, SHA-256 `fa08feb006ae6b872f170f7aaeb7fc598c16ebeddea763fa036ae72eb490e779`.
+Seeds 1 and 2 of arm D are still running; one seed is not a result, and this row is provisional.
+
+**Restoring one block of processing recovers nothing.** Arm D sits at 0.615, inside arm C's range and
+nowhere near arm A. So "the frozen blocks after the write must process the payload", the second
+preregistered outcome, is not what the data says either — one block of processing is worth nothing
+here, and the write in arm D still reaches every downstream K/V (exposure 6.30).
+
+What separates A from both C and D is the other thing C changed: in arm A the block-8 write is
+already in the residual when the block-10 read computes its routing query. C and D both remove that,
+and a contract test pins that they address bit-identically at every routing slot. On the evidence so
+far the operative factor is **the first write's feedback into the second read**, not the depth of
+processing after a write — which is a different mechanism from the one this document predicted, and
+it needs arm D's remaining seeds before it is more than a two-point reading.
+
 ## What is not claimed
 
 Late binding, final-layer adapters, decoupled read/write placement, cache purity, symlink routing
