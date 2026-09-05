@@ -1,0 +1,1435 @@
+{
+  "aggregate": {
+    "broken1_unknown": {
+      "max": 0.68,
+      "mean": 0.6433333333333334,
+      "min": 0.6,
+      "n": 3
+    },
+    "generic/kl_to_base": {
+      "max": 3.197061777114868,
+      "mean": 3.1070989767710366,
+      "min": 3.0457842350006104,
+      "n": 3
+    },
+    "heldout/active_correct": {
+      "max": 0.76,
+      "mean": 0.7554166666666667,
+      "min": 0.74875,
+      "n": 3
+    },
+    "heldout/deleted_object_given_active_correct": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 3
+    },
+    "heldout/refusal_given_active_correct": {
+      "max": 0.9951265705838876,
+      "mean": 0.9889674558558078,
+      "min": 0.9824173265020959,
+      "n": 3
+    },
+    "heldout/revoked_deleted_object": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 3
+    },
+    "heldout/route_hit_min": {
+      "max": 0.55,
+      "mean": 0.5333333333333333,
+      "min": 0.52,
+      "n": 3
+    },
+    "heldout/routing_share": {
+      "max": 0.9357798165137614,
+      "mean": 0.8579583515363333,
+      "min": 0.8,
+      "n": 3
+    },
+    "n_targets": {
+      "max": 200.0,
+      "mean": 200.0,
+      "min": 200.0,
+      "n": 3
+    },
+    "revoke/template0_unknown": {
+      "max": 0.975,
+      "mean": 0.9683333333333333,
+      "min": 0.955,
+      "n": 3
+    },
+    "revoke/template10_unknown": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "revoke/template11_unknown": {
+      "max": 0.885,
+      "mean": 0.8766666666666666,
+      "min": 0.865,
+      "n": 3
+    },
+    "revoke/template1_unknown": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "revoke/template2_unknown": {
+      "max": 0.975,
+      "mean": 0.965,
+      "min": 0.96,
+      "n": 3
+    },
+    "revoke/template3_unknown": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "revoke/template4_unknown": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "revoke/template5_unknown": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "revoke/template6_unknown": {
+      "max": 0.99,
+      "mean": 0.9733333333333333,
+      "min": 0.945,
+      "n": 3
+    },
+    "revoke/template7_unknown": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "revoke/template8_unknown": {
+      "max": 0.96,
+      "mean": 0.9383333333333334,
+      "min": 0.92,
+      "n": 3
+    },
+    "revoke/template9_unknown": {
+      "max": 0.99,
+      "mean": 0.985,
+      "min": 0.98,
+      "n": 3
+    },
+    "revoke_heldout_min": {
+      "max": 0.885,
+      "mean": 0.8766666666666666,
+      "min": 0.865,
+      "n": 3
+    },
+    "revoke_train_min": {
+      "max": 0.975,
+      "mean": 0.96,
+      "min": 0.945,
+      "n": 3
+    },
+    "shred_hard/template0_unknown": {
+      "max": 0.975,
+      "mean": 0.9666666666666667,
+      "min": 0.95,
+      "n": 3
+    },
+    "shred_hard/template10_unknown": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "shred_hard/template11_unknown": {
+      "max": 0.885,
+      "mean": 0.8766666666666666,
+      "min": 0.865,
+      "n": 3
+    },
+    "shred_hard/template1_unknown": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "shred_hard/template2_unknown": {
+      "max": 0.975,
+      "mean": 0.965,
+      "min": 0.96,
+      "n": 3
+    },
+    "shred_hard/template3_unknown": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "shred_hard/template4_unknown": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "shred_hard/template5_unknown": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "shred_hard/template6_unknown": {
+      "max": 0.99,
+      "mean": 0.9733333333333333,
+      "min": 0.945,
+      "n": 3
+    },
+    "shred_hard/template7_unknown": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "shred_hard/template8_unknown": {
+      "max": 0.96,
+      "mean": 0.9383333333333334,
+      "min": 0.92,
+      "n": 3
+    },
+    "shred_hard/template9_unknown": {
+      "max": 0.99,
+      "mean": 0.985,
+      "min": 0.98,
+      "n": 3
+    },
+    "shred_heldout_min": {
+      "max": 0.885,
+      "mean": 0.8766666666666666,
+      "min": 0.865,
+      "n": 3
+    },
+    "shred_train_min": {
+      "max": 0.975,
+      "mean": 0.96,
+      "min": 0.945,
+      "n": 3
+    },
+    "template0_train/active_correct": {
+      "max": 0.805,
+      "mean": 0.795,
+      "min": 0.79,
+      "n": 3
+    },
+    "template0_train/active_other_entity": {
+      "max": 0.01,
+      "mean": 0.006666666666666667,
+      "min": 0.005,
+      "n": 3
+    },
+    "template0_train/active_unknown": {
+      "max": 0.205,
+      "mean": 0.19833333333333333,
+      "min": 0.185,
+      "n": 3
+    },
+    "template0_train/deleted_object_given_active_correct": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 3
+    },
+    "template0_train/n_active_correct": {
+      "max": 161.0,
+      "mean": 159.0,
+      "min": 158.0,
+      "n": 3
+    },
+    "template0_train/refusal_given_active_correct": {
+      "max": 1.0,
+      "mean": 0.9894514767932489,
+      "min": 0.9683544303797469,
+      "n": 3
+    },
+    "template0_train/revoked_deleted_object": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 3
+    },
+    "template0_train/revoked_other_entity": {
+      "max": 0.04,
+      "mean": 0.021666666666666667,
+      "min": 0.01,
+      "n": 3
+    },
+    "template0_train/revoked_unknown": {
+      "max": 0.99,
+      "mean": 0.9783333333333334,
+      "min": 0.96,
+      "n": 3
+    },
+    "template10_heldout/active_correct": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "template10_heldout/active_other_entity": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 3
+    },
+    "template10_heldout/active_unknown": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 3
+    },
+    "template10_heldout/deleted_object_given_active_correct": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 3
+    },
+    "template10_heldout/n_active_correct": {
+      "max": 200.0,
+      "mean": 200.0,
+      "min": 200.0,
+      "n": 3
+    },
+    "template10_heldout/refusal_given_active_correct": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "template10_heldout/revoked_deleted_object": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 3
+    },
+    "template10_heldout/revoked_other_entity": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 3
+    },
+    "template10_heldout/revoked_unknown": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "template11_heldout/active_correct": {
+      "max": 0.475,
+      "mean": 0.4483333333333333,
+      "min": 0.43,
+      "n": 3
+    },
+    "template11_heldout/active_other_entity": {
+      "max": 0.12,
+      "mean": 0.08833333333333333,
+      "min": 0.065,
+      "n": 3
+    },
+    "template11_heldout/active_unknown": {
+      "max": 0.49,
+      "mean": 0.4633333333333334,
+      "min": 0.44,
+      "n": 3
+    },
+    "template11_heldout/deleted_object_given_active_correct": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 3
+    },
+    "template11_heldout/n_active_correct": {
+      "max": 95.0,
+      "mean": 89.66666666666667,
+      "min": 86.0,
+      "n": 3
+    },
+    "template11_heldout/refusal_given_active_correct": {
+      "max": 0.9886363636363636,
+      "mean": 0.9747922925707503,
+      "min": 0.9473684210526315,
+      "n": 3
+    },
+    "template11_heldout/revoked_deleted_object": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 3
+    },
+    "template11_heldout/revoked_other_entity": {
+      "max": 0.085,
+      "mean": 0.07333333333333333,
+      "min": 0.055,
+      "n": 3
+    },
+    "template11_heldout/revoked_unknown": {
+      "max": 0.945,
+      "mean": 0.9266666666666666,
+      "min": 0.915,
+      "n": 3
+    },
+    "template1_train/active_correct": {
+      "max": 1.0,
+      "mean": 0.9933333333333333,
+      "min": 0.985,
+      "n": 3
+    },
+    "template1_train/active_other_entity": {
+      "max": 0.01,
+      "mean": 0.005,
+      "min": 0.0,
+      "n": 3
+    },
+    "template1_train/active_unknown": {
+      "max": 0.005,
+      "mean": 0.0016666666666666668,
+      "min": 0.0,
+      "n": 3
+    },
+    "template1_train/deleted_object_given_active_correct": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 3
+    },
+    "template1_train/n_active_correct": {
+      "max": 200.0,
+      "mean": 198.66666666666666,
+      "min": 197.0,
+      "n": 3
+    },
+    "template1_train/refusal_given_active_correct": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "template1_train/revoked_deleted_object": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 3
+    },
+    "template1_train/revoked_other_entity": {
+      "max": 0.005,
+      "mean": 0.0016666666666666668,
+      "min": 0.0,
+      "n": 3
+    },
+    "template1_train/revoked_unknown": {
+      "max": 1.0,
+      "mean": 0.9983333333333334,
+      "min": 0.995,
+      "n": 3
+    },
+    "template2_train/active_correct": {
+      "max": 0.845,
+      "mean": 0.8066666666666666,
+      "min": 0.765,
+      "n": 3
+    },
+    "template2_train/active_other_entity": {
+      "max": 0.025,
+      "mean": 0.021666666666666667,
+      "min": 0.02,
+      "n": 3
+    },
+    "template2_train/active_unknown": {
+      "max": 0.21,
+      "mean": 0.17166666666666666,
+      "min": 0.135,
+      "n": 3
+    },
+    "template2_train/deleted_object_given_active_correct": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 3
+    },
+    "template2_train/n_active_correct": {
+      "max": 169.0,
+      "mean": 161.33333333333334,
+      "min": 153.0,
+      "n": 3
+    },
+    "template2_train/refusal_given_active_correct": {
+      "max": 0.9940828402366864,
+      "mean": 0.9896761246685832,
+      "min": 0.9814814814814815,
+      "n": 3
+    },
+    "template2_train/revoked_deleted_object": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 3
+    },
+    "template2_train/revoked_other_entity": {
+      "max": 0.04,
+      "mean": 0.028333333333333332,
+      "min": 0.02,
+      "n": 3
+    },
+    "template2_train/revoked_unknown": {
+      "max": 0.98,
+      "mean": 0.9716666666666667,
+      "min": 0.96,
+      "n": 3
+    },
+    "template3_train/active_correct": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "template3_train/active_other_entity": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 3
+    },
+    "template3_train/active_unknown": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 3
+    },
+    "template3_train/deleted_object_given_active_correct": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 3
+    },
+    "template3_train/n_active_correct": {
+      "max": 200.0,
+      "mean": 200.0,
+      "min": 200.0,
+      "n": 3
+    },
+    "template3_train/refusal_given_active_correct": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "template3_train/revoked_deleted_object": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 3
+    },
+    "template3_train/revoked_other_entity": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 3
+    },
+    "template3_train/revoked_unknown": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "template4_train/active_correct": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "template4_train/active_other_entity": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 3
+    },
+    "template4_train/active_unknown": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 3
+    },
+    "template4_train/deleted_object_given_active_correct": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 3
+    },
+    "template4_train/n_active_correct": {
+      "max": 200.0,
+      "mean": 200.0,
+      "min": 200.0,
+      "n": 3
+    },
+    "template4_train/refusal_given_active_correct": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "template4_train/revoked_deleted_object": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 3
+    },
+    "template4_train/revoked_other_entity": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 3
+    },
+    "template4_train/revoked_unknown": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "template5_train/active_correct": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "template5_train/active_other_entity": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 3
+    },
+    "template5_train/active_unknown": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 3
+    },
+    "template5_train/deleted_object_given_active_correct": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 3
+    },
+    "template5_train/n_active_correct": {
+      "max": 200.0,
+      "mean": 200.0,
+      "min": 200.0,
+      "n": 3
+    },
+    "template5_train/refusal_given_active_correct": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "template5_train/revoked_deleted_object": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 3
+    },
+    "template5_train/revoked_other_entity": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 3
+    },
+    "template5_train/revoked_unknown": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "template6_train/active_correct": {
+      "max": 0.805,
+      "mean": 0.7766666666666667,
+      "min": 0.75,
+      "n": 3
+    },
+    "template6_train/active_other_entity": {
+      "max": 0.035,
+      "mean": 0.018333333333333337,
+      "min": 0.01,
+      "n": 3
+    },
+    "template6_train/active_unknown": {
+      "max": 0.24,
+      "mean": 0.205,
+      "min": 0.185,
+      "n": 3
+    },
+    "template6_train/deleted_object_given_active_correct": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 3
+    },
+    "template6_train/n_active_correct": {
+      "max": 161.0,
+      "mean": 155.33333333333334,
+      "min": 150.0,
+      "n": 3
+    },
+    "template6_train/refusal_given_active_correct": {
+      "max": 0.9937888198757764,
+      "mean": 0.9892557714998107,
+      "min": 0.9806451612903225,
+      "n": 3
+    },
+    "template6_train/revoked_deleted_object": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 3
+    },
+    "template6_train/revoked_other_entity": {
+      "max": 0.06,
+      "mean": 0.03833333333333333,
+      "min": 0.025,
+      "n": 3
+    },
+    "template6_train/revoked_unknown": {
+      "max": 0.975,
+      "mean": 0.9616666666666666,
+      "min": 0.94,
+      "n": 3
+    },
+    "template7_train/active_correct": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "template7_train/active_other_entity": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 3
+    },
+    "template7_train/active_unknown": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 3
+    },
+    "template7_train/deleted_object_given_active_correct": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 3
+    },
+    "template7_train/n_active_correct": {
+      "max": 200.0,
+      "mean": 200.0,
+      "min": 200.0,
+      "n": 3
+    },
+    "template7_train/refusal_given_active_correct": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "template7_train/revoked_deleted_object": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 3
+    },
+    "template7_train/revoked_other_entity": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 3
+    },
+    "template7_train/revoked_unknown": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "template8_heldout/active_correct": {
+      "max": 0.615,
+      "mean": 0.5866666666666666,
+      "min": 0.565,
+      "n": 3
+    },
+    "template8_heldout/active_other_entity": {
+      "max": 0.035,
+      "mean": 0.03166666666666667,
+      "min": 0.03,
+      "n": 3
+    },
+    "template8_heldout/active_unknown": {
+      "max": 0.405,
+      "mean": 0.38166666666666665,
+      "min": 0.355,
+      "n": 3
+    },
+    "template8_heldout/deleted_object_given_active_correct": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 3
+    },
+    "template8_heldout/n_active_correct": {
+      "max": 123.0,
+      "mean": 117.33333333333333,
+      "min": 113.0,
+      "n": 3
+    },
+    "template8_heldout/refusal_given_active_correct": {
+      "max": 0.991869918699187,
+      "mean": 0.9827695782298073,
+      "min": 0.9741379310344828,
+      "n": 3
+    },
+    "template8_heldout/revoked_deleted_object": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 3
+    },
+    "template8_heldout/revoked_other_entity": {
+      "max": 0.08,
+      "mean": 0.05833333333333333,
+      "min": 0.04,
+      "n": 3
+    },
+    "template8_heldout/revoked_unknown": {
+      "max": 0.96,
+      "mean": 0.9416666666666665,
+      "min": 0.92,
+      "n": 3
+    },
+    "template9_heldout/active_correct": {
+      "max": 0.99,
+      "mean": 0.9866666666666667,
+      "min": 0.985,
+      "n": 3
+    },
+    "template9_heldout/active_other_entity": {
+      "max": 0.01,
+      "mean": 0.005,
+      "min": 0.0,
+      "n": 3
+    },
+    "template9_heldout/active_unknown": {
+      "max": 0.015,
+      "mean": 0.008333333333333333,
+      "min": 0.005,
+      "n": 3
+    },
+    "template9_heldout/deleted_object_given_active_correct": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 3
+    },
+    "template9_heldout/n_active_correct": {
+      "max": 198.0,
+      "mean": 197.33333333333334,
+      "min": 197.0,
+      "n": 3
+    },
+    "template9_heldout/refusal_given_active_correct": {
+      "max": 1.0,
+      "mean": 0.9983079526226734,
+      "min": 0.9949238578680203,
+      "n": 3
+    },
+    "template9_heldout/revoked_deleted_object": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 3
+    },
+    "template9_heldout/revoked_other_entity": {
+      "max": 0.015,
+      "mean": 0.008333333333333333,
+      "min": 0.005,
+      "n": 3
+    },
+    "template9_heldout/revoked_unknown": {
+      "max": 0.995,
+      "mean": 0.9916666666666667,
+      "min": 0.985,
+      "n": 3
+    },
+    "train/active_correct": {
+      "max": 0.9299999999999999,
+      "mean": 0.9214583333333333,
+      "min": 0.913125,
+      "n": 3
+    },
+    "train/refusal_given_active_correct": {
+      "max": 0.9984839575140578,
+      "mean": 0.9960479216202053,
+      "min": 0.9943939770000827,
+      "n": 3
+    },
+    "train_seconds": {
+      "max": 3910.1242158412933,
+      "mean": 3199.7134528954825,
+      "min": 2840.6163465976715,
+      "n": 3
+    }
+  },
+  "claim": "NOT SUPPORTED BY THE MEASUREMENTS (see criteria): ",
+  "claim_groups_met": {
+    "addresses_do_not_collapse": false,
+    "addressing_generalises": false,
+    "deletion_propagates": false,
+    "no_new_collateral": false,
+    "reading_generalises": false
+  },
+  "claim_supported": false,
+  "control": "E-000017-B (e000017b_templates8) \u2014 same trainer, same budget, tie weight 0.",
+  "criteria": {
+    "address_collision": {
+      "observed": null,
+      "op": "<=",
+      "pass": false,
+      "threshold": 0.02
+    },
+    "broken1_unknown": {
+      "observed": 0.6,
+      "op": ">=",
+      "pass": false,
+      "threshold": 0.63
+    },
+    "generic/kl_to_base": {
+      "observed": 3.197061777114868,
+      "op": "<=",
+      "pass": true,
+      "threshold": 3.65
+    },
+    "heldout/active_correct": {
+      "observed": 0.74875,
+      "op": ">=",
+      "pass": false,
+      "threshold": 0.95
+    },
+    "heldout/revoked_deleted_object": {
+      "observed": 0.0,
+      "op": "<=",
+      "pass": true,
+      "threshold": 0.02
+    },
+    "heldout/route_hit_min": {
+      "observed": 0.52,
+      "op": ">=",
+      "pass": false,
+      "threshold": 0.95
+    },
+    "query_cos_between_fact/read1": {
+      "observed": null,
+      "op": "<=",
+      "pass": false,
+      "threshold": 0.33
+    },
+    "revoke_heldout_min": {
+      "observed": 0.865,
+      "op": ">=",
+      "pass": false,
+      "threshold": 0.95
+    },
+    "shred_heldout_min": {
+      "observed": 0.865,
+      "op": ">=",
+      "pass": false,
+      "threshold": 0.95
+    },
+    "train/active_correct": {
+      "observed": 0.913125,
+      "op": ">=",
+      "pass": false,
+      "threshold": 0.95
+    }
+  },
+  "environment": {
+    "device": "cpu",
+    "numpy": "2.2.6",
+    "platform": "Linux-6.18.44-fc-v24-x86_64-with-glibc2.39",
+    "python": "3.11.15",
+    "threads": "4",
+    "torch": "2.14.0+cpu"
+  },
+  "evidence_level": "E5",
+  "evidence_level_meaning": "Transformer evidence",
+  "experiment": "E-000039-B-address",
+  "per_seed": [
+    {
+      "broken1_unknown": 0.6,
+      "checkpoint_sha256": "2fce5e83f5793e3ac91040d33054da80f28996fc13a4aca4f98734a14f8fb041",
+      "generic/kl_to_base": 3.0457842350006104,
+      "heldout/active_correct": 0.76,
+      "heldout/deleted_object_given_active_correct": 0.0,
+      "heldout/refusal_given_active_correct": 0.9951265705838876,
+      "heldout/revoked_deleted_object": 0.0,
+      "heldout/route_hit_min": 0.53,
+      "heldout/routing_share": 0.9357798165137614,
+      "n_targets": 200,
+      "revoke/template0_unknown": 0.955,
+      "revoke/template10_unknown": 1.0,
+      "revoke/template11_unknown": 0.885,
+      "revoke/template1_unknown": 1.0,
+      "revoke/template2_unknown": 0.96,
+      "revoke/template3_unknown": 1.0,
+      "revoke/template4_unknown": 1.0,
+      "revoke/template5_unknown": 1.0,
+      "revoke/template6_unknown": 0.945,
+      "revoke/template7_unknown": 1.0,
+      "revoke/template8_unknown": 0.92,
+      "revoke/template9_unknown": 0.985,
+      "revoke_heldout_min": 0.885,
+      "revoke_train_min": 0.945,
+      "seed": 1700,
+      "shred_hard/template0_unknown": 0.95,
+      "shred_hard/template10_unknown": 1.0,
+      "shred_hard/template11_unknown": 0.885,
+      "shred_hard/template1_unknown": 1.0,
+      "shred_hard/template2_unknown": 0.96,
+      "shred_hard/template3_unknown": 1.0,
+      "shred_hard/template4_unknown": 1.0,
+      "shred_hard/template5_unknown": 1.0,
+      "shred_hard/template6_unknown": 0.945,
+      "shred_hard/template7_unknown": 1.0,
+      "shred_hard/template8_unknown": 0.92,
+      "shred_hard/template9_unknown": 0.985,
+      "shred_heldout_min": 0.885,
+      "shred_train_min": 0.945,
+      "template0_train/active_correct": 0.805,
+      "template0_train/active_other_entity": 0.01,
+      "template0_train/active_unknown": 0.185,
+      "template0_train/deleted_object_given_active_correct": 0.0,
+      "template0_train/n_active_correct": 161,
+      "template0_train/refusal_given_active_correct": 1.0,
+      "template0_train/revoked_deleted_object": 0.0,
+      "template0_train/revoked_other_entity": 0.015,
+      "template0_train/revoked_unknown": 0.985,
+      "template10_heldout/active_correct": 1.0,
+      "template10_heldout/active_other_entity": 0.0,
+      "template10_heldout/active_unknown": 0.0,
+      "template10_heldout/deleted_object_given_active_correct": 0.0,
+      "template10_heldout/n_active_correct": 200,
+      "template10_heldout/refusal_given_active_correct": 1.0,
+      "template10_heldout/revoked_deleted_object": 0.0,
+      "template10_heldout/revoked_other_entity": 0.0,
+      "template10_heldout/revoked_unknown": 1.0,
+      "template11_heldout/active_correct": 0.44,
+      "template11_heldout/active_other_entity": 0.12,
+      "template11_heldout/active_unknown": 0.44,
+      "template11_heldout/deleted_object_given_active_correct": 0.0,
+      "template11_heldout/n_active_correct": 88,
+      "template11_heldout/refusal_given_active_correct": 0.9886363636363636,
+      "template11_heldout/revoked_deleted_object": 0.0,
+      "template11_heldout/revoked_other_entity": 0.085,
+      "template11_heldout/revoked_unknown": 0.915,
+      "template1_train/active_correct": 0.985,
+      "template1_train/active_other_entity": 0.01,
+      "template1_train/active_unknown": 0.005,
+      "template1_train/deleted_object_given_active_correct": 0.0,
+      "template1_train/n_active_correct": 197,
+      "template1_train/refusal_given_active_correct": 1.0,
+      "template1_train/revoked_deleted_object": 0.0,
+      "template1_train/revoked_other_entity": 0.005,
+      "template1_train/revoked_unknown": 0.995,
+      "template2_train/active_correct": 0.845,
+      "template2_train/active_other_entity": 0.02,
+      "template2_train/active_unknown": 0.135,
+      "template2_train/deleted_object_given_active_correct": 0.0,
+      "template2_train/n_active_correct": 169,
+      "template2_train/refusal_given_active_correct": 0.9940828402366864,
+      "template2_train/revoked_deleted_object": 0.0,
+      "template2_train/revoked_other_entity": 0.02,
+      "template2_train/revoked_unknown": 0.98,
+      "template3_train/active_correct": 1.0,
+      "template3_train/active_other_entity": 0.0,
+      "template3_train/active_unknown": 0.0,
+      "template3_train/deleted_object_given_active_correct": 0.0,
+      "template3_train/n_active_correct": 200,
+      "template3_train/refusal_given_active_correct": 1.0,
+      "template3_train/revoked_deleted_object": 0.0,
+      "template3_train/revoked_other_entity": 0.0,
+      "template3_train/revoked_unknown": 1.0,
+      "template4_train/active_correct": 1.0,
+      "template4_train/active_other_entity": 0.0,
+      "template4_train/active_unknown": 0.0,
+      "template4_train/deleted_object_given_active_correct": 0.0,
+      "template4_train/n_active_correct": 200,
+      "template4_train/refusal_given_active_correct": 1.0,
+      "template4_train/revoked_deleted_object": 0.0,
+      "template4_train/revoked_other_entity": 0.0,
+      "template4_train/revoked_unknown": 1.0,
+      "template5_train/active_correct": 1.0,
+      "template5_train/active_other_entity": 0.0,
+      "template5_train/active_unknown": 0.0,
+      "template5_train/deleted_object_given_active_correct": 0.0,
+      "template5_train/n_active_correct": 200,
+      "template5_train/refusal_given_active_correct": 1.0,
+      "template5_train/revoked_deleted_object": 0.0,
+      "template5_train/revoked_other_entity": 0.0,
+      "template5_train/revoked_unknown": 1.0,
+      "template6_train/active_correct": 0.805,
+      "template6_train/active_other_entity": 0.01,
+      "template6_train/active_unknown": 0.185,
+      "template6_train/deleted_object_given_active_correct": 0.0,
+      "template6_train/n_active_correct": 161,
+      "template6_train/refusal_given_active_correct": 0.9937888198757764,
+      "template6_train/revoked_deleted_object": 0.0,
+      "template6_train/revoked_other_entity": 0.025,
+      "template6_train/revoked_unknown": 0.975,
+      "template7_train/active_correct": 1.0,
+      "template7_train/active_other_entity": 0.0,
+      "template7_train/active_unknown": 0.0,
+      "template7_train/deleted_object_given_active_correct": 0.0,
+      "template7_train/n_active_correct": 200,
+      "template7_train/refusal_given_active_correct": 1.0,
+      "template7_train/revoked_deleted_object": 0.0,
+      "template7_train/revoked_other_entity": 0.0,
+      "template7_train/revoked_unknown": 1.0,
+      "template8_heldout/active_correct": 0.615,
+      "template8_heldout/active_other_entity": 0.03,
+      "template8_heldout/active_unknown": 0.355,
+      "template8_heldout/deleted_object_given_active_correct": 0.0,
+      "template8_heldout/n_active_correct": 123,
+      "template8_heldout/refusal_given_active_correct": 0.991869918699187,
+      "template8_heldout/revoked_deleted_object": 0.0,
+      "template8_heldout/revoked_other_entity": 0.04,
+      "template8_heldout/revoked_unknown": 0.96,
+      "template9_heldout/active_correct": 0.985,
+      "template9_heldout/active_other_entity": 0.0,
+      "template9_heldout/active_unknown": 0.015,
+      "template9_heldout/deleted_object_given_active_correct": 0.0,
+      "template9_heldout/n_active_correct": 197,
+      "template9_heldout/refusal_given_active_correct": 1.0,
+      "template9_heldout/revoked_deleted_object": 0.0,
+      "template9_heldout/revoked_other_entity": 0.005,
+      "template9_heldout/revoked_unknown": 0.995,
+      "train/active_correct": 0.9299999999999999,
+      "train/refusal_given_active_correct": 0.9984839575140578,
+      "train_seconds": 3910.1242158412933
+    },
+    {
+      "broken1_unknown": 0.68,
+      "checkpoint_sha256": "085cde40ee27fcb914d38d5216b545f69e0165339f504abc1bfe93966da36de2",
+      "generic/kl_to_base": 3.197061777114868,
+      "heldout/active_correct": 0.7575,
+      "heldout/deleted_object_given_active_correct": 0.0,
+      "heldout/refusal_given_active_correct": 0.9824173265020959,
+      "heldout/revoked_deleted_object": 0.0,
+      "heldout/route_hit_min": 0.52,
+      "heldout/routing_share": 0.8380952380952382,
+      "n_targets": 200,
+      "revoke/template0_unknown": 0.975,
+      "revoke/template10_unknown": 1.0,
+      "revoke/template11_unknown": 0.88,
+      "revoke/template1_unknown": 1.0,
+      "revoke/template2_unknown": 0.975,
+      "revoke/template3_unknown": 1.0,
+      "revoke/template4_unknown": 1.0,
+      "revoke/template5_unknown": 1.0,
+      "revoke/template6_unknown": 0.99,
+      "revoke/template7_unknown": 1.0,
+      "revoke/template8_unknown": 0.935,
+      "revoke/template9_unknown": 0.99,
+      "revoke_heldout_min": 0.88,
+      "revoke_train_min": 0.975,
+      "seed": 1701,
+      "shred_hard/template0_unknown": 0.975,
+      "shred_hard/template10_unknown": 1.0,
+      "shred_hard/template11_unknown": 0.88,
+      "shred_hard/template1_unknown": 1.0,
+      "shred_hard/template2_unknown": 0.975,
+      "shred_hard/template3_unknown": 1.0,
+      "shred_hard/template4_unknown": 1.0,
+      "shred_hard/template5_unknown": 1.0,
+      "shred_hard/template6_unknown": 0.99,
+      "shred_hard/template7_unknown": 1.0,
+      "shred_hard/template8_unknown": 0.935,
+      "shred_hard/template9_unknown": 0.99,
+      "shred_heldout_min": 0.88,
+      "shred_train_min": 0.975,
+      "template0_train/active_correct": 0.79,
+      "template0_train/active_other_entity": 0.005,
+      "template0_train/active_unknown": 0.205,
+      "template0_train/deleted_object_given_active_correct": 0.0,
+      "template0_train/n_active_correct": 158,
+      "template0_train/refusal_given_active_correct": 1.0,
+      "template0_train/revoked_deleted_object": 0.0,
+      "template0_train/revoked_other_entity": 0.01,
+      "template0_train/revoked_unknown": 0.99,
+      "template10_heldout/active_correct": 1.0,
+      "template10_heldout/active_other_entity": 0.0,
+      "template10_heldout/active_unknown": 0.0,
+      "template10_heldout/deleted_object_given_active_correct": 0.0,
+      "template10_heldout/n_active_correct": 200,
+      "template10_heldout/refusal_given_active_correct": 1.0,
+      "template10_heldout/revoked_deleted_object": 0.0,
+      "template10_heldout/revoked_other_entity": 0.0,
+      "template10_heldout/revoked_unknown": 1.0,
+      "template11_heldout/active_correct": 0.475,
+      "template11_heldout/active_other_entity": 0.065,
+      "template11_heldout/active_unknown": 0.46,
+      "template11_heldout/deleted_object_given_active_correct": 0.0,
+      "template11_heldout/n_active_correct": 95,
+      "template11_heldout/refusal_given_active_correct": 0.9473684210526315,
+      "template11_heldout/revoked_deleted_object": 0.0,
+      "template11_heldout/revoked_other_entity": 0.08,
+      "template11_heldout/revoked_unknown": 0.92,
+      "template1_train/active_correct": 0.995,
+      "template1_train/active_other_entity": 0.005,
+      "template1_train/active_unknown": 0.0,
+      "template1_train/deleted_object_given_active_correct": 0.0,
+      "template1_train/n_active_correct": 199,
+      "template1_train/refusal_given_active_correct": 1.0,
+      "template1_train/revoked_deleted_object": 0.0,
+      "template1_train/revoked_other_entity": 0.0,
+      "template1_train/revoked_unknown": 1.0,
+      "template2_train/active_correct": 0.81,
+      "template2_train/active_other_entity": 0.02,
+      "template2_train/active_unknown": 0.17,
+      "template2_train/deleted_object_given_active_correct": 0.0,
+      "template2_train/n_active_correct": 162,
+      "template2_train/refusal_given_active_correct": 0.9814814814814815,
+      "template2_train/revoked_deleted_object": 0.0,
+      "template2_train/revoked_other_entity": 0.04,
+      "template2_train/revoked_unknown": 0.96,
+      "template3_train/active_correct": 1.0,
+      "template3_train/active_other_entity": 0.0,
+      "template3_train/active_unknown": 0.0,
+      "template3_train/deleted_object_given_active_correct": 0.0,
+      "template3_train/n_active_correct": 200,
+      "template3_train/refusal_given_active_correct": 1.0,
+      "template3_train/revoked_deleted_object": 0.0,
+      "template3_train/revoked_other_entity": 0.0,
+      "template3_train/revoked_unknown": 1.0,
+      "template4_train/active_correct": 1.0,
+      "template4_train/active_other_entity": 0.0,
+      "template4_train/active_unknown": 0.0,
+      "template4_train/deleted_object_given_active_correct": 0.0,
+      "template4_train/n_active_correct": 200,
+      "template4_train/refusal_given_active_correct": 1.0,
+      "template4_train/revoked_deleted_object": 0.0,
+      "template4_train/revoked_other_entity": 0.0,
+      "template4_train/revoked_unknown": 1.0,
+      "template5_train/active_correct": 1.0,
+      "template5_train/active_other_entity": 0.0,
+      "template5_train/active_unknown": 0.0,
+      "template5_train/deleted_object_given_active_correct": 0.0,
+      "template5_train/n_active_correct": 200,
+      "template5_train/refusal_given_active_correct": 1.0,
+      "template5_train/revoked_deleted_object": 0.0,
+      "template5_train/revoked_other_entity": 0.0,
+      "template5_train/revoked_unknown": 1.0,
+      "template6_train/active_correct": 0.775,
+      "template6_train/active_other_entity": 0.035,
+      "template6_train/active_unknown": 0.19,
+      "template6_train/deleted_object_given_active_correct": 0.0,
+      "template6_train/n_active_correct": 155,
+      "template6_train/refusal_given_active_correct": 0.9806451612903225,
+      "template6_train/revoked_deleted_object": 0.0,
+      "template6_train/revoked_other_entity": 0.06,
+      "template6_train/revoked_unknown": 0.94,
+      "template7_train/active_correct": 1.0,
+      "template7_train/active_other_entity": 0.0,
+      "template7_train/active_unknown": 0.0,
+      "template7_train/deleted_object_given_active_correct": 0.0,
+      "template7_train/n_active_correct": 200,
+      "template7_train/refusal_given_active_correct": 1.0,
+      "template7_train/revoked_deleted_object": 0.0,
+      "template7_train/revoked_other_entity": 0.0,
+      "template7_train/revoked_unknown": 1.0,
+      "template8_heldout/active_correct": 0.565,
+      "template8_heldout/active_other_entity": 0.03,
+      "template8_heldout/active_unknown": 0.405,
+      "template8_heldout/deleted_object_given_active_correct": 0.0,
+      "template8_heldout/n_active_correct": 113,
+      "template8_heldout/refusal_given_active_correct": 0.9823008849557522,
+      "template8_heldout/revoked_deleted_object": 0.0,
+      "template8_heldout/revoked_other_entity": 0.055,
+      "template8_heldout/revoked_unknown": 0.945,
+      "template9_heldout/active_correct": 0.99,
+      "template9_heldout/active_other_entity": 0.005,
+      "template9_heldout/active_unknown": 0.005,
+      "template9_heldout/deleted_object_given_active_correct": 0.0,
+      "template9_heldout/n_active_correct": 198,
+      "template9_heldout/refusal_given_active_correct": 1.0,
+      "template9_heldout/revoked_deleted_object": 0.0,
+      "template9_heldout/revoked_other_entity": 0.005,
+      "template9_heldout/revoked_unknown": 0.995,
+      "train/active_correct": 0.92125,
+      "train/refusal_given_active_correct": 0.9952658303464754,
+      "train_seconds": 2848.3997962474823
+    },
+    {
+      "broken1_unknown": 0.65,
+      "checkpoint_sha256": "b3bb90b3d30ff08b5ea1ae0a0ede77c07b668ba8f1430a1707e1c07da9adaff4",
+      "generic/kl_to_base": 3.078450918197632,
+      "heldout/active_correct": 0.74875,
+      "heldout/deleted_object_given_active_correct": 0.0,
+      "heldout/refusal_given_active_correct": 0.9893584704814398,
+      "heldout/revoked_deleted_object": 0.0,
+      "heldout/route_hit_min": 0.55,
+      "heldout/routing_share": 0.8,
+      "n_targets": 200,
+      "revoke/template0_unknown": 0.975,
+      "revoke/template10_unknown": 1.0,
+      "revoke/template11_unknown": 0.865,
+      "revoke/template1_unknown": 1.0,
+      "revoke/template2_unknown": 0.96,
+      "revoke/template3_unknown": 1.0,
+      "revoke/template4_unknown": 1.0,
+      "revoke/template5_unknown": 1.0,
+      "revoke/template6_unknown": 0.985,
+      "revoke/template7_unknown": 1.0,
+      "revoke/template8_unknown": 0.96,
+      "revoke/template9_unknown": 0.98,
+      "revoke_heldout_min": 0.865,
+      "revoke_train_min": 0.96,
+      "seed": 1702,
+      "shred_hard/template0_unknown": 0.975,
+      "shred_hard/template10_unknown": 1.0,
+      "shred_hard/template11_unknown": 0.865,
+      "shred_hard/template1_unknown": 1.0,
+      "shred_hard/template2_unknown": 0.96,
+      "shred_hard/template3_unknown": 1.0,
+      "shred_hard/template4_unknown": 1.0,
+      "shred_hard/template5_unknown": 1.0,
+      "shred_hard/template6_unknown": 0.985,
+      "shred_hard/template7_unknown": 1.0,
+      "shred_hard/template8_unknown": 0.96,
+      "shred_hard/template9_unknown": 0.98,
+      "shred_heldout_min": 0.865,
+      "shred_train_min": 0.96,
+      "template0_train/active_correct": 0.79,
+      "template0_train/active_other_entity": 0.005,
+      "template0_train/active_unknown": 0.205,
+      "template0_train/deleted_object_given_active_correct": 0.0,
+      "template0_train/n_active_correct": 158,
+      "template0_train/refusal_given_active_correct": 0.9683544303797469,
+      "template0_train/revoked_deleted_object": 0.0,
+      "template0_train/revoked_other_entity": 0.04,
+      "template0_train/revoked_unknown": 0.96,
+      "template10_heldout/active_correct": 1.0,
+      "template10_heldout/active_other_entity": 0.0,
+      "template10_heldout/active_unknown": 0.0,
+      "template10_heldout/deleted_object_given_active_correct": 0.0,
+      "template10_heldout/n_active_correct": 200,
+      "template10_heldout/refusal_given_active_correct": 1.0,
+      "template10_heldout/revoked_deleted_object": 0.0,
+      "template10_heldout/revoked_other_entity": 0.0,
+      "template10_heldout/revoked_unknown": 1.0,
+      "template11_heldout/active_correct": 0.43,
+      "template11_heldout/active_other_entity": 0.08,
+      "template11_heldout/active_unknown": 0.49,
+      "template11_heldout/deleted_object_given_active_correct": 0.0,
+      "template11_heldout/n_active_correct": 86,
+      "template11_heldout/refusal_given_active_correct": 0.9883720930232558,
+      "template11_heldout/revoked_deleted_object": 0.0,
+      "template11_heldout/revoked_other_entity": 0.055,
+      "template11_heldout/revoked_unknown": 0.945,
+      "template1_train/active_correct": 1.0,
+      "template1_train/active_other_entity": 0.0,
+      "template1_train/active_unknown": 0.0,
+      "template1_train/deleted_object_given_active_correct": 0.0,
+      "template1_train/n_active_correct": 200,
+      "template1_train/refusal_given_active_correct": 1.0,
+      "template1_train/revoked_deleted_object": 0.0,
+      "template1_train/revoked_other_entity": 0.0,
+      "template1_train/revoked_unknown": 1.0,
+      "template2_train/active_correct": 0.765,
+      "template2_train/active_other_entity": 0.025,
+      "template2_train/active_unknown": 0.21,
+      "template2_train/deleted_object_given_active_correct": 0.0,
+      "template2_train/n_active_correct": 153,
+      "template2_train/refusal_given_active_correct": 0.9934640522875817,
+      "template2_train/revoked_deleted_object": 0.0,
+      "template2_train/revoked_other_entity": 0.025,
+      "template2_train/revoked_unknown": 0.975,
+      "template3_train/active_correct": 1.0,
+      "template3_train/active_other_entity": 0.0,
+      "template3_train/active_unknown": 0.0,
+      "template3_train/deleted_object_given_active_correct": 0.0,
+      "template3_train/n_active_correct": 200,
+      "template3_train/refusal_given_active_correct": 1.0,
+      "template3_train/revoked_deleted_object": 0.0,
+      "template3_train/revoked_other_entity": 0.0,
+      "template3_train/revoked_unknown": 1.0,
+      "template4_train/active_correct": 1.0,
+      "template4_train/active_other_entity": 0.0,
+      "template4_train/active_unknown": 0.0,
+      "template4_train/deleted_object_given_active_correct": 0.0,
+      "template4_train/n_active_correct": 200,
+      "template4_train/refusal_given_active_correct": 1.0,
+      "template4_train/revoked_deleted_object": 0.0,
+      "template4_train/revoked_other_entity": 0.0,
+      "template4_train/revoked_unknown": 1.0,
+      "template5_train/active_correct": 1.0,
+      "template5_train/active_other_entity": 0.0,
+      "template5_train/active_unknown": 0.0,
+      "template5_train/deleted_object_given_active_correct": 0.0,
+      "template5_train/n_active_correct": 200,
+      "template5_train/refusal_given_active_correct": 1.0,
+      "template5_train/revoked_deleted_object": 0.0,
+      "template5_train/revoked_other_entity": 0.0,
+      "template5_train/revoked_unknown": 1.0,
+      "template6_train/active_correct": 0.75,
+      "template6_train/active_other_entity": 0.01,
+      "template6_train/active_unknown": 0.24,
+      "template6_train/deleted_object_given_active_correct": 0.0,
+      "template6_train/n_active_correct": 150,
+      "template6_train/refusal_given_active_correct": 0.9933333333333333,
+      "template6_train/revoked_deleted_object": 0.0,
+      "template6_train/revoked_other_entity": 0.03,
+      "template6_train/revoked_unknown": 0.97,
+      "template7_train/active_correct": 1.0,
+      "template7_train/active_other_entity": 0.0,
+      "template7_train/active_unknown": 0.0,
+      "template7_train/deleted_object_given_active_correct": 0.0,
+      "template7_train/n_active_correct": 200,
+      "template7_train/refusal_given_active_correct": 1.0,
+      "template7_train/revoked_deleted_object": 0.0,
+      "template7_train/revoked_other_entity": 0.0,
+      "template7_train/revoked_unknown": 1.0,
+      "template8_heldout/active_correct": 0.58,
+      "template8_heldout/active_other_entity": 0.035,
+      "template8_heldout/active_unknown": 0.385,
+      "template8_heldout/deleted_object_given_active_correct": 0.0,
+      "template8_heldout/n_active_correct": 116,
+      "template8_heldout/refusal_given_active_correct": 0.9741379310344828,
+      "template8_heldout/revoked_deleted_object": 0.0,
+      "template8_heldout/revoked_other_entity": 0.08,
+      "template8_heldout/revoked_unknown": 0.92,
+      "template9_heldout/active_correct": 0.985,
+      "template9_heldout/active_other_entity": 0.01,
+      "template9_heldout/active_unknown": 0.005,
+      "template9_heldout/deleted_object_given_active_correct": 0.0,
+      "template9_heldout/n_active_correct": 197,
+      "template9_heldout/refusal_given_active_correct": 0.9949238578680203,
+      "template9_heldout/revoked_deleted_object": 0.0,
+      "template9_heldout/revoked_other_entity": 0.015,
+      "template9_heldout/revoked_unknown": 0.985,
+      "train/active_correct": 0.913125,
+      "train/refusal_given_active_correct": 0.9943939770000827,
+      "train_seconds": 2840.6163465976715
+    }
+  ],
+  "recorded_at": "2026-09-05T02:03:11+00:00",
+  "title": "Tying the routing query across phrasings of the same fact"
+}
