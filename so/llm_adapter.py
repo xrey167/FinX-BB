@@ -506,6 +506,11 @@ class KnowledgeAdapterLM(nn.Module):
         routing = torch.stack(self._ctx["routing"], dim=1) if self._ctx is not None and self._ctx["routing"] else None
         # (B, len(read_layers), d_key), read-layer order. Kept as an attribute rather than a fifth
         # return value so that every existing call site keeps its four-tuple.
+        # E-000084 arm E: the boundary decode is an ADDRESSING decision like the routing slots, and is
+        # exported so a trainer can supervise it the way the routing slots are supervised. Shape
+        # (B, 1, C+1), the same layout routing_loss expects.
+        self.last_bind = (torch.stack(self._ctx["bind"], dim=1)
+                          if self._ctx is not None and self._ctx.get("bind") else None)
         self.last_query = (torch.stack(self._ctx["query"], dim=1)
                            if self._ctx is not None and self._ctx.get("query") else None)
         self._ctx = None

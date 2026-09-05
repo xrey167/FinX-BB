@@ -40,13 +40,27 @@ Arms D and E follow from that.
 * D (write after block 10) answers a confound in C: C removes the payload from every
   block that could process it AND removes the block-8 write from the input of the
   block-10 read.  D keeps the second change and restores one block of processing.
-* E asks whether what rides has to be the KNOWLEDGE.  Each row gets a fixed random
-  handle; the read layers inject the routing-weighted handle in place, so it takes
-  part in the frozen computation exactly as a payload write would, and the value is
-  bound to the handle only after the last cache-writing block.  Handles are a
-  function of row position, so a payload UPDATE, an alias RELINK and a SHRED leave
-  every persisted tensor bit-identical while still changing the answer.  If E holds
-  the capability gate, participation and revocability stop trading off.
+* E asks whether what rides has to be the KNOWLEDGE.  Each row gets a handle derived
+  from its stable knowledge identity; the read layers inject the routing-weighted
+  handle in place, so it takes part in the frozen computation exactly as a payload
+  write would, and the value is bound to the handle only after the last cache-writing
+  block.  A handle is a function of the identity alone, so a payload UPDATE, an alias
+  RELINK and a SHRED leave every persisted tensor bit-identical while still changing
+  the answer.  If E holds the capability gate, participation and revocability stop
+  trading off.
+
+  Two corrections were made to arm E after its first run, and both are recorded
+  rather than quietly folded in.  Handles were first keyed by ROW POSITION, which is
+  a silent ABA defect: inserting or removing a row shifts every later row, so a
+  handle already in a cache would name a different pod.  They are now keyed by
+  identity.  And the boundary decode -- which row the transported handle names -- was
+  unsupervised, while every addressing slot in arms A/C/D is supervised; that first
+  run produced a boundary distribution which never concentrated, an answer almost
+  independent of the payload (updating every payload moved the logits by 0.23 while
+  shredding moved them by 9.6) and 0.0000 correct on all four held-out templates.
+  E-000085 separately establishes that the carrier itself transports fine, so that
+  failure was supervision, not transport.  `bind_supervision` now trains it the way
+  the other arms' addressing is trained.
 
 Declared by construction (pipeline rows, not claim rows): C's persisted K/V and
 every block input are bit-identical to the no-memory forward (exposure 0.0) and
@@ -204,6 +218,10 @@ def run(arm: str, seed: int, steps: int, consistency: float, alt_supervision: fl
 
     trained = E81.train_symlink_consistent(
         gk, seed, steps, consistency=consistency, alt_supervision=alt_supervision,
+        # Arm E has one addressing decision the others do not -- which row the transported handle
+        # names -- and the other arms have every addressing slot supervised. Supervising it is the
+        # fair analogue, not an advantage; see the note in the trainer.
+        bind_supervision=1.0 if cfg.reference_carrier else 0.0,
         n_groups=max(24, n_groups), verbose=True,
     )
     centre = np.asarray(trained["centre"])
