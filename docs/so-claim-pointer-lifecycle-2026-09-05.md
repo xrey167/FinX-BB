@@ -1,54 +1,51 @@
-# The claim: a storage pointer keeps its semantics through a frozen model's read
+# The claim: a learned dereference resolves a storage pointer, at a measured price
 
-**Status.** One claim, at the size the measurements support. Ten adversarial sweeps of this seam
-returned "none"; this is what the eleventh has, and it is a **measurement**, not a mechanism. Every
-mechanism in it is owned and is cited below. The ledger (`docs/so-experiment-ledger.md`, §31.51) holds
-the tables; this document holds the sentence, its evidence, its boundary and what it does not say.
-
----
+**Status: withdrawn once and rewritten, on the day it was made.** The first version of this document
+claimed seven lifecycle rows. A three-lens audit refuted five of them, found the headline price
+misdescribed, and found one row excluded by this experiment's own pre-registration. Ledger §31.53 is
+the retraction and lists every finding with its file and line. What follows is the sentence that
+survived, and it is about a third of the size of the one it replaces. The tables are ledger §31.51,
+read with the correction note at its head.
 
 ## The sentence
 
-> On a frozen GPT-2 small reading an external multi-version store in which several access keys are
-> **LINK rows pointing at one knowledge object** rather than copies of it, the pointer's semantics
-> survive the neural read at **every one of twelve phrasings** and across the store's lifecycle: an
-> aliased read returns the target's current object at ≥ 0.82, one UPDATE to the target reaches every
-> alias at ≥ 0.82, one SHRED or DELETE of the target makes every alias answer UNKNOWN at ≥ 0.995 and
-> return the deleted object at 0.0000, a blanked alias (`ON DELETE SET NULL`) answers with an entity
-> in ≤ 0.01, and a relinked alias reads its new target at ≥ 0.82 — while the reader's price for the
-> indirection, against a link-free adapter trained on the same budget and scored over the same twelve
-> phrasings, is **0.088** of reading accuracy. Worst of three seeds throughout, criteria and decision
-> rule fixed before the run.
+> On a frozen GPT-2 small reading an external store in which an access key is a **LINK row carrying
+> only another row's key**, rather than a copy of its object, a trained depth-1 dereference slot
+> resolves the pointer at all twelve phrasings of the template set: **0.8150 to 0.9400**, worst of
+> three seeds, n = 200 alias reads per phrasing per seed, so the worst cell's 95% Clopper–Pearson
+> interval is 0.754 to 0.866. Reading through the pointer costs **the same adapter 0.088** of accuracy
+> against reading the same keys as duplicated copies, and 0.046 and 0.056 on the other two seeds.
 
-Two facts make the sentence measurable rather than assumed, and both could have come out otherwise:
+Two things make it a measurement rather than a definition:
 
-- **It is a property of the read, not of the store.** The store resolves an alias by construction; a
-  frozen 124M-parameter language model reading a routed memory does not have to. On the same
-  checkpoints read with the subject at token position 0, the identical battery collapses to 0.29–0.53
-  direct and 0.30–0.50 through an alias. The pointer works **once the prompt's first position is
-  occupied**, by a single space at inference with no weight changed, or by training with a BOS.
-- **The reverse control fires.** The BOS-trained adapter, read without its BOS, answers a
-  subject-initial alias at 0.0050–0.0100 while its subject-medial ones stand at 0.9150–0.9550.
+- **The store does not resolve it.** `MVCCStore.bank()` exports an alias row carrying the target's
+  key and a constant placeholder in place of an object, and says so at `so/mvcc.py:522-525`: *"A link
+  row carries the TARGET'S KEY, not its payload and not its state: whether that key is held by a
+  signed, active, existing cell is exactly what the model has to discover."* The frozen model must
+  route to the alias, read out the key, re-query the key table through its dereference slot
+  (`so/llm_adapter.py:262-285`), and read the target's value.
+- **It fails when the instrument is wrong.** The identical read on the recorded checkpoints, with the
+  subject on GPT-2's attention sink at prompt position 0, gives 0.30 to 0.50. Occupying position 0
+  with a single space, no weight changed, restores it.
 
 ---
 
 ## Evidence
 
-| row | worst seed | where | the control that could have failed |
+| row | worst seed | 95% interval | status |
 |---|---|---|---|
-| aliased read, all 12 phrasings | 0.8150 – 0.9400 | E-000052 | the same read at position 0: 0.30 – 0.50 |
-| one UPDATE reaches every alias | 0.8200 – 0.9550 | E-000052 | the duplication arm, 0.0000 — **store arithmetic, a baseline and not evidence** |
-| one SHRED → every alias UNKNOWN | 0.9950 – 1.0000 | E-000052 | the alias must still be *addressable*: it is, and it reads UNKNOWN rather than nothing |
-| one DELETE → every alias UNKNOWN | 0.9950 – 1.0000 | E-000052 | — |
-| SHRED/DELETE → the deleted object | 0.0000 at every phrasing | E-000052 | the object is a random entity the frozen model has no prior on |
-| BLANK → some entity (the safety row) | 0.0000 (11 of 12), 0.0100 at t9 | E-000052 | it failed at 0.175 on the sink-reading substrate (§31.45) |
-| BLANK → UNKNOWN | 0.9900 – 1.0000 | E-000052 | — |
-| RELINK → the new target | 0.8200 – 0.9400 | E-000052 | — |
-| price of the pointer, all phrasings | **0.0879** (bar 0.10) | E-000052 | E-000025's 0.0954 did not transfer; the bar was set before the substrate existed |
-| price of link training | 0.0054 (bar 0.25) | E-000052 | — |
-| reverse control, alias without the BOS | 0.0050 – 0.0100 initial; 0.9150 – 0.9550 medial | E-000052 | the arm exists to make the finding fail if position 0 is not the cause |
-| the same battery, **no training at all**, one space at inference | direct ≥ 0.9433, alias ≥ 0.8600, UPDATE reach ≥ 0.8500 at five phrasings | E-000050-A | bare: 0.2933 / 0.3000 / 0.2950 at the worst phrasing |
-| the synthetic precedent | update reach 1.0000 vs 0.0000 duplicated; object recoverable by probe after one SHRED 0.7% vs 87.3% | E-000015 | a 2.5M model trained from scratch — the claim is that this survives to a frozen pretrained one |
+| aliased read, all twelve phrasings | 0.8150 – 0.9400 | 0.754 – 0.866 at the floor | **the claim** |
+| the same read with the subject at position 0 | 0.30 – 0.50 | — | **the control that could have failed** |
+| cost of sharing, same adapter, alias against duplicate | 0.0879 (0.0462, 0.0563 on the other seeds) | — | **the claim** |
+| one UPDATE reaches every alias | 0.8200 – 0.9550 | — | demoted: the aliased read re-run, r = 0.910 against it |
+| RELINK reads the new target | 0.8200 – 0.9400 | — | demoted: r = 0.980 against the aliased read |
+| SHRED or DELETE leaves every alias UNKNOWN | 0.9950 – 1.0000 | — | demoted: forced by the exporter and the gate; passes at 0.95+ where the reader reads at 0.30 |
+| the deleted object returns | 0.0000 | — | demoted: cannot fail, and the pre-registration excludes such rows |
+| BLANK answers with an entity | 0.0100 at t9 | 0.001 – 0.036 | reported, not claimed: the rule gates it on a neighbour row that failed at 0.79 against 0.80 |
+| cost of link training, against the link-free adapter | 0.0054 | — | demoted: cannot fail, 46× headroom |
+
+The record's own verdict on the battery is `criteria.claim_supported = False`: thirteen of fourteen
+pre-registered criteria pass, and one fails.
 
 ### Why the update row is a property of the read, not of the store
 
@@ -97,10 +94,15 @@ Records: `so/results/e000052_symlink_bos_battery.{json,md}`,
 - **The composition of a store-side and a reader-side guarantee** is Garg, Goldwasser and Vasudevan
   (Eurocrypt 2020), generalised by Godin and Vasudevan (2022) and Cohen et al. (CCS 2023).
 
-**What is new is the result sentence**: no published measurement reports, for an external memory read
-by a frozen language model, that a *storage pointer's* semantics — read-through, update-reach,
-delete-propagation, set-null safety, relink — hold across every phrasing of a query set, with the
-reader's price for the indirection measured against a link-free control.
+**What is new is a narrower result sentence**: no published measurement reports, for an external
+memory read by a frozen language model, the resolution rate of a *storage pointer* followed inside
+the computation across every phrasing of a query set, with the cost of the indirection measured
+against the same reader reading copies. Raeesi and Roed already measure delete-propagation over alias
+closures at far larger scale (12,228 deletions, six prompt formulations) on independent triplets, and
+RippleEdits already owns "one edit must reach every alias" at the parametric tier; those conjuncts are
+theirs, which is why they are demoted above. And §9's future work names a *test* this battery does not
+run: re-running their audit on the modified database and checking whether the retrieval-artifact rate
+falls. This executes their design, not their test.
 
 ---
 

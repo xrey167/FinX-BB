@@ -3805,7 +3805,11 @@ alias). Thirteen of fourteen pre-registered criteria pass.
 | **t10 medial, held out** | 0.9967 | 0.9150 | 0.9950 | 0.9300 | 1.0000 | 1.0000 | 0.0000 | 0.9200 | 0.9550 |
 | **t11 initial, held out** | 0.9967 | 0.9250 | 0.9950 | 0.9400 | 1.0000 | 1.0000 | 0.0000 | 0.9300 | 0.0100 |
 
-Worst seed everywhere; n = 200 alias reads per template per seed, so the 0.8150 worst cell carries a
+[Corrected, §31.53: the record's own verdict is `criteria.claim_supported = False`; the SHRED, DELETE,
+deleted-object and BLANK-UNKNOWN rows below are demoted (forced by the exporter and the gate, or
+unfailable); the price is a within-reader contrast and not a link-free one; and the no-BOS column
+prints the most favourable seed at the seven subject-medial templates.] Worst seed for the C arm;
+n = 200 alias reads per template per seed, so the 0.8150 worst cell carries a
 95% Clopper-Pearson interval of 0.754 to 0.866, and eight of the twelve templates are trained forms
 while t10 is the trained t0 under a fixed prefix (verified: `TEMPLATES12[0][10] == E39.PREFIX +
 TEMPLATES12[0][0]`), leaving three genuinely novel phrasings. The reader's **price for the pointer**, against a link-free adapter trained on
@@ -3886,7 +3890,7 @@ landed. On the corrected substrate the SET NULL row reads **0.0000** at eleven o
 (§31.51). The failure was the attention sink, not the operation, so the paper is not carried by it;
 what carries it is the positive battery and its price.
 
-**The claim, made at last and at its size.** `docs/so-claim-pointer-lifecycle-2026-09-05.md`. On a
+**The claim, made at last and at its size.** [Withdrawn to a third of this size six hours later; §31.53 is the retraction and holds the surviving sentence.] `docs/so-claim-pointer-lifecycle-2026-09-05.md`. On a
 frozen GPT-2 small reading an external multi-version store whose access keys are LINK rows pointing at
 one object, the pointer's semantics survive the neural read at every one of twelve phrasings — aliased
 read ≥ 0.82, one UPDATE reaching every alias ≥ 0.82, one SHRED or DELETE leaving every alias UNKNOWN
@@ -3910,6 +3914,83 @@ entities, three seeds. And J space, closed on all three readings (§31.42).
 
 Eleven retractions precede this. It is the first sentence in the programme that survived a sweep
 designed to kill it, and it survived by being smaller than every sentence that came before.
+
+### 31.53 Twelfth retraction, and it is this morning's claim: five of its seven rows do not survive their own audit (2026-09-05)
+
+§31.52 made this programme's first claim. A three-lens audit was then run against it with the same
+rules everything else here gets, and two of the three lenses refuted it. Every finding below was
+re-verified by hand against the record or the code before being written down. The claim is withdrawn
+to the sentence that survives, and the claim document is rewritten rather than patched.
+
+**1. The price was described wrongly, and it is the headline number.** `cost_of_sharing` is
+`dup_mean − alias_mean` with **both arms scored by the same link adapter** on two stores
+(`e000052_symlink_bos_battery.py:130-141`), and E-000025's own docstring says so: *"`dup` minus
+`alias` on the same adapter is the cost of sharing."* The claim called 0.0879 a price "against a
+link-free adapter trained on the same budget". That is the other number, `cost_of_link_training` =
+0.0054, and it is a criterion that cannot fail: both arms read the link-free store at ceiling
+(0.9914 against 0.9938) with 46× headroom. The honest statement is a **within-reader contrast**:
+reading through a pointer costs this adapter 0.088 against reading the same keys as duplicated
+copies, and 0.046 and 0.056 on the other two seeds.
+
+**2. UPDATE-reach and RELINK measure the aliased read.** The alias row's exported bytes really are
+unchanged by an update to its target (§31.51's verification stands, `so/mvcc.py:522-525`). But the
+reader is stateless: `forward` recomputes `encode_bank` on every call (`so/llm_adapter.py:329-333`)
+and the battery rebuilds the bank from the store at every read
+(`e000020_symlink_gpt2.py:186-190`), so the post-UPDATE bank is structurally identical to a bank in
+which the target had always held the new object. There is no cache for an update to break. The
+paired numbers say it: over 36 cells, update minus alias has mean +0.012 and r = 0.910; relink minus
+alias has mean −0.0001, |Δ| ≤ 0.025 everywhere, r = 0.980. Both rows are the aliased read, measured
+again.
+
+**3. SHRED and DELETE are forced before the pointer is followed.** `shred` replaces the target row's
+marker only; `encode_bank` then computes `values = payload·g + unk·(1−g)` with the gate closed, so
+**the shredded row's exported value is already the UNKNOWN direction** when the dereference arrives.
+`bank()` does not export deleted cells at all. The decisive evidence is in this programme's own
+record: both rows sit at 0.95–0.995 on the bare recorded checkpoints, where the aliased read is
+0.30–0.50 — they pass while the reader cannot read.
+
+**4. "The deleted object returns at 0.0000" is a criterion that cannot fail**, and E-000052's own
+pre-registration says so: it excludes rows a routing miss would pass for free
+(`e000052_symlink_bos_battery.py:22-24`). The claim table re-imported exactly such a row. This is
+§31.33's and §31.44's error, committed a third time, by me, today. `BLANK → UNKNOWN` is likewise the
+arithmetic complement of `BLANK → some entity` and is one row, not two.
+
+**5. The SET NULL row is gated out by the rule fixed before the run.** That rule reads the wrong-entity
+rate only when its neighbour rows hold; `sibling_readable` came in at 0.7900 against its 0.80 bar, so
+under my own pre-registration the row is **not readable** and cannot appear in a claim. Its value,
+0.0100 at t9 with a 95% interval of 0.001 to 0.036, is reported.
+
+**6. Two presentation errors.** The record's own verdict is `criteria.claim_supported = False`, and
+§31.51 framed thirteen-of-fourteen as clean without quoting it. And the battery's no-BOS column
+applies one "lower is better" convention to a column whose desired direction flips: for the
+subject-initial templates the printed value is conservative, for the subject-medial ones it is the
+most favourable seed (t1 prints 0.9100 where the worst seed is 0.7450). The pre-registered criteria
+are unaffected — they take the max for the initial bar and the min for the medial one — but the
+display is corrected in the script and re-stated here.
+
+**7. The prior-art boundary was too generous to itself.** Raeesi and Roed (arXiv:2607.00605) already
+measure the delete half at far larger scale: 12,228 alias-closure deletions, 13 databases, four
+topologies including ALIAS, six prompt formulations, parametric leakage 0.11%. RippleEdits owns "one
+edit must reach every alias" as an evaluation axis, at the parametric tier. And §9's future-work
+sentence names a *test* — re-running their audit on the modified database and measuring whether the
+retrieval-artifact rate falls — which this battery does not perform. The claim executes their design,
+not their test.
+
+**What survives, and it is one sentence.** *On a frozen GPT-2 small reading an external store in
+which an access key is a LINK row carrying only another row's key rather than a copy of its object, a
+trained depth-1 dereference slot resolves the pointer at all twelve phrasings of the template set:
+0.8150 to 0.9400, worst of three seeds, n = 200 alias reads per phrasing per seed, so the worst cell's
+95% Clopper–Pearson interval is 0.754 to 0.866 — against 0.30 to 0.50 for the identical read on the
+recorded checkpoints when the subject occupies the prompt's position 0 — and reading through the
+pointer costs the same adapter 0.088 of accuracy against reading the same keys as duplicated copies
+(0.046 and 0.056 on the other two seeds).* Everything else in the morning's sentence is demoted to a
+reported row.
+
+That is smaller than what §31.52 announced, and it is what the measurements support. The programme's
+first claim lasted six hours before its own audit cut it to a third of its size; the claim document
+`docs/so-claim-pointer-lifecycle-2026-09-05.md` is rewritten to the surviving sentence, §31.51 and
+§31.52 carry correction notes at the site of every wrong number, and the pull request no longer leads
+with the withdrawn version.
 
 ### 31.8 Boundary
 

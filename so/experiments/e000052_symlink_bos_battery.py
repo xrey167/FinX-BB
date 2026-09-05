@@ -294,12 +294,20 @@ def main(argv: Optional[List[str]] = None) -> Dict[str, Any]:
                      w(f"C/t{t}/direct"), w(f"C/t{t}/alias_direct"), w(f"C/t{t}/dup_direct"),
                      w(f"C/t{t}/shared_update/alias_new_object"), w(f"C/t{t}/shred_target/alias_unknown"),
                      w(f"C/t{t}/delete_target/alias_unknown"), w(f"C/t{t}/blank/alias_wrong_entity", lower=True),
-                     w(f"C/t{t}/relink/alias_direct"), w(f"D/t{t}/alias_direct", lower=True)])
+                     w(f"C/t{t}/relink/alias_direct"),
+                     # The reverse control's desired direction FLIPS with the template: low is the
+                     # control firing at a subject-INITIAL template, high is it holding at a MEDIAL
+                     # one. A single `lower=True` printed the most favourable seed for the medial
+                     # rows (t1: 0.9100 where the worst seed is 0.7450). Ledger 31.53.
+                     w(f"D/t{t}/alias_direct", lower=(t in per[0]["subject_initial_templates"]))])
     md = [f"# E-000052 — the pointer battery on the BOS-trained symlink adapter, narrowed", "",
           f"Seeds {args.seeds}, templates {args.templates}, link adapter `{link_name}`, link-free `{free_name}`"
           + (" — SMOKE ON THE RECORDED CHECKPOINTS AT REDUCED SIZES, not a record" if args.smoke_on_recorded else "")
           + ". Worst seed throughout. Arm C reads the BOS-trained checkpoint with a BOS; arm D reads it without "
-          "(the reverse control); arm P is E-000025's price against the BOS-trained link-free adapter.", "",
+          "(the reverse control); arm P is E-000025's price. NOTE (31.53): `cost_of_sharing` is dup minus "
+          "alias on the SAME adapter, a within-reader contrast; only `cost_of_link_training` involves "
+          "the link-free adapter. The D column takes the worst seed in the direction the control is "
+          "supposed to move, which is low at subject-initial templates and high at medial ones.", "",
           ledger.table(["template", "direct", "alias", "dup", "UPDATE reaches alias", "SHRED → unknown",
                         "DELETE → unknown", "BLANK → some entity", "RELINK reads", "D: alias, no BOS"], rows), "",
           ledger.table(["price (P), BOS regime", "train", "held out", "all"],
