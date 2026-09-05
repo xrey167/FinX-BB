@@ -1,0 +1,46 @@
+name: E000070 CAVI live symlink boundary
+
+on:
+  push:
+    branches: [research/e000051-clean-bystanders]
+    paths:
+      - 'so/cavi.py'
+      - 'so/tests/test_cavi.py'
+      - 'so/experiments/e000070_cavi_live_symlink_boundary.py'
+      - 'so/llm_adapter.py'
+      - 'so/mvcc.py'
+      - 'so/data.py'
+      - 'so/experiments/e000015_symlink_cells.py'
+      - 'so/experiments/e000020_symlink_gpt2.py'
+      - '.github/workflows/e000070-cavi-live-symlink.yml'
+  workflow_dispatch:
+
+jobs:
+  cavi-live-symlink:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+          cache-dependency-path: so/requirements.txt
+      - name: Install CPU dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install torch --index-url https://download.pytorch.org/whl/cpu
+          python -m pip install -r so/requirements.txt
+      - name: CAVI unit semantics
+        run: python -m pytest so/tests/test_cavi.py -q
+      - name: E-000070 real symlink consumption attack
+        env:
+          SO_THREADS: '2'
+        run: |
+          mkdir -p ci-e70
+          python -m so.experiments.e000070_cavi_live_symlink_boundary --seeds 0 --steps 1200 --groups 16 --template 9 --threads 2 --results-dir ci-e70
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: e000070-cavi-live-symlink
+          path: ci-e70/
