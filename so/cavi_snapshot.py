@@ -50,11 +50,36 @@ class ForwardSnapshotConsumptionGuard:
         blocks = transformer_blocks(adapter.lm)
         self._first = reads[0]
         self._last = reads[-1]
-        self._pre_handle = blocks[self._first].register_forward_pre_hook(self._begin)
+        # The terminal block is never entered when an earlier block raises.
+        # Therefore its always_call hook is not a request-finally boundary.
+        # Register a separate outer cleanup hook, including for the fast-head
+        # adapter which calls lm.transformer rather than lm.forward.
+        root = adapter if isinstance(adapter, torch.nn.Module) else adapter.lm
+        self._handles = []
         try:
-            self._post_handle = blocks[self._last].register_forward_hook(self._end, always_call=True)
-        except TypeError:  # older torch fallback
-            self._post_handle = blocks[self._last].register_forward_hook(self._end)
+            self._handles.append(blocks[self._first].register_forward_pre_hook(self._begin))
+            self._handles.append(blocks[self._last].register_forward_hook(self._end, always_call=True))
+            self._handles.append(root.register_forward_pre_hook(self._root_begin, prepend=True))
+            self._handles.append(root.register_forward_hook(self._root_end, always_call=True))
+        except Exception:
+            for handle in self._handles:
+                handle.remove()
+            raise
+
+    def _root_begin(self, module, inputs):
+        self._tls.depth = getattr(self._tls, "depth", 0) + 1
+
+    def _root_end(self, module, inputs, output):
+        depth = max(0, getattr(self._tls, "depth", 1) - 1)
+        self._tls.depth = depth
+        # A rejected nested forward must not release an outer forward's lock.
+        if depth == 0:
+            self._release()
+
+    def _release(self):
+        if getattr(self._tls, "held", False):
+            self._tls.held = False
+            self.lock.release()
 
     def _begin(self, module, inputs):
         ctx = self.adapter._ctx
@@ -87,22 +112,18 @@ class ForwardSnapshotConsumptionGuard:
             raise
 
     def _end(self, module, inputs, output):
-        if getattr(self._tls, "held", False):
-            self._tls.held = False
-            self.lock.release()
+        self._release()
         return None
 
     def close(self) -> None:
-        self._pre_handle.remove()
-        self._post_handle.remove()
+        """Detach on the installing thread with no forwards concurrently in flight."""
+        self._release()
+        for handle in self._handles:
+            handle.remove()
+        self._handles.clear()
 
     def __enter__(self):
         return self
 
     def __exit__(self, exc_type, exc, tb):
-        # If the core raises before the final hook on an older torch build that
-        # lacks always_call=True, fail safe by releasing the reference lock here.
-        if getattr(self._tls, "held", False):
-            self._tls.held = False
-            self.lock.release()
         self.close()

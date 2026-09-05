@@ -30,7 +30,9 @@ can be copied into the adapter either.
 
 from __future__ import annotations
 
+from contextlib import contextmanager
 from dataclasses import asdict, dataclass
+import threading
 from typing import Dict, List, Optional, Sequence, Tuple
 
 import numpy as np
@@ -160,9 +162,52 @@ class KnowledgeAdapterLM(nn.Module):
             # "nothing found" -> no injection at all (fixed, not learnable: no constant shortcut can be learned)
             self.null_value = nn.Parameter(torch.zeros(len(cfg.read_layers), d), requires_grad=False)
         self.scale = nn.Parameter(torch.tensor(1.0))
+        self._request_state = threading.local()
         self._ctx: Optional[Dict] = None
         blocks = transformer_blocks(lm)
         self._hooks = [blocks[l].register_forward_hook(self._make_hook(i, l)) for i, l in enumerate(cfg.read_layers)]
+
+    @property
+    def _ctx(self):
+        """Per-thread inference state; authority locking alone cannot isolate requests."""
+        return getattr(self._request_state, "ctx", None)
+
+    @_ctx.setter
+    def _ctx(self, value):
+        self._request_state.ctx = value
+
+    @property
+    def last_query(self):
+        return getattr(self._request_state, "last_query", None)
+
+    @last_query.setter
+    def last_query(self, value):
+        self._request_state.last_query = value
+
+    @contextmanager
+    def _memory_request(self, bank, last_idx, cell_mask=None):
+        """Own temporary state for one synchronous forward, including failures.
+
+        Concurrent inference assumes immutable weights/config and pre-installed
+        hooks. Concurrent training or hook installation/removal is not supported.
+        Same-thread nested forwards are rejected, not silently allowed to replace
+        the outer request's memory context.
+        """
+        if getattr(self._request_state, "busy", False):
+            raise RuntimeError("nested adapter forward on the same thread is not supported")
+        self._request_state.busy = True
+        self._ctx = None
+        self.last_query = None
+        try:
+            if bank is not None:
+                enc = self.encode_bank(bank)
+                allowed = enc["active"] if cell_mask is None else enc["active"] & cell_mask
+                self._ctx = {"keys": enc["keys"], "values": enc["values"], "allowed": allowed,
+                             "last_idx": last_idx, "routing": []}
+            yield self._ctx
+        finally:
+            self._ctx = None
+            self._request_state.busy = False
 
     @property
     def w_in(self) -> torch.Tensor:
@@ -329,21 +374,13 @@ class KnowledgeAdapterLM(nn.Module):
     def forward(self, bank: Optional[Dict[str, torch.Tensor]], input_ids: torch.Tensor, attention_mask: torch.Tensor,
                 last_idx: torch.Tensor, cell_mask: Optional[torch.Tensor] = None):
         """Returns (candidate logits (B, n_entities+1), full-vocab logits at the last token, routing (B, R, C+1), hidden (B, d))."""
-        if bank is not None:
-            enc = self.encode_bank(bank)
-            allowed = enc["active"] if cell_mask is None else enc["active"] & cell_mask
-            self._ctx = {"keys": enc["keys"], "values": enc["values"], "allowed": allowed, "last_idx": last_idx, "routing": []}
-        else:
-            self._ctx = None
-        out = self.lm(input_ids=input_ids, attention_mask=attention_mask, output_hidden_states=True)
-        ar = torch.arange(input_ids.shape[0], device=input_ids.device)
-        full = out.logits[ar, last_idx]                                    # (B, V)
-        hidden = out.hidden_states[-1][ar, last_idx]
-        cand = full[:, self.candidate_ids]
-        routing = torch.stack(self._ctx["routing"], dim=1) if self._ctx is not None and self._ctx["routing"] else None
-        # (B, len(read_layers), d_key), read-layer order. Kept as an attribute rather than a fifth
-        # return value so that every existing call site keeps its four-tuple.
-        self.last_query = (torch.stack(self._ctx["query"], dim=1)
-                           if self._ctx is not None and self._ctx.get("query") else None)
-        self._ctx = None
-        return cand, full, routing, hidden
+        with self._memory_request(bank, last_idx, cell_mask) as ctx:
+            out = self.lm(input_ids=input_ids, attention_mask=attention_mask, output_hidden_states=True)
+            ar = torch.arange(input_ids.shape[0], device=input_ids.device)
+            full = out.logits[ar, last_idx]
+            hidden = out.hidden_states[-1][ar, last_idx]
+            cand = full[:, self.candidate_ids]
+            routing = torch.stack(ctx["routing"], dim=1) if ctx is not None and ctx["routing"] else None
+            # Kept as a per-request attribute so existing four-tuple call sites still work.
+            self.last_query = torch.stack(ctx["query"], dim=1) if ctx is not None and ctx.get("query") else None
+            return cand, full, routing, hidden
