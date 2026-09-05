@@ -6,6 +6,9 @@ on:
       - research/e000051-clean-bystanders
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
   verify:
     runs-on: ubuntu-latest
@@ -41,9 +44,38 @@ jobs:
         run: |
           mkdir -p ci-results
           python -m so.experiments.e000051b_clean_bystanders --quick --readers syn --seeds 0 --n-pods 6 --threads 2 --results-dir ci-results
+      - name: E-000051-B full synthetic correction
+        env:
+          SO_THREADS: '2'
+        run: |
+          mkdir -p correction-results
+          python -m so.experiments.e000051b_clean_bystanders --readers syn --seeds 0 1 2 --n-pods 100 --threads 2 --results-dir correction-results
+      - name: Preserve correction record on research branch
+        if: success()
+        run: |
+          mkdir -p so/results/corrections
+          cp correction-results/e000051_residue_reader-syn.json so/results/corrections/e000051b_clean_bystanders-syn.json
+          cp correction-results/e000051_residue_reader-syn.md so/results/corrections/e000051b_clean_bystanders-syn.md
+          cat > so/results/corrections/e000051b_clean_bystanders-MANIFEST.md <<EOF
+          # E-000051-B correction manifest
+
+          Contamination-controlled re-run of E-000051 synthetic reader. The historical E-000051 files are intentionally unchanged.
+
+          Correction: class-(ii) alias bystanders are selected per target pod and asserted disjoint from the target pod. All banks, reader, feature extraction, AUC computation, thresholds and decision rules remain E-000051's.
+
+          Workflow source commit: ${GITHUB_SHA}
+          Workflow run: ${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}
+          EOF
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add so/results/corrections/
+          git commit -m 'results: record E-000051-B clean-bystander correction' || exit 0
+          git push
       - uses: actions/upload-artifact@v4
         if: always()
         with:
           name: e000051-clean-results
-          path: ci-results/
+          path: |
+            ci-results/
+            correction-results/
           if-no-files-found: warn
