@@ -60,7 +60,20 @@ from so.llm_adapter import AdapterConfig, transformer_blocks
 ARMS = {
     "A": dict(read_layers=(8, 10), write_layer=None),   # E-000081: address and write at (8, 10)
     "C": dict(read_layers=(8, 10), write_layer=11),     # address at (8, 10), one write after block 11
+    "D": dict(read_layers=(8, 10), write_layer=10),     # address at (8, 10), one write after block 10
 }
+
+# Arm D exists because arm C changes two things at once, and the audit of run 33970654975 said so:
+# it removes the payload from every block that could process it AND it removes the block-8 write from
+# the input of the block-10 read, so the second read's routing sees a different residual.  D holds the
+# second change fixed -- it also has no in-place write at block 8, so its block-10 read sees exactly
+# the residual C's does -- and restores exactly one block of downstream processing.  Reading C, D and A
+# together therefore separates "the frozen blocks after the write must process the payload" from "the
+# first write's feedback into the second read is what capability needs".
+#
+# The participation depth d = (n_blocks - 1) - write_layer is the size of the K/V light cone the write
+# creates, so the three arms are also the first interior points of the exposure/capability frontier:
+# C has d = 0 and exposure exactly 0.0, D has d = 1, A writes in place at 8 and 10.
 
 
 def _kv_tensors(pkv) -> List[torch.Tensor]:
@@ -167,9 +180,13 @@ def run(arm: str, seed: int, steps: int, consistency: float, alt_supervision: fl
         "heldout_full_vocab_mean_ge_095": float(np.mean(full_rates)) >= 0.95,
         "heldout_full_vocab_every_template_ge_095": float(np.min(full_rates)) >= 0.95,
     }
+    participation_depth = None if cfg.write_layer is None else (len(blocks) - 1) - int(cfg.write_layer)
     by_construction = {
-        # declared before the run: C must be exactly cache-pure, A must not be; both must be material
-        "expected_kv_exposure_zero": arm == "C",
+        # Declared before the run: only a write after the LAST block is cache-pure.  Every other
+        # placement leaves a light cone of participation_depth blocks, so its exposure must be nonzero.
+        # Both must be material.
+        "participation_depth": participation_depth,
+        "expected_kv_exposure_zero": participation_depth == 0,
         "kv_exposure_is_zero": expo["kv_maxabs"] == 0.0 and expo["block_input_maxabs"] == 0.0,
         "memory_is_material": expo["last_logit_maxabs"] > 0.0,
     }

@@ -28,6 +28,24 @@ N_ENT, UNK = 20, 5
 N_LAYER = 4
 
 
+@pytest.fixture(autouse=True)
+def _single_threaded():
+    """Every assertion here is bit-exact equality between two SEPARATELY allocated models.
+
+    Repeated forwards of one module are bit-identical at any thread count (checked), but two models
+    allocated independently can take different vectorised kernel paths under intra-op parallelism, so
+    the same arithmetic reduces in a different order and the last bits differ. That is a property of
+    the CPU kernels, not of the code path under test, and it made this file fail under load. The
+    tolerance is not relaxed: the comparisons stay exact and the thread count is pinned instead.
+    """
+    n = torch.get_num_threads()
+    torch.set_num_threads(1)
+    try:
+        yield
+    finally:
+        torch.set_num_threads(n)
+
+
 def _lm():
     cfg = transformers.GPT2Config(vocab_size=64, n_positions=16, n_embd=32, n_layer=N_LAYER, n_head=2)
     torch.manual_seed(0)
@@ -155,6 +173,31 @@ def test_deferred_and_in_place_variants_address_identically():
     assert torch.equal(ra[:, 0], rd[:, 0])
     # and the two placements are different computations, not the same one relabelled
     assert not torch.equal(fa, fd)
+
+
+def test_two_deferred_placements_see_identical_residuals_at_every_read():
+    """The confound control for E-000084 arm D.
+
+    Arm C writes after the last block, arm D after the second read's own block. Neither writes in
+    place at the first read layer, so both read layers see exactly the residual the frozen model
+    produces: the routing — the addressing decision at both slots — must be bit-identical between the
+    two placements. That is what lets arm D vary only the depth of processing after the write, while
+    arm A (in-place) differs at the second slot because its first write has already moved the residual.
+    """
+    c = _adapter(write_layer=N_LAYER - 1)
+    d = _adapter(write_layer=N_LAYER - 2)
+    a = _adapter()
+    d.load_state_dict(c.state_dict())
+    a.load_state_dict(c.state_dict())
+    bank = _bank(); ids, am, last = _prompt()
+    with torch.no_grad():
+        _, fc, rc, _ = c(bank, ids, am, last)
+        _, fd, rd, _ = d(bank, ids, am, last)
+        _, _, ra, _ = a(bank, ids, am, last)
+    assert torch.equal(rc, rd), "the two deferred placements must address identically at every slot"
+    assert torch.equal(rc[:, 0], ra[:, 0]), "the first read is upstream of every write"
+    assert not torch.equal(rc[:, 1], ra[:, 1]), "the in-place arm's second read sees its own first write"
+    assert not torch.equal(fc, fd), "different write depths are different computations"
 
 
 def test_no_memory_forward_is_untouched_by_the_write_hook():

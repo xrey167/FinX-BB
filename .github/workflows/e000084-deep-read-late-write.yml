@@ -17,11 +17,10 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - { arm: C, seed: 0 }
-          - { arm: C, seed: 1 }
-          - { arm: C, seed: 2 }
-          - { arm: A, seed: 0 }
-          - { arm: A, seed: 1 }
+          - { arm: D, seed: 0 }
+          - { arm: D, seed: 1 }
+          - { arm: D, seed: 2 }
+          - { arm: A, seed: 2 }
     env:
       SO_THREADS: '2'
       SO_BOS: '1'
