@@ -1,0 +1,58 @@
+name: E-000097A teacher identity probe
+on:
+  push:
+    branches: [research/e000097-identity-compiler]
+    paths:
+      - 'so/experiments/e000097a_teacher_identity_probe.py'
+      - '.github/workflows/e000097a-teacher-identity-probe.yml'
+      - 'docs/novelty/e000097-preregister.md'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  identity-probe:
+    strategy:
+      fail-fast: false
+      matrix:
+        seed: [0, 1, 2]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 120
+    env:
+      SO_BOS: '1'
+      OMP_NUM_THREADS: '2'
+      OPENBLAS_NUM_THREADS: '1'
+      MKL_NUM_THREADS: '1'
+      TOKENIZERS_PARALLELISM: 'false'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+          cache-dependency-path: so/requirements.txt
+      - name: Install CPU dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install torch --index-url https://download.pytorch.org/whl/cpu
+          python -m pip install -r so/requirements.txt
+      - name: Compile probe
+        run: python -m py_compile so/experiments/e000097a_teacher_identity_probe.py
+      - name: Train qualified teacher and probe immutable row identity
+        run: |
+          set -o pipefail
+          mkdir -p ci-e97a
+          python -m so.experiments.e000097a_teacher_identity_probe \
+            --seeds ${{ matrix.seed }} --steps 3000 --groups 100 --threads 2 \
+            --results-dir ci-e97a 2>&1 | tee ci-e97a/stdout-s${{ matrix.seed }}.txt
+      - name: Hash evidence
+        if: always()
+        run: |
+          sha256sum so/experiments/e000097a_teacher_identity_probe.py > ci-e97a/source-sha256-s${{ matrix.seed }}.txt
+          find ci-e97a -maxdepth 1 -name '*.json' -print0 | sort -z | xargs -0 -r sha256sum > ci-e97a/result-sha256-s${{ matrix.seed }}.txt
+          python -m pip freeze > ci-e97a/environment-s${{ matrix.seed }}.txt
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: e000097a-teacher-identity-s${{ matrix.seed }}
+          path: ci-e97a/
+          if-no-files-found: error
