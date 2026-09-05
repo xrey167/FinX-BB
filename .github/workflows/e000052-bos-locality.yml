@@ -2,6 +2,17 @@ name: E000052 BOS locality pilot
 on:
   push:
     branches: [research/e000051-clean-bystanders]
+    paths:
+      - '.github/workflows/e000052-bos-locality.yml'
+      - 'so/experiments/e000052_bos_locality.py'
+      - 'so/experiments/e000008_gpt2_adapter.py'
+      - 'so/experiments/e000017_paraphrase_gap.py'
+      - 'so/experiments/e000018_no_key_no_injection.py'
+      - 'so/llm_adapter.py'
+      - 'so/train.py'
+      - 'so/data.py'
+      - 'so/world.py'
+      - 'so/tests/**'
   workflow_dispatch:
 jobs:
   pilot:
