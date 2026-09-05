@@ -1,0 +1,44 @@
+name: E000063 workspace-pod certificate
+
+on:
+  push:
+    branches: [research/e000051-clean-bystanders]
+    paths:
+      - 'so/experiments/e000063_workspace_pod_certificate.py'
+      - 'so/experiments/e000020_symlink_gpt2.py'
+      - 'so/jlens.py'
+      - 'so/mvcc.py'
+      - '.github/workflows/e000063-workspace-pod-certificate.yml'
+  workflow_dispatch:
+
+jobs:
+  certificate:
+    strategy:
+      fail-fast: false
+      matrix:
+        seed: [0, 1]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 55
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+          cache-dependency-path: so/requirements.txt
+      - name: Install CPU dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install torch --index-url https://download.pytorch.org/whl/cpu
+          python -m pip install -r so/requirements.txt
+      - name: E-000063 composed certificate
+        env:
+          SO_THREADS: '2'
+        run: |
+          mkdir -p ci-e63
+          python -m so.experiments.e000063_workspace_pod_certificate \
+            --seed '${{ matrix.seed }}' --steps 2000 --threads 2 --n-groups 16 --results-dir ci-e63
+      - uses: actions/upload-artifact@v4
+        with:
+          name: e000063-workspace-pod-seed${{ matrix.seed }}
+          path: ci-e63/
