@@ -1,8 +1,36 @@
-# The claim: a deletion-residue detector reads the store's shape, not the model's memory
+# Not a claim: the residue floors, written up, with the external clearance they never had
 
-*2026-09-05. One claim, its evidence, and the prior art it has to survive. Every number below is
-read from a record in this repository; every external citation was fetched at the source and the
-sentence relied on is quoted.*
+*2026-09-05. This document was drafted as a novelty claim and is retained as a WRITE-UP. The finding
+is not mine and is not new to this repository: ledger §31.41 and §31.45 state it, with these numbers,
+dated before this file. What is added here is an external prior-art clearance the ledger did not do,
+a framing of the same numbers, and one experiment (E-000058) that tests a sentence §31.41 asserts and
+never measured. Every number is read from a record in this repository; every external citation was
+fetched at the source.*
+
+## Attribution first, because the claim died on it
+
+§31.41 already names both floors, gives the mechanism, states the inversion, and draws the
+methodological conclusion — verbatim:
+
+> "The reader's off-pod outputs carry the number of active rows — every row sits in every routing
+> softmax and the dereference pass-through bias is `log(n_cells)` … BLANK's 0.817 and DANGLE's 0.869
+> sit *below* the two-fresh-rows floor … a paper reporting such an AUC without the two floors would be
+> reporting the reader's arithmetic."
+
+and it already cites the adversary shape as owned by Chen et al., arXiv:2506.14003. §31.45 carries the
+GPT-2 half under the title *"both floors rise, the residue rises with them"*. E-000056's own lesson (iv)
+— *check the repository's ledger before claiming, it has usually already said it* — fires here exactly
+as it fired on C2. **This is a restatement, not a discovery, and it is recorded as one.**
+
+What is genuinely added, and it is modest:
+
+1. an external prior-art clearance the ledger did not run — Raeesi & Roed (arXiv:2607.00605) fetched
+   and read at the source, its arms established as `FULL`/`DEL-ON`/`DEL-OFF` with no record-count arm,
+   no insertion-order arm and no null distribution, which clears the nearest neighbour;
+2. the per-seed reading below, which shows the score is uncorrelated with behavioural change;
+3. **E-000058**, which measures the one sentence §31.41 asserts without measuring: that the row-count
+   floor is *"a property of dense routing and not of history"*. That attribution has never been tested,
+   and it is the only unowned thing in this document.
 
 ## The measurement
 
@@ -149,7 +177,9 @@ A residue AUC below its own cardinality null is not evidence of residue.
 
 ## Status, and what would kill it
 
-**Status: a candidate claim resting on recorded measurements, not yet a novelty claim.** The GPT-2
+**Status: NOT a novelty claim. A write-up of ledger §31.41 and §31.45, killed as a claim by those
+sections on the day it was drafted, and retained because the write-up and the external clearance are
+still useful and because E-000058 came out of it.** The GPT-2
 numbers are E-000051's record; the content-marker repair is E-000053's, and E-000053 ran on the
 **synthetic** reader only.
 
