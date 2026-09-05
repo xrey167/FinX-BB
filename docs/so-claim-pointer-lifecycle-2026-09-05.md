@@ -50,6 +50,24 @@ Two facts make the sentence measurable rather than assumed, and both could have 
 | the same battery, **no training at all**, one space at inference | direct ≥ 0.9433, alias ≥ 0.8600, UPDATE reach ≥ 0.8500 at five phrasings | E-000050-A | bare: 0.2933 / 0.3000 / 0.2950 at the worst phrasing |
 | the synthetic precedent | update reach 1.0000 vs 0.0000 duplicated; object recoverable by probe after one SHRED 0.7% vs 87.3% | E-000015 | a 2.5M model trained from scratch — the claim is that this survives to a frozen pretrained one |
 
+### Why the update row is a property of the read, not of the store
+
+The obvious objection to the load-bearing row is that the store resolves the alias and the model only
+reads the answer. It does not. `MVCCStore.bank()` exports an alias row carrying **the target's key**,
+never the target's object, and the code says so at `so/mvcc.py:522-525`:
+
+> *A link row carries the TARGET'S KEY, not its payload and not its state: whether that key is held by
+> a signed, active, existing cell is exactly what the model has to discover.* `obj` *is a constant
+> placeholder for link rows (never the target's object).*
+
+So after one UPDATE to the target, **the alias row's exported bytes do not change at all**. Only the
+target row's payload does. For the alias to answer with the new object the frozen model must route to
+the alias row, read out the target's key, re-query the key table through its dereference slot
+(`so/llm_adapter.py:262-285`), and read the target's current value. That chain is learned, and it
+fails: at 0.2950 to 0.5350 with the subject on the attention sink, and at 0.8850 against a 0.90 bar in
+the earlier battery (E-000026). The duplication arm at 0.0000 is the store's arithmetic; the reach at
+0.82 to 0.955 is not.
+
 Records: `so/results/e000052_symlink_bos_battery.{json,md}`,
 `so/results/e000050a_symlink_prefix.{json,md}`, `so/results/e000050a_bos_artefact.{json,md}`,
 `so/results/e000015_symlink_cells.md`, `so/results/e000026_lifecycle.md`.
