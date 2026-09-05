@@ -1,0 +1,47 @@
+name: E000079 retained-checkpoint joint contract
+on:
+  push:
+    branches: [research/e000079-joint-contract]
+    paths: ['.github/workflows/e000079-joint-contract.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  joint:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 90
+    strategy:
+      fail-fast: false
+      matrix:
+        seed: [0, 1, 2]
+    env:
+      SO_BOS: '1'
+      SO_THREADS: '2'
+      OMP_NUM_THREADS: '2'
+      MKL_NUM_THREADS: '2'
+      OPENBLAS_NUM_THREADS: '1'
+      HF_HUB_DISABLE_XET: '1'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install CPU dependencies
+        run: |
+          python -m pip install torch --index-url https://download.pytorch.org/whl/cpu
+          python -m pip install 'transformers==5.16.1' numpy pytest
+          python -m pip freeze > environment.txt
+      - name: Numerical head and authority regression tests
+        run: python -m pytest so/tests/test_cavi.py so/tests/test_cavi_snapshot.py so/tests/test_last_token_adapter.py -q
+      - name: Train once, retain checkpoint, audit joint behavior
+        run: |
+          python -m so.experiments.e000079_joint_contract --seed ${{ matrix.seed }} --steps 3000 --groups 100 --threads 2 --fast-head --model-name openai-community/gpt2 --results-dir ci-e79
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: e000079-joint-s${{ matrix.seed }}
+          path: |
+            ci-e79/
+            environment.txt
+          retention-days: 30
+          if-no-files-found: error
