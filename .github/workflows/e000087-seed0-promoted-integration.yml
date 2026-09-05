@@ -4,6 +4,8 @@ on:
   push:
     branches: [research/e000051-clean-bystanders]
     paths:
+      - 'so/experiments/e000084_consistent_reader_cavi.py'
+      - 'so/experiments/e000085_consistent_reader_derived_state.py'
       - '.github/workflows/e000087-seed0-promoted-integration.yml'
   workflow_dispatch:
 
