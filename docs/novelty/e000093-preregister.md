@@ -14,24 +14,24 @@ Use the E-000081 strong real-symlink reader family with BOS, strict marker contr
 
 ## Intervention-pair training objective
 
-During the full-loss phase, sample a small paired sub-batch of one-hop queries A. For each query, clone the current bank and mutate the payload of one active canonical Pod B chosen so that B is not the query target and not in the reference resolution path for A. Run the same textual query against the original and counterfactual bank.
+During the full-loss phase, on every step select one active non-link canonical row B and up to **8** one-hop query rows A whose supervised resolve/dereference targets do not include B. Clone the encoded bank tensors and change only B's object payload to a deterministic different entity `(old + 17) mod n_entities`. Run the identical selected text rows against original and counterfactual banks.
 
-Add a locality loss over quantities that should be invariant to B:
+Add
 
-1. routing distribution at every resolve/dereference slot;
-2. final candidate-logit distribution;
-3. final hidden representation.
+`L_local = KLsym(candidate) + KLsym(routing) + NMSE(hidden)`
 
-Use symmetric KL for routing/candidate distributions and normalized MSE for the final hidden state. The counterfactual arm is not given a changed answer target because its mutation is reference-irrelevant to A.
+where symmetric KL is computed on normalized candidate or routing distributions, and `NMSE(hidden)=MSE(h,h_cf)/(mean(stopgrad(h)^2)+1e-6)`.
+
+The total locality-arm loss is the historical E-000081 loss plus **0.25 * L_local**. The locality term is disabled during the routing-only warmup. The counterfactual arm receives no changed answer target because B is excluded from every selected A dependency path.
 
 This objective is explicitly different from paraphrase consistency: the text is held fixed and the *knowledge state* is intervened on.
 
 ## Arms
 
-- control: historical E-000081 objective;
-- locality: same objective + mutation-locality loss.
+- control: historical E-000081 objective, consistency=0.15, alt_supervision=0.5;
+- locality: identical objective and hyperparameters + locality_weight=0.25, locality_rows<=8.
 
-No thresholds may be changed after results are observed.
+Both arms use 3000 steps unless the command line explicitly requests a different preregistered smoke-test length; result promotion requires the 3000-step run. No thresholds may be changed after results are observed.
 
 ## Primary capability gate
 
