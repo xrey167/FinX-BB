@@ -47,8 +47,13 @@ a name that is not a value, and a name is enough to ride.
 
 `AdapterConfig.reference_carrier`, with `write_layer` set to the last block.
 
-1. **Handles.** Every bank row has a fixed vector drawn once from a fixed generator, held as a buffer and
-   never trained. A handle is a function of row position only: no payload, no link target, no marker.
+1. **Handles.** A handle is a deterministic function of the row's **stable knowledge identity** — the
+   store's `kid`, mapped through a fixed untrained basis — and of nothing else: no payload, no link
+   target, no marker, and **not the row's position**. Position keying was the first implementation and
+   it was wrong: inserting, removing or compacting a row shifts every later row, so a handle already
+   written into a cache would come to name a different pod and bind to its value, undetected. That is
+   the ABA hazard the CAVI-N work exists to catch, reintroduced one layer down. Keyed by identity, a
+   cached handle either still names its pod or names nothing that is present.
 2. **The carrier participates.** At each read layer the routing distribution over cell keys selects a
    handle mixture, injected in place, RMS-matched, exactly where a payload write would go. It therefore
    takes part in the frozen computation and is written into every downstream K/V tensor.
@@ -61,14 +66,31 @@ a name that is not a value, and a name is enough to ride.
 5. **Therefore** the persisted state depends on the prompt and on which rows exist under which
    (subject, relation) keys, and on nothing else that a lifecycle operation changes.
 
+### Two invariances, and they are different in kind
+
+This distinction matters more than it looks, and claiming the weaker one as the stronger would be false.
+
+| Change | Effect on every persisted tensor | Why |
+|---|---|---|
+| payload UPDATE, alias RELINK, marker SHRED | **exactly 0.0** | the handles and the routing are literally unchanged tensors |
+| reordering, compacting or growing the store | **7.5e-08** (float32 rounding; bounded at 1e-6 in the test) | permuting rows reduces the same softmax and mixture sums in a different order |
+| DELETE of an identity | affects only references to **that** identity | other identities keep exactly the handles they had, which is what identity keying buys |
+
+The first row is the claim. The second is a robustness property and is reported as numerical, not
+bit-exact. The third answers the obvious objection that deletion changes the namespace and so must
+invalidate everything: under position keying it would have; under identity keying it does not.
+
 ### By construction, and pinned by tests rather than asserted
 
 These follow from the mechanism and are declared as pipeline rows, not claim rows
-(`so/tests/test_write_layer.py`, 16 tests):
+(`so/tests/test_write_layer.py`, 19 tests):
 
-- handles are an untrained buffer and do not move when banks are read;
+- handles are an untrained buffer, do not move when banks are read, are a function of the identity
+  alone, and do not crowd (closest pair 0.0225 against a norm of 0.107 on the tested identities);
 - a payload UPDATE, an alias RELINK and a SHRED of every marker each leave every persisted K/V tensor
   bit-identical while the answer at the last position changes;
+- a store reordering does not rebind, asserted in the same test against the exactly-zero UPDATE row;
+- a handle for a removed identity is reproduced by no surviving identity;
 - the carrier participates: persisted K/V differs from the no-memory forward, where arm C's provably
   does not;
 - `reference_carrier` without a `write_layer` is refused.
