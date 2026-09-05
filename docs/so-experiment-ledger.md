@@ -2735,6 +2735,70 @@ evaluation (a hundred targets over a thousand cells at these held-out forms) and
 prefix still reaches 0.97 on the same weights. E-000050 (§31.38) says why: the failing templates are
 exactly those that put the subject at token position 0, and GPT-2's tokenizer prepends no BOS.
 
+### 31.39 The J-space pod is by construction in this adapter, and the one measurement that survived is predicted by §31.38 (2026-09-05)
+
+A fifteen-agent workflow was asked for the training-free measurements at the symlink / J-space / pod
+seam — whether knowledge injected through the store lands on its object's J-lens atom and has a
+J-space closure of one; what fraction of the adapter lives in the model's verbalizable basis; whether
+the pod's lifecycle is visible in J space; and whether the held-out addressing gap is linearly
+erasable from the routing query without training. Each design stated its result sentence first; two
+refuters attacked each sentence; one survived to implementation. The verdict closes the J-space angle
+for this implementation, and it closes it by reading the code rather than by prior art.
+
+**Three of four are tautologies of `so/llm_adapter.py`, not measurements.** `encode_bank` builds a
+row's value from `W_U[obj]` alone (`payload_from='output'`), through `v_proj` and `o_proj` initialised
+to the identity; nothing about the (subject, relation) key enters the value. So (i) every access path
+of an object — target key, alias keys, every phrasing, other pods with the same object, and the
+duplication arm's copies — injects one vector up to routing weight, and "one atom silences every
+access path" is what the code does before any measurement; (ii) the write is *keyed by object token*
+by construction, so "the J-space closure is scoped by object rather than by pod" is the definition of a
+J-lens atom meeting the definition of the value; (iii) every adapter parameter is trained by
+cross-entropy on the answer logit at the last token, whose gradient with respect to the injected read
+is the per-prompt Jacobian applied to `W_U[u]` — the quantity whose corpus expectation *defines* the
+J-lens vector — so "the write aligns with `v_u`" and "projecting `v_u` out removes the write's
+first-order contribution" are consequences of the objective and the lens definition. The contrast
+with E-000042's pretrained facts is void as well: the paper's guard never lets `v_u` be ablated when
+the model answers `u`, so "injected facts have a closure of one where pretrained facts have none"
+compares ablate-`v_u` with never-ablate-`v_u`. The J-space *fraction* of the transport is, to first
+order, the identity that the restricted candidate logits respond only to the component of the read
+in the span of their gradients.
+
+**What a refuter measured on `e000020_gpt2_seed0.pt` while killing the design**, kept as a calibration
+of the instrument: the trained write is far from `W_U[u]` (relative Frobenius distance of `v_proj` and
+`o_proj` from the identity 2.42 / 1.71 / 1.24; cos(write at block 8, `w_u`) 0.21); the block-8 atom is
+80% the logit-lens row (cos(`v_u`, `w_u`) 0.80); the write's cosine to its own object's atom is 0.24
+against 0.06 to another object's — 94% of the write's energy is orthogonal to the atom; and the
+block-10 atom estimated with the final post-`ln_f` residual as target is **degenerate**, cos 0.99
+between any two tokens, because the VJP is dominated by the shared normalisation direction. The second
+number is an instrument note on `so/jlens.py` — `target_layer=-1` on a HuggingFace GPT-2 differentiates
+through `ln_f` and must not be used — and none of them is a sentence about pods.
+
+**The survivor, E-000049 — is the held-out addressing gap a linear-erasure problem?** Implemented
+(`so/experiments/e000049_template_nullspace_addressing.py`, 787 lines: an `Eraser` wrapped around
+`q_ln`, orthogonal / LEACE / PCA arms, a within-fact permutation null, matched-rank random nulls, a
+transport-side control that erases the same subspace after the query is taken), smoke-tested at 8 and
+100 targets, decompose() reproducing the E-000039-A record to 0.0000. At smoke size every erasure,
+the 7-direction random null included, *lowered* held-out addressing. The landing expected the negative
+at 75%, and its completeness critic said why the run is worth less than it looks: E-000050 (§31.38) had
+by then shown the failing templates are exactly those that put the subject at token position 0, so
+the subject's content is *lost* at the sink position and a projection at the last token can only
+remove, never add — the negative is predicted by Xiao et al. 2023 and Sun et al. 2024, and a positive
+would be the function-vector literature (Todd et al. 2024; Hendel et al. 2023: format information at
+the last token is additive and low-rank) plus All-but-the-Top / BERT-whitening (Mu and Viswanath 2018;
+Su et al. 2021) for the PCA arms. The critic also listed what must change before the run can record
+anything: the transport and null bars are one-sided, so in the negative branch no control can fail;
+the LEACE-7 and orthogonal-7 arms erase the same span; the permutation null was variance-matched at
+smoke size only; a NaN in any seed's recovered fraction sinks the aggregate; and the decisive
+measurement — a subject-identity probe on `h_10[last]` fit on medial templates and tested on
+subject-initial ones — was filed as optional when it is the decision. The file is kept as delivered,
+with those defects named here rather than patched silently, and it is not run until E-000050 has
+said whether there is anything left for it to explain.
+
+**What this closes.** "Symlink – J space – pod" as a mechanism claim is closed for this repository:
+in this adapter the pod's object-keying in the model's verbalizable basis is what the code writes and
+the training objective aligns, and the sweep that was asked to find its unowned measurement found
+three tautologies and one experiment whose answer the tokenisation finding already supplies.
+
 ### 31.8 Boundary
 
 CPU only, no GPU, no LLM above 124M parameters, synthetic worlds, single-token entities, two surface forms per relation, one session. Nothing here shows unlearning of facts already encoded in pretrained weights. Evidence levels recorded: E3–E4 for the synthetic system (F4 for SHRED with the verified gate, E-000010 — **on the value channel only**: E-000028 recovers the shredded object at 1.0000 through the ungated reverse key, where REVOKE and DELETE are at chance, so F4 for SHRED is a claim about answers, logits, hidden states and probes and not about routing); E5 as substrate for the frozen-GPT-2 experiment, with reading, composition, update and the copy bound supported and behavioural deletion not yet supported at the pre-registered thresholds.
