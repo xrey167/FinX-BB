@@ -93,6 +93,15 @@ class AdapterConfig:
                                    # on an untied model it is the control arm that should fail.
     fallback: str = "unknown"      # 'unknown': a null / unsigned / revoked read emits ' unknown';
                                    # 'prior' (E-000013): it injects nothing, so the pretrained distribution returns
+    write_layer: Optional[int] = None  # E-000084: decouple WHERE the memory is addressed from WHERE it is written.
+                                   # None (every recorded experiment): each read layer injects its own read into
+                                   # the residual stream in place. An integer L: the read layers still compute the
+                                   # routing query, the routing distribution and the dereference chain exactly as
+                                   # before, but inject NOTHING there; the read vectors are carried in the forward's
+                                   # context and written once, summed, into the last-token residual after block L.
+                                   # With L = the final block, every K/V tensor the model persists is a function of
+                                   # the prompt alone (E-000082's cache purity), while the addressing query is still
+                                   # taken from the deep residual that E-000083 showed the final block cannot supply.
 
     def to_dict(self) -> Dict:
         return asdict(self)
@@ -163,6 +172,16 @@ class KnowledgeAdapterLM(nn.Module):
         self._ctx: Optional[Dict] = None
         blocks = transformer_blocks(lm)
         self._hooks = [blocks[l].register_forward_hook(self._make_hook(i, l)) for i, l in enumerate(cfg.read_layers)]
+        if cfg.write_layer is not None:
+            wl = int(cfg.write_layer)
+            if not (0 <= wl < len(blocks)):
+                raise ValueError(f"write_layer {wl} is outside the {len(blocks)} decoder blocks")
+            if wl < max(cfg.read_layers):
+                raise ValueError(f"write_layer {wl} must not precede the last read layer {max(cfg.read_layers)}: "
+                                 f"a read after the write would see a residual the write never reached")
+            # Registered AFTER the read hooks on purpose: if the write layer coincides with a read layer, PyTorch
+            # runs forward hooks in registration order, so the read is recorded before the write consumes it.
+            self._hooks.append(blocks[wl].register_forward_hook(self._make_write_hook(wl)))
 
     @property
     def w_in(self) -> torch.Tensor:
@@ -317,10 +336,43 @@ class KnowledgeAdapterLM(nn.Module):
                 ref = self.o_proj[str(layer)](val)
                 rms_r = ref.pow(2).mean(-1, keepdim=True).sqrt().clamp_min(1e-3 * rms_h + 1e-6)
                 read = read * (rms_h / rms_r) * self.inject_gain[read_index]
-            delta = torch.zeros_like(h)
-            delta[ar, ctx["last_idx"]] = read
             if self.cfg.n_deref == 0:
                 ctx["routing"].append(p)
+            if self.cfg.write_layer is not None:
+                # E-000084: address here, write later. The read is carried as a direction relative to THIS
+                # layer's residual RMS (read / rms_h), so that the write layer can re-scale it to its own
+                # residual RMS and the injection keeps the same relative magnitude it has when written in
+                # place. Nothing is added to h: the block's output, and every K/V computed from it downstream,
+                # is exactly what the frozen model computes without memory.
+                ctx.setdefault("deferred", []).append(read / rms_h)
+                return None
+            delta = torch.zeros_like(h)
+            delta[ar, ctx["last_idx"]] = read
+            h2 = h + delta
+            return (h2,) + tuple(output[1:]) if isinstance(output, tuple) else h2
+        return hook
+
+    def _make_write_hook(self, layer: int):
+        """E-000084: the single write site when ``cfg.write_layer`` is set.
+
+        Sums the read directions the read layers deferred, re-scales them to this block's last-token
+        residual RMS and adds the result at the last position only. When the forward carries no memory
+        (``bank=None``) or no read layer deferred anything, the block's output is returned untouched, so
+        the no-memory path stays bit-identical to the frozen model.
+        """
+        def hook(module, inputs, output):
+            ctx = self._ctx
+            if ctx is None or not ctx.get("deferred"):
+                return None
+            h = output[0] if isinstance(output, tuple) else output
+            B = h.shape[0]
+            ar = torch.arange(B, device=h.device)
+            hl = h[ar, ctx["last_idx"]]
+            rms_h = hl.detach().pow(2).mean(-1, keepdim=True).sqrt()
+            read = torch.stack(ctx["deferred"], dim=0).sum(dim=0) * rms_h       # (B, d)
+            ctx["deferred"] = []
+            delta = torch.zeros_like(h)
+            delta[ar, ctx["last_idx"]] = read
             h2 = h + delta
             return (h2,) + tuple(output[1:]) if isinstance(output, tuple) else h2
         return hook
@@ -340,6 +392,9 @@ class KnowledgeAdapterLM(nn.Module):
         full = out.logits[ar, last_idx]                                    # (B, V)
         hidden = out.hidden_states[-1][ar, last_idx]
         cand = full[:, self.candidate_ids]
+        if self._ctx is not None and self._ctx.get("deferred"):
+            raise RuntimeError("a read layer deferred its write but the write hook never consumed it; "
+                               "write_layer must be a block that runs after every read layer")
         routing = torch.stack(self._ctx["routing"], dim=1) if self._ctx is not None and self._ctx["routing"] else None
         # (B, len(read_layers), d_key), read-layer order. Kept as an attribute rather than a fifth
         # return value so that every existing call site keeps its four-tuple.
