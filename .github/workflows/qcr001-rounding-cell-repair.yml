@@ -1,0 +1,69 @@
+name: QCR001 rounding cell repair
+on:
+  push:
+    branches: [research/qcr001-rounding-cell-repair]
+    paths:
+      - so/experiments/qcr001_rounding_cell_repair.py
+      - so/tests/test_qcr001_rounding_cell_repair.py
+      - .github/workflows/qcr001-rounding-cell-repair.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  screen:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - arm: scalar
+            model: ''
+            dtype: bfloat16
+          - arm: distilgpt2-bfloat16
+            model: distilbert/distilgpt2
+            dtype: bfloat16
+          - arm: distilgpt2-float32
+            model: distilbert/distilgpt2
+            dtype: float32
+          - arm: pythia70m-bfloat16
+            model: EleutherAI/pythia-70m
+            dtype: bfloat16
+          - arm: pythia70m-float32
+            model: EleutherAI/pythia-70m
+            dtype: float32
+    env:
+      OMP_NUM_THREADS: '1'
+      OPENBLAS_NUM_THREADS: '1'
+      MKL_NUM_THREADS: '1'
+      HF_HUB_DISABLE_XET: '1'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - name: Install pinned CPU dependencies
+        run: |
+          python -m pip install numpy==2.3.5 scipy==1.17.0 pytest==9.0.2 transformers==4.57.6
+          python -m pip install torch==2.10.0 --index-url https://download.pytorch.org/whl/cpu
+      - name: Execute full arm, equality controls and exact witness checks
+        env:
+          MODEL: ${{ matrix.model }}
+          DTYPE: ${{ matrix.dtype }}
+        run: |
+          set -euo pipefail
+          mkdir -p ci-qcr001
+          if [ -z "$MODEL" ]; then
+            python -m so.experiments.qcr001_rounding_cell_repair --output-dir ci-qcr001 | tee ci-qcr001/run.txt
+          else
+            python -m so.experiments.qcr001_rounding_cell_repair --model "$MODEL" --dtype "$DTYPE" --output-dir ci-qcr001 | tee ci-qcr001/run.txt
+          fi
+          python -m pytest so/tests/test_qcr001_rounding_cell_repair.py -q -ra | tee ci-qcr001/pytest.txt
+          python -m pip freeze > ci-qcr001/environment.txt
+          sha256sum so/experiments/qcr001_rounding_cell_repair.py so/tests/test_qcr001_rounding_cell_repair.py ci-qcr001/*.json > ci-qcr001/sha256.txt
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: qcr001-${{ matrix.arm }}
+          path: ci-qcr001/
+          if-no-files-found: warn
