@@ -1,0 +1,38 @@
+name: RMC001 failed gate diagnostic
+on:
+  push:
+    branches: [research/rmc001-rounding-margin-certificates]
+    paths:
+      - so/experiments/rmc001_failure_diagnostic.py
+      - .github/workflows/rmc001-failure-diagnostic.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  preserve-failure:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    env:
+      OMP_NUM_THREADS: '1'
+      OPENBLAS_NUM_THREADS: '1'
+      MKL_NUM_THREADS: '1'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - run: python -m pip install numpy==2.3.5 pytest==9.0.2
+      - name: Re-run unchanged failed protocol and preserve all cells
+        run: |
+          set -euo pipefail
+          mkdir -p ci-rmc001-failure
+          python -m so.experiments.rmc001_failure_diagnostic --seeds 0 1 2 3 4 --output ci-rmc001-failure/results.json | tee ci-rmc001-failure/run.txt
+          python -m pytest so/tests/test_rmc001_rounding_margin_certificates.py -q -ra | tee ci-rmc001-failure/pytest.txt
+          python -m pip freeze > ci-rmc001-failure/environment.txt
+          sha256sum so/experiments/rmc001_rounding_margin_certificates.py so/experiments/rmc001_failure_diagnostic.py so/tests/test_rmc001_rounding_margin_certificates.py ci-rmc001-failure/results.json > ci-rmc001-failure/sha256.txt
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: rmc001-failed-gate
+          path: ci-rmc001-failure/
+          if-no-files-found: error
