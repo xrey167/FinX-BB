@@ -10,6 +10,8 @@ jobs:
   bundle:
     runs-on: ubuntu-24.04
     timeout-minutes: 15
+    env:
+      HF_HUB_DISABLE_XET: '1'
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -26,14 +28,15 @@ jobs:
           import json
           from pathlib import Path
           from huggingface_hub import HfApi, snapshot_download
-          revision = HfApi().model_info('gpt2').sha
-          snapshot_download('gpt2', revision=revision, local_dir='audit-bundle/gpt2',
+          info = HfApi().model_info('openai-community/gpt2')
+          snapshot_download(info.id, revision=info.sha, local_dir='audit-bundle/gpt2',
               allow_patterns=['config.json','model.safetensors','tokenizer.json','tokenizer_config.json','vocab.json','merges.txt'])
-          Path('audit-bundle/model-provenance.json').write_text(json.dumps({'model':'gpt2','revision':revision}, indent=2))
+          Path('audit-bundle/model-provenance.json').write_text(json.dumps({'model':info.id,'revision':info.sha}, indent=2))
           PY
           find audit-bundle -type f ! -path '*/.cache/*' -print0 | sort -z | xargs -0 sha256sum > audit-bundle-sha256.txt
           cp audit-bundle-sha256.txt audit-bundle/SHA256SUMS
       - uses: actions/upload-artifact@v4
+        if: always()
         with:
           name: research-offline-audit-bundle
           path: audit-bundle/
