@@ -3626,6 +3626,105 @@ otherwise; recording them under a criterion that cannot fail is the mistake §31
 caught, and it is avoided here by declaring it in the file before the run
 (`so/experiments/e000056_epoch_capacity.py`). Record: `so/results/e000056_epoch_capacity.{json,md}`.
 
+### 31.49 The parallel branch audited: what CAVI-N really holds, why its differentiator does not survive, and the one question that does (2026-09-05)
+
+§31.47 checked two of the parallel branch's findings against this code. An eight-agent audit then read
+its claim documents, its experiments, its committed evidence and its prior art at source, and put the
+differentiator to two refuters. The verdict matters here for three reasons: the two records must
+eventually merge, the branch's locality failure reproduces this one independently, and its surviving
+question is the only unowned measurement either branch has left at the seam.
+
+**First, what the branch itself says.** Every committed result file on all eight `research/*` refs is
+stamped `breakthrough: false`; its evidence index says the same; its pre-registration hardcodes the
+string `novelty` into a `not_established` list emitted into every record
+(`so/experiments/e000079_joint_contract.py:169-170`); and each architecture document is headed "not a
+breakthrough or novelty claim". **The branch does not claim what it is being credited with.** Anyone
+reporting a research-level novelty from it is overstating its own record.
+
+**What is real there, with provenance.** A three-seed, three-thousand-step joint contract whose twelve
+numeric criteria are declared in code and which *failed* its own bars, recorded as failing. A
+KV-lineage race on two public backbones (`distilgpt2`, `pythia-70m-deduped`), three seeds each, where
+stale key-value cache against current differs by 14.2 and 21.0 max-abs and 1.26 / 1.60 nats — with the
+control that carries it, clean-current cache against full recompute at 9.2e-05 and 0.0, ruling out
+ordinary cache-versus-recompute drift; a first harness attempt is preserved as invalid because its
+trigger also fired in the no-memory control. Three provenance counterexamples on two qualified readers
+with before-and-after controls. A write-scope pilot with the reader's weights hashed before and after.
+And negatives kept: Pythia readers failing at 0.72 / 0.68, a seed failing a gradient-equivalence
+preflight at 0.0198 against a 0.0002 tolerance **with the tolerance not relaxed**, and a reader gate
+that refused to run attacks on unqualified checkpoints. That is the discipline this ledger runs.
+
+**Why the differentiator does not survive.** Its sentence is: *an authorized memory read does not
+permanently authorize the neural tensors derived from it; if those tensors survive into a later
+consumption event their originating reference-plus-referent authority must still be live, otherwise
+they are inert and execution reduces to the no-memory path.* Four independent failures:
+
+1. **The two criteria that carry it are arithmetic on four integers.** `alias_lineage_rejection` and
+   `pod_only_differentiation` both pass at 1.000 on all three seeds because `relink_alias` executes
+   `a.incarnation += 1`, `validate_witness` compares that counter, and `validate_pod_only` does not read
+   the alias table at all (`so/cavi.py:131`, `:159`, `:170`). No tensor enters either number. This is
+   §31.33's and §31.44's error, on the two rows that matter most.
+2. **The neural half was measured and failed.** `stale_updated_unknown` and `stale_relinked_unknown` —
+   the criteria that ask whether stale derived state actually goes inert — came in at 0.88 / 0.84,
+   0.84 / 0.80 and 0.77 / 0.80 against a 0.95 bar, failed on three of three seeds. The clause's second
+   half fails separately: `generic_locality` failed 3/3 at 3.65–5.23 nats against a 0.05 bar, so the
+   fallback is not the no-memory path either. **That is this repository's own locality failure,
+   reproduced by an independent implementation** (§31.36: 2.27 nats on E-000013, 3.65 on E-000017-B,
+   4.22 on the BOS-trained arm). Two codebases, one bar, the same failure: residual injection into a
+   frozen model is not local, and that now has two witnesses.
+3. **Their own counterexample refutes the mechanism.** A *live, genuine* alias witness authorizes
+   unrelated cached values and restores the original logits exactly (`replay_vs_original_maxabs 0.0`,
+   injected layers 0 → 2). Lineage liveness is not evidence that the tensor was derived under it. A
+   second counterexample shows "its originating authority" is not well defined for a dense routed
+   mixture at all: the queried witness stays valid while a different contributing pod is deleted.
+4. **The structure is owned, and precisely.** Redell (1974) revokes through an alias while the referent
+   stays live. CHERIvoke (2019) and Cornucopia (S&P 2020) invalidate stale *derived* references
+   including the reallocation case. **Cornucopia Reloaded (ASPLOS 2024) moves that check to the point
+   of use with a revocation-epoch load barrier** — "an authorized read does not permanently authorize
+   the derived reference; its authority must be live at the consumption event; otherwise it is inert"
+   is a load barrier, in print, two years old. In the agent-memory domain PAMSPEC
+   (`draft-infantado-agent-memory-architecture-00`, an individual Internet-Draft of 19 July 2026, no
+   IETF standing) owns authoritative-versus-derived separation and deletion propagation to derived
+   state, and Wu and Canedo (arXiv:2609.00243, 31 August 2026) own version-stamped invalidation of
+   cached agent memory — a citation the branch found itself. Its own sibling branch also records two
+   patent collisions, one of which recites deletion inside a key-value cache layer of a language model.
+
+**A caution about the evidence.** Roughly ten of the experiments the claim document lists as its
+breakthrough sequence — including the "20/20" and "5/5" figures and E-000075's 10.67 / 0.0029 / 19.22
+— have modules and CI workflows but **no committed result file anywhere in the repository**. They may
+well have run in Actions and had their artifacts expire; either way there is nothing to audit, and a
+number with no retained record cannot support anything. This ledger's own rule (a record is a file
+with seeds, criteria and a checkpoint hash) is what separates the four families above from the rest.
+
+**The numbering collision, which has to be fixed before anything merges.** The merge base is `a67eb37`
+(§31.38). Above E-000051 the two branches numbered independently: E-000052 is the pointer battery here
+and BOS locality there; E-000053 is history-independent markers here and a hard-match frontier there;
+E-000054 is two-token subjects here and a hard-gate frontier there; E-000056 is the epoch capacity here
+and a single read site there; and the other branch also collides with itself twice (E-000073 and
+E-000079 each name two different experiments). Recommendation, recorded so it is not silently
+resolved later: freeze E-000001–E-000051 as the common prefix, and let the other branch renumber above
+it into a disjoint range with a committed mapping table — this branch's numbers are cited across
+§§31.41–31.49 and in eleven retraction records whose whole value is that they are stable references,
+while that branch's real primary keys are its run identifiers and commit hashes.
+
+**The one question that survives, and it is not about the gate.** A pointer has one referent; a routed
+tensor has many. So the revocation unit for neural derived state may be the whole set of rows with
+non-zero routing coefficient rather than the queried witness. Their only two measurements of that
+effect are 0.2251 and 0.0151 max-abs logit change at coefficients 0.0118 and 0.0011, with top-1
+unchanged **and no null measured at all** — which, after §31.41 and §31.45, is exactly the mistake
+those two sections exist to prevent. Registered here as **E-000057**, trains nothing, on the E-000015
+synthetic reader first and the three GPT-2 symlink checkpoints second: per queried alias, holding
+prompt, authority and coefficients fixed, ablate one row's linear contribution from the cached
+mixture — **DEL** a row whose pod was SHREDded at coefficient c; **NULL-c** a *live* row matched on
+coefficient to within 10%, the calibrated null and the arm that can void the run; **PERM** the float
+floor (E-000051: 0.499); **ADD2** the row-count floor (E-000051: 0.965). Measured with E-000051's
+instrument unchanged. The residue counts as real only if, on the worst of three seeds,
+AUC(DEL) − AUC(NULL-c) ≥ 0.10 *and* AUC(DEL) > 0.965; behavioural only if the top-1 flip rate is at
+least 0.02 or the KL at least 0.05 nats. If DEL does not separate from NULL-c the dependency-closure
+requirement is unfounded on this substrate and the entry is a refutation; if it separates and the
+behavioural bar fails — the expected outcome — the residue is real, sub-behavioural, and the sentence
+is about logits and not answers. Two to four CPU-hours for the GPT-2 half, under one for the
+synthetic; it does not run while the box is training.
+
 ### 31.8 Boundary
 
 CPU only, no GPU, no LLM above 124M parameters, synthetic worlds, single-token entities, two surface forms per relation, one session. Nothing here shows unlearning of facts already encoded in pretrained weights. Evidence levels recorded: E3–E4 for the synthetic system (F4 for SHRED with the verified gate, E-000010 — **on the value channel only**: E-000028 recovers the shredded object at 1.0000 through the ungated reverse key, where REVOKE and DELETE are at chance, so F4 for SHRED is a claim about answers, logits, hidden states and probes and not about routing); E5 as substrate for the frozen-GPT-2 experiment, with reading, composition, update and the copy bound supported and behavioural deletion not yet supported at the pre-registered thresholds.
