@@ -13,7 +13,7 @@ Readers ['syn'], seeds [0, 1, 2], 100 pods per seed, trains nothing. AUCs are fi
 | blank_never: blank vs never | - | 0.951 | 0.671 | 0.229 | 1.000 | 0.000 |
 | dangle_never: dangle vs never | - | 0.949 | 0.699 | 0.035 | 1.000 | 0.000 |
 | perm: perm vs perm2 | - | 0.499 | 0.500 | 0.000 | 1.000 | 0.000 |
-| add2: add2 vs perm | - | 0.983 | 0.741 | 0.000 | 1.000 | 16.770 |
+| add2: add2 vs perm | - | 0.965 | 0.749 | 0.000 | 1.000 | 0.000 |
 
 | store-level (mean over pods) | exported HI | residue rows | markers equal |
 |---|---|---|---|
@@ -40,8 +40,8 @@ Per reader. VOID if present/auc_i < 0.95 (the adversary cannot see a live row ag
 | syn/enc/cascade_never_maxabs | >= 1e-06 | 0.0092 | PASS |
 | syn/perm/auc_ii | <= 0.6 | 0.5577 | PASS |
 | syn/perm/auc_iii | <= 0.6 | 0.5612 | PASS |
-| syn/add2/auc_ii | <= 0.6 | 1.0000 | FAIL |
-| syn/add2/auc_iii | <= 0.6 | 0.8388 | FAIL |
+| syn/add2/auc_ii | <= 0.6 | 0.9688 | FAIL |
+| syn/add2/auc_iii | <= 0.6 | 0.7951 | FAIL |
 | syn/blank_matched/auc_i | >= 0.75 | 1.0000 | PASS |
 | syn/dangle_matched/auc_i | >= 0.75 | 0.9987 | PASS |
 | syn/cascade_soft/auc_i | <= 0.6 | 0.5013 | PASS |

@@ -2868,6 +2868,69 @@ tokenisation finding (E-000050) is Yang et al.'s diagnosis transported to an ext
 own price. The two experiments that remain unowned are calibrated-null-shaped, and both say so before
 they run.
 
+### 31.41 The residue against the reader, synthetic half: the reader carries the row count and the marker, not the history (2026-09-05, E-000051)
+
+§31.35 measured the residue of a pod deletion at the store level: BLANK (`ON DELETE SET NULL` by hand)
+and a dangling link (`NO ACTION`) leave two live rows that a never-wrote store does not have, CASCADE
+leaves none. E-000051 (§31.40's survivor, run with its critic's fixes) reads those states through the
+reader and asks whether the residue changes answers on queries *not about the pod*. Query-only
+adversary, one system, no snapshot: five logit features per query, a linear probe, five-fold
+cross-validation over 100 pods per seed, Mann–Whitney AUC; per-pod calibration banks (two row
+permutations of the live bank; the live bank plus two fresh live LINK rows); KL and top-1 agreement
+beside every AUC; the E-000015 reader first, three seeds, trains nothing. The first full run exposed
+one instrument leak — the two fresh rows could land on a generic-class key, giving KL 16.8 on that
+class — fixed and re-run; every other number reproduced.
+
+| arm (positive vs reference) | AUC, deleted keys | AUC, bystanders | AUC, generic | max KL, bystanders | top-1 agreement |
+|---|---|---|---|---|---|
+| LIVE vs NEVER (validity) | 1.000 | — | — | — | — |
+| CASCADE vs NEVER (the marker channel alone) | 0.501 | **0.948** (worst 0.976) | 0.577 | 0.000 | 1.000 |
+| BLANK vs CASCADE (two self-referencing rows) | 1.000 | 0.817 | 0.670 | 0.229 (one seed; 0.04 on the others) | 1.000 |
+| DANGLE vs CASCADE (two tombstone-key rows) | 0.999 | 0.869 | 0.685 | 0.035 | 1.000 |
+| PERM vs PERM2 (float floor) | — | 0.499 | 0.500 | 0.000 | 1.000 |
+| ADD2 vs PERM (row-count floor) | — | **0.965** (worst 0.969) | 0.749 | 0.000 | 1.000 |
+
+Validity held: the adversary sees a live row against none at 1.000, the float floor sits at chance,
+the hard-gate pipeline check is bit-identical (encoding and logits 0.000), the marker channel exists
+at the interface (residual 0.009–0.014), blanked aliases read UNKNOWN in 1.000 of cases, and the
+store-level columns reproduce §31.35 pod for pod (CASCADE exported-HI 1.0, BLANK and DANGLE 0.0 with
+two residue rows).
+
+**Two readings fire, both pre-registered, and neither is a sentence about history.**
+
+*Row count.* Two fresh live rows that touch no bystander are detectable on bystander queries at
+0.965 and on free-key queries at 0.749, at KL 0.000 and top-1 agreement 1.000. The reader's off-pod
+outputs carry the number of active rows — every row sits in every routing softmax and the
+dereference pass-through bias is `log(n_cells)` — as a deterministic, sub-milli-nat shift a
+standardised probe reads perfectly. Under the rule this voids the residue AUCs as history channels:
+BLANK's 0.817 and DANGLE's 0.869 sit *below* the two-fresh-rows floor, so two residue rows are, if
+anything, less legible than two ordinary ones.
+
+*Marker.* CASCADE versus NEVER — identical content, identical row count, markers of every row written
+after the pod drawn one generator position earlier — is separable at 0.948 on bystanders (the four
+rows written after the pod's target are among them) and at chance on the deleted keys and on
+free-key queries. E-000046's exported-level history independence of 1.0000 for CASCADE does not
+transfer to the reader: the seeded generator's position is a history channel the soft marker gate
+exposes, at KL 0.000. The fix is engineering and is named, not run — draw markers from content or
+from a per-row secret, never from a position in a stream — and it is what a deployed store of this
+kind would need before any history-independence claim could be made at the reader.
+
+*What is behavioural.* One number moves an answer distribution: BLANK's residue shifts a bystander's
+logits by up to 0.229 nats on one seed (0.04 on the others), with top-1 unchanged everywhere. The
+locality bar of 0.05 nats fails for BLANK and holds for DANGLE. Everything else in the table is
+statistical — a trained probe on standardised logits — and behaviourally invisible.
+
+**Sentences.** The negative sentence (confined) is not licensed, because its precondition — the
+row-count floor at or below 0.60 — fails. The positive sentence is not licensed, because the residue
+never exceeds the floor. What is recorded is the calibrated null the landing expected: on this
+reader, "detectability of a deletion residue off the pod" is a row-count and a marker number, and a
+paper reporting such an AUC without the two floors would be reporting the reader's arithmetic.
+Owned and cited: the adversary shape (Chen et al., arXiv:2506.14003), the cascade-versus-never cell
+(Ramesh, arXiv:2607.27539 — at chance in his memory, which has no seeded markers; here it is the
+marker channel), the two-clause store/reader structure (Garg, Goldwasser and Vasudevan). The GPT-2
+half is queued behind E-000050 and decides whether a frozen language model's adapter, which routes
+with the same dense softmax, carries the same two channels.
+
 ### 31.8 Boundary
 
 CPU only, no GPU, no LLM above 124M parameters, synthetic worlds, single-token entities, two surface forms per relation, one session. Nothing here shows unlearning of facts already encoded in pretrained weights. Evidence levels recorded: E3–E4 for the synthetic system (F4 for SHRED with the verified gate, E-000010 — **on the value channel only**: E-000028 recovers the shredded object at 1.0000 through the ungated reverse key, where REVOKE and DELETE are at chance, so F4 for SHRED is a claim about answers, logits, hidden states and probes and not about routing); E5 as substrate for the frozen-GPT-2 experiment, with reading, composition, update and the copy bound supported and behavioural deletion not yet supported at the pre-registered thresholds.
