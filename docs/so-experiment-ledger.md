@@ -3805,7 +3805,10 @@ alias). Thirteen of fourteen pre-registered criteria pass.
 | **t10 medial, held out** | 0.9967 | 0.9150 | 0.9950 | 0.9300 | 1.0000 | 1.0000 | 0.0000 | 0.9200 | 0.9550 |
 | **t11 initial, held out** | 0.9967 | 0.9250 | 0.9950 | 0.9400 | 1.0000 | 1.0000 | 0.0000 | 0.9300 | 0.0100 |
 
-Worst seed everywhere. The reader's **price for the pointer**, against a link-free adapter trained on
+Worst seed everywhere; n = 200 alias reads per template per seed, so the 0.8150 worst cell carries a
+95% Clopper-Pearson interval of 0.754 to 0.866, and eight of the twelve templates are trained forms
+while t10 is the trained t0 under a fixed prefix (verified: `TEMPLATES12[0][10] == E39.PREFIX +
+TEMPLATES12[0][0]`), leaving three genuinely novel phrasings. The reader's **price for the pointer**, against a link-free adapter trained on
 the same budget and scored across all twelve phrasings (E-000025's protocol): `cost_of_sharing`
 **0.0879** against its 0.10 bar (0.0944 on trained templates, 0.0750 on held-out ones), and
 `cost_of_link_training` **0.0054** against 0.25. The **reverse control** fires exactly as registered:

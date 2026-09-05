@@ -135,11 +135,36 @@ reader's price for the indirection measured against a link-free control.
 
 ---
 
+## Precision the sentence needs, checked at source
+
+**"Every one of twelve phrasings" means this, exactly.** Eight of the twelve are trained forms and four
+are held out. Of the four held out, **t10 is the trained t0 under a fixed prefix**: `TEMPLATES12[0][10]`
+is `"It is known that {s} lives in"` and equals `E39.PREFIX + TEMPLATES12[0][0]` character for
+character, verified. So the genuinely novel forms are three, t8, t9 and t11, of which two are
+subject-initial and one is subject-medial. The claim covers twelve phrasings; it does not cover twelve
+*unseen* phrasings, and §31.34 already records that this programme's count of phrasings is the number
+somebody typed.
+
+**The intervals.** Each cell is 100 alias groups of two aliases, so n = 200 alias reads per template
+per seed (`E20.EVAL`). At that n the worst-seed rates carry real width:
+
+| row | worst seed | 95% Clopper–Pearson |
+|---|---|---|
+| alias read, worst template (t1) | 0.8150 | 0.754 to 0.866 |
+| UPDATE reach and RELINK, worst (t9) | 0.8200 | 0.760 to 0.871 |
+| SHRED or DELETE leaves the alias UNKNOWN, worst | 0.9950 | 0.972 to 1.000 |
+| BLANK answers with some entity, worst (t9) | 0.0100 | 0.001 to 0.036 |
+| alias read, best template (t4) | 0.9400 | 0.898 to 0.969 |
+
+The lower bounds are what the sentence is entitled to: the aliased read and the update reach are
+"above 0.75 with 95% confidence at the worst template of the worst seed", not "0.82". The deletion
+rows and the SET NULL row survive their bars comfortably. Nothing in the claim turns on a difference
+smaller than these intervals.
+
 ## How it could be wrong
 
 - Twelve templates of two surface forms per relation is not "every phrasing" in any general sense; it
-  is every phrasing in a fixed, typed set, and §31.34 already records that this programme's `s` is the
-  number of phrasings someone typed.
+  is every phrasing in a fixed, typed set.
 - The price, 0.088, is against *this* link-free control at *this* budget. A better-trained link-free
   adapter would raise it.
 - The single failing validity row (a blanked alias's sibling readable at 0.79 against 0.80) is
