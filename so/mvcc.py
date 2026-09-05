@@ -21,11 +21,24 @@ Markers: each version carries a marker vector.  Valid markers are drawn around a
 per-store secret centre (the "key κ"); ``shred`` replaces the marker with noise
 that is far from the centre.  ``marker_valid`` is the mechanical check; the neural
 model must *learn* an equivalent check from data (see ``so.model``).
+
+``content_markers`` (default off; every recorded run used the default): E-000051 (ledger §31.41)
+found that drawing markers from the store's seeded generator makes the POSITION in that stream a
+history channel -- a store that wrote a pod and then evicted every row of it differs from one that
+never wrote it in the markers of every row written after the pod, and a frozen reader separates the
+two on bystander queries at AUC 0.948 at KL 0.  With the option on, a row's marker is derived from
+its EXPORTED CONTENT (kind, key, object or pointed-at key) and a per-store secret ``marker_key``, an
+HMAC mapped into the same distribution ``new_valid_marker`` draws from (a seeded normal draw of
+scale 0.05 around the centre, normalised), so the marker of a row is a function of what the row
+holds and not of when it was written.  Owned mechanism: content-derived / deterministic
+signatures.  ``bank()``, ``state_hash`` and the gate semantics are unchanged; two rows with
+identical exported content carry identical markers, which is the side effect E-000053 measures.
 """
 
 from __future__ import annotations
 
 import hashlib
+import hmac
 import json
 from dataclasses import dataclass, field
 from enum import Enum
@@ -83,8 +96,11 @@ class Cell:
 
 
 class MVCCStore:
+    MARKER_SCALE = 0.05          # the spread of a valid marker around the centre, both marker schemes
+
     def __init__(self, marker_dim: int = 16, seed: int = 0, valid_radius: float = 0.35,
-                 marker_centre: Optional[np.ndarray] = None):
+                 marker_centre: Optional[np.ndarray] = None, content_markers: bool = False,
+                 marker_key: Optional[bytes] = None):
         self.marker_dim = marker_dim
         self.seed = seed
         self.rng = np.random.default_rng(seed)
@@ -92,6 +108,12 @@ class MVCCStore:
         centre = drawn if marker_centre is None else np.asarray(marker_centre, dtype=float)
         self.marker_centre = centre / np.linalg.norm(centre)
         self.valid_radius = valid_radius
+        # History-independent markers (module docstring). The per-store secret defaults to a digest of
+        # the seed so that two stores built with the same seed -- E-000051's CASCADE(p) and NEVER(p) --
+        # sign identical content identically; pass ``marker_key`` to give a store its own secret.
+        self.content_markers = bool(content_markers)
+        self.marker_key = (marker_key if marker_key is not None
+                           else hashlib.sha256(b"so.mvcc.marker-key|" + str(seed).encode()).digest())
         self.cells: Dict[int, Cell] = {}
         self.log: List[Tuple[str, Dict[str, Any]]] = []
         self._next_kid = 1
@@ -114,6 +136,60 @@ class MVCCStore:
     def marker_valid(self, marker: np.ndarray) -> bool:
         return bool(np.linalg.norm(marker - self.marker_centre) <= self.valid_radius)
 
+    # ---- content-derived markers (the ``content_markers`` option)
+    def row_content(self, v: "Version") -> Tuple[Any, ...]:
+        """What ``bank()`` exports for this version, as a tuple: the input to a content-derived marker.
+
+        A FACT row is (kind, subject, relation, object). A LINK row is (kind, subject, relation,
+        pointed-at subject, pointed-at relation) with the pointed-at key resolved exactly as ``bank()``
+        resolves it -- the target's key, its tombstone key once it is gone, the row's own key once it
+        is blanked -- so the marker follows the row's exported content through its lifecycle and never
+        encodes a cell id (cell ids encode write order, which is the history the option removes).
+        """
+        if v.kind is CellKind.FACT:
+            return ("FACT", int(v.subject), int(v.relation), int(v.obj))
+        t = self.cells.get(v.target) if v.target is not None else None
+        if t is not None and t.versions:
+            tv = t.version_obj(t.active_version)
+            ls, lr = int(tv.subject), int(tv.relation)
+        elif t is not None and t.tombstone_key is not None:
+            ls, lr = int(t.tombstone_key[0]), int(t.tombstone_key[1])
+        else:
+            ls, lr = int(v.subject), int(v.relation)
+        return ("LINK", int(v.subject), int(v.relation), ls, lr)
+
+    def _derived_rng(self, content: Tuple[Any, ...], valid: bool) -> np.random.Generator:
+        tag = b"valid|" if valid else b"invalid|"
+        digest = hmac.new(self.marker_key, tag + json.dumps(list(content)).encode(), hashlib.sha256).digest()
+        return np.random.default_rng(int.from_bytes(digest[:16], "big"))
+
+    def derived_marker(self, content: Tuple[Any, ...], valid: bool = True) -> np.ndarray:
+        """The marker a row with this exported content carries under ``content_markers``.
+
+        Same distribution as the generator scheme -- a normal draw of scale ``MARKER_SCALE`` around
+        the centre, normalised (invalid: the same rejection loop as ``new_invalid_marker``) -- so a
+        reader trained on generator-drawn markers sees the same family; only the SOURCE of the draw
+        changes, from a position in a stream to a digest of the content.
+        """
+        rng = self._derived_rng(content, valid)
+        if valid:
+            m = self.marker_centre + rng.normal(scale=self.MARKER_SCALE, size=self.marker_dim)
+            return m / np.linalg.norm(m)
+        m = rng.normal(size=self.marker_dim)
+        m = m / np.linalg.norm(m)
+        while np.linalg.norm(m - self.marker_centre) < 2 * self.valid_radius:
+            m = rng.normal(size=self.marker_dim)
+            m = m / np.linalg.norm(m)
+        return m
+
+    def _sign(self, v: "Version") -> None:
+        """Give ``v`` its marker under whichever scheme the store uses (called once per new version)."""
+        v.marker = self.derived_marker(self.row_content(v)) if self.content_markers else self.new_valid_marker()
+
+    def _unsign(self, v: "Version") -> None:
+        v.marker = (self.derived_marker(self.row_content(v), valid=False) if self.content_markers
+                    else self.new_invalid_marker())
+
     # ------------------------------------------------------------------ operations
     def _record(self, op: str, **args: Any) -> int:
         self.log.append((op, args))
@@ -125,7 +201,9 @@ class MVCCStore:
         self._next_kid += 1
         op = self._record("write", subject=subject, relation=relation, obj=obj, provenance=provenance)
         cell = Cell(kid=kid, provenance=provenance)
-        cell.versions.append(Version(1, subject, relation, obj, self.new_valid_marker(), op))
+        v = Version(1, subject, relation, obj, None, op)
+        self._sign(v)
+        cell.versions.append(v)
         self.cells[kid] = cell
         return kid
 
@@ -141,8 +219,9 @@ class MVCCStore:
         self._next_kid += 1
         op = self._record("link", subject=subject, relation=relation, target=target, provenance=provenance)
         cell = Cell(kid=kid, provenance=provenance)
-        cell.versions.append(Version(1, subject, relation, LINK_OBJ, self.new_valid_marker(), op,
-                                     kind=CellKind.LINK, target=target))
+        v = Version(1, subject, relation, LINK_OBJ, None, op, kind=CellKind.LINK, target=target)
+        self._sign(v)
+        cell.versions.append(v)
         self.cells[kid] = cell
         return kid
 
@@ -153,8 +232,9 @@ class MVCCStore:
             raise KeyError(f"link target {target} does not exist")
         op = self._record("relink", kid=kid, target=target)
         prev = cell.version_obj(cell.active_version)
-        v = Version(len(cell.versions) + 1, prev.subject, prev.relation, LINK_OBJ, self.new_valid_marker(), op,
+        v = Version(len(cell.versions) + 1, prev.subject, prev.relation, LINK_OBJ, None, op,
                     kind=CellKind.LINK, target=target)
+        self._sign(v)
         cell.versions.append(v)
         cell.active_version = v.version
         cell.status = Status.ACTIVE
@@ -184,7 +264,8 @@ class MVCCStore:
         cell = self._alive(kid)
         op = self._record("update", kid=kid, obj=obj)
         prev = cell.version_obj(cell.active_version)
-        v = Version(len(cell.versions) + 1, prev.subject, prev.relation, obj, self.new_valid_marker(), op)
+        v = Version(len(cell.versions) + 1, prev.subject, prev.relation, obj, None, op)
+        self._sign(v)
         cell.versions.append(v)
         cell.active_version = v.version
         cell.status = Status.ACTIVE
@@ -249,7 +330,7 @@ class MVCCStore:
         """
         cell = self._alive(kid)
         self._record("shred", kid=kid)
-        cell.version_obj(cell.active_version).marker = self.new_invalid_marker()
+        self._unsign(cell.version_obj(cell.active_version))
 
     def blank(self, kid: int) -> None:
         """Clear a LINK's target: the row stays live and addressable, and points at nothing.
@@ -280,12 +361,14 @@ class MVCCStore:
                 "operation that cannot fail gets into a certificate.")
         self._record("blank", kid=kid)
         v.target = None
+        if self.content_markers:
+            self._sign(v)       # the exported content changed (the row now points at its own key): re-derive
 
     def resign(self, kid: int) -> None:
         """Give the active version a fresh valid marker (undo of shred, for restore tests)."""
         cell = self._alive(kid)
         self._record("resign", kid=kid)
-        cell.version_obj(cell.active_version).marker = self.new_valid_marker()
+        self._sign(cell.version_obj(cell.active_version))
 
     def swap(self, kid_a: int, kid_b: int) -> None:
         """Causal intervention: exchange the payload objects of two active cells."""
@@ -475,11 +558,31 @@ class MVCCStore:
 
     @classmethod
     def replay(cls, log: List[Tuple[str, Dict[str, Any]]], marker_dim: int, seed: int,
-               valid_radius: float, marker_centre: Optional[np.ndarray] = None) -> "MVCCStore":
-        store = cls(marker_dim=marker_dim, seed=seed, valid_radius=valid_radius, marker_centre=marker_centre)
+               valid_radius: float, marker_centre: Optional[np.ndarray] = None,
+               content_markers: bool = False, marker_key: Optional[bytes] = None) -> "MVCCStore":
+        store = cls(marker_dim=marker_dim, seed=seed, valid_radius=valid_radius, marker_centre=marker_centre,
+                    content_markers=content_markers, marker_key=marker_key)
         for op, args in log:
             getattr(store, op)(**args)
         return store
 
     def clone_by_replay(self) -> "MVCCStore":
-        return MVCCStore.replay(list(self.log), self.marker_dim, self.seed, self.valid_radius, self.marker_centre)
+        return MVCCStore.replay(list(self.log), self.marker_dim, self.seed, self.valid_radius, self.marker_centre,
+                                content_markers=self.content_markers, marker_key=self.marker_key)
+
+    def marker_invariant_holds(self) -> bool:
+        """Under ``content_markers``: every exported row's marker equals the marker derived from its
+        exported content (a SHRED row: the derived invalid marker). Returns False for a store without
+        the option, so a test cannot pass by running the wrong scheme. ``swap`` and ``replace`` are
+        causal interventions that change a payload in place without re-signing; they break this on
+        purpose and are outside the interface the option covers."""
+        if not self.content_markers:
+            return False
+        for cell in self.cells.values():
+            if cell.status in (Status.DELETED, Status.EVICTED) or not cell.versions:
+                continue
+            v = cell.version_obj(cell.active_version)
+            want = self.derived_marker(self.row_content(v), valid=self.marker_valid(v.marker))
+            if not np.array_equal(np.asarray(v.marker), want):
+                return False
+        return True

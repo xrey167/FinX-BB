@@ -205,8 +205,9 @@ class Pod:
 class Setting:
     """One reader, one seed: the world, the store, the fixed query sets, and the bank builders."""
 
-    def __init__(self, reader: str, seed: int, n_pods: int, threads: int):
+    def __init__(self, reader: str, seed: int, n_pods: int, threads: int, content_markers: bool = False):
         self.reader, self.seed = reader, seed
+        self.content_markers = content_markers          # E-000053: history-independent markers, default off
         rng = np.random.default_rng(2000 + seed)
         if reader == "syn":
             out = E15.train_or_load(seed, 4000, 1)
@@ -220,7 +221,8 @@ class Setting:
             self.world, self.spec = E15.sample_alias_world(rng, 700, 100, 2, self.gk.n_entities, 4,
                                                            E20.N_TRAIN_TEMPLATES)
             self.n_ent = self.gk.n_entities
-        self.store, self.kids = E15.load_arm(self.world, self.spec, self.centre, seed, symlink=True)
+        self.store, self.kids = E15.load_arm(self.world, self.spec, self.centre, seed, symlink=True,
+                                             content_markers=content_markers)
         self.live = bank_from_store(self.store)
         groups = self.spec.groups
         self.pods = [Pod(t, ks, self.world.index[t]) for t, ks in groups[:n_pods]]
@@ -266,7 +268,7 @@ class Setting:
                   [f for f in self.world.facts if f.key not in drop])
         spec = E15.AliasSpec({k: v for k, v in self.spec.alias_of.items() if k not in drop},
                              [g for g in self.spec.groups if g[0] != p.target])
-        s, _ = E15.load_arm(w, spec, self.centre, self.seed, symlink=True)
+        s, _ = E15.load_arm(w, spec, self.centre, self.seed, symlink=True, content_markers=self.content_markers)
         return bank_from_store(s), s
 
     def bank_perm(self, p: Pod, which: int):
@@ -375,11 +377,12 @@ ARMS = {                        # name -> (positive bank, reference bank, classe
 }
 
 
-def run_reader_seed(reader: str, seed: int, n_pods: int, threads: int, n_hardgate: int, verbose: bool = True
-                    ) -> Dict[str, Any]:
+def run_reader_seed(reader: str, seed: int, n_pods: int, threads: int, n_hardgate: int, verbose: bool = True,
+                    content_markers: bool = False) -> Dict[str, Any]:
     t0 = time.time()
-    S = Setting(reader, seed, n_pods, threads)
-    m: Dict[str, Any] = {"reader": reader, "seed": seed, "n_pods": len(S.pods), "checkpoint_sha256": S.sha}
+    S = Setting(reader, seed, n_pods, threads, content_markers=content_markers)
+    m: Dict[str, Any] = {"reader": reader, "seed": seed, "n_pods": len(S.pods), "checkpoint_sha256": S.sha,
+                         "content_markers": content_markers}
     feats: Dict[Tuple[str, str], List[np.ndarray]] = {}
     logits: Dict[Tuple[str, str], List[np.ndarray]] = {}
     enc_res = {"cascade_never": [], "blank_cascade": [], "dangle_cascade": [], "add2_perm": []}
