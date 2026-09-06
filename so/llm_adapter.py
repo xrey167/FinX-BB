@@ -161,6 +161,7 @@ class KnowledgeAdapterLM(nn.Module):
             self.null_value = nn.Parameter(torch.zeros(len(cfg.read_layers), d), requires_grad=False)
         self.scale = nn.Parameter(torch.tensor(1.0))
         self._ctx: Optional[Dict] = None
+        self._inject_projection = None      # evaluation-only; see set_inject_projection
         blocks = transformer_blocks(lm)
         self._hooks = [blocks[l].register_forward_hook(self._make_hook(i, l)) for i, l in enumerate(cfg.read_layers)]
 
@@ -241,6 +242,62 @@ class KnowledgeAdapterLM(nn.Module):
         allowed = bank["routable"] if (self.cfg.status_gated and "routable" in bank) else bank["active"]
         return {"keys": keys, "values": values, "values_payload": payload, "gate": g.squeeze(-1), "active": allowed}
 
+    # -------------------------------------------------- the injected read, restricted to a subspace
+    #
+    # EVALUATION-ONLY INSTRUMENT, off by default, so every recorded number is unaffected: with no
+    # projection set this is the identity and the forward is bit-identical to the one that produced
+    # the records (pinned by so/tests/test_inject_projection.py).
+    #
+    # WHY IT EXISTS. The adapter's write is RMS-matched to the residual stream, so a memory read is a
+    # LARGE perturbation, not an infinitesimal one. A first-order interpretability basis -- the
+    # J-lens, the logit lens, an SAE dictionary -- is only guaranteed to account for infinitesimal
+    # ones. Restricting the injected read to a basis and to its orthogonal complement, and reading the
+    # model's answer in each case, is what separates "the basis represents the channel" from "the
+    # basis is where the first-order term lives by definition".
+    #
+    # WHY BOTH MAGNITUDES. Projection removes norm as well as direction, so a bare projection confounds
+    # "the wrong directions" with "a smaller write". The ``_renorm`` modes restore the unprojected
+    # read's norm, isolating direction; the bare modes are what an audit of the real write would see.
+    # Both are reported rather than one being chosen.
+    def set_inject_projection(self, basis: Optional[torch.Tensor], mode: str = "keep") -> None:
+        """``basis`` is (d, r) with ORTHONORMAL COLUMNS, or None to restore the trained behaviour.
+
+        Modes: ``keep`` / ``drop`` -- inject the component inside / outside the span; ``keep_renorm``
+        / ``drop_renorm`` -- the same direction at the unprojected read's norm; ``zero`` -- inject
+        nothing (the no-memory floor, which needs no basis).
+        """
+        allowed = ("keep", "drop", "keep_renorm", "drop_renorm", "zero")
+        if mode not in allowed:
+            raise ValueError(f"mode must be one of {allowed}, got {mode!r}")
+        if basis is None and mode != "zero":
+            self._inject_projection = None
+            return
+        if mode != "zero":
+            b = torch.as_tensor(basis, dtype=torch.float32)
+            if b.ndim != 2 or b.shape[0] != self.d:
+                raise ValueError(f"basis must be (d={self.d}, r), got {tuple(b.shape)}")
+            gram = b.t() @ b
+            off = (gram - torch.eye(b.shape[1], dtype=gram.dtype)).abs().max()
+            if float(off) > 1e-3:
+                raise ValueError(f"basis columns are not orthonormal (max |G - I| = {float(off):.2e}); "
+                                 "orthonormalise it, or the 'keep' and 'drop' arms do not partition the read")
+            self._inject_projection = (b, mode)
+        else:
+            self._inject_projection = (None, mode)
+
+    def _project_injection(self, read: torch.Tensor) -> torch.Tensor:
+        p = getattr(self, "_inject_projection", None)
+        if p is None:
+            return read
+        basis, mode = p
+        if mode == "zero":
+            return torch.zeros_like(read)
+        inside = (read @ basis) @ basis.t()
+        out = inside if mode.startswith("keep") else read - inside
+        if mode.endswith("_renorm"):
+            out = out * (read.norm(dim=-1, keepdim=True) / out.norm(dim=-1, keepdim=True).clamp_min(1e-6))
+        return out
+
     def _make_hook(self, read_index: int, layer: int):
         def hook(module, inputs, output):
             if self._ctx is None:
@@ -317,6 +374,8 @@ class KnowledgeAdapterLM(nn.Module):
                 ref = self.o_proj[str(layer)](val)
                 rms_r = ref.pow(2).mean(-1, keepdim=True).sqrt().clamp_min(1e-3 * rms_h + 1e-6)
                 read = read * (rms_h / rms_r) * self.inject_gain[read_index]
+            read = self._project_injection(read)
+            ctx.setdefault("injected", []).append(read.detach())
             delta = torch.zeros_like(h)
             delta[ar, ctx["last_idx"]] = read
             if self.cfg.n_deref == 0:
@@ -345,5 +404,9 @@ class KnowledgeAdapterLM(nn.Module):
         # return value so that every existing call site keeps its four-tuple.
         self.last_query = (torch.stack(self._ctx["query"], dim=1)
                            if self._ctx is not None and self._ctx.get("query") else None)
+        # (B, len(read_layers), d): the vector actually added to the residual at each read site, after
+        # gating, RMS matching and any injection projection. The geometry rows read this.
+        self.last_injected = (torch.stack(self._ctx["injected"], dim=1)
+                              if self._ctx is not None and self._ctx.get("injected") else None)
         self._ctx = None
         return cand, full, routing, hidden

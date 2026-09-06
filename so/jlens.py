@@ -119,3 +119,44 @@ def jlens_logits(h: torch.Tensor, jl: JLens) -> torch.Tensor:
     monotone per-row rescaling does not change which directions a state is made of.
     """
     return h.reshape(-1, h.shape[-1]) @ jl.vectors.t()
+
+
+def workspace_basis(lm, layer: int, token_ids, input_ids: torch.Tensor, attention_mask: torch.Tensor,
+                    w_out: torch.Tensor, target_layer: int = -2, rank: Optional[int] = None,
+                    energy: float = 0.99, batch: int = 4):
+    """An orthonormal basis of ``span{v_u : u in token_ids}`` at ``layer``, with its spectrum.
+
+    Returns ``(basis (d, r), singular_values, jl)``. ``rank`` fixes r; otherwise r is the smallest
+    number of singular directions holding ``energy`` of the J-lens family's squared spectrum.
+
+    WHAT THIS SUBSPACE IS. Each J-lens vector is the direction at ``layer`` whose inner product with
+    the residual gives the first-order contribution to one token's final logit. Their span is
+    therefore the subspace in which a perturbation at this layer has ANY first-order effect on the
+    tokens concerned: a perturbation in the orthogonal complement moves those logits only through
+    second-order terms. Anthropic's workspace paper reads a state's coordinates in this family; an
+    accessibility audit built on it (J-Access) sees exactly this subspace and nothing else.
+
+    WHY THE SPECTRUM MATTERS AND IS RETURNED. The family is far from orthogonal (on GPT-2 small the
+    mean |cos| between two entity atoms at layer 8 is 0.51), so 256 atoms do not span 256 useful
+    directions: r99 is 210 at layer 8 and 216 at layer 10. A caller comparing against a matched-rank
+    random subspace must match THIS r, not the number of tokens, or the null is not matched.
+    """
+    jl = jlens_vectors(lm, layer, token_ids, input_ids, attention_mask, w_out, target_layer, batch)
+    u, s, _ = torch.linalg.svd(jl.vectors.t().to(torch.float32), full_matrices=False)
+    if rank is None:
+        frac = (s ** 2).cumsum(0) / (s ** 2).sum()
+        rank = int((frac < energy).sum()) + 1
+    return u[:, :rank].contiguous(), s, jl
+
+
+def random_basis(d: int, rank: int, seed: int) -> torch.Tensor:
+    """A uniformly random orthonormal (d, rank) basis: the structure-matched null for ``workspace_basis``.
+
+    The null a subspace result needs is not "a random vector" but a random subspace OF THE SAME RANK:
+    projecting onto any r-dimensional subspace keeps r/d of a random vector's mass, so a keep/drop
+    contrast that is really about rank reproduces itself here and the arm is void.
+    """
+    g = torch.Generator().manual_seed(int(seed))
+    a = torch.randn(d, rank, generator=g)
+    q, _ = torch.linalg.qr(a)
+    return q[:, :rank].contiguous()
