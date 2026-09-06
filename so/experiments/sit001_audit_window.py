@@ -113,7 +113,8 @@ def lens_families(gk: E8.GPT2Knowledge, sites: Sequence[str], obj_ids: Sequence[
     return fams, cos
 
 
-def run_arm(arm: str, seed: int, n_groups: int, verbose: bool = True) -> Dict[str, Any]:
+def run_arm(arm: str, seed: int, n_groups: int, verbose: bool = True,
+            families: bool = False) -> Dict[str, Any]:
     """One arm, one seed: capability, mediators, lens cosines, the window, and the audit at every site."""
     spec_arm = ARMS[arm]
     ckpt = CHECKPOINTS / f"e000020_gpt2{spec_arm['suffix']}_seed{seed}.pt"
@@ -212,6 +213,8 @@ def run_arm(arm: str, seed: int, n_groups: int, verbose: bool = True) -> Dict[st
     # The audit itself, at EVERY site. The registered site is chosen across seeds afterwards, by the
     # rule in the pre-registration, so no site is picked here by what it answered.
     per_site: Dict[str, Dict[str, float]] = {}
+    per_family: Dict[str, Dict[str, Dict[str, float]]] = {}
+    rows = gk.model.w_out[torch.as_tensor(obj_ids)]
     for s in sites:
         states = {st: torch.cat(acc[(s, st)]) for st in ("active", "shred", "never")}
         feats = {st: F.normalize(v.float(), dim=-1) @ fams[s].t() for st, v in states.items()}
@@ -219,6 +222,21 @@ def run_arm(arm: str, seed: int, n_groups: int, verbose: bool = True) -> Dict[st
         per_site[s] = {"jprobe_active": p["active"], "jprobe_shred": p["shred"], "jprobe_never": p["never"],
                        "jprobe_active_minus_never": p["active"] - p["never"],
                        "jprobe_shred_minus_never": p["shred"] - p["never"]}
+        if families:
+            # EXPLORATORY, and off by default: not part of the pre-registered verdict, which reads the
+            # audit's own family alone. It answers the question a reader asks next -- at an admissible
+            # site, is the AUDIT'S BASIS doing the work, or would any k-dimensional readout do? WSC-001
+            # found a dimension-matched random projection at 0.741-0.871 downstream on the recorded
+            # adapter, so the question is live and the answer belongs in the record either way.
+            fam = WSC.probe_families(states, fams[s], rows, n, seed)
+            per_family[s] = {}
+            for name, fe in fam.items():
+                q = E63.transfer_probe(fe["active"], fe["shred"], fe["never"], y, g, n)
+                per_family[s][name] = {"active_minus_never": q["active"] - q["never"],
+                                       "shred_minus_never": q["shred"] - q["never"], "never": q["never"]}
+            if verbose:
+                print("    families " + s + ": " + "  ".join(
+                    f"{k}={v['active_minus_never']:+.3f}" for k, v in per_family[s].items()), flush=True)
         if verbose:
             r = [x for x in readings if x.site == s][0]
             print(f"  {arm:8s} seed {seed} {s:7s} moves {mediators[s]:8.2f} (ratio {r.arrival_ratio:.3f})  "
@@ -234,6 +252,7 @@ def run_arm(arm: str, seed: int, n_groups: int, verbose: bool = True) -> Dict[st
         "write_mediators": writes, "lens_cos": cos,
         "siting": [r.to_dict() for r in readings], "window": window_sites(readings),
         "audit": per_site,
+        "audit_families_exploratory": per_family or None,
         "e000063_site": first_read,
         "e000063_certificate": certify(readings, first_read, per_site[first_read]),
     }
@@ -320,6 +339,9 @@ def main(argv=None) -> None:
     ap.add_argument("--seeds", type=int, nargs="*", default=[0, 1, 2])
     ap.add_argument("--n-groups", type=int, default=16)
     ap.add_argument("--threads", type=int, default=int(os.environ.get("SO_THREADS", "4")))
+    ap.add_argument("--families", action="store_true",
+                    help="also score WSC-001's five feature families at every site (EXPLORATORY, not "
+                         "part of the pre-registered verdict; use SO_RESULT_SUFFIX to keep it apart)")
     a = ap.parse_args(argv)
     if a.threads:
         torch.set_num_threads(a.threads)
@@ -327,12 +349,13 @@ def main(argv=None) -> None:
     records: List[Dict[str, Any]] = []
     for arm in a.arms:
         for seed in a.seeds:
-            records.append(run_arm(arm, seed, a.n_groups))
+            records.append(run_arm(arm, seed, a.n_groups, families=a.families))
     verdict = decide(records)
     rec = {"experiment": "SIT-001", "candidate_only": True,
            "preregistration": "docs/novelty/sit001-preregister.md",
            "arms": {k: {"read_layers": list(v["read_layers"]), "suffix": v["suffix"]} for k, v in ARMS.items()},
            "bos": os.environ.get("SO_BOS", "") == "1", "seconds": time.time() - t0,
+           "families_exploratory": bool(a.families),
            "records": records, "verdict": verdict}
     ledger.save("sit001_audit_window", rec, markdown(records, verdict))
     print(json.dumps(verdict, indent=2))
