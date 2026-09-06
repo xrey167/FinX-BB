@@ -1,0 +1,21 @@
+{
+  "experiment": "E-000087",
+  "rows": [
+    {
+      "model": "EleutherAI/pythia-70m-deduped",
+      "n_entities": 64,
+      "chance": 0.015625,
+      "C1_ideal_retained_bit_identical_across_entities": true,
+      "C2_attack_on_ideal_top1": 0.015625,
+      "P_IDEAL_top1": 0.015625,
+      "P_STUB_top1": 1.0,
+      "P_ZERO_top1": 1.0,
+      "P_NOOP_top1": 1.0,
+      "behavioural_logprob_gain_on_e_after_stub_vs_ideal": 1.6599948406219482,
+      "behavioural_top1_is_e_after_stub": 0.0,
+      "behavioural_rank_of_e_after_stub": 916.234375,
+      "controls_ok": true
+    }
+  ],
+  "not_claimed": "no novelty claim; an audit of a cache erasure primitive"
+}
