@@ -1,9 +1,10 @@
 # Reference-carried memory — withdrawn, and what the attempt measured
 
 Date: 2026-09-05
-Status: **withdrawn as a novelty claim**, and now closed on capability too — but on grounds measured
-after a retraction, not the ones first given. Twelfth retraction with a thirteenth inside it. Nothing
-here is a legal novelty or patentability opinion.
+Status: **withdrawn as a novelty claim** on prior-art and invariance-attribution grounds, which stand
+and are independently verified. The capability side is an **unexplained negative**: arm E does not
+read, and none of the three explanations I published for that survived checking. Twelfth retraction,
+with two more inside it. Nothing here is a legal novelty or patentability opinion.
 
 An earlier version of this document claimed that a knowledge-free reference, carried through a frozen
 model's participating state with the value bound after the last cache-writing block, made persisted
@@ -113,7 +114,7 @@ mapping is held outside the model, and the true value is bound back only after g
 already has the asserted invariance; it goes unstated there because in that setting it is obvious. The
 entire delta of this claim over it is carrier-as-mid-stack-vector rather than carrier-as-token. That
 delta was first measured at 0.0 through a collinear-handle artefact; re-measured with that fixed, it is
-0.0037-0.0113, and E-000086 says why. Either way the concept sits inside this patent's scope.
+0.0037-0.0113, and why is not established. Either way the concept sits inside this patent's scope.
 
 Also occupying or narrowing the same point, all verified by fetch:
 
@@ -176,6 +177,11 @@ a placement that already gives total invariance and cannot read.
 - listed "a lifecycle status change" among the bit-identical operations — untested, and measured at
   7.1e-01 once a revoked row is made unroutable;
 - asserted the design point was unoccupied without having run the search that found it occupied;
+- published a "capacity ceiling" and a "bootstrap gap" as the explanation of arm E's failure, both
+  computed by scoring the raw boundary residual against the handle table while the number they were
+  compared against subtracted the no-memory baseline. Corrected, the ceiling is 0.9873 rather than
+  0.3799 and the carrier tolerates a five-percent router. Three explanations of one negative result,
+  all three artefacts of how I measured it;
 - reported E-000085's held-out-PROMPT score of 1.0000 as evidence that the carrier transports, when
   the design needs the held-out-IDENTITY split. The diagnostic had a clean control for the prompt axis
   and none for the identity axis;
