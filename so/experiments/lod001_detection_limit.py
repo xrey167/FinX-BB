@@ -448,6 +448,23 @@ def summarise(rec: Dict[str, Any]) -> str:
             if c:
                 out.append(f"| {s['seed']} | answer | " + " | ".join(f"{v:+.3f}" for v in c) + " |")
 
+    # The saturation diagnostic. WSC-001 states the alternative explanation for its site-8 zeros in
+    # its own "how it could be wrong": the probe is saturated by PROMPT IDENTITY, because the NEVER arm
+    # already reads the alias name. A difference of zero between a probe at 0.95 on both arms and a
+    # probe at chance on both arms is the same number and not the same fact, so the ABSOLUTE accuracy
+    # of every arm is printed beside every limit rather than only the difference.
+    out.append("\n## Saturation: the probe's absolute accuracy, not the difference (worst seed)\n")
+    out.append("| mode | site | family | never | a=0 | a=1 | chance |")
+    out.append("|---|---|---|---|---|---|---|")
+    ch = float(np.mean([s_["chance"] for s_ in per]))
+    for mode in rec["modes"]:
+        for site in SITE_NAMES:
+            for fam in FAMILIES:
+                g = lambda arm: min((s_.get(f"{mode}/{site}/{fam}/{arm}", float("nan")) for s_ in per),
+                                    default=float("nan"))
+                out.append(f"| {mode} | `{site}` | `{fam}` | {g('never'):.3f} | {g('a0'):.3f} | "
+                           f"{g('a1'):.3f} | {ch:.3f} |")
+
     out.append("\n## Mediators (worst seed), the rows WSC-001 reports beside every probe number\n")
     out.append("| mode | site | shred_moves | never_moves |")
     out.append("|---|---|---|---|")
