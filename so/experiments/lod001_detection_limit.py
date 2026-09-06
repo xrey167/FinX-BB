@@ -352,6 +352,125 @@ def _families(states: Dict[str, torch.Tensor], atoms: torch.Tensor, unembed: tor
     }
 
 
+def _lod_str(l: Any, top: float) -> str:
+    """A limit as a reader should see it: the rung, or '> top' when no rung cleared the bar."""
+    if not isinstance(l, dict):
+        return "?"
+    if not l.get("detected"):
+        m = l.get("max_observed")
+        return f"**> {top:g}**" + (f" (max {m:+.3f})" if isinstance(m, float) else "")
+    return f"{l['rung']:g}"
+
+
+def _worst_lod(per_seed: List[Dict[str, Any]], key: str, top: float, increasing: bool) -> Dict[str, Any]:
+    """The worst seed's limit: for a detection limit, worst = LEAST SENSITIVE = the largest rung.
+
+    An undetected seed is worst of all and dominates: one seed on which the audit could not see the
+    memory at any dose is not averaged away by two on which it could.
+    """
+    vals = [s.get(key) for s in per_seed if isinstance(s.get(key), dict)]
+    if not vals:
+        return {"detected": False, "rung": None, "missing": True}
+    if any(not v.get("detected") for v in vals):
+        und = [v for v in vals if not v.get("detected")]
+        return {"detected": False, "rung": None,
+                "max_observed": max((v.get("max_observed", float("-inf")) for v in und)),
+                "n_undetected": len(und), "n_seeds": len(vals)}
+    rungs = [v["rung"] for v in vals]
+    worst = max(rungs) if increasing else min(rungs)
+    return {"detected": True, "rung": float(worst), "spread": [float(min(rungs)), float(max(rungs))],
+            "n_seeds": len(vals)}
+
+
+def summarise(rec: Dict[str, Any]) -> str:
+    """The record as the tables a reader checks the pre-registered rows against."""
+    per = rec["per_seed"]
+    seeds = rec["seeds"]
+    delta = rec["delta"]
+    a_top, c_top = max(rec["alpha_ladder"]), min(rec["chord_ladder"])
+    out: List[str] = []
+    out.append(f"# LOD-001 — the detection limit of an accessibility audit\n")
+    out.append(f"Seeds {seeds}, {per[0]['n_pods']} pods per seed, delta = {delta}, "
+               f"modes {rec['modes']}. Worst seed reported in every summary row; a limit is 'worst' "
+               f"when it is the LEAST sensitive, and an undetected seed dominates.\n")
+    out.append(f"Pre-registration: `docs/novelty/lod001-preregister.md`. Every bar in it was written "
+               f"before this file existed.\n")
+
+    out.append("\n## Validity rows (worst seed)\n")
+    out.append("| row | observed | bar | |")
+    out.append("|---|---|---|---|")
+    v1 = min(s.get("alias/answer/a1", float("nan")) for s in per)
+    v2 = min(s.get("alias/final/raw/a1_minus_never", float("nan")) for s in per)
+    v3a = max(s.get("alias/answer/a0", 0.0) - s.get("alias/answer/never", 0.0) for s in per)
+    v3b = max(abs(s.get("alias/final/raw/a0_minus_never", 0.0)) for s in per)
+    g0 = min(s["gate_by_chord"].get("c0", float("nan")) for s in per)
+    g1 = max(s["gate_by_chord"].get("c1", float("nan")) for s in per)
+    for name, obs, op, bar in (("V1 alias/answer/a1", v1, ">=", 0.80),
+                               ("V2 alias/final/raw a1-never", v2, ">=", 0.30),
+                               ("V3a alias/answer a0-never", v3a, "<=", 0.05),
+                               ("V3b |alias/final/raw a0-never|", v3b, "<=", 0.10),
+                               ("V4a gate at chord 0", g0, ">=", 0.90),
+                               ("V4b gate at chord 1.0", g1, "<=", 0.10)):
+        ok = (obs >= bar) if op == ">=" else (obs <= bar)
+        out.append(f"| `{name}` | {obs:.4f} | {op} {bar} | {'PASS' if ok else '**FAIL**'} |")
+
+    for mode in rec["modes"]:
+        out.append(f"\n## Detection limits — {mode} mode, worst seed\n")
+        out.append(f"A cell is the smallest rung whose separation from the never-written control "
+                   f"reaches {delta}. `> {a_top:g}` means no rung cleared it: the audit could not have "
+                   f"seen the memory with all of it present.\n")
+        out.append("| site | " + " | ".join(FAMILIES) + " | answer |")
+        out.append("|---|" + "---|" * (len(FAMILIES) + 1))
+        ans = _worst_lod(per, f"{mode}/answer/LOD_alpha", a_top, True)
+        for site in SITE_NAMES:
+            cells = [_lod_str(_worst_lod(per, f"{mode}/{site}/{f}/LOD_alpha", a_top, True), a_top)
+                     for f in FAMILIES]
+            out.append(f"| `{site}` | " + " | ".join(cells) + f" | {_lod_str(ans, a_top)} |")
+        out.append(f"\nStore-side ladder (marker chord; a SMALLER chord is a LARGER residue, so the "
+                   f"limit is the LARGEST chord still detected and `< {c_top:g}` means none was):\n")
+        out.append("| site | " + " | ".join(FAMILIES) + " | answer |")
+        out.append("|---|" + "---|" * (len(FAMILIES) + 1))
+        ansc = _worst_lod(per, f"{mode}/answer/LOD_chord", c_top, False)
+        for site in SITE_NAMES:
+            cells = [_lod_str(_worst_lod(per, f"{mode}/{site}/{f}/LOD_chord", c_top, False), c_top)
+                     for f in FAMILIES]
+            out.append(f"| `{site}` | " + " | ".join(cells) + f" | {_lod_str(ansc, c_top)} |")
+
+        out.append(f"\n### The curves — {mode}, `jspace` and the answer, per seed\n")
+        out.append("| seed | site | " + " | ".join(f"a={a:g}" for a in rec["alpha_ladder"]) + " |")
+        out.append("|---|---|" + "---|" * len(rec["alpha_ladder"]))
+        for s in per:
+            for site in SITE_NAMES:
+                c = s.get(f"{mode}/{site}/jspace/curve_alpha")
+                if c:
+                    out.append(f"| {s['seed']} | `{site}` | " + " | ".join(f"{v:+.3f}" for v in c) + " |")
+            c = s.get(f"{mode}/answer/curve_alpha")
+            if c:
+                out.append(f"| {s['seed']} | answer | " + " | ".join(f"{v:+.3f}" for v in c) + " |")
+
+    out.append("\n## Mediators (worst seed), the rows WSC-001 reports beside every probe number\n")
+    out.append("| mode | site | shred_moves | never_moves |")
+    out.append("|---|---|---|---|")
+    for mode in rec["modes"]:
+        for site in list(SITE_NAMES) + [f"write{l}" for l in (8, 10)]:
+            sm = [s.get(f"{mode}/{site}/shred_moves") for s in per]
+            nm = [s.get(f"{mode}/{site}/never_moves") for s in per]
+            if any(x is not None for x in sm):
+                f = lambda xs: f"{max(x for x in xs if x is not None):.3f}" if any(x is not None for x in xs) else "-"
+                out.append(f"| {mode} | `{site}` | {f(sm)} | {f(nm)} |")
+
+    out.append("\n## The store-side ladder, in the quantity the payload sees\n")
+    out.append("| requested chord | achieved chord | gate |")
+    out.append("|---|---|---|")
+    for c in rec["chord_ladder"]:
+        k = f"c{c:g}"
+        ach = float(np.mean([s["achieved_chord"][k] for s in per if k in s.get("achieved_chord", {})]))
+        gt = float(np.mean([s["gate_by_chord"][k] for s in per if k in s.get("gate_by_chord", {})]))
+        out.append(f"| {c:g} | {ach:.3f} | {gt:.4f} |")
+    out.append(f"\nRun in {rec['seconds']:.0f}s.\n")
+    return "\n".join(out)
+
+
 def main(argv: Optional[List[str]] = None) -> Dict[str, Any]:
     ap = argparse.ArgumentParser()
     ap.add_argument("--seeds", type=int, nargs="*", default=[0, 1, 2])
@@ -377,6 +496,7 @@ def main(argv: Optional[List[str]] = None) -> Dict[str, Any]:
            "per_seed": per_seed, "seconds": time.time() - t0}
     p = Path(a.results_dir); p.mkdir(parents=True, exist_ok=True)
     (p / "lod001_detection_limit.json").write_text(json.dumps(rec, indent=2), encoding="utf-8")
+    (p / "lod001_detection_limit.md").write_text(summarise(rec), encoding="utf-8")
     print(f"wrote {p / 'lod001_detection_limit.json'} in {rec['seconds']:.0f}s", flush=True)
     return rec
 

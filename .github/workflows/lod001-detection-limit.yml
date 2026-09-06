@@ -1,0 +1,76 @@
+name: LOD001 detection limit
+
+# The ladder needs a TRAINED symlink adapter, and no checkpoint is committed
+# (so/results/checkpoints/ is ignored), so this job trains one per seed before it measures. That is
+# the whole cost: the measurement itself is forward passes and probe fits on a fixed set of states.
+on:
+  push:
+    branches: [claude/vision-technical-novelty-m2t1sa]
+    paths:
+      - 'so/experiments/lod001_detection_limit.py'
+      - 'so/experiments/wsc001_workspace_share.py'
+      - 'so/experiments/e000063_workspace_pod_certificate.py'
+      - 'so/llm_adapter.py'
+      - 'so/jlens.py'
+      - 'so/mvcc.py'
+      - '.github/workflows/lod001-detection-limit.yml'
+  workflow_dispatch:
+
+jobs:
+  unit:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+          cache-dependency-path: so/requirements.txt
+      - name: Install CPU dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install torch --index-url https://download.pytorch.org/whl/cpu
+          python -m pip install -r so/requirements.txt
+      - name: The dose axis must not move a record
+        run: python -m pytest so/tests/test_inject_scale.py so/tests/test_inject_projection.py so/tests/test_jlens.py -q
+
+  ladder:
+    needs: unit
+    strategy:
+      fail-fast: false
+      matrix:
+        seed: [0, 1, 2]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 110
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+          cache-dependency-path: so/requirements.txt
+      - name: Install CPU dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install torch --index-url https://download.pytorch.org/whl/cpu
+          python -m pip install -r so/requirements.txt
+      - name: Train the BOS symlink adapter for this seed
+        env:
+          SO_BOS: '1'
+          SO_CKPT_SUFFIX: '_bos'
+          SO_THREADS: '2'
+        run: |
+          python -m so.experiments.e000052_symlink_bos_train --seeds '${{ matrix.seed }}' --steps 3000 --threads 2
+      - name: LOD-001 both ladders
+        env:
+          SO_BOS: '1'
+          SO_THREADS: '2'
+        run: |
+          mkdir -p ci-lod001
+          python -m so.experiments.lod001_detection_limit \
+            --seeds '${{ matrix.seed }}' --threads 2 --n-groups 16 --results-dir ci-lod001
+      - uses: actions/upload-artifact@v4
+        with:
+          name: lod001-seed${{ matrix.seed }}
+          path: ci-lod001/

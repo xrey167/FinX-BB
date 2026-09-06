@@ -14,7 +14,7 @@ SEEDS ?= 0 1 2
 RUN = OMP_NUM_THREADS=$(THREADS) SO_THREADS=$(THREADS) $(PY) -m
 
 .PHONY: help test smoke synthetic gpt2 demo compare rescore certify closure retrieval pointers \
-        disclosure traceless keychannel untied report clean-results env
+        disclosure traceless keychannel untied report clean-results env lod001
 
 help:
 	@echo "make test        unit tests, ~3 min (the deletion certificate sweeps its whole payload domain)"
@@ -33,6 +33,7 @@ help:
 	@echo "make keychannel  the channel SHRED does not close: recover a shredded object from the keys"
 	@echo "make untied      the layer on a model that does not tie its embeddings (downloads Pythia-160m)"
 	@echo "make report      rebuild docs/so-results-2026-09-02.md from so/results/"
+	@echo "make lod001      the detection limit of the audit: train 3 BOS symlink seeds, then both ladders"
 	@echo "make env         print what will be used"
 	@echo ""
 	@echo "variables: PY=$(PY)  THREADS=$(THREADS)  SEEDS=$(SEEDS)"
@@ -128,3 +129,9 @@ report:
 # results are the record; this only removes the reduced smoke output
 clean-results:
 	rm -f so/results/*-quick.json so/results/*-quick.md so/results/*-smoke.json so/results/*-smoke.md
+
+# LOD-001: the smallest residue the accessibility audit could have seen. The training is the whole
+# cost (~20 min per seed on 4 cores); the ladders themselves are forward passes and probe fits.
+lod001:
+	SO_BOS=1 SO_CKPT_SUFFIX=_bos $(RUN) so.experiments.e000052_symlink_bos_train --seeds $(SEEDS) --steps 3000
+	SO_BOS=1 $(RUN) so.experiments.lod001_detection_limit --seeds $(SEEDS) --threads $(THREADS)
