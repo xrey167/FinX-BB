@@ -163,13 +163,13 @@ def topk_routing(k: Optional[int]):
         HopBlock.read, DerefBlock.forward = hop_original, deref_original
 
 
-def run_seed(seed: int, n_pods: int, threads: int, n_hardgate: int) -> Dict[str, Any]:
+def run_seed(seed: int, n_pods: int, threads: int, n_hardgate: int, reader: str = "syn") -> Dict[str, Any]:
     out: Dict[str, Any] = {"seed": seed}
     for mode in MODES:
         k = None if mode == "dense" else int(mode[3:])
         t0 = time.time()
         with topk_routing(k):
-            m = E51.run_reader_seed("syn", seed, n_pods, threads, n_hardgate, verbose=False)
+            m = E51.run_reader_seed(reader, seed, n_pods, threads, n_hardgate, verbose=False)
         for key, val in m.items():
             if isinstance(val, (int, float)) and not isinstance(val, bool):
                 out[f"{mode}/{key}"] = float(val)
@@ -187,6 +187,7 @@ def main(argv: Optional[List[str]] = None) -> int:
     ap.add_argument("--n-pods", type=int, default=100)
     ap.add_argument("--n-hardgate", type=int, default=20)
     ap.add_argument("--threads", type=int, default=int(os.environ.get("SO_THREADS", "0")))
+    ap.add_argument("--reader", default="syn", choices=("syn", "gpt2"))
     ap.add_argument("--quick", action="store_true", help="reduced sizes: not a record")
     ap.add_argument("--results-dir", default="so/results")
     args = ap.parse_args(argv)
@@ -198,7 +199,7 @@ def main(argv: Optional[List[str]] = None) -> int:
     per_seed = []
     for seed in args.seeds:
         print(f"seed {seed}:", flush=True)
-        per_seed.append(run_seed(seed, args.n_pods, args.threads, args.n_hardgate))
+        per_seed.append(run_seed(seed, args.n_pods, args.threads, args.n_hardgate, args.reader))
 
     keys = sorted(set.intersection(*[set(r) for r in per_seed]) - {"seed"})
     agg = ledger.aggregate([{k: v for k, v in r.items() if k != "seed"} for r in per_seed], keys)
@@ -213,7 +214,7 @@ def main(argv: Optional[List[str]] = None) -> int:
     record = {
         "experiment": "E-000058",
         "question": "Is the E-000051 cardinality floor a property of dense routing?",
-        "reader": "syn",
+        "reader": args.reader,
         "seeds": args.seeds,
         "n_pods": args.n_pods,
         "quick": args.quick,
@@ -234,7 +235,7 @@ def main(argv: Optional[List[str]] = None) -> int:
         "not_claimed": ["top-k attention", "sparse routing", "sparse mixture-of-experts",
                         "retrieval top-k", "that a softmax normaliser depends on its support"],
     }
-    suffix = "-quick" if args.quick else ""
+    suffix = ("-quick" if args.quick else "") + ("" if args.reader == "syn" else "-" + args.reader)
     out = Path(args.results_dir) / f"e000058_routing_cardinality_floor{suffix}.json"
     out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text(json.dumps(record, indent=1, default=float))
