@@ -79,6 +79,10 @@ FAMILIES = ("jspace", "random", "pca", "unembed", "raw")
 SITE_NAMES = tuple(f"site{l}" for l in WSC.SITES) + ("final",)
 
 
+def site_names(sites: Sequence[int]) -> Tuple[str, ...]:
+    return tuple(f"site{l}" for l in sites) + ("final",)
+
+
 def rotate_marker(marker: np.ndarray, centre: np.ndarray, chord: float,
                   rng: np.random.Generator) -> np.ndarray:
     """A marker at chord distance ``chord`` from ``centre``, in the plane of a random orthogonal axis.
@@ -168,8 +172,16 @@ def _arm_states(gk, cap, store, texts, alpha: Optional[float]):
 
 
 def run_seed(gk: E8.GPT2Knowledge, centre: np.ndarray, seed: int, n_groups: int,
-             modes: Sequence[str], verbose: bool = True) -> Dict[str, Any]:
-    """One seed: both ladders, both address modes, every site, every family."""
+             modes: Sequence[str], verbose: bool = True,
+             sites: Optional[Sequence[int]] = None) -> Dict[str, Any]:
+    """One seed: both ladders, both address modes, every site, every family.
+
+    ``sites`` names the blocks whose output is captured. It defaults to WSC-001's (8, 9, 10), which is
+    the set that experiment chose around THIS adapter's read layers; LOD-002 moves the read layers and
+    must therefore move the capture set with them, which is the whole point of that experiment.
+    """
+    sites = tuple(WSC.SITES if sites is None else sites)
+    names = site_names(sites)
     rng = np.random.default_rng(63000 + seed)
     world, spec = E15.sample_alias_world(rng, 420, max(n_groups * 2, 48), 2, gk.n_entities, 4,
                                          E20.N_TRAIN_TEMPLATES)
@@ -187,7 +199,7 @@ def run_seed(gk: E8.GPT2Knowledge, centre: np.ndarray, seed: int, n_groups: int,
     w_out = gk.model.w_out
     jl: Dict[str, Any] = {f"site{l}": jlens_vectors(gk.model.lm, l + 1, obj_ids, enc["input_ids"],
                                                     enc["attention_mask"], w_out, batch=4)
-                          for l in WSC.SITES}
+                          for l in sites}
 
     class _Identity:                      # at the final state J = I, so the lens IS the unembedding row
         vectors = F.normalize(w_out[torch.as_tensor(obj_ids)].float(), dim=-1)
@@ -196,7 +208,7 @@ def run_seed(gk: E8.GPT2Knowledge, centre: np.ndarray, seed: int, n_groups: int,
     arm_names = (["never", "shred"]
                  + [f"a{a:g}" for a in ALPHA_LADDER]
                  + [f"c{c:g}" for c in CHORD_LADDER])
-    cap = WSC.MultiCapture(gk)
+    cap = WSC.MultiCapture(gk, sites)
     acc: Dict[Tuple[str, str, str], List[torch.Tensor]] = {}
     ans: Dict[Tuple[str, str], List[torch.Tensor]] = {}
     med: Dict[Tuple[str, str, str], List[float]] = {}
@@ -285,7 +297,9 @@ def run_seed(gk: E8.GPT2Knowledge, centre: np.ndarray, seed: int, n_groups: int,
     out: Dict[str, Any] = {"seed": seed, "n_pods": n, "chance": 1.0 / n, "arms": arm_names,
                            "alpha_ladder": list(ALPHA_LADDER), "chord_ladder": list(CHORD_LADDER),
                            "delta": DELTA, "gate_by_chord": {k: float(np.mean(v)) for k, v in gates.items()},
-                           "achieved_chord": {k: float(np.mean(v)) for k, v in achieved.items()}}
+                           "achieved_chord": {k: float(np.mean(v)) for k, v in achieved.items()},
+                           "sites": list(sites), "site_names": list(names),
+                           "read_layers": list(gk.model.cfg.read_layers)}
     for (mode, site, what), v in med.items():
         out[f"{mode}/{site}/{what}"] = float(np.mean(v))
 
@@ -296,7 +310,7 @@ def run_seed(gk: E8.GPT2Knowledge, centre: np.ndarray, seed: int, n_groups: int,
         beh = {arm: float((torch.cat(v) == truth).float().mean()) for (m_, arm), v in ans.items() if m_ == mode}
         for arm, v in beh.items():
             out[f"{mode}/answer/{arm}"] = v
-        for site in SITE_NAMES:
+        for site in names:
             states = {arm: torch.cat(acc[(mode, site, arm)]) for arm in arm_names}
             fam_feats = _families(states, jl[site].vectors, w_out[torch.as_tensor(obj_ids)], n, seed)
             for fam, feats in fam_feats.items():
@@ -414,6 +428,7 @@ def summarise(rec: Dict[str, Any]) -> str:
         ok = (obs >= bar) if op == ">=" else (obs <= bar)
         out.append(f"| `{name}` | {obs:.4f} | {op} {bar} | {'PASS' if ok else '**FAIL**'} |")
 
+    names = tuple(per[0].get("site_names") or SITE_NAMES)
     for mode in rec["modes"]:
         out.append(f"\n## Detection limits — {mode} mode, worst seed\n")
         out.append(f"A cell is the smallest rung whose separation from the never-written control "
@@ -422,7 +437,7 @@ def summarise(rec: Dict[str, Any]) -> str:
         out.append("| site | " + " | ".join(FAMILIES) + " | answer |")
         out.append("|---|" + "---|" * (len(FAMILIES) + 1))
         ans = _worst_lod(per, f"{mode}/answer/LOD_alpha", a_top, True)
-        for site in SITE_NAMES:
+        for site in names:
             cells = [_lod_str(_worst_lod(per, f"{mode}/{site}/{f}/LOD_alpha", a_top, True), a_top)
                      for f in FAMILIES]
             out.append(f"| `{site}` | " + " | ".join(cells) + f" | {_lod_str(ans, a_top)} |")
@@ -431,7 +446,7 @@ def summarise(rec: Dict[str, Any]) -> str:
         out.append("| site | " + " | ".join(FAMILIES) + " | answer |")
         out.append("|---|" + "---|" * (len(FAMILIES) + 1))
         ansc = _worst_lod(per, f"{mode}/answer/LOD_chord", c_top, False)
-        for site in SITE_NAMES:
+        for site in names:
             cells = [_lod_str(_worst_lod(per, f"{mode}/{site}/{f}/LOD_chord", c_top, False), c_top)
                      for f in FAMILIES]
             out.append(f"| `{site}` | " + " | ".join(cells) + f" | {_lod_str(ansc, c_top)} |")
@@ -440,7 +455,7 @@ def summarise(rec: Dict[str, Any]) -> str:
         out.append("| seed | site | " + " | ".join(f"a={a:g}" for a in rec["alpha_ladder"]) + " |")
         out.append("|---|---|" + "---|" * len(rec["alpha_ladder"]))
         for s in per:
-            for site in SITE_NAMES:
+            for site in names:
                 c = s.get(f"{mode}/{site}/jspace/curve_alpha")
                 if c:
                     out.append(f"| {s['seed']} | `{site}` | " + " | ".join(f"{v:+.3f}" for v in c) + " |")
@@ -458,7 +473,7 @@ def summarise(rec: Dict[str, Any]) -> str:
     out.append("|---|---|---|---|---|---|---|")
     ch = float(np.mean([s_["chance"] for s_ in per]))
     for mode in rec["modes"]:
-        for site in SITE_NAMES:
+        for site in names:
             for fam in FAMILIES:
                 g = lambda arm: min((s_.get(f"{mode}/{site}/{fam}/{arm}", float("nan")) for s_ in per),
                                     default=float("nan"))
@@ -469,7 +484,7 @@ def summarise(rec: Dict[str, Any]) -> str:
     out.append("| mode | site | shred_moves | never_moves |")
     out.append("|---|---|---|---|")
     for mode in rec["modes"]:
-        for site in list(SITE_NAMES) + [f"write{l}" for l in (8, 10)]:
+        for site in list(names) + [f"write{l}" for l in (per[0].get("read_layers") or (8, 10))]:
             sm = [s.get(f"{mode}/{site}/shred_moves") for s in per]
             nm = [s.get(f"{mode}/{site}/never_moves") for s in per]
             if any(x is not None for x in sm):
