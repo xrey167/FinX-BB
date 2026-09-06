@@ -76,6 +76,53 @@ are blind, and both drop to near chance on the never arm (0.049–0.080) exactly
 reading the memory (live 0.946–0.969). This is the LOD-001 finding reproduced on three independently
 trained adapters with different read layers.
 
+## BY CONSTRUCTION, declared after the run and before any claim: the blind layer is a supervised no-op
+
+A hostile reviewer in this round's sweep found what this document should have declared before it was
+written, and it is in this repository's own trainer. `so/experiments/e000020_symlink_gpt2.py:59-63`:
+
+```python
+start = n_reads - q.hops
+for t in range(start):
+    for sl in range(1 + D):
+        route[i, t * (1 + D) + sl] = -1        # the passthrough / null column
+```
+
+For a one-hop query with two read layers, `start = 1`, so **read-layer 0 — block 8 on arm A, block 5
+on arm B — is supervised to the null column on every slot of every one-hop query.** Every read in
+LOD-001, LOD-002 and E-000063 is one-hop. The parallel agent's ledger §31.48 R2 measured the
+consequence a day before this experiment was designed: those slots read the null column at **≥ 0.998
+on every query**, so the injection there is "a bank-independent learned bias", and forcing that layer
+to passthrough changes the second read layer's query by 1e-7 to 3e-4 relative.
+
+**So the audit's blindness at the first read layer is not a discovery. It is the training objective.**
+This document's earlier phrasing — that the audit is blind there "because the memory has not been
+written yet" — is imprecise and is corrected here: nothing pod-specific is written there *because the
+router was trained to write nothing there*.
+
+What that does and does not do to the result:
+
+- It **does not** touch `W1`. Block 8 is blind on arm A and sighted on arm B, at identical depth in an
+  identical frozen model, on three seeds. That contrast is what the experiment was built to measure and
+  it stands.
+- It **does** replace the explanation, and the replacement is stronger for the operational point: the
+  blind region is fixed by the memory system's **routing supervision and read-layer configuration** —
+  two designer choices — and not by the model at all. A designer who moves either moves where a
+  deletion audit can see.
+- It **does** mean no sentence here may present the blindness itself as a finding about transformers.
+  It is a finding about this adapter's training, whose location is configurable.
+
+## Prior art for the site sweep itself
+
+Liao & Cao, *Present but Not Remembered: Auditing How Frozen VLAs Encode, Deploy, and Steer Visual
+History*, arXiv:2607.03372 (3 Jul 2026), fetched this session, already sweeps probe sites across the
+depth of a **frozen** model and decomposes a site's status into separately measured quantities —
+linear decodability, information unique to history, and causal deployment — with layer-resolved
+probing and causal interchange interventions. A layer-resolved site sweep with a decomposed
+per-site verdict on a frozen backbone is therefore **owned**, and is not claimed here. What it does not
+cover, checked in the source: it audits an unmodified model's own history representation, with no
+external memory, no deletion or unlearning audit, and no never-written control.
+
 ## The store-side ladder agrees, and more strongly than on arm A
 
 `jspace` chord-floor: **0.825** at sites 7, 8, 9 and 10, and 0.75 at the final state, against the
@@ -109,6 +156,10 @@ floor together with the never-written contrast, neither alone.
   arXiv:2608.20569 §3.6; ActAdd; CAA).
 - **Not the J-lens basis:** `K2` of LOD-001 fires in part and the same caution applies here; every
   sentence above is about *a readout at a site*.
+- **Not the layer-resolved site sweep with a decomposed per-site verdict on a frozen model:** Liao &
+  Cao, arXiv:2607.03372, own it.
+- **Not the blindness of the first read layer**, which is this adapter's supervised routing target and
+  was measured at ≥ 0.998 in ledger §31.48 R2 before this experiment existed.
 - Not a deletion guarantee, a certificate, or a mechanism.
 - Nothing about models above 124M, multi-token entities, free text, or any backbone but GPT-2 small.
 
