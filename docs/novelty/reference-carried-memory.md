@@ -67,28 +67,34 @@ to identities it has never seen.
 
 **Arm E was then rerun with the corrected handles and still fails**: held-out 0.0037 and 0.0113 on
 seeds 0 and 1 (run 34002574279, digests `9146f3e9…`, `5cabf04c…`), against arm A at 0.955-0.990. The
-bind loss did improve, 5.70 to 4.93, so the collinearity was real but not the whole cause. E-000086
-then measured the two limits that are, with no training at all:
+bind loss improved from 5.70 to 4.93, so the collinearity was real but not the whole cause.
 
-| Routing over a 700-row bank | identification, store-supplied readout |
+**Why it fails is NOT established, and two published explanations of mine were wrong.** Both were
+measured by scoring the RAW boundary residual against the handle table. The raw residual is dominated
+by the prompt, which is identical across identities, so those numbers measured my readout rather than
+the channel. With the no-memory baseline subtracted, at a 700-row bank, chance 0.0014:
+
+| Routing mass on the correct row | identification |
 |---|---:|
-| one-hot (the ceiling) | 0.3799 |
-| 0.9 of the mass on the right row | 0.3809 |
-| 0.5 | 0.3789 |
-| 0.3 | 0.3740 |
-| near-uniform, i.e. a cold start | **0.0000** |
+| one-hot | 0.9873 |
+| 0.50 | 0.9873 |
+| 0.10 | 0.9795 |
+| 0.05 | 0.9658 |
+| 0.01 | 0.1377 |
+| cold start (max mass 0.012) | 0.0381 |
 
-**Capacity.** The ceiling is 0.9834 at 256 identities and 0.3799 at the 700 a real bank holds. Even a
-perfect router misses the 0.95 gate at realistic sizes.
+- **The "capacity ceiling" is withdrawn.** I published 0.3799 at 700 identities and called it a limit a
+  perfect router could not beat. Measured correctly it is **0.9873**. There is no capacity ceiling at
+  realistic bank sizes. Orthogonal handles were tried against the wrong number and are unnecessary.
+- **The "bootstrap gap" is withdrawn as stated.** I published that a cold router conveys nothing and
+  that the carrier needs sharp routing. The carrier in fact tolerates a very soft router — 0.9658 at
+  five percent of the mass on the right row — and only collapses below about one percent. Arm E's
+  router passes that threshold early: its route loss of ~1.5 corresponds to roughly 22% mass.
 
-**Bootstrap.** A weighted average of near-orthogonal handles is not a handle, so at a cold start the
-carrier conveys nothing and there is no gradient path: the boundary decode gets no signal, and the
-router gets no reward for sharpening. The payload carrier has that path, which is why arm A trains —
-an average of payloads still raises the right token in proportion to its weight, because payloads are
-the model's own unembedding rows. **Averaging destroys a reference; it merely dilutes a value.** That
-is the defensible version of the claim I retracted, and unlike the retracted one it is measured rather
-than inferred from a broken carrier. Mixing itself is not the problem: the carrier tolerates 0.3 of the
-mass on the right row.
+So transport is fine, capacity is fine, and the router is sharp enough. **The cause of arm E's
+end-to-end failure is open.** I am not proposing a third mechanism from quick probes; three in a row
+were artefacts of how I measured, and the honest state of this line is an unexplained negative rather
+than an explained one.
 
 The rank-7.2 transport-channel measurement stands as arithmetic and is withdrawn as an explanation: a
 channel that carries near-orthogonal directions at 0.98 was never the binding constraint.
@@ -151,11 +157,10 @@ a placement that already gives total invariance and cannot read.
 
 ## What is still worth running, and why it is not a claim
 
-1. **Curriculum bootstrap, if anyone revisits this.** The design's failure is that a cold router
-   conveys nothing through a reference carrier (0.0000), while it tolerates a substantially soft one
-   once sharp (0.374 at 0.3 of the mass). Injecting the SUPERVISED row's handle for the first few
-   hundred steps would supply the missing gradient path. It would not fix the capacity ceiling of
-   0.3799 at 700 rows, which is the harder of the two limits and the reason this is not queued.
+1. **Find out why arm E actually fails.** Transport, capacity and router sharpness are all measured
+   and all adequate, so the cause is elsewhere and is genuinely unknown. The next probe should
+   instrument a TRAINED arm E checkpoint — what its boundary distribution puts on the supervised row,
+   on real queries — rather than reasoning from synthetic injections, which has misled me three times.
 2. ~~Arm E with corrected handles~~ — done: 0.0037 and 0.0113, and E-000086 explains both limits.
 3. **Per-read write placement**, to separate the routing feedback from a depth threshold above one
    block in the arm A/C/D comparison. That question is still open and is about placement, not carriers.

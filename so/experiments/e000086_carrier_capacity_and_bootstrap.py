@@ -1,28 +1,21 @@
-"""E-000086 -- the two limits of a reference carrier, measured on frozen GPT-2.
+"""E-000086 -- handle-mixture readout on frozen GPT-2. RESULTS SUPERSEDED; READ THIS FIRST.
 
-Arm E fails end to end even after its handle family was fixed (E-000085: 0.9834 identification with no
-learning at 256 identities). This experiment asks why, with no training at all, by injecting handle
-mixtures directly and reading them back with the store-supplied table.
+This experiment as first written scored the RAW boundary residual against the handle table. The raw
+residual is dominated by the prompt, which is identical across identities, so its numbers measured the
+readout and not the channel.  Two conclusions were published from them and BOTH ARE WITHDRAWN:
 
-Two independent limits, both fatal on this substrate:
+  * a "capacity ceiling" of 0.3799 at 700 identities -- with the no-memory baseline subtracted it is
+    0.9873, so there is no capacity ceiling at realistic bank sizes;
+  * a "bootstrap gap" in which a cold router conveys nothing -- the carrier in fact tolerates five
+    percent of the routing mass on the correct row (0.9658) and only collapses below about one
+    percent, which arm E's router clears early.
 
-1. CAPACITY. Identification under ONE-HOT routing -- the ceiling, where the carrier is a single clean
-   handle -- is 0.9834 at 256 identities but 0.3799 at the 700 a real bank holds. Even a perfect router
-   cannot reach the 0.95 gate at realistic bank sizes.
+Corrected numbers, 700-row bank, baseline subtracted, chance 0.0014: one-hot 0.9873, 0.50 mass 0.9873,
+0.10 mass 0.9795, 0.05 mass 0.9658, 0.01 mass 0.1377, cold start 0.0381.
 
-2. BOOTSTRAP. A weighted average of near-orthogonal handles is not a handle. Under the near-uniform
-   routing a cold-started model actually produces, identification is 0.0000. So the boundary decode
-   gets no learnable signal and the router gets no reward for sharpening: there is no gradient path in.
-   The payload carrier has one, which is why arm A trains: an average of payloads still raises the
-   right token's logit in proportion to its weight, because payloads are the model's own unembedding
-   rows. Averaging destroys a reference; it merely dilutes a value.
-
-Note what is NOT the cause: mixing per se. With 0.9, 0.7, 0.5 and even 0.3 of the routing mass on the
-right row, identification is 0.3809 / 0.3809 / 0.3789 / 0.3740 -- indistinguishable from the one-hot
-ceiling. The carrier tolerates a substantially soft router; what it cannot survive is the uniform one
-it must start from.
-
-No adapter is trained here and nothing is a novelty claim.
+The cause of arm E's end-to-end failure is therefore OPEN.  Anyone extending this should instrument a
+trained checkpoint rather than synthetic injections: three explanations derived this way were artefacts
+of the measurement.
 """
 import torch
 from transformers import AutoModelForCausalLM, AutoTokenizer
