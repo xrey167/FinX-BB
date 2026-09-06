@@ -34,9 +34,10 @@ guarantee, and if it is not, what replaces it and what the replacement costs.
 **It is not.** We report a clean failure: a deletion primitive that passed four attacks at chance over
 750 pooled trials and surrendered the deleted object at top-1 1.0000 to a fifth attack written
 afterwards, through an index term derived from the very payload it destroyed. Restated over an
-abstract store, the same channel reproduces in three unrelated shapes — and in the vector-index shape
-it leaks most of the payload while scoring **0.0000** on the very top-1 metric the first attack
-reported, so the audit's own headline metric is also wrong.
+abstract store, the same channel reproduces in three unrelated shapes — **reconstructions of published
+designs, not the published systems themselves** (§3, §13) — and in the vector-index shape it leaks
+most of the payload while scoring **0.0000** on the very top-1 metric the first attack reported, so
+the audit's own headline metric is also wrong.
 
 **What replaces it is a proof.** Where knowledge is held in rows with a small payload domain,
 independence of the model's computation from a deleted payload is provable exhaustively: sweep every
@@ -87,9 +88,10 @@ at larger scale (*unverified*). The system here is an instrument for asking F1�
 The primitive SHRED destroys a cell's marker; a learned gate closes; the payload becomes unreadable.
 Against it we ran a calibrated linear probe, forced choice, logit rank and top-1, on fresh seeds that
 took no part in choosing the configuration. Forced choice landed on exactly 375 of 750. The probe on
-4 of 750 against a chance of 1 in 256. Every exact interval contained its chance level — **and the
-probe read live cells at 0.893–0.927**, so the attacks demonstrably worked where there was something
-to find. (`make keychannel`, E-000019.)
+4 of 750 against a chance of 1 in 256. Every exact interval contained its chance level — three of the
+four carry one, logit rank being a statistic without an interval — **and the probe read live cells at
+0.893–0.927**, so the attacks demonstrably worked where there was something to find. (`make
+keychannel`, E-000019, **seeds 5–7**.)
 
 Then one question none of the four asked. `shred()` writes only the marker and leaves the row ACTIVE,
 and the routing keys are computed **before** the gate and never gated:
@@ -103,7 +105,14 @@ v_f = v_fwd(o) * g              # only the values are gated
 Give the attacker what the rest of the battery gives them — a cell's subject and relation — let them
 locate its column from the routing of the ordinary forward question, then sweep candidate objects
 through a *reverse* query and take the one that steers the read onto that column. Five seeds, 500
-pooled targets, no training:
+pooled targets, no training (E-000028):
+
+**The fifth attack is a different experiment from the four, on a disjoint seed set.** The battery
+above is E-000019 on seeds 5–7, held out from configuration selection, 750 trials; this table is
+E-000028 on seeds 0–4 — the selection seeds — with 100 targets each. Held-out seeds are what makes an
+*at-chance* reading evidence, and they do not bear on a recovery at 500 of 500, so nothing here rests
+on the overlap. But the two rows are not the same trials and the paper should not be read as if a
+fifth attack were added to the same battery.
 
 | condition | object recovered top-1 | mean rank | winning margin |
 |---|---|---|---|
@@ -112,8 +121,10 @@ pooled targets, no training:
 | revoke / delete | 0.0040 | 128.02 | 0.0022 |
 | chance | 0.0039 | 127.5 | — |
 
-The shredded row is not leaky. It is *unchanged* — equal to the live cell to four decimals, margin
-included — because the tensors the attack reads are the same before and after.
+The shredded row is not leaky. It is *unchanged*: on every one of the five seeds the shred arm's
+top-1, top-5, mean rank and margin are bit-identical to the active arm's, not equal to some number of
+decimals. That is not a measurement, it is the mechanism — the tensors the attack reads are the same
+object before and after, because `shred()` never touches them.
 
 **This is not "soft-deleted data still on the medium."** The payload *was* gated; the value channel
 *is* at chance; the recovery runs through a derived index the primitive never touched. The nearest
@@ -179,9 +190,11 @@ sample; every case.
 
 **Interface.** Both models read the store in exactly one place. So if the *encoding* is bit-identical
 across the whole payload domain, every downstream quantity is identical **for every possible query**
-— multi-hop, reverse, phrasings nobody has written. The cost is one cheap encoding per payload value,
-never running the core, which is why it took under a second for a 124M-parameter adapter and would
-take the same for a 7B one.
+— multi-hop, reverse, phrasings nobody has written. The cost is one cheap encoding per payload value
+and **no core forward pass at all**, which is why it took under a second on a 124M-parameter adapter.
+The cost therefore does not scale with the core; it scales with the encoder and the payload domain.
+We have not run it on a larger core, so "and it would be as cheap at 7B" is a prediction the argument
+supports and no measurement here establishes.
 
 The guards exist because reading source is how two defects entered the record. `check_mediation`
 looks for an output that moves while the encoding holds still — which would mean the interface is not
@@ -265,7 +278,15 @@ calls it "directly testable within our framework" and does not test it (*all unv
 
 What is ours is the measurement, the composition with a record-level certificate, and the price the
 reader charges for the indirection: 0.0954 for sharing and 0.0688 for link training, worst of three
-seeds over twelve phrasings.
+seeds over twelve phrasings (`make rescore`, E-000025).
+
+**Provenance caveat on those two numbers.** E-000025's own record notes that a forced re-run
+overwrote the seed-0 and seed-1 checkpoints of E-000020 after that record was written; only seed 2
+still matches the SHA-256 E-000020 recorded. E-000025 is internally sound — it stores the SHA of
+every checkpoint it actually scored — but for two of three seeds those checkpoints cannot be traced
+to E-000020, so §0's "reproducible by the `make` target beside it" holds for this pair only in the
+sense that the scored artefacts are hashed, not that re-running the chain reproduces them. These are
+the only two numbers in the paper with that qualification.
 
 ## 7. Why the construction needs rows at all
 
@@ -292,7 +313,7 @@ Read the rows as a demonstration that the comparison is *available*, not as an e
 | **a certificate is even available** | **yes** | no | no |
 
 The relabel arm is the strongest practical baseline and the worst of the three: it looks deleted at
-0.02, and an attacker who fine-tunes on half the deleted facts recovers 76% of the half they never
+0.02, and an attacker who fine-tunes on half the deleted facts recovers 0.72 of the half they never
 supplied.
 
 The last row is the one that matters, and not because of effort: in a LoRA there is no finite payload
@@ -329,15 +350,19 @@ points at that no row holds. Three seeds, 100 pods each (`make disclosure`, E-00
 | **canonical (pod)** | **1.0000** | **1.0000** | **1 of 1,536** | 0.00 |
 | duplicated | 0.0000 | 0.0000 | 1,536 of 1,536 | 0.00 |
 
-And the closure **inverts** with the guarantee you ask for:
+And the closure **inverts** with the guarantee you ask for. **The two rows are two experiments**, and
+only the second is the one this section is about: unreachability is E-000032 (`make closure`, three
+seeds, **25 pods each**) and tracelessness is E-000035 (three seeds, 100 pods each). Both are exact
+on every seed, so the inversion does not turn on the pod count — but it is a comparison across runs,
+not two columns of one table.
 
-| guarantee | canonical pod | duplicated |
-|---|---|---|
-| unreachable to the reader | **1.00** | 3.00 |
-| no trace left in the bank | 3.00 | **1.00** |
+| guarantee | canonical pod | duplicated | record |
+|---|---|---|---|
+| unreachable to the reader | **1.00** | 3.00 | E-000032, 25 pods/seed |
+| no trace left in the bank | 3.00 | **1.00** | E-000035, 100 pods/seed |
 
 A pod's aliases *are* the signposts, so leaving no trace costs the object plus all of them; a
-duplicated store costs the one record you were removing anyway. Exact on every seed.
+duplicated store costs the one record you were removing anyway.
 
 **So the recommendation of Part II must be stated in both directions: canonicalisation makes erasure
 a single certifiable operation and turns every access path into a deletion oracle.** Both follow from
@@ -384,12 +409,23 @@ is cheap.
 and `so/results/`, and each was caught by a person opening a JSON file: a mean rank written 128.0
 where the record says 128.02; an accept rate written 1.0000 where the sweep says 0.9999; and §7's
 table presented with no seed count where the record is one seed. Three for three is the absence of
-an instrument, so there is now a registry (`make papernums`) binding 65 figures printed in this text
-and 30 more printed inside the three drawn figures to the record paths they came from, re-rendered
-under the rounding rule used, plus 7 **scope claims** — a fact about a record's extent that this text
+an instrument, so there is now a registry (`make papernums`) binding 70 figures printed in this text
+and 31 more printed inside the three drawn figures to the record paths they came from, re-rendered
+under the rounding rule used, plus 10 **scope claims** — a fact about a record's extent that this text
 must state in words, which is what caught §7. It fails when prose and record part. Its own floor
 mutates each registered figure and requires the check to notice, for all of them rather than a
 sample, since a claim whose path silently failed to resolve would pass a clean run too.
+
+**A fourth disagreement then survived it, and that is the most useful thing the registry has done.**
+A read-through found §7's prose claiming a relearning attack recovered "76%" where the record says
+**0.72**, and three scope errors: §2 presenting one battery when it is two experiments on disjoint
+seed sets, §8 combining a 25-pod experiment and a 100-pod one under one heading, and §6 quoting two
+numbers whose checkpoints the record itself flags as no longer traceable. The check was green
+throughout — because none of the four was registered. That is what "partial by construction" costs,
+stated as a measurement rather than a disclaimer: a green run is a statement about the bindings that
+exist, and the bindings that exist are the ones somebody thought to write. All four are registered
+now, which makes them the last things this particular reading can find and says nothing about the
+next one.
 
 Calibrating it made the same point a third time. Its presence test began as a substring search,
 which is nearly vacuous for a short token — `0.0` is inside `0.0040` — and requiring a standalone
@@ -480,7 +516,10 @@ system people cite, or a null that localises the defect. No training; inference 
 checkpoints. **This is also the answer to the reviewer who objects to the scale of our own setup** —
 it converts that setup from the subject of the paper into its instrument.
 
-**(d) Verify every citation.** See §0.
+**(d) Obtain the citations, then verify them.** §12 currently names *topics*, not works: there is not
+one author, year or title in this draft. "Verify every citation" understates the task — the
+references have to be found first, and only then checked against §0's warning. Until that is done the
+related-work section cannot be assessed by a reviewer at all.
 
 ## 14. Venue
 
@@ -494,5 +533,5 @@ are what a practitioner will act on.
 
 Every number above: `make keychannel certify closure retrieval disclosure compare pdxaudit`. Records
 in `so/results/`. Instrument audits: `make calibrate charged unread auditinstr`. To check this text
-against those records: `make papernums` (65 figures in the prose, 30 in the drawn figures, 7 scope
+against those records: `make papernums` (70 figures in the prose, 31 in the drawn figures, 10 scope
 claims; non-zero exit when any of them parts from its record).

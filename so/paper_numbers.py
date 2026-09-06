@@ -269,6 +269,12 @@ CLAIMS: tuple[Claim, ...] = (
     # E-000032 — the store-side closure, proved rather than sampled
     Claim("E32 canonical closure", "e000032_deletion_closure.json", "aggregate/canonical/fact_closure_mean/mean", "1.00", "dp2"),
     Claim("E32 duplicated closure", "e000032_deletion_closure.json", "aggregate/duplicated/fact_closure_mean/mean", "3.00", "dp2"),
+    # E-000032 runs 25 pods per seed, E-000035 runs 100; the paper combined them under one heading
+    Claim("E32 pods per seed", "e000032_deletion_closure.json", "n_groups", "25", "int"),
+
+    # E-000029 — the reproduction of the published false-accept rate on its own distribution
+    Claim("E29 rejection-sampled accept rate", "e000029_marker_geometry.json",
+          "aggregate/rejection_sampled_accept_rate/mean", "8.550e-04", "exp3"),
 
     # E-000035 — the closure inverts, and the false-positive column
     Claim("E35 canonical trace closure", "e000035_deletion_disclosure.json", "aggregate/canonical/trace_closure_mean/mean", "3.00", "dp2"),
@@ -281,6 +287,14 @@ CLAIMS: tuple[Claim, ...] = (
     Claim("E24 cells forced choice", "e000024_weights_vs_cells-seed0.json", "aggregate/cells/after/forced_choice/mean", "0.44", "dp2"),
     Claim("E24 cells perplexity", "e000024_weights_vs_cells-seed0.json", "aggregate/cells/ppl_after/mean", "42.9", "dp1"),
     Claim("E24 cells delete seconds", "e000024_weights_vs_cells-seed0.json", "aggregate/cells/delete_seconds/mean", "0.0008", "dp4"),
+    # the prose said "76%" where the record says 0.72 -- the fourth prose/record disagreement,
+    # found by reading the paper rather than by this check, because it was not registered
+    Claim("E24 relabel relearning recovery", "e000024_weights_vs_cells-seed0.json",
+          "aggregate/relabel/relearn/heldout_acc/mean", "0.72", "dp2"),
+    Claim("E24 gradient-ascent relearning recovery", "e000024_weights_vs_cells-seed0.json",
+          "aggregate/ga/relearn/heldout_acc/mean", "0.48", "dp2"),
+    Claim("E24 cells relearning recovery", "e000024_weights_vs_cells-seed0.json",
+          "aggregate/cells/relearn/heldout_acc/mean", "0.00", "dp2"),
 
     # E-000030 — the certificate
     Claim("E30 swept questions", "e000030_deletion_certificate.json", "per_seed/0/n_queries_swept", "838", "int"),
@@ -355,6 +369,8 @@ FIGURE_CLAIMS: tuple[FigureClaim, ...] = (
                 "aggregate/duplicated/candidate_keys_mean/mean", "1,536", "thousands"),
     FigureClaim(_F3, "F3 pods per seed", "e000035_deletion_disclosure.json",
                 "aggregate/n_groups/mean", "100", "int"),
+    FigureClaim(_F3, "F3 unreachability pods per seed", "e000032_deletion_closure.json",
+                "n_groups", "25", "int"),
 )
 
 
@@ -363,6 +379,26 @@ SCOPE_CLAIMS: tuple[ScopeClaim, ...] = (
         "E28's attack pooled five seeds",
         "e000028_key_channel.json", "seeds", [0, 1, 2, 3, 4],
         "Five seeds",
+    ),
+    ScopeClaim(
+        "the four-attack battery ran on seeds held out from selection, disjoint from E28's",
+        "e000019_fresh_seed_chance.json", "config/seeds", [5, 6, 7],
+        "seeds 5–7",
+    ),
+    ScopeClaim(
+        "E32 runs 25 pods per seed, not E35's 100",
+        "e000032_deletion_closure.json", "n_groups", 25,
+        "25 pods",
+    ),
+    # bound to the note itself, not to some unrelated field that happens to be stable: if the record's
+    # provenance changes, the paper's caveat has to be re-read rather than silently kept
+    ScopeClaim(
+        "E25's checkpoints cannot all be traced back to E-000020",
+        "e000025_template_rescoring.json", "provenance_note",
+        "a forced re-run of E-000020 overwrote its seed-0 and seed-1 checkpoints after that record "
+        "was written; only seed 2 still matches the SHA-256 recorded there. The SHA of every "
+        "checkpoint scored here is in per_seed.",
+        "Provenance caveat",
     ),
     ScopeClaim(
         "E32, E35 and E25 are three seeds each",

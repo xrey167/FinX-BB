@@ -1,4 +1,4 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="620" height="446" viewBox="0 0 620 446"
+<svg xmlns="http://www.w3.org/2000/svg" width="620" height="462" viewBox="0 0 620 462"
      role="img" aria-labelledby="f2title f2desc" font-family="Helvetica Neue, Helvetica, Arial, sans-serif">
   <title id="f2title">The deletion closure inverts with the guarantee</title>
   <desc id="f2desc">To make a fact unreachable to the reader, a canonical pod store must delete 1 record
@@ -22,10 +22,10 @@
     .mdup    { fill: #fcfcfb; stroke: #eb6834; stroke-width: 2.25; }
   </style>
 
-  <rect class="surface" width="620" height="446"/>
+  <rect class="surface" width="620" height="462"/>
 
   <text class="ink title" x="24" y="30">Canonicalisation is cheapest to make unreachable and dearest to leave traceless</text>
-  <text class="ink2 sub" x="24" y="49">Records that must be deleted · 3 seeds, 100 pods each · exact on every seed</text>
+  <text class="ink2 sub" x="24" y="49">Records that must be deleted · 3 seeds · exact on every seed · two experiments, see the note below</text>
 
   <!-- gridlines at 1, 2, 3 -->
   <g class="grid">
@@ -83,5 +83,6 @@
   <text class="ink2 note" x="24" y="398">uniquely at 1.0000 (1 of 1,536 keys); the duplicated store at 0.0000 (1,536 of 1,536).</text>
   <text class="ink2 note" x="24" y="412">Zero false positives in both.</text>
 
-  <text class="ink2 note" x="24" y="430">E-000035 · `make disclosure` · so/results/e000035_deletion_disclosure.json</text>
+  <text class="ink2 note" x="24" y="430">Unreachability: E-000032 · `make closure` · 25 pods per seed. Tracelessness: E-000035 ·</text>
+  <text class="ink2 note" x="24" y="444">`make disclosure` · 100 pods per seed. The two lines are two experiments, not one table.</text>
 </svg>

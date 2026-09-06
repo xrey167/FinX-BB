@@ -3272,6 +3272,44 @@ The registry is **partial by construction**: `coverage()` reports what it binds,
 it is unchecked, not verified. What the check does not do: it compares the paper against the
 records, never the records against reality. A wrong number written identically in both passes.
 
+### 31.50 A read-through found four things the green check could not (2026-09-06, paper review)
+
+§31.49 built the registry and it ran clean. A close reading of the draft then found four
+disagreements it had been green through, every one of them outside its bindings.
+
+**One wrong number.** §7's prose said a relearning attack against the relabel arm "recovers 76% of
+the half they never supplied". The record says `relabel/relearn/heldout_acc = 0.72`, and nothing in
+E-000024 is 0.76. The *table* in the same section printed 0.72 correctly, so the paper contradicted
+itself on one page.
+
+**Three scope errors, all of the §31.49 shape.**
+
+* §2 read as one deletion attacked five ways. It is two experiments: the four-attack battery is
+  E-000019 on **seeds 5–7** (750 trials, held out from configuration selection); the fifth attack is
+  E-000028 on **seeds 0–4** (500 trials) -- the selection seeds. Held-out seeds are what make an
+  *at-chance* reading evidence and are irrelevant to a recovery at 500 of 500, so no finding moves;
+  the disclosure was simply missing.
+* §8's inversion table combined E-000032 (`n_groups = 25`) with E-000035 (`n_groups = 100`) under a
+  heading reading "Three seeds, 100 pods each". Figure 3's subtitle carried the same error, in a
+  figure written this session.
+* §6's 0.0954 and 0.0688 come from E-000025, whose own `provenance_note` says a forced re-run
+  overwrote E-000020's seed-0 and seed-1 checkpoints and only seed 2 still matches the recorded
+  SHA-256. E-000025 is internally sound -- it hashes what it scored -- but §0's "reproducible by the
+  `make` target beside it" does not hold for that pair in the ordinary sense.
+
+**And one understatement, which is the pleasant kind of error.** §2 said the shredded row is "equal
+to the live cell to four decimals". Per seed, the shred arm's top-1, top-5, mean rank and margin are
+**bit-identical** to the active arm's on all five seeds. The claim was weaker than the record.
+
+**What this says about §31.49.** The check was green the whole time, and it was not lying: it reports
+what it binds, and none of these four was bound. A green run is a statement about the bindings that
+exist, and the bindings that exist are the ones somebody thought to write -- which is why
+`coverage()` and `not_claimed` are part of the output rather than a footnote. The registry's value
+here was not catching these; it was making it cheap to fix them permanently. All four are now bound
+(70 prose figures, 31 drawn, 10 scope claims), including the E-000025 claim, which is bound to the
+provenance note *itself* rather than to some stable neighbouring field -- binding a caveat to an
+unrelated number would have been §31.42's defect in a new costume.
+
 ### 31.8 Boundary
 
 CPU only, no GPU, no LLM above 124M parameters, synthetic worlds, single-token entities, two surface forms per relation, one session. Nothing here shows unlearning of facts already encoded in pretrained weights. Evidence levels recorded: E3–E4 for the synthetic system (F4 for SHRED with the verified gate, E-000010 — **on the value channel only**: E-000028 recovers the shredded object at 1.0000 through the ungated reverse key, where REVOKE and DELETE are at chance, so F4 for SHRED is a claim about answers, logits, hidden states and probes and not about routing); E5 as substrate for the frozen-GPT-2 experiment, with reading, composition, update and the copy bound supported and behavioural deletion not yet supported at the pre-registered thresholds.
