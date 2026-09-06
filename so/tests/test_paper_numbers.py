@@ -18,12 +18,15 @@ from so.paper_numbers import (
     Claim,
     FigureClaim,
     ScopeClaim,
+    _NOT_A_MEASUREMENT,
     _figure_text,
     _fmt,
     _resolve,
     check,
+    check_self_description,
     coverage,
     occurrences,
+    unregistered,
 )
 
 _PAPER_TEXT = PAPER.read_text(encoding="utf-8")
@@ -257,6 +260,81 @@ def test_rounding_rules_render_as_the_paper_prints():
 def test_an_unknown_rounding_rule_raises_rather_than_passing():
     with pytest.raises(ValueError):
         _fmt(1.0, "nearest-convenient")
+
+
+# --------------------------------------------------------------------------- coverage
+
+def test_no_number_in_the_paper_is_unbound():
+    """The registry was green while `137`, `311` and `8.49e+06` were wrong, because none was bound.
+
+    Coverage is the other half of the check: every numeric token in the paper must be bound to a
+    record or excluded by a rule that states its reason. Zero unbound is the only reading that lets
+    a clean `check()` mean anything about the paper as a whole.
+    """
+    cov = unregistered()
+    assert cov["unbound_count"] == 0, cov["unbound"]
+    assert cov["distinct_numeric_tokens"] > 40
+
+
+def test_coverage_notices_a_number_nothing_binds():
+    """Floor: introduce an unbound figure and it must be reported."""
+    doctored = _PAPER_TEXT + "\n\nThe adapter recovered 0.4173 of the held-out facts.\n"
+    cov = unregistered(doctored)
+    assert "0.4173" in cov["unbound"]
+
+
+def test_every_exclusion_states_why_it_is_not_a_measurement():
+    """An exclusion list without reasons is a way to make coverage say whatever you want."""
+    assert _NOT_A_MEASUREMENT
+    for pattern, reason in _NOT_A_MEASUREMENT:
+        assert pattern and reason
+        assert len(reason) > 8, (pattern, reason)
+        re.compile(pattern)
+
+
+def test_the_three_wrong_numbers_in_section_7_are_bound_now():
+    """`137` was a mean rank read as seconds; `311` was in no record; `8.49e+06` came from §5."""
+    by_label = {c.label: c for c in CLAIMS}
+    assert by_label["E24 ga delete seconds"].printed == "129"
+    assert by_label["E24 relabel delete seconds"].printed == "335"
+    assert by_label["E24 relabel perplexity"].printed == "6.39e+06"
+
+
+def test_the_wrong_numbers_survive_only_where_the_paper_reports_them_as_wrong():
+    """They are quoted in §9's methods narrative, and must not be back in §7's table."""
+    table_row = next(line for line in _PAPER_TEXT.splitlines()
+                     if line.startswith("| seconds to delete 50 facts"))
+    assert "129" in table_row and "335" in table_row
+    assert "137" not in table_row and "311" not in table_row
+    ppl_row = next(line for line in _PAPER_TEXT.splitlines()
+                   if line.startswith("| perplexity on ordinary prose"))
+    assert "6.39e+06" in ppl_row and "8.49e+06" not in ppl_row
+    # where they do survive, they are backticked -- the paper's mark for a numeral being discussed
+    for quoted in ("`137`", "`311`", "`8.49e+06`"):
+        assert quoted in _PAPER_TEXT
+
+
+# --------------------------------------------------------------- the paper's self-description
+
+def test_the_paper_states_this_registry_size_correctly():
+    """These three numbers cannot be bound to a record: their source is the registry itself."""
+    rows = check_self_description()
+    assert rows, "the paper no longer describes the registry at all"
+    assert [r["status"] for r in rows] == ["OK"] * len(rows), rows
+
+
+def test_the_self_description_can_fail_on_a_stale_count():
+    """Floor: it has drifted 33 -> 65 -> 70 -> 87, corrected by hand each time. Not any more."""
+    rows = check_self_description(_PAPER_TEXT, claims=CLAIMS[:-1])
+    assert [r["status"] for r in rows] == ["MISMATCH"] * len(rows), rows
+    assert str(len(CLAIMS) - 1) in rows[0]["detail"]
+
+
+def test_the_self_description_can_fail_when_the_paper_stops_making_it():
+    text = _PAPER_TEXT.replace("figures printed in this text", "<removed>")
+    text = text.replace("figures in the prose", "<removed>")
+    rows = check_self_description(text)
+    assert [r["status"] for r in rows] == ["ABSENT"] * len(rows), rows
 
 
 # --------------------------------------------------------------------------- the presence test

@@ -251,6 +251,8 @@ CLAIMS: tuple[Claim, ...] = (
     Claim("E35 canonical unique", "e000035_deletion_disclosure.json", "aggregate/canonical/uniquely_identified/mean", "1.0000", "dp4"),
     Claim("E35 duplicated disclosed", "e000035_deletion_disclosure.json", "aggregate/duplicated/deleted_key_disclosed/mean", "0.0000", "dp4"),
     Claim("E35 key space", "e000035_deletion_disclosure.json", "aggregate/duplicated/candidate_keys_mean/mean", "1,536", "thousands"),
+    Claim("E35 canonical candidate keys", "e000035_deletion_disclosure.json",
+          "aggregate/canonical/candidate_keys_mean/mean", "1", "int"),
 
     # E-000019 — the attack validity floor
     Claim("E19 probe floor min", "e000019_fresh_seed_chance.json", "aggregate/verified_hard/probe_calibration_top1/min", "0.893", "dp3"),
@@ -283,10 +285,31 @@ CLAIMS: tuple[Claim, ...] = (
     Claim("E35 pods per seed", "e000035_deletion_disclosure.json", "aggregate/n_groups/mean", "100", "int"),
     Claim("E35 blanking closes it", "e000035_deletion_disclosure.json", "aggregate/blanked/channel_closed/mean", "1.0000", "dp4"),
 
-    # E-000024 — rows versus weights
+    # E-000024 — rows versus weights. The whole head-to-head table is bound, because leaving it
+    # unbound is how "137" (a mean rank read as seconds), "311" and "8.49e+06" got into print.
+    Claim("E24 cells answered before", "e000024_weights_vs_cells-seed0.json",
+          "aggregate/cells/before/direct_acc/mean", "0.92", "dp2"),
+    # both LoRA arms share ONE before-measurement; the table's two 0.96 cells are one number
+    Claim("E24 weights answered before", "e000024_weights_vs_cells-seed0.json",
+          "aggregate/weights/before/direct_acc/mean", "0.96", "dp2"),
+    Claim("E24 cells answers after", "e000024_weights_vs_cells-seed0.json", "aggregate/cells/after/direct_acc/mean", "0.02", "dp2"),
+    Claim("E24 ga answers after", "e000024_weights_vs_cells-seed0.json", "aggregate/ga/after/direct_acc/mean", "0.00", "dp2"),
+    Claim("E24 relabel answers after", "e000024_weights_vs_cells-seed0.json", "aggregate/relabel/after/direct_acc/mean", "0.02", "dp2"),
     Claim("E24 cells forced choice", "e000024_weights_vs_cells-seed0.json", "aggregate/cells/after/forced_choice/mean", "0.44", "dp2"),
+    Claim("E24 ga forced choice", "e000024_weights_vs_cells-seed0.json", "aggregate/ga/after/forced_choice/mean", "0.78", "dp2"),
+    Claim("E24 relabel forced choice", "e000024_weights_vs_cells-seed0.json", "aggregate/relabel/after/forced_choice/mean", "1.00", "dp2"),
     Claim("E24 cells perplexity", "e000024_weights_vs_cells-seed0.json", "aggregate/cells/ppl_after/mean", "42.9", "dp1"),
+    Claim("E24 ga perplexity", "e000024_weights_vs_cells-seed0.json", "aggregate/ga/ppl_after/mean", "6.19e+09", "exp2"),
+    Claim("E24 relabel perplexity", "e000024_weights_vs_cells-seed0.json", "aggregate/relabel/ppl_after/mean", "6.39e+06", "exp2"),
     Claim("E24 cells delete seconds", "e000024_weights_vs_cells-seed0.json", "aggregate/cells/delete_seconds/mean", "0.0008", "dp4"),
+    Claim("E24 ga delete seconds", "e000024_weights_vs_cells-seed0.json", "aggregate/ga/delete_seconds/mean", "129", "int"),
+    Claim("E24 relabel delete seconds", "e000024_weights_vs_cells-seed0.json", "aggregate/relabel/delete_seconds/mean", "335", "int"),
+    # the "parameters changed: 0" cell. The record's nearest quantity is the L2 norm of the weight
+    # delta, which is exactly 0.0 -- zero movement, hence zero parameters changed.
+    Claim("E24 cells weight delta", "e000024_weights_vs_cells-seed0.json",
+          "aggregate/cells/weight_delta_l2/mean", "0", "int"),
+    Claim("E24 cells", "e000024_weights_vs_cells-seed0.json", "n_cells", "400", "int"),
+    Claim("E24 deletion targets", "e000024_weights_vs_cells-seed0.json", "n_targets", "50", "int"),
     # the prose said "76%" where the record says 0.72 -- the fourth prose/record disagreement,
     # found by reading the paper rather than by this check, because it was not registered
     Claim("E24 relabel relearning recovery", "e000024_weights_vs_cells-seed0.json",
@@ -298,6 +321,8 @@ CLAIMS: tuple[Claim, ...] = (
 
     # E-000030 — the certificate
     Claim("E30 swept questions", "e000030_deletion_certificate.json", "per_seed/0/n_queries_swept", "838", "int"),
+    Claim("E30 targets", "e000030_deletion_certificate.json", "n_targets", "3", "int"),
+    Claim("E30 synthetic cells", "e000030_deletion_certificate.json", "per_seed/0/n_cells", "1000", "int"),
     Claim("E30 soft-gate residual", "e000030_deletion_certificate.json", "gpt2/0/gpt2_soft/shred/residual", "1.390e-02", "exp3"),
 )
 
@@ -590,6 +615,129 @@ def check(
     }
 
 
+# --------------------------------------------------------------------------- coverage
+# Tokens that look numeric but are not measurements. Each carries the reason it is excluded, so
+# the exclusion list can be argued with rather than trusted. Anything NOT here and NOT registered
+# is reported as unbound.
+_NOT_A_MEASUREMENT: tuple[tuple[str, str], ...] = (
+    (r"E-\d{6}",              "experiment identifier"),
+    (r"§\s?\d+(?:\.\d+)*(?:\s?[–-]\s?\d+)?", "section reference or range"),
+    (r"(?m)^#{1,4} \d+(?:\.\d+)?\.", "markdown heading number"),
+    (r"Part [IVX]+, \s*[–-]?\s*\d+", "section range in the roadmap table"),
+    (r"Revision \d\b|revision\b",  "draft revision number"),
+    (r"\bseeds \d\s?[–-]\s?\d\b",  "seed range, carried by a scope claim"),
+    (r"\bseed-\d\b|\bseed \d\b", "seed name"),
+    (r"\(Figure \d\)",        "inline figure reference"),
+    (r"\d{4}-\d{2}-\d{2}",    "ISO date — must precede the bare-year rule"),
+    (r"\b(?:19|20)\d{2}\b",   "calendar year"),
+    (r"(?m)^\d+\. ",          "numbered list item in §11"),
+    (r"\*Figure \d+ —",       "figure caption number"),
+    (r"\b1 in 256\b",         "chance stated in words; the figure itself is bound as 0.0039"),
+    (r"\b\d+ (?:figures printed in this text|more printed inside|\*\*scope claims\*\*|figures in the prose|in the drawn figures|scope\nclaims)",
+                              "the registry's own size: checked by check_self_description, not bound to a record"),
+    (r"PDX-\d+|NOV-\d+",      "experiment identifier"),
+    (r"\bF[123]\b",           "sub-question label"),
+    (r"GPT-2|top-[15]|rank-\d", "term of art containing a digit"),
+    (r"\b124M\b|\b7B\b",      "model size named in prose, not read from a record"),
+    (r"\brev \d\b",           "revision number"),
+    (r"figures/fig\d[^)]*|\bfig\d\b", "figure filename"),
+    (r"\b41-agent\b",         "provenance of the literature workflow, not a measurement"),
+    (r"\b2,359,296\b|\b2,370,692\b", "LoRA and adapter parameter counts: configuration, not in E-000024"),
+    (r"\b127\.5\b",           "analytic chance rank, 255/2, not a recorded value"),
+    (r"\b0\.55\b",            "derived in the text: 0.90 minus 0.35"),
+    # the paper's convention: an asserted figure is plain or bold, a figure being *talked about*
+    # (an example, or an error being reported) is in backticks. Only the former is a claim.
+    (r"`\d[\d,.e+-]*`",       "a numeral in backticks: quoted or illustrative, not asserted"),
+    (r"\b76\b|\b128\.0\b|\b137\.2\b", "quoted in §9 as an error that was corrected"),
+    (r"\b45 of 95\b",         "the coverage instrument's own first-run reading, recorded in ledger §31.51"),
+    (r"\b0\.50\b",            "the stated chance level of a forced choice, by construction"),
+    (r"\b95%",                "training stopping criterion, not a measured outcome"),
+    (r"\b0\.6\b|\b0\.7\b|\b2\.0\b|\b0\.60\b|\b0\.70\b|\b0\.80\b|\b0\.90\b",
+                              "shell radii: the sweep's x-axis, bound by the accept rates at them"),
+    (r"\b1000\b",             "cell count of E-000030's synthetic arm, stated in prose"),
+    (r"\bn = 1\b|\bk−1\b|\bk-1\b", "algebra in prose"),
+)
+
+
+def check_self_description(paper_text: str | None = None,
+                           claims: tuple[Claim, ...] | None = None,
+                           figure_claims: tuple[FigureClaim, ...] | None = None,
+                           scope_claims: tuple[ScopeClaim, ...] | None = None) -> list[dict]:
+    """§9 and the Reproduction note state how big this registry is. Check that they are right.
+
+    These three numbers are the one set the registry cannot bind to a record, because their source
+    is the registry itself. They have already drifted twice (33 -> 65 -> 70) and were corrected by
+    hand both times, which is the same failure this module exists to stop. So they get checked
+    against `len()` instead.
+    """
+    text = paper_text if paper_text is not None else PAPER.read_text(encoding="utf-8")
+    sizes = {
+        "prose figures": len(CLAIMS if claims is None else claims),
+        "drawn figures": len(FIGURE_CLAIMS if figure_claims is None else figure_claims),
+        "scope claims": len(SCOPE_CLAIMS if scope_claims is None else scope_claims),
+    }
+    # both places the paper states them, in the order prose / drawn / scope
+    patterns = {
+        "§9": r"binding (\d+) figures printed in this text\s+and (\d+) more printed inside the three drawn figures.*?plus (\d+) \*\*scope claims\*\*",
+        "Reproduction": r"`make papernums` \((\d+) figures in the prose, (\d+) in the drawn figures, (\d+) scope\s+claims",
+    }
+    rows = []
+    for where, pattern in patterns.items():
+        m = re.search(pattern, text, flags=re.DOTALL)
+        if not m:
+            rows.append({"where": where, "status": "ABSENT",
+                         "detail": "the paper no longer states the registry's size here"})
+            continue
+        stated = [int(g) for g in m.groups()]
+        actual = list(sizes.values())
+        if stated != actual:
+            rows.append({"where": where, "status": "MISMATCH",
+                         "detail": f"states {stated}, registry holds {actual}"})
+            continue
+        rows.append({"where": where, "status": "OK",
+                     "detail": " / ".join(f"{v} {k}" for k, v in sizes.items())})
+    return rows
+
+
+def unregistered(paper_text: str | None = None,
+                 claims: tuple[Claim, ...] | None = None) -> dict:
+    """Every number in the paper that no claim covers.
+
+    `coverage()` says what the registry binds. It cannot say what the registry *misses*, and the
+    difference is where four errors lived through a green run. This is the other half: strip the
+    tokens that are not measurements (each with its reason), subtract the registered figures, and
+    report the remainder. A number here is not necessarily wrong -- it is unchecked, which is the
+    condition that let ``137`` (a mean rank printed as seconds) reach the draft.
+    """
+    text = paper_text if paper_text is not None else PAPER.read_text(encoding="utf-8")
+    claims = CLAIMS if claims is None else claims
+    stripped = text
+    for pattern, _reason in _NOT_A_MEASUREMENT:
+        stripped = re.sub(pattern, " ", stripped)
+    # a trailing comma or full stop is punctuation, not part of the number
+    token = re.compile(r"(?<![\w.])\d(?:[\d,]*\d)?(?:\.\d+)?(?:e[-+]?\d+)?(?![\w])")
+    counts: dict[str, int] = {}
+    where: dict[str, str] = {}
+    for m in token.finditer(stripped):
+        tok = m.group(0)
+        counts[tok] = counts.get(tok, 0) + 1
+        where.setdefault(tok, stripped[max(0, m.start() - 40):m.end() + 25].replace("\n", " "))
+    bound = {c.sought for c in claims} | {c.printed for c in claims}
+    unbound = {tok: n for tok, n in counts.items() if tok not in bound}
+    return {
+        "distinct_numeric_tokens": len(counts),
+        "unbound": dict(sorted(unbound.items(), key=lambda kv: (-kv[1], kv[0]))),
+        "unbound_count": len(unbound),
+        "first_context": {tok: where[tok] for tok in unbound},
+        "excluded_with_reason": [{"pattern": p, "reason": r} for p, r in _NOT_A_MEASUREMENT],
+        "not_claimed": (
+            "A token counted as bound because its printed form matches a registered figure may in "
+            "fact be a different quantity that renders the same way. This measures coverage, not "
+            "correctness."
+        ),
+    }
+
+
 def coverage() -> dict:
     return {
         "records_bound": sorted(
@@ -609,6 +757,18 @@ def main() -> None:
     for r in report["figures"] + report["drawn"] + report["scope"]:
         mark = " ok " if r["status"] == "OK" else r["status"]
         print(f"[{mark:>11}] {r['label']:<52} {r['detail']}")
+
+    self_rows = check_self_description()
+    for r in self_rows:
+        mark = " ok " if r["status"] == "OK" else r["status"]
+        print(f"[{mark:>11}] {('self-description: ' + r['where']):<52} {r['detail']}")
+
+    cov = unregistered()
+    print()
+    print(f"coverage: {cov['distinct_numeric_tokens']} distinct numeric tokens in the paper, "
+          f"{cov['unbound_count']} bound to no claim")
+    for tok, n in cov["unbound"].items():
+        print(f"  {n:>3}x  {tok:<12} {cov['first_context'][tok].strip()[:78]}")
     print()
     print(f"{report['registered_figures']} figures in the prose + "
           f"{report['registered_drawn_figures']} in the drawn figures + "
@@ -618,7 +778,8 @@ def main() -> None:
     if weak:
         print(f"{len(weak)} figures are round enough to recur; their presence test does not "
               f"discriminate and only the record comparison counts for them.")
-    if not report["clean"]:
+    failed_self = [r for r in self_rows if r["status"] != "OK"]
+    if not report["clean"] or failed_self or cov["unbound_count"]:
         raise SystemExit(1)
 
 

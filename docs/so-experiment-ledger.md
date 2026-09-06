@@ -3310,6 +3310,46 @@ here was not catching these; it was making it cheap to fix them permanently. All
 provenance note *itself* rather than to some stable neighbouring field -- binding a caveat to an
 unrelated number would have been §31.42's defect in a new costume.
 
+### 31.51 Measuring how partial "partial by construction" was: 45 of 95 (2026-09-06, coverage)
+
+§31.50 found four errors the green check could not, all of them outside its bindings, and concluded
+that a green run is a statement about the bindings that exist. That is a true sentence and a useless
+one, because nothing said *how many* bindings that was. So `unregistered()` measures it: take every
+numeric token in the paper, strip the ones that are not measurements, subtract the registered
+figures, report what is left.
+
+**First run: 45 of 95 distinct numbers bound to nothing.** Almost the whole of §7's head-to-head
+table was among them, and working it produced **three more wrong figures** in a table that had
+already been read twice this session:
+
+| §7 printed | record says | what happened |
+|---|---|---|
+| `137` seconds | `ga/delete_seconds` = **129.49** | 137.2 is `cells/after/true_obj_mean_rank` -- a rank read off the wrong row |
+| `311` seconds | `relabel/delete_seconds` = **334.94** | 311 appears nowhere in E-000024 |
+| `8.49e+06` perplexity | `relabel/ppl_after` = **6,388,351.97** | absent from the record; 8.49 is §5's false-accept mantissa |
+
+`0.96` in the same table turned out correct but doubly-printed: both LoRA arms share **one**
+`weights/before/direct_acc`, so the table shows one measurement twice. Said so.
+
+**Coverage is now zero unbound**, and `make papernums` exits non-zero if that changes. Getting there
+required an exclusion list, which is the obvious way to make a coverage number say whatever you
+want -- so every exclusion carries the reason it is not a measurement, a test asserts every entry
+has one, and the list is in the output. The most useful of them turned out to be a convention the
+paper already followed without stating it: **an asserted figure is plain or bold; a numeral being
+talked about is in backticks.** All seven backticked numerals in the draft are examples or quoted
+errors, none an asserted result.
+
+**And the check now checks its own description.** The three numbers saying how large the registry is
+cannot be bound to a record -- their source is the registry. They had drifted 33 -> 65 -> 70 -> 87,
+corrected by hand every time, which is precisely the failure §31.49 exists to stop, committed by
+§31.49's own author in §31.49's own paragraph. `check_self_description` compares them to `len()`
+instead. It caught its own drift on the first run.
+
+Seven prose/record disagreements now, in one document, found by four different means: three by
+reading JSON, one by reading the paper, three by measuring what the check did not cover. The
+progression is the point -- each instrument found what the previous one could not, and none of them
+found what came after.
+
 ### 31.8 Boundary
 
 CPU only, no GPU, no LLM above 124M parameters, synthetic worlds, single-token entities, two surface forms per relation, one session. Nothing here shows unlearning of facts already encoded in pretrained weights. Evidence levels recorded: E3–E4 for the synthetic system (F4 for SHRED with the verified gate, E-000010 — **on the value channel only**: E-000028 recovers the shredded object at 1.0000 through the ungated reverse key, where REVOKE and DELETE are at chance, so F4 for SHRED is a claim about answers, logits, hidden states and probes and not about routing); E5 as substrate for the frozen-GPT-2 experiment, with reading, composition, update and the copy bound supported and behavioural deletion not yet supported at the pre-registered thresholds.

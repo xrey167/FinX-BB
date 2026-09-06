@@ -299,7 +299,9 @@ identically. The weights arms get a LoRA of 2,359,296 parameters against the ada
 
 **This table is one seed.** The record is seed 0 only; every aggregate in it has n = 1. It is the
 weakest evidence in the paper and the easiest to strengthen — the three-seed run needs no new code.
-Read the rows as a demonstration that the comparison is *available*, not as an effect size.
+Read the rows as a demonstration that the comparison is *available*, not as an effect size. The two
+LoRA columns also share **one** before-deletion measurement (`weights/before/direct_acc` = 0.96), so
+the 0.96 appears twice as one number, not as two agreeing ones.
 
 | | cells (SHRED) | LoRA, gradient ascent | LoRA, relabel to ' unknown' |
 |---|---|---|---|
@@ -307,9 +309,9 @@ Read the rows as a demonstration that the comparison is *available*, not as an e
 | answers it after | 0.02 | 0.00 | 0.02 |
 | forced choice, chance 0.50 | **0.44** | 0.78 | **1.00** |
 | relearning attack recovers held-out facts | **0.00** | 0.48 | **0.72** |
-| perplexity on ordinary prose, from 42.9 | **42.9** | 6.19e+09 | 8.49e+06 |
+| perplexity on ordinary prose, from 42.9 | **42.9** | 6.19e+09 | 6.39e+06 |
 | parameters changed | **0** | 2,359,296 | 2,359,296 |
-| seconds to delete 50 facts | **0.0008** | 137 | 311 |
+| seconds to delete 50 facts | **0.0008** | 129 | 335 |
 | **a certificate is even available** | **yes** | no | no |
 
 The relabel arm is the strongest practical baseline and the worst of the three: it looks deleted at
@@ -409,23 +411,36 @@ is cheap.
 and `so/results/`, and each was caught by a person opening a JSON file: a mean rank written 128.0
 where the record says 128.02; an accept rate written 1.0000 where the sweep says 0.9999; and §7's
 table presented with no seed count where the record is one seed. Three for three is the absence of
-an instrument, so there is now a registry (`make papernums`) binding 70 figures printed in this text
+an instrument, so there is now a registry (`make papernums`) binding 87 figures printed in this text
 and 31 more printed inside the three drawn figures to the record paths they came from, re-rendered
 under the rounding rule used, plus 10 **scope claims** — a fact about a record's extent that this text
 must state in words, which is what caught §7. It fails when prose and record part. Its own floor
 mutates each registered figure and requires the check to notice, for all of them rather than a
 sample, since a claim whose path silently failed to resolve would pass a clean run too.
 
-**A fourth disagreement then survived it, and that is the most useful thing the registry has done.**
-A read-through found §7's prose claiming a relearning attack recovered "76%" where the record says
-**0.72**, and three scope errors: §2 presenting one battery when it is two experiments on disjoint
-seed sets, §8 combining a 25-pod experiment and a 100-pod one under one heading, and §6 quoting two
-numbers whose checkpoints the record itself flags as no longer traceable. The check was green
-throughout — because none of the four was registered. That is what "partial by construction" costs,
-stated as a measurement rather than a disclaimer: a green run is a statement about the bindings that
-exist, and the bindings that exist are the ones somebody thought to write. All four are registered
-now, which makes them the last things this particular reading can find and says nothing about the
-next one.
+**Four more disagreements then survived it, and that is the most useful thing the registry has
+done.** A read-through found §7's prose claiming a relearning attack recovered "76%" where the record
+says **0.72**, and three scope errors: §2 presenting one battery when it is two experiments on
+disjoint seed sets, §8 combining a 25-pod experiment and a 100-pod one under one heading, and §6
+quoting two numbers whose checkpoints the record itself flags as no longer traceable. The check was
+green throughout — because none of the four was registered.
+
+**So we measured how partial "partial" was, and it was worse than the four.** `unregistered()` takes
+every numeric token in this text, strips the ones that are not measurements (each exclusion carries
+its reason, so the list can be argued with rather than trusted), and reports the remainder. On its
+first run **45 of 95 distinct numbers were bound to nothing at all** — including almost the whole of
+§7's table, where it immediately turned up three more wrong figures: `137` seconds, which is
+E-000024's *mean rank* of 137.2 read off the wrong row; `311` seconds, which appears nowhere in the
+record; and a perplexity of `8.49e+06`, which is not in the record either and borrows §5's
+false-accept mantissa. The record says **129**, **335** and **6.39e+06**.
+
+Coverage is now **zero unbound**, and `make papernums` fails if that changes. Two further things the
+check now does to itself: the numbers in this very paragraph — how large the registry is — are the
+one set that cannot be bound to a record, since their source is the registry, so they are compared
+against `len()` instead; and they had already drifted three times before that check existed. What
+remains true is the general form: a green run is a statement about the bindings that exist, and the
+bindings that exist are the ones somebody thought to write. The difference is that the paper now
+reports how many that is.
 
 Calibrating it made the same point a third time. Its presence test began as a substring search,
 which is nearly vacuous for a short token — `0.0` is inside `0.0040` — and requiring a standalone
@@ -533,5 +548,5 @@ are what a practitioner will act on.
 
 Every number above: `make keychannel certify closure retrieval disclosure compare pdxaudit`. Records
 in `so/results/`. Instrument audits: `make calibrate charged unread auditinstr`. To check this text
-against those records: `make papernums` (70 figures in the prose, 31 in the drawn figures, 10 scope
+against those records: `make papernums` (87 figures in the prose, 31 in the drawn figures, 10 scope
 claims; non-zero exit when any of them parts from its record).
