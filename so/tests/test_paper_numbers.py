@@ -12,10 +12,13 @@ import pytest
 
 from so.paper_numbers import (
     CLAIMS,
+    FIGURE_CLAIMS,
     PAPER,
     SCOPE_CLAIMS,
     Claim,
+    FigureClaim,
     ScopeClaim,
+    _figure_text,
     _fmt,
     _resolve,
     check,
@@ -25,6 +28,7 @@ from so.paper_numbers import (
 
 _PAPER_TEXT = PAPER.read_text(encoding="utf-8")
 _REPORT = check(_PAPER_TEXT)
+_FIG_TEXT = {name: _figure_text(name) for name in {c.figure for c in FIGURE_CLAIMS}}
 
 
 def _bump_last_digit(printed: str) -> str:
@@ -58,6 +62,41 @@ def test_every_figure_can_fail_on_a_paper_that_omits_it(claim):
     text = re.sub(re.escape(claim.sought), "<removed>", _PAPER_TEXT, flags=re.IGNORECASE)
     rows = check(text, claims=(claim,), scope_claims=())["figures"]
     assert [r["status"] for r in rows] == ["ABSENT"], rows
+
+
+@pytest.mark.parametrize("fig", FIGURE_CLAIMS, ids=[c.label for c in FIGURE_CLAIMS])
+def test_every_drawn_figure_can_fail_on_a_wrong_number(fig):
+    """Floor, on the figures: a bar labelled with a number no record holds must be reported."""
+    broken = FigureClaim(fig.figure, fig.label, fig.record, fig.path,
+                         _bump_last_digit(fig.printed), fig.rule, fig.reduce)
+    rows = check(_PAPER_TEXT, claims=(), scope_claims=(), figure_claims=(broken,))["drawn"]
+    assert [r["status"] for r in rows] == ["MISMATCH"], rows
+
+
+@pytest.mark.parametrize("fig", FIGURE_CLAIMS, ids=[c.label for c in FIGURE_CLAIMS])
+def test_every_drawn_figure_can_fail_when_the_svg_stops_printing_it(fig):
+    """Floor: the record still agrees, but the number is no longer drawn -> ABSENT."""
+    doctored = dict(_FIG_TEXT)
+    doctored[fig.figure] = _FIG_TEXT[fig.figure].replace(fig.printed, "<removed>")
+    rows = check(_PAPER_TEXT, claims=(), scope_claims=(), figure_claims=(fig,),
+                 figure_texts=doctored)["drawn"]
+    assert [r["status"] for r in rows] == ["ABSENT"], rows
+
+
+def test_a_missing_figure_file_is_reported_not_skipped():
+    bogus = FigureClaim("figN-does-not-exist.svg", "bogus", CLAIMS[0].record,
+                        "aggregate/active/object_top1/mean", "1.0000", "dp4")
+    rows = check(_PAPER_TEXT, claims=(), scope_claims=(), figure_claims=(bogus,))["drawn"]
+    assert rows[0]["status"] == "PATH"
+    assert "figN-does-not-exist.svg" in rows[0]["detail"]
+
+
+def test_the_figure_text_reader_finds_the_drawn_numbers_and_not_the_geometry():
+    """It reads what a reader sees. Path coordinates are geometry and are deliberately not checked."""
+    drawn = _FIG_TEXT["fig2-swept-geometry.svg"]
+    assert "0.2191" in drawn and "2,199,996" in drawn
+    assert "M137.2,72.0" not in drawn          # the series path is geometry, not a claim
+    assert "137.2" not in drawn
 
 
 @pytest.mark.parametrize("scope", SCOPE_CLAIMS, ids=[s.label for s in SCOPE_CLAIMS])
@@ -116,9 +155,32 @@ def test_the_three_drifts_that_motivated_the_registry_are_bound():
 def test_coverage_is_declared_partial():
     cov = coverage()
     assert cov["figures"] == len(CLAIMS)
+    assert cov["drawn_figures"] == len(FIGURE_CLAIMS)
     assert cov["scope_claims"] == len(SCOPE_CLAIMS)
     assert len(cov["records_bound"]) >= 7
     assert "unchecked, not verified" in _REPORT["not_claimed"]
+
+
+def test_every_figure_the_paper_embeds_has_at_least_one_bound_number():
+    """A figure nobody registered is a page of unchecked numbers in the reader's first glance."""
+    embedded = set(re.findall(r"\(figures/([^)]+\.svg)\)", _PAPER_TEXT))
+    assert embedded, "the paper embeds no figures; this test is checking nothing"
+    bound = {c.figure for c in FIGURE_CLAIMS}
+    assert embedded <= bound, f"unbound figures: {sorted(embedded - bound)}"
+
+
+def test_no_registered_figure_has_gone_missing_from_the_paper():
+    """The mirror: a registry entry for a figure the paper no longer shows is dead weight."""
+    embedded = set(re.findall(r"\(figures/([^)]+\.svg)\)", _PAPER_TEXT))
+    assert {c.figure for c in FIGURE_CLAIMS} <= embedded
+
+
+def test_the_figures_are_numbered_in_the_order_they_appear():
+    """Figure 1 was added to section 3 after Figures 1 and 2 already existed; both had to move."""
+    order = re.findall(r"\(figures/(fig(\d+)-[^)]+\.svg)\)", _PAPER_TEXT)
+    assert [int(n) for _, n in order] == list(range(1, len(order) + 1)), order
+    captions = [int(n) for n in re.findall(r"^\*Figure (\d+) —", _PAPER_TEXT, flags=re.MULTILINE)]
+    assert captions == list(range(1, len(order) + 1)), captions
 
 
 # --------------------------------------------------------------------------- resolver and rules

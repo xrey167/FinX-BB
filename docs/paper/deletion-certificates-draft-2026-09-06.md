@@ -144,10 +144,15 @@ readings.
 | row removed from addressable set | 0.0000 | 256.00 | 0.003906 | 1× | **yes** |
 | every derived quantity gated | 0.0000 | 256.00 | 0.003906 | 1× | **yes** |
 
+![Top-1 reads the same on a leaking policy and a certified one](figures/fig1-top1-false-negative.svg)
+
+*Figure 1 — the false negative. The bars are what is recoverable; the strip beneath them is what a
+top-1 audit would publish. The shaded column leaks and reads 0.0000.*
+
 **And here the standard fails a second time, at its own metric.** A soft-deleted index node that
 keeps the adjacency list built from its own embedding **never names the payload** — top-1 flat at
-0.0000. Under §2's headline that is a clean deletion. It is not: the retained edges narrow 256
-candidates to 2.92, a posterior of 0.3917 against a chance of 0.0039. **An audit reporting top-1
+0.0000 (Figure 1). Under §2's headline that is a clean deletion. It is not: the retained edges narrow
+256 candidates to 2.92, a posterior of 0.391667 against a chance of 0.003906. **An audit reporting top-1
 alone returns a false negative on precisely the arrangement most deployed systems use.** The
 candidate-set posterior is not a refinement; it is the difference between seeing the leak and
 certifying its absence.
@@ -208,15 +213,15 @@ gate thresholds to exactly zero.
 
 ## 5. What a learned gate certifies is not what it was written to implement
 
-![Accept rate by shell radius](figures/fig1-swept-geometry.svg)
+![Accept rate by shell radius](figures/fig2-swept-geometry.svg)
 
-*Figure 1 — the swept geometry. The declared radius and the operational one are 0.55 apart, and everything between them is accepted.*
+*Figure 2 — the swept geometry. The declared radius and the operational one are 0.55 apart, and everything between them is accepted.*
 
 A certificate over a *learned* predicate inherits the predicate's actual boundary, not its declared
 one, and the gap is measurable.
 
 The store declares a deletion radius of 0.35. Sweeping twenty shells of 20,000 markers over eleven
-checkpoints (Figure 1): accept rate is 1.0000 out to 0.60, 0.9999 at 0.70 (min 0.9992 across
+checkpoints (Figure 2): accept rate is 1.0000 out to 0.60, 0.9999 at 0.70 (min 0.9992 across
 checkpoints), 0.2191 at 0.80 (min 0.0953, max 0.4014), and 0.0000 from 0.90 through 2.0. **The
 gate's operational radius is 0.90 against a declared 0.35, identical on every checkpoint.** The
 annulus the store's own predicate calls deleted is accepted at **2,199,996 of 2,200,000**, and no
@@ -315,9 +320,9 @@ still carrying the removed cell's key.
 No model, no checkpoint, no training: the adversary reads the bank and names every key a LINK row
 points at that no row holds. Three seeds, 100 pods each (`make disclosure`, E-000035):
 
-![The closure inverts with the guarantee](figures/fig2-closure-inversion.svg)
+![The closure inverts with the guarantee](figures/fig3-closure-inversion.svg)
 
-*Figure 2 — the inversion. No store design is cheapest for both guarantees.*
+*Figure 3 — the inversion. No store design is cheapest for both guarantees.*
 
 | store | deleted key disclosed | uniquely identified | candidate keys left | false positives |
 |---|---|---|---|---|
@@ -379,20 +384,22 @@ is cheap.
 and `so/results/`, and each was caught by a person opening a JSON file: a mean rank written 128.0
 where the record says 128.02; an accept rate written 1.0000 where the sweep says 0.9999; and §7's
 table presented with no seed count where the record is one seed. Three for three is the absence of
-an instrument, so there is now a registry (`make papernums`) binding 65 figures printed here to the
-record paths they came from, re-rendered under the rounding rule used, plus 7 **scope claims** — a
-fact about a record's extent that this text must state in words, which is what caught §7. It fails
-when prose and record part. Its own floor mutates each registered figure and requires the check to
-notice, for all of them rather than a sample, since a claim whose path silently failed to resolve
-would pass a clean run too.
+an instrument, so there is now a registry (`make papernums`) binding 65 figures printed in this text
+and 30 more printed inside the three drawn figures to the record paths they came from, re-rendered
+under the rounding rule used, plus 7 **scope claims** — a fact about a record's extent that this text
+must state in words, which is what caught §7. It fails when prose and record part. Its own floor
+mutates each registered figure and requires the check to notice, for all of them rather than a
+sample, since a claim whose path silently failed to resolve would pass a clean run too.
 
 Calibrating it made the same point a third time. Its presence test began as a substring search,
 which is nearly vacuous for a short token — `0.0` is inside `0.0040` — and requiring a standalone
 match immediately found two figures it had been passing on a coincidence. For a figure round enough
 to recur (`1.0000`, `256`) the test still does not discriminate, and those are reported weak rather
 than counted. What remains unclaimed: the registry is partial by construction, so a figure not in it
-is unchecked rather than verified; and it compares this paper against the records, never the records
-against reality — a wrong number written identically in both would pass.
+is unchecked rather than verified; on the drawn figures it reads the numbers a reader sees and not
+the geometry that places them, so a bar drawn at the wrong height with the right label passes — one
+was, and a render caught it, not the check; and it compares this paper against the records, never
+the records against reality, so a wrong number written identically in both would pass.
 
 ## 10. What this is not
 
@@ -440,9 +447,9 @@ irrelevant, by making it the instrument rather than the subject.
 
 **Methods.**
 7. A rule with five worked instances, including three in this programme's own instruments (§9).
-8. The rule turned on the write-up itself: a machine-checked binding from every figure printed here
-   to the record it came from, with scope claims for extent, and a floor that mutates each binding
-   to prove the check can fail (§9).
+8. The rule turned on the write-up itself: a machine-checked binding from every figure printed here —
+   in the prose and inside the drawn figures — to the record it came from, with scope claims for
+   extent, and a floor that mutates each binding to prove the check can fail (§9).
 
 ## 12. Related work, in one place
 
@@ -487,4 +494,5 @@ are what a practitioner will act on.
 
 Every number above: `make keychannel certify closure retrieval disclosure compare pdxaudit`. Records
 in `so/results/`. Instrument audits: `make calibrate charged unread auditinstr`. To check this text
-against those records: `make papernums` (65 figures, 7 scope claims; non-zero exit when they part).
+against those records: `make papernums` (65 figures in the prose, 30 in the drawn figures, 7 scope
+claims; non-zero exit when any of them parts from its record).

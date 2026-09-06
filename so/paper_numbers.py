@@ -33,6 +33,11 @@ both of which the paper spells in words and never prints as numerals. `appears_a
 for a figure round enough to recur across the paper (`1.0000`, `256`) the presence test still does
 not discriminate; those are reported weak rather than counted as checks.
 
+**The drawn figures are checked separately**, because they drift on their own and are what a reader
+looks at first. `FIGURE_CLAIMS` binds each number printed inside an SVG to its record. What that pass
+does *not* claim is the geometry: Figure 2 was once drawn with a y-scale that put 0.2191 at the
+height of 0.50, and no string check would have seen it -- a render did.
+
 This registry is **partial by construction** and says so: `coverage()` reports what it binds. A
 figure absent from the registry is unchecked, not verified.
 """
@@ -46,6 +51,7 @@ from pathlib import Path
 
 RESULTS = Path("so/results")
 PAPER = Path("docs/paper/deletion-certificates-draft-2026-09-06.md")
+FIGURES = Path("docs/paper/figures")
 
 
 # ----------------------------------------------------------------------------- rounding rules
@@ -78,6 +84,28 @@ class Claim:
     @property
     def sought(self) -> str:
         return self.appears_as or self.printed
+
+
+@dataclass(frozen=True)
+class FigureClaim:
+    """A number printed inside a figure, bound to the record it came from.
+
+    Figures drift independently of the prose and are what a reader looks at first -- Figure 2 was
+    drawn once with a y-scale that put 0.2191 at the height of 0.50, and only a render caught it.
+    A number in an SVG is as much a claim as a number in a paragraph.
+    """
+
+    figure: str
+    label: str
+    record: str
+    path: str
+    printed: str
+    rule: str
+    reduce: str = ""
+
+    @property
+    def sought(self) -> str:
+        return self.printed
 
 
 @dataclass(frozen=True)
@@ -260,6 +288,76 @@ CLAIMS: tuple[Claim, ...] = (
 )
 
 
+_F1 = "fig1-top1-false-negative.svg"
+_F2 = "fig2-swept-geometry.svg"
+_F3 = "fig3-closure-inversion.svg"
+_PDX = "pdx001/pdx001_payload_derived_index_audit.json"
+
+FIGURE_CLAIMS: tuple[FigureClaim, ...] = (
+    # Figure 1 — every bar height and every strip reading is a record value
+    FigureClaim(_F1, "F1 value-gated posterior", _PDX,
+                "policies/policy=value_gated_shred/mean_posterior_on_true_payload", "1.000000", "dp6"),
+    FigureClaim(_F1, "F1 tombstone posterior", _PDX,
+                "policies/policy=hnsw_tombstone/mean_posterior_on_true_payload", "0.391667", "dp6"),
+    FigureClaim(_F1, "F1 certified posterior", _PDX,
+                "policies/policy=revoke_unindex/mean_posterior_on_true_payload", "0.003906", "dp6"),
+    FigureClaim(_F1, "F1 chance floor", _PDX,
+                "policies/policy=hnsw_tombstone/chance_top1", "0.003906", "dp6"),
+    FigureClaim(_F1, "F1 top-1 on the leaking policy", _PDX,
+                "policies/policy=value_gated_shred/top1_recovery", "1.0000", "dp4"),
+    FigureClaim(_F1, "F1 top-1 on the tombstone", _PDX,
+                "policies/policy=hnsw_tombstone/top1_recovery", "0.0000", "dp4"),
+    FigureClaim(_F1, "F1 candidates left", _PDX,
+                "policies/policy=hnsw_tombstone/mean_candidates_remaining", "2.92", "dp2"),
+    FigureClaim(_F1, "F1 search-space cut", _PDX,
+                "policies/policy=hnsw_tombstone/search_space_reduction_factor", "88", "int"),
+    FigureClaim(_F1, "F1 payload domain", _PDX,
+                "policies/policy=hnsw_tombstone/payload_domain", "256", "int"),
+    FigureClaim(_F1, "F1 validity floor", _PDX, "validity_control/top1_recovery", "1.0000", "dp4"),
+
+    # Figure 2 — the swept geometry: the y-scale bug lived here
+    FigureClaim(_F2, "F2 declared radius", "e000029_marker_geometry.json", "declared_radius", "0.35", "dp2"),
+    FigureClaim(_F2, "F2 operational radius", "e000029_marker_geometry.json",
+                "aggregate/operational_radius/mean", "0.90", "dp2"),
+    FigureClaim(_F2, "F2 band 0.60", "e000029_marker_geometry.json",
+                "per_checkpoint/*/band_accept/5", "1.0000", "dp4", "mean"),
+    FigureClaim(_F2, "F2 band 0.70", "e000029_marker_geometry.json",
+                "per_checkpoint/*/band_accept/6", "0.9999", "dp4", "mean"),
+    FigureClaim(_F2, "F2 band 0.80", "e000029_marker_geometry.json",
+                "per_checkpoint/*/band_accept/7", "0.2191", "dp4", "mean"),
+    FigureClaim(_F2, "F2 band 0.80 min", "e000029_marker_geometry.json",
+                "per_checkpoint/*/band_accept/7", "0.0953", "dp4", "min"),
+    FigureClaim(_F2, "F2 band 0.80 max", "e000029_marker_geometry.json",
+                "per_checkpoint/*/band_accept/7", "0.4014", "dp4", "max"),
+    FigureClaim(_F2, "F2 band 0.90", "e000029_marker_geometry.json",
+                "per_checkpoint/*/band_accept/8", "0.0000", "dp4", "mean"),
+    FigureClaim(_F2, "F2 annulus accepted", "e000029_marker_geometry.json",
+                "pooled/annulus/0", "2,199,996", "thousands"),
+    FigureClaim(_F2, "F2 annulus n", "e000029_marker_geometry.json",
+                "pooled_intervals/annulus/n", "2,200,000", "thousands"),
+    FigureClaim(_F2, "F2 markers per band", "e000029_marker_geometry.json", "n_per_band", "20,000", "thousands"),
+    FigureClaim(_F2, "F2 checkpoints", "e000029_marker_geometry.json", "n_checkpoints", "11", "int"),
+
+    # Figure 3 — the inversion
+    FigureClaim(_F3, "F3 canonical fact closure", "e000032_deletion_closure.json",
+                "aggregate/canonical/fact_closure_mean/mean", "1.00", "dp2"),
+    FigureClaim(_F3, "F3 duplicated fact closure", "e000032_deletion_closure.json",
+                "aggregate/duplicated/fact_closure_mean/mean", "3.00", "dp2"),
+    FigureClaim(_F3, "F3 canonical trace closure", "e000035_deletion_disclosure.json",
+                "aggregate/canonical/trace_closure_mean/mean", "3.00", "dp2"),
+    FigureClaim(_F3, "F3 duplicated trace closure", "e000035_deletion_disclosure.json",
+                "aggregate/duplicated/trace_closure_mean/mean", "1.00", "dp2"),
+    FigureClaim(_F3, "F3 canonical disclosure", "e000035_deletion_disclosure.json",
+                "aggregate/canonical/deleted_key_disclosed/mean", "1.0000", "dp4"),
+    FigureClaim(_F3, "F3 duplicated disclosure", "e000035_deletion_disclosure.json",
+                "aggregate/duplicated/deleted_key_disclosed/mean", "0.0000", "dp4"),
+    FigureClaim(_F3, "F3 key space", "e000035_deletion_disclosure.json",
+                "aggregate/duplicated/candidate_keys_mean/mean", "1,536", "thousands"),
+    FigureClaim(_F3, "F3 pods per seed", "e000035_deletion_disclosure.json",
+                "aggregate/n_groups/mean", "100", "int"),
+)
+
+
 SCOPE_CLAIMS: tuple[ScopeClaim, ...] = (
     ScopeClaim(
         "E28's attack pooled five seeds",
@@ -325,21 +423,69 @@ def _load(name: str):
     return json.loads(p.read_text(encoding="utf-8"))
 
 
+def _figure_text(name: str) -> str | None:
+    """The visible text of one figure: its `<text>` runs, its title and its description.
+
+    Read as text rather than parsed, because the numbers we are checking are what a reader sees --
+    a value baked into a `d=` path attribute is *geometry*, and the registry deliberately does not
+    claim to check geometry. Figure 2's y-scale bug was in a path and no string check would have
+    caught it; a render did.
+    """
+    p = FIGURES / name
+    if not p.exists():
+        return None
+    return " ".join(re.findall(r">([^<>]*)<", p.read_text(encoding="utf-8")))
+
+
+def _check_value_claim(c, doc, where: str, text: str) -> dict:
+    """The shared body: resolve, reduce, render, compare, then look for it in `text`."""
+    row: dict = {"label": c.label}
+    value, err = _resolve(doc, c.path)
+    if err:
+        return {**row, "status": "PATH", "detail": f"{c.path}: {err}"}
+    if c.reduce:
+        if not isinstance(value, list) or not value:
+            return {**row, "status": "PATH",
+                    "detail": f"{c.path}: reducer {c.reduce!r} needs a non-empty list"}
+        value = _reduce(value, c.reduce)
+    try:
+        rendered = _fmt(float(value), c.rule)
+    except (TypeError, ValueError) as exc:
+        return {**row, "status": "PATH", "detail": f"{c.path}: {exc}"}
+    if rendered != c.printed:
+        return {**row, "status": "MISMATCH",
+                "detail": f"record {value!r} renders {rendered!r} under {c.rule}, "
+                          f"{where} prints {c.printed!r}"}
+    hits = occurrences(c.sought, text)
+    if hits == 0:
+        return {**row, "status": "ABSENT", "occurrences": 0,
+                "detail": f"{c.sought!r} matches the record but does not appear in {where}"}
+    weak = hits > _PRESENCE_NOISE_FLOOR
+    spelled = "" if not getattr(c, "appears_as", "") else f" (spelled {c.appears_as!r})"
+    return {**row, "status": "OK", "occurrences": hits, "presence_discriminating": not weak,
+            "detail": f"{c.printed}{spelled} = {c.path}"
+                      + (f"  [presence test weak: {hits} matches]" if weak else "")}
+
+
 def check(
     paper_text: str | None = None,
     claims: tuple[Claim, ...] | None = None,
     scope_claims: tuple[ScopeClaim, ...] | None = None,
+    figure_claims: tuple[FigureClaim, ...] | None = None,
+    figure_texts: dict[str, str] | None = None,
 ) -> dict:
-    """Check the paper against the records.
+    """Check the paper, and the figures, against the records.
 
-    `claims` and `scope_claims` default to the registries above. They are parameters so that the
-    validity floor can be exercised: a checker that has never been shown to fail is not evidence
-    that the paper agrees with the records, it is only evidence that it printed ``0 failing``.
+    Every registry is a parameter so that the validity floor can be exercised: a checker that has
+    never been shown to fail is not evidence that the paper agrees with the records, it is only
+    evidence that it printed ``0 failing``.
     """
     text = paper_text if paper_text is not None else PAPER.read_text(encoding="utf-8")
     claims = CLAIMS if claims is None else claims
     scope_claims = SCOPE_CLAIMS if scope_claims is None else scope_claims
+    figure_claims = FIGURE_CLAIMS if figure_claims is None else figure_claims
     cache: dict[str, object] = {}
+    figtext: dict[str, str | None] = dict(figure_texts or {})
     rows = []
 
     for c in claims:
@@ -347,36 +493,21 @@ def check(
         if doc is None:
             rows.append({"label": c.label, "status": "PATH", "detail": f"no record {c.record}"})
             continue
-        value, err = _resolve(doc, c.path)
-        if err:
-            rows.append({"label": c.label, "status": "PATH", "detail": f"{c.path}: {err}"})
+        rows.append(_check_value_claim(c, doc, "the paper", text))
+
+    figure_rows = []
+    for c in figure_claims:
+        doc = cache.setdefault(c.record, _load(c.record))
+        if doc is None:
+            figure_rows.append({"label": c.label, "status": "PATH", "detail": f"no record {c.record}"})
             continue
-        if c.reduce:
-            if not isinstance(value, list) or not value:
-                rows.append({"label": c.label, "status": "PATH",
-                             "detail": f"{c.path}: reducer {c.reduce!r} needs a non-empty list"})
-                continue
-            value = _reduce(value, c.reduce)
-        try:
-            rendered = _fmt(float(value), c.rule)
-        except (TypeError, ValueError) as exc:
-            rows.append({"label": c.label, "status": "PATH", "detail": f"{c.path}: {exc}"})
+        if c.figure not in figtext:
+            figtext[c.figure] = _figure_text(c.figure)
+        drawn = figtext[c.figure]
+        if drawn is None:
+            figure_rows.append({"label": c.label, "status": "PATH", "detail": f"no figure {c.figure}"})
             continue
-        if rendered != c.printed:
-            rows.append({"label": c.label, "status": "MISMATCH",
-                         "detail": f"record {value!r} renders {rendered!r} under {c.rule}, paper prints {c.printed!r}"})
-            continue
-        hits = occurrences(c.sought, text)
-        if hits == 0:
-            rows.append({"label": c.label, "status": "ABSENT", "occurrences": 0,
-                         "detail": f"{c.sought!r} matches the record but does not appear in the paper"})
-            continue
-        weak = hits > _PRESENCE_NOISE_FLOOR
-        spelled = "" if not c.appears_as else f" (spelled {c.appears_as!r})"
-        rows.append({"label": c.label, "status": "OK", "occurrences": hits,
-                     "presence_discriminating": not weak,
-                     "detail": f"{c.printed}{spelled} = {c.path}"
-                               + (f"  [presence test weak: {hits} matches]" if weak else "")})
+        figure_rows.append({**_check_value_claim(c, doc, c.figure, drawn), "figure": c.figure})
 
     scope_rows = []
     for s in scope_claims:
@@ -398,12 +529,14 @@ def check(
             continue
         scope_rows.append({"label": s.label, "status": "OK", "detail": s.must_appear})
 
-    failures = [r for r in rows + scope_rows if r["status"] != "OK"]
-    weak = [r["label"] for r in rows if r.get("presence_discriminating") is False]
+    failures = [r for r in rows + figure_rows + scope_rows if r["status"] != "OK"]
+    weak = [r["label"] for r in rows + figure_rows if r.get("presence_discriminating") is False]
     return {
         "registered_figures": len(claims),
+        "registered_drawn_figures": len(figure_claims),
         "registered_scope_claims": len(scope_claims),
         "figures": rows,
+        "drawn": figure_rows,
         "scope": scope_rows,
         "failures": failures,
         "clean": not failures,
@@ -414,26 +547,36 @@ def check(
             "records, never that the records are right. And a round figure that recurs across the "
             "paper (1.0000, 256) has a presence test that no longer discriminates: its record "
             "comparison still holds, but its ABSENT half is reported weak rather than counted as a "
-            "check."
+            "check. On the drawn figures it checks the numbers a reader sees, never the geometry "
+            "that places them: a bar drawn at the wrong height with the right label passes here, "
+            "and only a render catches it."
         ),
     }
 
 
 def coverage() -> dict:
     return {
-        "records_bound": sorted({c.record for c in CLAIMS} | {s.record for s in SCOPE_CLAIMS}),
+        "records_bound": sorted(
+            {c.record for c in CLAIMS}
+            | {c.record for c in FIGURE_CLAIMS}
+            | {s.record for s in SCOPE_CLAIMS}
+        ),
+        "figures_bound": sorted({c.figure for c in FIGURE_CLAIMS}),
         "figures": len(CLAIMS),
+        "drawn_figures": len(FIGURE_CLAIMS),
         "scope_claims": len(SCOPE_CLAIMS),
     }
 
 
 def main() -> None:
     report = check()
-    for r in report["figures"] + report["scope"]:
+    for r in report["figures"] + report["drawn"] + report["scope"]:
         mark = " ok " if r["status"] == "OK" else r["status"]
         print(f"[{mark:>11}] {r['label']:<52} {r['detail']}")
     print()
-    print(f"{report['registered_figures']} figures + {report['registered_scope_claims']} scope claims; "
+    print(f"{report['registered_figures']} figures in the prose + "
+          f"{report['registered_drawn_figures']} in the drawn figures + "
+          f"{report['registered_scope_claims']} scope claims; "
           f"{len(report['failures'])} failing")
     weak = report["weak_presence_tests"]
     if weak:

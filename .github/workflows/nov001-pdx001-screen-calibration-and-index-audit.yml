@@ -16,8 +16,9 @@ on:
       - "so/experiments/nov003_unread_coordinates_e103.py"
       - "docs/novelty/nov004-instrument-audit-result.md"
       - "docs/paper/deletion-certificates-draft-2026-09-06.md"
-      - "docs/paper/figures/fig1-swept-geometry.svg"
-      - "docs/paper/figures/fig2-closure-inversion.svg"
+      - "docs/paper/figures/fig1-top1-false-negative.svg"
+      - "docs/paper/figures/fig2-swept-geometry.svg"
+      - "docs/paper/figures/fig3-closure-inversion.svg"
       - "so/experiments/nov004_instrument_audit.py"
       - "so/tests/test_nov004_instrument_audit.py"
       - "so/paper_numbers.py"
@@ -131,8 +132,9 @@ jobs:
             so/experiments/nov004_instrument_audit.py \
             so/tests/test_nov004_instrument_audit.py \
             docs/paper/deletion-certificates-draft-2026-09-06.md \
-            docs/paper/figures/fig1-swept-geometry.svg \
-            docs/paper/figures/fig2-closure-inversion.svg \
+            docs/paper/figures/fig1-top1-false-negative.svg \
+            docs/paper/figures/fig2-swept-geometry.svg \
+            docs/paper/figures/fig3-closure-inversion.svg \
             so/paper_numbers.py \
             so/tests/test_paper_numbers.py \
             so/results/e000019_fresh_seed_chance.json \
