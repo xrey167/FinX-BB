@@ -1,9 +1,9 @@
 # Reference-carried memory — withdrawn, and what the attempt measured
 
 Date: 2026-09-05
-Status: **withdrawn as a novelty claim** on prior-art and invariance-attribution grounds, which stand.
-The CAPABILITY closure is itself retracted — see section 3 — and arm E is rerunning. Twelfth
-retraction, with a thirteenth inside it. Nothing here is a legal novelty or patentability opinion.
+Status: **withdrawn as a novelty claim**, and now closed on capability too — but on grounds measured
+after a retraction, not the ones first given. Twelfth retraction with a thirteenth inside it. Nothing
+here is a legal novelty or patentability opinion.
 
 An earlier version of this document claimed that a knowledge-free reference, carried through a frozen
 model's participating state with the value bound after the last cache-writing block, made persisted
@@ -63,8 +63,32 @@ identities, full rank, unbounded identity range), on frozen GPT-2 over 256 ident
 
 So the frozen stack does transport an arbitrary knowledge-free reference; identity is recoverable with
 no learning at all, because the store already knows the handle table; and a learned readout generalises
-to identities it has never seen. Arm E is retraining on three seeds and its capability is an open
-question again, not a closed one.
+to identities it has never seen.
+
+**Arm E was then rerun with the corrected handles and still fails**: held-out 0.0037 and 0.0113 on
+seeds 0 and 1 (run 34002574279, digests `9146f3e9…`, `5cabf04c…`), against arm A at 0.955-0.990. The
+bind loss did improve, 5.70 to 4.93, so the collinearity was real but not the whole cause. E-000086
+then measured the two limits that are, with no training at all:
+
+| Routing over a 700-row bank | identification, store-supplied readout |
+|---|---:|
+| one-hot (the ceiling) | 0.3799 |
+| 0.9 of the mass on the right row | 0.3809 |
+| 0.5 | 0.3789 |
+| 0.3 | 0.3740 |
+| near-uniform, i.e. a cold start | **0.0000** |
+
+**Capacity.** The ceiling is 0.9834 at 256 identities and 0.3799 at the 700 a real bank holds. Even a
+perfect router misses the 0.95 gate at realistic sizes.
+
+**Bootstrap.** A weighted average of near-orthogonal handles is not a handle, so at a cold start the
+carrier conveys nothing and there is no gradient path: the boundary decode gets no signal, and the
+router gets no reward for sharpening. The payload carrier has that path, which is why arm A trains —
+an average of payloads still raises the right token in proportion to its weight, because payloads are
+the model's own unembedding rows. **Averaging destroys a reference; it merely dilutes a value.** That
+is the defensible version of the claim I retracted, and unlike the retracted one it is measured rather
+than inferred from a broken carrier. Mixing itself is not the problem: the carrier tolerates 0.3 of the
+mass on the right row.
 
 The rank-7.2 transport-channel measurement stands as arithmetic and is withdrawn as an explanation: a
 channel that carries near-orthogonal directions at 0.98 was never the binding constraint.
@@ -82,10 +106,8 @@ through every layer — so it enters persisted state more thoroughly than a mid-
 mapping is held outside the model, and the true value is bound back only after generation. That system
 already has the asserted invariance; it goes unstated there because in that setting it is obvious. The
 entire delta of this claim over it is carrier-as-mid-stack-vector rather than carrier-as-token. That
-delta is being re-measured: the reading that put it at 0.0 was the collinear-handle artefact of
-section 3, so whether it is worth anything is open again. Even a positive answer leaves the concept
-inside this patent's scope; what it would change is whether there is a mechanism worth distinguishing
-at all.
+delta was first measured at 0.0 through a collinear-handle artefact; re-measured with that fixed, it is
+0.0037-0.0113, and E-000086 says why. Either way the concept sits inside this patent's scope.
 
 Also occupying or narrowing the same point, all verified by fetch:
 
@@ -129,12 +151,12 @@ a placement that already gives total invariance and cannot read.
 
 ## What is still worth running, and why it is not a claim
 
-1. **A store-supplied bind instead of a learned one.** The no-learning readout reaches 0.9834, so the
-   boundary decode need not be learned at all: the store knows the handle table and can supply the
-   projection. That removes the only component that could fail to generalise, and it is the first
-   thing to try if the retrained arm E still misses.
-2. **Arm E on three seeds with the corrected handles.** The three seeds that read 0.0000 were all run
-   against the collinear handle family and say nothing about the design. Rerunning.
+1. **Curriculum bootstrap, if anyone revisits this.** The design's failure is that a cold router
+   conveys nothing through a reference carrier (0.0000), while it tolerates a substantially soft one
+   once sharp (0.374 at 0.3 of the mass). Injecting the SUPERVISED row's handle for the first few
+   hundred steps would supply the missing gradient path. It would not fix the capacity ceiling of
+   0.3799 at 700 rows, which is the harder of the two limits and the reason this is not queued.
+2. ~~Arm E with corrected handles~~ — done: 0.0037 and 0.0113, and E-000086 explains both limits.
 3. **Per-read write placement**, to separate the routing feedback from a depth threshold above one
    block in the arm A/C/D comparison. That question is still open and is about placement, not carriers.
 4. **A real patent search.** Nothing above may be called cleared until USPTO, Espacenet, Patentscope
