@@ -1,0 +1,109 @@
+{
+ "experiment": "E-000059",
+ "question": "Does GRACE's un-repaired deferral radius disclose a deleted edit?",
+ "ports": "E-000028 (key channel) + E-000035 (alias-as-oracle) out of this repository",
+ "source_quoted": "https://raw.githubusercontent.com/zjunlp/EasyEdit/main/easyeditor/models/grace/GRACE.py",
+ "model": "distilgpt2",
+ "layer": 3,
+ "per_seed": [
+  {
+   "seed": 0,
+   "n_candidates": 256,
+   "n_edits": 24,
+   "n_splits": 2,
+   "chance_top1": 0.00390625,
+   "true_distance": 6.02932071685791,
+   "attack_top1": 1.0,
+   "attack_rank": 1,
+   "attack_residual": 0.0,
+   "attack_runner_up_residual": 0.0021367344665526034,
+   "repaired_top1": 0.0,
+   "repaired_rank": 167,
+   "shuffled_top1": 0.0,
+   "shuffled_rank": 60,
+   "nosplit_top1": 0.0,
+   "nosplit_rank": 197,
+   "value_reverted": true
+  },
+  {
+   "seed": 1,
+   "n_candidates": 256,
+   "n_edits": 24,
+   "n_splits": 7,
+   "chance_top1": 0.00390625,
+   "true_distance": 5.210870742797852,
+   "attack_top1": 1.0,
+   "attack_rank": 1,
+   "attack_residual": 0.0,
+   "attack_runner_up_residual": 0.0015745162963867188,
+   "repaired_top1": 0.0,
+   "repaired_rank": 109,
+   "shuffled_top1": 0.0,
+   "shuffled_rank": 119,
+   "nosplit_top1": 0.0,
+   "nosplit_rank": 156,
+   "value_reverted": true
+  },
+  {
+   "seed": 2,
+   "n_candidates": 256,
+   "n_edits": 24,
+   "n_splits": 3,
+   "chance_top1": 0.00390625,
+   "true_distance": 5.865926742553711,
+   "attack_top1": 1.0,
+   "attack_rank": 1,
+   "attack_residual": 0.0,
+   "attack_runner_up_residual": 0.0007081303405760409,
+   "repaired_top1": 0.0,
+   "repaired_rank": 109,
+   "shuffled_top1": 0.0,
+   "shuffled_rank": 16,
+   "nosplit_top1": 0.0,
+   "nosplit_rank": 140,
+   "value_reverted": true
+  }
+ ],
+ "checks": {
+  "attack_top1": true,
+  "repaired_top1": true,
+  "nosplit_top1": true,
+  "shuffled_top1": true
+ },
+ "observed_worst_seed": {
+  "attack_top1": 1.0,
+  "repaired_top1": 0.0,
+  "nosplit_top1": 0.0,
+  "shuffled_top1": 0.0
+ },
+ "bars": {
+  "attack_top1": {
+   "op": ">=",
+   "threshold": 0.9
+  },
+  "repaired_top1": {
+   "op": "<=",
+   "threshold": 0.1
+  },
+  "nosplit_top1": {
+   "op": "<=",
+   "threshold": 0.1
+  },
+  "shuffled_top1": {
+   "op": "<=",
+   "threshold": 0.1
+  }
+ },
+ "claim_supported": true,
+ "limits": "Faithful reproduction of the quoted codebook rules on real frozen-LM activations; EasyEdit itself is not imported here, so this is a property of those rules and not an end-to-end package run.",
+ "not_claimed": [
+  "GRACE",
+  "key-value editors",
+  "codebooks",
+  "deferral radii",
+  "tombstones",
+  "embedding inversion",
+  "persistence of deleted data on a medium",
+  "E-000028's rule, which is this repository's prior work"
+ ]
+}
