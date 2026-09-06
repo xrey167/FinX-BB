@@ -3223,6 +3223,37 @@ E-000100 onward, syntactic identity without a mutation window (87 to 3), and mut
 nothing (94 to 61). An instrument built to find instruments that cannot fail keeps failing, which is
 the only evidence available that it can.
 
+### 31.49 The prose had drifted from the records three times, and nothing here noticed (2026-09-06, so/paper_numbers.py)
+
+Writing the paper produced three disagreements between what the draft printed and what
+`so/results/` holds, and all three were caught the same way: a human opened the JSON.
+
+* E-000028's revoke/delete mean rank was written `128.0`; the record says **128.02**.
+* The marker accept rate was written "1.0000 out to 0.70"; the band sweep says **0.9999** at 0.70,
+  and **0.9992** on the weakest checkpoint.
+* §7's head-to-head table was presented with no seed count. The record is seed 0 alone: **n = 1**
+  behind every aggregate in it.
+
+Three for three is not a run of bad luck, it is the absence of an instrument. Prose drifts from the
+record whenever either side is edited, and the repository had no check that would notice. `make
+papernums` is that check: 33 printed figures and 3 scope claims, each bound to a record path, each
+re-read and re-rendered under the rounding rule the paper used. It exits non-zero when they part.
+
+**The scope claims are the half that matters most**, and the half a number-checker would miss. A
+figure can be exactly right and still mislead if the reader is not told it rests on one seed. Three
+are registered, and all three were `UNDISCLOSED` on first run -- true of the records, absent from the
+paper. The paper now states each in words, and the check fails if that sentence is ever deleted.
+
+**The floor.** A checker that prints `0 failing` and has never been shown to fail is not evidence.
+`so/tests/test_paper_numbers.py` mutates each registered figure by one in its last place and requires
+a `MISMATCH`, and deletes each from the paper text and requires an `ABSENT` -- for **every** claim,
+not a sample, because a claim whose path silently failed to resolve would pass the clean run too. 84
+tests, of which 72 are that floor. The registry is also **partial by construction** and says so:
+`coverage()` reports what it binds, and a figure not in it is unchecked, not verified.
+
+What the check does not do: it compares the paper against the records, never the records against
+reality. A wrong number written identically in both passes.
+
 ### 31.8 Boundary
 
 CPU only, no GPU, no LLM above 124M parameters, synthetic worlds, single-token entities, two surface forms per relation, one session. Nothing here shows unlearning of facts already encoded in pretrained weights. Evidence levels recorded: E3–E4 for the synthetic system (F4 for SHRED with the verified gate, E-000010 — **on the value channel only**: E-000028 recovers the shredded object at 1.0000 through the ungated reverse key, where REVOKE and DELETE are at chance, so F4 for SHRED is a claim about answers, logits, hidden states and probes and not about routing); E5 as substrate for the frozen-GPT-2 experiment, with reading, composition, update and the copy bound supported and behavioural deletion not yet supported at the pre-registered thresholds.

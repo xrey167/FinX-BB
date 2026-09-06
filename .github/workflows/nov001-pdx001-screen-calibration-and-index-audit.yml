@@ -20,6 +20,8 @@ on:
       - "docs/paper/figures/fig2-closure-inversion.svg"
       - "so/experiments/nov004_instrument_audit.py"
       - "so/tests/test_nov004_instrument_audit.py"
+      - "so/paper_numbers.py"
+      - "so/tests/test_paper_numbers.py"
       - "so/tests/test_nov003_unread_coordinates_e103.py"
       - "so/tests/test_screen.py"
       - "so/experiments/nov001_screen_calibration.py"
@@ -29,6 +31,14 @@ on:
       - "so/tests/test_nov002_charged_rerun_e104_e105.py"
       - "so/tests/test_pdx001_payload_derived_index_audit.py"
       - ".github/workflows/nov001-pdx001-screen-calibration-and-index-audit.yml"
+      # the records the paper's figures are bound to: editing one must re-run the check
+      - "so/results/e000019_fresh_seed_chance.json"
+      - "so/results/e000021_gate_error_rates.json"
+      - "so/results/e000024_weights_vs_cells-seed0.json"
+      - "so/results/e000028_key_channel.json"
+      - "so/results/e000029_marker_geometry.json"
+      - "so/results/e000030_deletion_certificate.json"
+      - "so/results/e000035_deletion_disclosure.json"
   workflow_dispatch:
 
 jobs:
@@ -50,6 +60,7 @@ jobs:
           python -m py_compile so/screen.py
           python -m py_compile so/experiments/nov003_unread_coordinates_e103.py
           python -m py_compile so/experiments/nov004_instrument_audit.py
+          python -m py_compile so/paper_numbers.py
       - name: Focused regressions
         run: |
           python -m pytest -q \
@@ -58,7 +69,17 @@ jobs:
             so/tests/test_nov002_charged_rerun_e104_e105.py \
             so/tests/test_screen.py \
             so/tests/test_nov003_unread_coordinates_e103.py \
-            so/tests/test_nov004_instrument_audit.py
+            so/tests/test_nov004_instrument_audit.py \
+            so/tests/test_paper_numbers.py
+      - name: Paper figures agree with the records
+        run: |
+          mkdir -p ci-paper
+          python -m so.paper_numbers | tee ci-paper/stdout.txt
+          python - <<'PY' > ci-paper/paper_numbers.json
+          import json
+          from so.paper_numbers import check, coverage
+          print(json.dumps({"check": check(), "coverage": coverage()}, indent=2))
+          PY
       - name: NOV001 registered screen calibration
         run: |
           mkdir -p ci-nov001
@@ -109,8 +130,17 @@ jobs:
             docs/paper/deletion-certificates-draft-2026-09-06.md \
             docs/paper/figures/fig1-swept-geometry.svg \
             docs/paper/figures/fig2-closure-inversion.svg \
+            so/paper_numbers.py \
+            so/tests/test_paper_numbers.py \
+            so/results/e000019_fresh_seed_chance.json \
+            so/results/e000021_gate_error_rates.json \
+            so/results/e000024_weights_vs_cells-seed0.json \
+            so/results/e000028_key_channel.json \
+            so/results/e000029_marker_geometry.json \
+            so/results/e000030_deletion_certificate.json \
+            so/results/e000035_deletion_disclosure.json \
             > ci-nov001/source-sha256.txt
-          find ci-nov001 ci-pdx001 ci-nov002 ci-nov003 ci-nov004 -maxdepth 1 -name '*.json' -print0 | sort -z \
+          find ci-nov001 ci-pdx001 ci-nov002 ci-nov003 ci-nov004 ci-paper -maxdepth 1 -name '*.json' -print0 | sort -z \
             | xargs -0 -r sha256sum > ci-nov001/result-sha256.txt
       - uses: actions/upload-artifact@v4
         with:
@@ -121,4 +151,5 @@ jobs:
             ci-nov002/
             ci-nov003/
             ci-nov004/
+            ci-paper/
           if-no-files-found: error

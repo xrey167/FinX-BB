@@ -183,7 +183,11 @@ looks for an output that moves while the encoding holds still — which would me
 the only path, and voids the certificate. `check_row_locality` checks whether one row's payload can
 move another's encoding.
 
-Three seeds, 3 targets, 1000 cells, payload domain 256, no training (`make certify`, E-000030):
+Three seeds, 3 targets, 1000 cells, payload domain 256, no training (`make certify`, E-000030).
+**The two synthetic rows and the four frozen-GPT-2 rows do not share a scope**, and the table
+below should not be read as though they did: the frozen-LM arm is **one seed** over **400 cells**
+with the same 256-value payload domain. Extending it to three seeds is cheap and has not been
+done.
 
 | model | operation | certified for every query | first quantity that moves |
 |---|---|---|---|
@@ -212,11 +216,11 @@ A certificate over a *learned* predicate inherits the predicate's actual boundar
 one, and the gap is measurable.
 
 The store declares a deletion radius of 0.35. Sweeping twenty shells of 20,000 markers over eleven
-checkpoints (Figure 1): accept rate is 1.0000 out to 0.60, 0.9999 at 0.70, 0.2191 at 0.80 (min
-0.0953, max 0.4014 across checkpoints), and 0.0000 from 0.90 through 2.0. **The gate's operational
-radius is 0.90 against a declared 0.35, identical on every checkpoint.** The annulus the store's own
-predicate calls deleted is accepted at **2,199,996 of 2,200,000**, and no training or evaluation
-distribution ever populated it, because both samplers reject inside 0.7.
+checkpoints (Figure 1): accept rate is 1.0000 out to 0.60, 0.9999 at 0.70 (min 0.9992 across
+checkpoints), 0.2191 at 0.80 (min 0.0953, max 0.4014), and 0.0000 from 0.90 through 2.0. **The
+gate's operational radius is 0.90 against a declared 0.35, identical on every checkpoint.** The
+annulus the store's own predicate calls deleted is accepted at **2,199,996 of 2,200,000**, and no
+training or evaluation distribution ever populated it, because both samplers reject inside 0.7.
 
 The published false-accept rate of 8.49e-04 reproduces at 8.550e-04 *on the distribution it was
 measured on*, and is not the false-accept rate of the thing being claimed.
@@ -266,6 +270,10 @@ thing the architecture is load-bearing for.
 One frozen GPT-2, 400 facts, 50 deletion targets, three ways of holding and removing them, attacked
 identically. The weights arms get a LoRA of 2,359,296 parameters against the adapter's 2,370,692 — a
 1.00× match — trained until they answer 95% of the targets. (`make compare`, E-000024.)
+
+**This table is one seed.** The record is seed 0 only; every aggregate in it has n = 1. It is the
+weakest evidence in the paper and the easiest to strengthen — the three-seed run needs no new code.
+Read the rows as a demonstration that the comparison is *available*, not as an effect size.
 
 | | cells (SHRED) | LoRA, gradient ascent | LoRA, relabel to ' unknown' |
 |---|---|---|---|
@@ -367,6 +375,19 @@ before its silence anywhere else meant anything.
 This is the half of the unlearning-evaluation problem that attack-based benchmarks leave open, and it
 is cheap.
 
+**The rule applies to the paper too.** Drafting this produced three disagreements between the prose
+and `so/results/`, and each was caught by a person opening a JSON file: a mean rank written 128.0
+where the record says 128.02; an accept rate written 1.0000 where the sweep says 0.9999; and §7's
+table presented with no seed count where the record is one seed. Three for three is the absence of
+an instrument, so there is now a registry (`make papernums`) binding every figure printed here to
+the record path it came from, re-rendered under the rounding rule used, plus **scope claims** — a
+fact about a record's extent that this text must state in words, which is what caught §7. It fails
+when prose and record part. Its own floor mutates each registered figure and requires the check to
+notice, for all of them rather than a sample, since a claim whose path silently failed to resolve
+would pass a clean run too. The registry is partial by construction: a figure not in it is
+unchecked, not verified. And it compares this paper against the records, never the records against
+reality — a wrong number written identically in both would pass.
+
 ## 10. What this is not
 
 The architecture is re-invention (§1). The word "provably" is not earned for the copy-bound claim:
@@ -413,6 +434,9 @@ irrelevant, by making it the instrument rather than the subject.
 
 **Methods.**
 7. A rule with five worked instances, including three in this programme's own instruments (§9).
+8. The rule turned on the write-up itself: a machine-checked binding from every figure printed here
+   to the record it came from, with scope claims for extent, and a floor that mutates each binding
+   to prove the check can fail (§9).
 
 ## 12. Related work, in one place
 
@@ -456,4 +480,5 @@ are what a practitioner will act on.
 ### Reproduction
 
 Every number above: `make keychannel certify closure retrieval disclosure compare pdxaudit`. Records
-in `so/results/`. Instrument audits: `make calibrate charged unread auditinstr`.
+in `so/results/`. Instrument audits: `make calibrate charged unread auditinstr`. To check this text
+against those records: `make papernums` (33 figures, 3 scope claims; non-zero exit when they part).
