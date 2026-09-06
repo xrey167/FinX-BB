@@ -3777,6 +3777,14 @@ value is refused. *What it is:* SQL-92's `ON DELETE SET NULL` given a target the
 verbalise. *What it is not:* a mechanism, a certificate, or a claim. It is one measurement (the export
 decides the row, the subject component carries it) and one option.
 
+*Retracted in part, 2026-09-06 (§31.49).* The measurements above stand; the reading built on them does
+not. E-000052 ran the registered battery on the BOS-trained symlink substrate and a blanked alias is
+answered with an entity in **0.0200** of reads at worst over twelve phrasings and three seeds (UNKNOWN
+0.9800), against the ≤ 0.05 bar §31.42 expected it to fail. The 0.26–0.475 measured here is therefore a
+property of the position-0 regime this adapter was trained in, not of the self-referencing export, and
+`blank_export="foreign"` repairs a defect a correctly trained reader does not have. The option stays,
+default off, for its store-side property alone.
+
 **Registered and running.** E-000054 is complete on three seeds (record 2026-09-06; R1 above carries
 the worst-seed numbers and the fired branch). E-000052's substrates (the BOS-trained symlink adapter
 and its link-free arm, three seeds each) and then its battery, which will read the BLANK row on a
@@ -3798,6 +3806,110 @@ paraphrase-generalisation numbers on a memory read by a frozen GPT-2-family mode
 against floors the reader's own arithmetic supplies — the row count, the marker generator's position,
 the subject at position 0, and now the exported pointer's subject — because each of them has, in this
 repository, produced a number that looked like a property of the memory and was not.
+
+### 31.49 E-000052 lands CLEAN on the corrected substrate, and it retracts §31.48's R5 reading; the design round says stop (2026-09-06)
+
+**The battery.** E-000052 — the pointer battery registered in §31.42 and narrowed there by its own
+completeness critic — ran on the substrate it was waiting for: `e000020_gpt2_bos`, E-000020's trainer
+unchanged with `SO_BOS=1`, three seeds, against the BOS-trained link-free adapter `e000050_bos`, at all
+twelve phrasings. Worst seed throughout. **All fourteen pre-registered criteria pass**, which is the
+outcome the rule fixed before the run calls CLEAN, and it is the first time in this programme that a
+battery has done so.
+
+| criterion (worst of three seeds) | bar | observed |
+| --- | --- | --- |
+| anchor, template 3: direct / alias | ≥ 0.9866 / ≥ 0.77 | 1.0000 / 0.9050 |
+| reverse control D: held-out subject-initial alias without the BOS | ≤ 0.85 | **0.0100** |
+| reverse control D: held-out medial alias without the BOS | ≥ 0.80 | 0.9100 |
+| (P) `cost_of_sharing`, all twelve phrasings | ≤ 0.10 | **0.0842** |
+| (P) `cost_of_link_training` | ≤ 0.25 | **0.0079** |
+| (N) BLANK: alias answered with an entity | ≤ 0.05 | **0.0200** |
+| (N) BLANK: alias UNKNOWN / sibling readable / target readable | ≥ 0.90 / ≥ 0.80 / ≥ 0.80 | 0.9800 / 0.8000 / 0.8400 |
+| (T) held-out medial: alias_direct / shared UPDATE reach | ≥ 0.80 / ≥ 0.80 | 0.8300 / 0.8200 |
+| RELINK reads back | ≥ 0.80 | 0.8000 |
+
+The reverse control is what makes the rest readable: the same checkpoint read **without** its BOS
+collapses to 0.0100–0.0300 alias reading on exactly the four subject-initial phrasings and holds
+0.9100–0.9700 on the medial ones. The substrate depends on its BOS, so it is not VOID, and §31.38's
+position-0 diagnosis is confirmed a third time from a new direction.
+
+**(P), the one number nobody could predict.** E-000025's price of the pointer was 0.0954 against a
+0.10 bar — five thousandths under it, which is why §31.42 put it first among the things the run would
+carry. In the BOS regime it is **0.0842** (train 0.0913, held out 0.0700), and the cost of training
+the link machinery at all is **0.0079** against a 0.25 bar. The pointer is close to free for this
+reader once the position-0 artefact is removed. That is a measurement of an owned design (SQL-92's
+referential actions; Raeesi & Roed name the pointer record as future work), and it is the paired-arm
+number §31.36 said no paper publishes.
+
+**(N), and the retraction of §31.48's R5 reading.** §31.42 pre-registered the expectation that the
+SET NULL row would fail here too — the smoke on the recorded no-BOS checkpoint read 0.15 (t3) and 0.30
+(t8) wrong-entity, and the bar was deliberately left at ≤ 0.05. It does not fail. A blanked alias is
+answered with an entity in **0.0200 of reads at worst over twelve phrasings and three seeds**, UNKNOWN
+at 0.9800.
+
+That retracts the reading §31.48's R5 gave, and the retraction is the twelfth in this ledger.
+R5 measured, on the **no-BOS** adapter, that a blanked alias is answered with an entity in 0.26–0.475
+of reads, that the export alone decides the row (target-key export and DANGLE agree on 200/200 reads),
+and that the exported pointer's **subject** component carries it. Those measurements stand. What does
+not stand is the sentence built on them — that the self-referencing export is a defect of the store
+that needs repairing. On a substrate whose subjects are not sitting on the attention sink, the same
+self-referencing export reads UNKNOWN at 0.98. **The leak was the position-0 regime, not the export.**
+`MVCCStore(blank_export="foreign")` (§31.48, default off, six tests) therefore repairs a defect that a
+correctly trained reader does not have; the option stays, with this note attached to it, because its
+store-side property — a blanked link exports a key no live cell holds — is worth having on its own and
+costs nothing when the row is already UNKNOWN. What it is not is a fix the record needed.
+
+**(T).** The held-out medial rows, where §31.44 left the residue at 0.91 read / 0.83 route: alias
+reading 0.8300 and a shared UPDATE reaching the alias at 0.8200, both over their 0.80 bars, with the
+entity-failure rows at t9/t10 reported at 0.0000 and never scored as the pre-registration requires.
+
+**What the CLEAN outcome means, at its size.** On the corrected substrate the pod's lifecycle works at
+every phrasing this repository has: direct reading 0.82–1.00, alias reading through a LINK cell
+0.79–0.94, one canonical UPDATE reaching the alias 0.81–0.92, SHRED and DELETE closing every path to
+UNKNOWN at 0.9950–1.0000, BLANK never answered with an entity, RELINK reading back at 0.80–0.96. Every
+number that §31.36 recorded at 0.50–0.52 for this adapter was a reading of the artefact, not of the
+architecture. **This does not make anything novel** — the mechanism is SERAC/GRACE/Larimar/SILO/LMLM
+and IBM's US20260119893A1, the pointer is SQL-92 and Raeesi & Roed's named future work, the dereference
+is MemN2N's hop (§31.48 R2) — and the rule that fixed CLEAN before the run said so in advance: *a
+measurement paper's table, every mechanism owned.* It is the table.
+
+**The design round, and its recommendation: stop.** With the candidate rounds exhausted, twenty-four
+agents were asked the other question — not *what can we claim* but *what would have to be BUILT for a
+claim to exist here, and what would it cost*. Five angles proposed nine constructions; eighteen hostile
+reviews followed, and in four cases the reviewer did not argue but **built the decisive arm and ran
+it**:
+
+| construction | what killed it |
+| --- | --- |
+| NULLBIND: a store-constant NULL target, an invisibility closure, and a theorem that a deletion can be made byte-identical-invisible | An attacker built the store half: 120/120 pods byte-identical under null, 0/120 under self/foreign/dangle — forced by the export function. The theorem is Naor & Teague (STOC 2001) and Hartline et al., whose Thm 1 owns the sentinel fixed at initialisation; `never_wrote` is Ficklebase (ICDE 2013); the minimisation is deletion propagation with a published NP-hardness. `so/audit.py:1357` already lexsorts and already excludes `kid`. |
+| SPANADDR / COMPOSITIONAL-POINTER: keys computed from the model's own representation of a phrase | An attacker ran it in four minutes on the checkpoint: the learned reconstruction transfers to held-out entities essentially unchanged (cos 0.633/0.646 trained against 0.606/0.626 held out). The residual failure is a **fixed passthrough bias** (`deref_pass_bias` + log n) thresholding a key-norm difference — not the address. TOME/KBLaM/E-BERT/PANM own both branches. |
+| The readout-wall negative result, resting on an in-context "ceiling" | The attacker ran the design's own Stage-0 gate: same template gives 1.000/0.990 (induction copying), cross-template 0.405/0.380, held-out asking template 0.285/0.205 — **below** the adapter's own 0.729–0.759. It is not a ceiling; it is a different task. E-000011 already records the two-hop version. |
+| SCOPE: derive the certificate's sweep domain instead of declaring it | The attacker swept 11 store fields over their full finite domains through the real `bank()` in under 30 minutes: the derived scope is exactly the two dependencies already written as comments at `so/audit.py:895-902` and already measured at `e000032_deletion_closure.py:349`. The pre-registered kill compares store fields against bank columns and cannot fire in either direction. |
+
+The other five fell to prior art fetched in the session: Prometheus Mind (arXiv:2601.15324) states the
+learned-value-encoder negative verbatim ("100% train, 0% test"); Ghost Echoes (arXiv:2608.20352, August
+2026) already published black-box deletion detection at 61.1% **and** already ran the full-rebuild
+reference and reported that it fails; Eisenhofer et al. (SaTML 2025) own verifiable unlearning;
+Allen-Zhu & Li (Physics of LMs 3.1) own locus-not-volume. No design in the batch carries a probability
+of novelty above 0.05 by its own reviewers' estimate.
+
+The recommendation the round returned, and which this entry adopts: **stop the novelty search at this
+seam.** Not because the question was asked badly — the refutations do not turn on its phrasing — but
+because the mechanisms are owned by sources that name them, and the ideas land there because they are
+right. What the round bought instead is the R4 correction (§31.48, corrected 2026-09-06: the key map
+was never constrained off the 223-dimensional span of its training subjects, at matched key norm; not
+per-entity memorisation), and five ledger rows that were already paid for by the attackers and need
+writing rather than compute.
+
+**Standing.** Twenty-two repetitions, ten sweeps, twelve retractions, ten refuted candidates and nine
+refuted constructions. What the record holds after this entry: an addressable pointer memory over a
+frozen GPT-2 whose full lifecycle passes fourteen pre-registered criteria at twelve phrasings on the
+worst of three seeds, at a measured pointer price of 0.0842; an executable auditor whose checks return
+NO; five floors that a residue or paraphrase number on this class of memory must be reported against;
+and no mechanism, no theorem and no novelty. The next honest work is not a twenty-third search. It is
+either the engineering the product needs — where R4's correction says a spanning training set is the
+question, not per-entity retraining — or the write-up of the instrument, which the agent-memory
+literature of 2026 does not have.
 
 ### 31.8 Boundary
 
