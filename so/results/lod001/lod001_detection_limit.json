@@ -10075,5 +10075,43 @@
       "checkpoint": "b68f5b08b35e8708f47d2fd96f6e2b901672b293050e2cdec7ca4a5238bf2585"
     }
   ],
-  "seconds": 368.88081884384155
+  "seconds": 368.88081884384155,
+  "validity": {
+    "V1_alias_answer_a1": {
+      "observed": 0.96875,
+      "op": ">=",
+      "bar": 0.8,
+      "pass": true
+    },
+    "V2_alias_final_raw_a1_minus_never": {
+      "observed": 0.8125,
+      "op": ">=",
+      "bar": 0.3,
+      "pass": true
+    },
+    "V3a_alias_answer_a0_minus_never": {
+      "observed": 0.01785714365541935,
+      "op": "<=",
+      "bar": 0.05,
+      "pass": true
+    },
+    "V3b_abs_alias_final_raw_a0_minus_never": {
+      "observed": 0.06250000000000001,
+      "op": "<=",
+      "bar": 0.1,
+      "pass": true
+    },
+    "V4a_gate_at_chord_0": {
+      "observed": 0.9987535625696182,
+      "op": ">=",
+      "bar": 0.9,
+      "pass": true
+    },
+    "V4b_gate_at_chord_1": {
+      "observed": 0.010148870758712292,
+      "op": "<=",
+      "bar": 0.1,
+      "pass": true
+    }
+  }
 }
