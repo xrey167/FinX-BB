@@ -4231,3 +4231,59 @@ an r-dimensional subspace holds r/d of a random vector's mass, so a contrast tha
 reproduces itself there and the arm is void. Measured on the frozen model: the 256-atom span holds
 **0.333** of a random unit vector at layer 8 (0.334 at layer 10) and **0.721 / 0.816** of the entity
 unembedding rows.
+
+### 31.57 The certificate returns its verdict from a block the pod never reaches (2026-09-06, E-000063 and WSC-001)
+
+E-000063 ran for the first time, on all three seeds, after §31.56's repair. It is the composition this
+programme has wanted since the J-space thesis: one canonical SHRED, read through aliases, with the
+output attacks and an independent causal audit against a never-memory control. Its record:
+
+| row | seed 0 | seed 1 | seed 2 | bar |
+|---|---|---|---|---|
+| `active_alias_correct` | 0.8795 | 0.9732 | 0.9821 | ≥ 0.80 |
+| `shred_alias_unknown` / `true_object` | 1.0000 / 0.0000 | 0.9955 / 0.0000 | 1.0000 / 0.0000 | ≥ 0.90 / ≤ 0.05 |
+| `bystander_top1_agree` / `kl_max` | 1.0000 / 0.0000 | 1.0000 / 0.0000 | 1.0000 / 0.0000 | ≥ 0.98 / ≤ 0.05 |
+| `finalprobe(ACTIVE − NEVER)` | 0.9018 | 0.8750 | 0.8616 | ≥ 0.30 |
+| **`jprobe(ACTIVE − NEVER)`** | **−0.0134** | **−0.0045** | **−0.0134** | ≥ 0.30 — **FAIL, every seed** |
+| `jprobe(SHRED − NEVER)` | −0.0179 | −0.0045 | −0.0134 | ≤ 0.05 — the headline row, passes |
+
+**The headline passes underneath the validity row, on every seed, including two where the memory reads
+at 0.97 and 0.98.** The rule this programme has stated ten times is *an instrument that cannot fail is
+not evidence*; this is its neighbour, an instrument that cannot SEE, and only the pre-registered
+validity bar catches it. Had E-000063 carried no such bar — most audits do not — its record would read
+"no workspace trace after deletion, three seeds, with a never-memory control".
+
+**WSC-001 says why, and it is not the basis.** The write mediator: when a pod is shredded, the
+injected vector at the FIRST read site moves by 2.81 and at the second by 89.70, a ratio of **0.032**
+(worst seed 0.049); the state moves 2.81 / 4.19 / 83.55 / 27.06 at blocks 8, 9, 10 and the final
+state. E-000063 captures block 8, chosen in its source as "the first adapter read site". The pod's
+content is not there. Five feature families — the audit's own atoms, a dimension-matched random
+projection, the top-k principal components of the live states, the unembedding rows, and the raw
+768-dimensional residual — all read ACTIVE − NEVER between **−0.022 and +0.000** at blocks 8 and 9, in
+both address modes, and **+0.66 to +0.92** at block 10 and the final state. Nothing is decodable at
+the capture site because almost nothing is there, and the mediator is what separates that from
+blindness.
+
+**The pointer does not break the audit.** Calibrated on a pod addressed by its own canonical key and
+applied to the same pod through a LINK alias the model must dereference, the audit loses **−0.010**
+(range −0.063 to +0.054) at the final state. Recorded as the endorsement branch.
+
+**Two rows are withdrawn by their own bars, and this is the part worth reading.** (i) Part B — whether
+the scored-token atom span is the causal channel of the write — is **VOID**: the token-matched null, a
+J-lens span built identically over 257 tokens that are not scored, costs the answer 0.02 to **0.26**
+against a 0.20 bar, so the asymmetry (removing the scored span takes aliased reading from ~0.95 to
+≤ 0.16) is real but the registered sentence is not licensed. (ii) A7, a disclosed post-hoc row seen at
++0.457 in a ten-pod single-template plumbing run — a shredded pod staying decodable under direct
+addressing but not through a pointer — does **not replicate**: **−0.016** at 16 pods over three seeds.
+The pre-registration called it the row to discount most and it was right.
+
+**And a defect of the experiment's own making.** Its pre-registration writes V1 at the anchor template
+3 (where it passes: alias 0.940, direct 1.000); its code takes the minimum over all twelve templates
+(where it fails: alias 0.690 at t1, direct 0.835). Recorded, not reconciled after the fact. Either
+reading leaves part B void.
+
+What survives is a siting rule with a mediator, a demonstrated vacuity mode of a composed
+store-and-audit certificate, and the observation that the pod store supplies the per-item
+never-memory counterfactual whose absence J-Access names when it reports item-level AUROC at chance.
+Claim document: `docs/novelty/audit-siting-claim.md`. Owned and not claimed: the lens, lens-based
+auditing, probing, projection, external memory, pods, pointer aliases.
