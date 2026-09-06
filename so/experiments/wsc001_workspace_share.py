@@ -127,7 +127,16 @@ def probe_families(states: Dict[str, torch.Tensor], atoms: torch.Tensor, unembed
 
 def part_a(gk: E8.GPT2Knowledge, centre: np.ndarray, seed: int, n_groups: int,
            verbose: bool = True) -> Dict[str, float]:
-    """E-000063's states and transfer probe, over five feature families at two sites."""
+    """E-000063's states and transfer probe, over five feature families, two sites and two ADDRESS MODES.
+
+    The address mode is what makes the pointer load-bearing rather than decorative. The pod, its
+    payload, the frozen weights and the template set are identical in both modes; only the way the
+    prompt reaches the pod differs -- its own canonical key, or a LINK alias that the model must
+    dereference. An audit calibrated on one access path and applied to the other is the deployment
+    situation a canonicalised store creates, and whether it survives that is not settled by anything
+    the code fixes: the alias path routes through a second learned hop (E-000058) whose output is the
+    same object vector, so a difference is about what the audit can see, not about what was injected.
+    """
     rng = np.random.default_rng(63000 + seed)
     world, spec = E15.sample_alias_world(rng, 420, max(n_groups * 2, 48), 2, gk.n_entities, 4,
                                          E20.N_TRAIN_TEMPLATES)
@@ -146,41 +155,50 @@ def part_a(gk: E8.GPT2Knowledge, centre: np.ndarray, seed: int, n_groups: int,
     jl = jlens_vectors(gk.model.lm, E63.JL_SOURCE, obj_ids, enc["input_ids"], enc["attention_mask"],
                        w_out, batch=4)
     cap = E63.Capture(gk)
-    mid: Dict[str, List[torch.Tensor]] = {"active": [], "shred": [], "never": []}
-    fin: Dict[str, List[torch.Tensor]] = {"active": [], "shred": [], "never": []}
-    ys, groups = [], []
+    acc: Dict[Tuple[str, str, str], List[torch.Tensor]] = {}
+    ys: Dict[str, List[int]] = {"alias": [], "direct": []}
+    gs: Dict[str, List[int]] = {"alias": [], "direct": []}
+    answers: Dict[str, List[torch.Tensor]] = {"alias": [], "direct": []}
+    truths: Dict[str, List[int]] = {"alias": [], "direct": []}
     for label, (target, aliases, obj) in enumerate(selected):
-        texts, tg = E63.texts_for(aliases, gk.names, E63.TEMPLATES)
-        sa, fa, _, _ = E63.eval_texts(gk, cap, store, texts)
         never = copy.deepcopy(store)
         for ak in aliases:
             if kids[ak] in never.cells:
                 never.delete(kids[ak])
         if kids[target] in never.cells:
             never.delete(kids[target])
-        sn, fn, _, _ = E63.eval_texts(gk, cap, never, texts)
-        store.shred(kids[target])
-        ss, fs, _, _ = E63.eval_texts(gk, cap, store, texts)
-        store.resign(kids[target])
-        for d, (a_, s_, n_) in ((mid, (sa, ss, sn)), (fin, (fa, fs, fn))):
-            d["active"].append(a_); d["shred"].append(s_); d["never"].append(n_)
-        ys.extend([label] * len(texts)); groups.extend(tg)
+        for mode, keys in (("alias", aliases), ("direct", [target])):
+            texts, tg = E63.texts_for(keys, gk.names, E63.TEMPLATES)
+            sa, fa, _, aa = E63.eval_texts(gk, cap, store, texts)
+            sn, fn, _, _ = E63.eval_texts(gk, cap, never, texts)
+            store.shred(kids[target])
+            ss, fs, _, _ = E63.eval_texts(gk, cap, store, texts)
+            store.resign(kids[target])
+            for site, (a_, s_, n_) in (("mid", (sa, ss, sn)), ("final", (fa, fs, fn))):
+                acc.setdefault((mode, site, "active"), []).append(a_)
+                acc.setdefault((mode, site, "shred"), []).append(s_)
+                acc.setdefault((mode, site, "never"), []).append(n_)
+            ys[mode].extend([label] * len(texts)); gs[mode].extend(tg)
+            answers[mode].append(aa); truths[mode].extend([obj] * len(texts))
     cap.close()
-    y = torch.tensor(ys, dtype=torch.long); g = torch.tensor(groups, dtype=torch.long)
     out: Dict[str, float] = {"partA/n_pods": float(n), "partA/chance": 1.0 / n}
-    for site, d in (("mid", mid), ("final", fin)):
-        states = {k_: torch.cat(v) for k_, v in d.items()}
-        fams = probe_families(states, jl.vectors, w_out[torch.as_tensor(obj_ids)], n, seed)
-        for fam, feats in fams.items():
-            p = E63.transfer_probe(feats["active"], feats["shred"], feats["never"], y, g, n)
-            for s_, v_ in p.items():
-                out[f"partA/{site}/{fam}/{s_}"] = v_
-            out[f"partA/{site}/{fam}/active_minus_never"] = p["active"] - p["never"]
-            out[f"partA/{site}/{fam}/shred_minus_never"] = p["shred"] - p["never"]
-            if verbose:
-                print(f"  seed {seed} partA {site:5s} {fam:8s}: active {p['active']:.4f} "
-                      f"shred {p['shred']:.4f} never {p['never']:.4f}  "
-                      f"A-N {p['active'] - p['never']:+.4f}", flush=True)
+    for mode in ("alias", "direct"):
+        y = torch.tensor(ys[mode], dtype=torch.long); g = torch.tensor(gs[mode], dtype=torch.long)
+        truth = torch.tensor(truths[mode], dtype=torch.long)
+        out[f"partA/{mode}/answer_correct"] = float((torch.cat(answers[mode]) == truth).float().mean())
+        for site in ("mid", "final"):
+            states = {st: torch.cat(acc[(mode, site, st)]) for st in ("active", "shred", "never")}
+            fams = probe_families(states, jl.vectors, w_out[torch.as_tensor(obj_ids)], n, seed)
+            for fam, feats in fams.items():
+                p = E63.transfer_probe(feats["active"], feats["shred"], feats["never"], y, g, n)
+                for s_, v_ in p.items():
+                    out[f"partA/{mode}/{site}/{fam}/{s_}"] = v_
+                out[f"partA/{mode}/{site}/{fam}/active_minus_never"] = p["active"] - p["never"]
+                out[f"partA/{mode}/{site}/{fam}/shred_minus_never"] = p["shred"] - p["never"]
+                if verbose:
+                    print(f"  seed {seed} partA {mode:6s} {site:5s} {fam:8s}: "
+                          f"active {p['active']:.4f} shred {p['shred']:.4f} never {p['never']:.4f}  "
+                          f"A-N {p['active'] - p['never']:+.4f}", flush=True)
     return out
 
 
@@ -317,6 +335,178 @@ def load_bos_adapter(seed: int, suffix: str = "_bos") -> Tuple[E8.GPT2Knowledge,
     return gk, np.asarray(ck["centre"]), _sha256(path)
 
 
+# ------------------------------------------------------------------------------- scoring
+SUMMARY_KEYS = ("B/full_alias_min", "B/full_direct_min", "B/dropW_alias_max", "B/dropW_n_alias_max",
+                "B/dropT_n_deficit_min", "B/perm_alias_max", "B/none_alias_max",
+                "B/n_templates_dropWn_ge_50", "B/share_W_mean", "B/atom_dropW_alias_max",
+                "A/mid_max_active_minus_never", "A/mid_jspace_amn", "A/mid_pca_amn", "A/mid_raw_amn",
+                "A/final_raw_amn",
+                "A/alias/final_jspace_amn", "A/direct/final_jspace_amn", "A/indirection/jspace",
+                "A/alias/final_raw_amn", "A/direct/final_raw_amn", "A/indirection/raw",
+                "A/alias/final_pca_amn", "A/direct/final_pca_amn", "A/indirection/pca",
+                "A/alias/final_raw_shred_minus_never", "A/direct/final_raw_shred_minus_never",
+                "A/shred_residual_direct", "A/shred_residual_alias", "A/shred_residual_asymmetry")
+
+
+def summarise(m: Dict[str, Any], templates: Sequence[int]) -> Dict[str, float]:
+    """Per-seed reductions the pre-registered bars are read on. Worst direction per row."""
+    g = lambda k, d=float("nan"): float(m.get(k, d))
+    out: Dict[str, float] = {}
+    ts = [t for t in templates if f"partB/t{t}/full/alias" in m]
+    if ts:
+        out["B/full_alias_min"] = min(g(f"partB/t{t}/full/alias") for t in ts)
+        out["B/full_direct_min"] = min(g(f"partB/t{t}/full/direct") for t in ts)
+        out["B/dropW_alias_max"] = max(g(f"partB/t{t}/dropW/alias") for t in ts)
+        out["B/dropW_n_alias_max"] = max(g(f"partB/t{t}/dropW_n/alias") for t in ts)
+        out["B/atom_dropW_alias_max"] = max(g(f"partB/t{t}/atom_dropW/alias") for t in ts)
+        out["B/dropT_n_deficit_min"] = min(g(f"partB/t{t}/dropT_n/alias") - g(f"partB/t{t}/full/alias")
+                                           for t in ts)
+        out["B/perm_alias_max"] = max(g(f"partB/t{t}/perm/alias") for t in ts)
+        out["B/none_alias_max"] = max(g(f"partB/t{t}/none/alias") for t in ts)
+        out["B/n_templates_dropWn_ge_50"] = float(sum(g(f"partB/t{t}/dropW_n/alias") >= 0.50 for t in ts))
+        out["B/share_W_mean"] = float(np.mean([g(f"partB/t{t}/share_W_site0") for t in ts]))
+    fams = ("jspace", "random", "pca", "unembed", "raw")
+    if any(f"partA/alias/mid/{f}/active_minus_never" in m for f in fams):
+        for mode in ("alias", "direct"):
+            for f in fams:
+                out[f"A/{mode}/mid_{f}_amn"] = g(f"partA/{mode}/mid/{f}/active_minus_never")
+                out[f"A/{mode}/final_{f}_amn"] = g(f"partA/{mode}/final/{f}/active_minus_never")
+            out[f"A/{mode}/mid_max_active_minus_never"] = max(out[f"A/{mode}/mid_{f}_amn"] for f in fams)
+            out[f"A/{mode}/final_max_active_minus_never"] = max(out[f"A/{mode}/final_{f}_amn"] for f in fams)
+            out[f"A/{mode}/final_raw_shred_minus_never"] = g(f"partA/{mode}/final/raw/shred_minus_never")
+        # INDIRECTION (A6): the audit calibrated on the canonical key, applied through the pointer.
+        for f in fams:
+            out[f"A/indirection/{f}"] = out[f"A/direct/final_{f}_amn"] - out[f"A/alias/final_{f}_amn"]
+        # A7, a DISCLOSED POST-HOC ROW: what a deletion leaves in the final state, by address mode.
+        out["A/shred_residual_direct"] = g("partA/direct/final/raw/shred_minus_never")
+        out["A/shred_residual_alias"] = g("partA/alias/final/raw/shred_minus_never")
+        out["A/shred_residual_asymmetry"] = (out["A/shred_residual_direct"]
+                                             - out["A/shred_residual_alias"])
+        out["A/mid_max_active_minus_never"] = max(out["A/alias/mid_max_active_minus_never"],
+                                                  out["A/direct/mid_max_active_minus_never"])
+        out["A/final_raw_amn"] = min(out["A/alias/final_raw_amn"], out["A/direct/final_raw_amn"])
+        out["A/mid_jspace_amn"] = max(out["A/alias/mid_jspace_amn"], out["A/direct/mid_jspace_amn"])
+        out["A/mid_pca_amn"] = max(out["A/alias/mid_pca_amn"], out["A/direct/mid_pca_amn"])
+        out["A/mid_raw_amn"] = max(out["A/alias/mid_raw_amn"], out["A/direct/mid_raw_amn"])
+    return out
+
+
+def criteria() -> Dict[str, Tuple[str, float]]:
+    """Exactly the bars of docs/novelty/wsc001-preregister.md, read on the worst seed."""
+    return {
+        "B/full_alias_min": (">=", 0.80), "B/full_direct_min": (">=", 0.90),      # V1
+        "B/perm_alias_max": ("<=", 0.05),                                          # V2
+        "B/none_alias_max": ("<=", 0.05),                                          # V3
+        "A/final_raw_amn": (">=", 0.30),                                           # V4
+        "B/dropW_n_alias_max": ("<=", 0.20),                                       # B1a
+        "B/dropT_n_deficit_min": (">=", -0.20),                                    # B1b
+    }
+
+
+def decide(agg: Dict[str, Dict[str, float]]) -> Dict[str, str]:
+    """Every branch of the pre-registered decision rule, evaluated on the worst seed."""
+    w = lambda k, lower_is_better: ledger.worst(agg[k], lower_is_better) if k in agg else float("nan")
+    v = {"V1": w("B/full_alias_min", False) >= 0.80 and w("B/full_direct_min", False) >= 0.90,
+         "V2": w("B/perm_alias_max", True) <= 0.05,
+         "V3": w("B/none_alias_max", True) <= 0.05,
+         "V4": w("A/final_raw_amn", False) >= 0.30,
+         "V5": all(agg[k]["max"] <= 1e-4 for k in agg if k.endswith("drop_retention_max"))}
+    out = {"validity": "PASS" if all(v.values()) else "FAIL: " + ",".join(k for k, ok in v.items() if not ok)}
+    if v["V1"] and v["V2"] and v["V3"] and v["V5"]:
+        null_fired = w("B/dropT_n_deficit_min", False) < -0.20
+        b1 = (w("B/dropW_n_alias_max", True) <= 0.20) and not null_fired
+        b2 = w("B/n_templates_dropWn_ge_50", True) >= 3
+        out["partB"] = ("VOID-NULL (B3): the token-matched span costs the answer too, so the result is "
+                        "about removing a rank-257 lens span of this construction" if null_fired else
+                        "B1 CONFIRMED: the scored-token atom span is the causal channel of the write "
+                        "and the token-matched null does not reproduce it" if b1 else
+                        "B2: the answer survives with the first-order channel removed" if b2 else
+                        "B4 mixed: neither branch holds across templates")
+    else:
+        out["partB"] = "VOID (validity)"
+    if v["V4"]:
+        mid_max = w("A/mid_max_active_minus_never", True)
+        out["partA"] = ("A1 DEPTH: no linear readout at the write site attributes the memory beyond the "
+                        "prompt, at any dimension up to the full residual" if mid_max <= 0.05 else
+                        "A2 DIRECTION: k coordinates suffice at the write site and the audit has the wrong k"
+                        if w("A/mid_pca_amn", False) >= 0.30 and w("A/mid_jspace_amn", True) <= 0.05 else
+                        "A3 DIMENSION: only the full residual attributes the memory at the write site"
+                        if w("A/mid_raw_amn", False) >= 0.30 and w("A/mid_pca_amn", True) <= 0.05 else
+                        "A4 mixed: no siting sentence is licensed")
+    else:
+        out["partA"] = "VOID (V4: no readout anywhere sees the memory)"
+    if v["V4"]:
+        ind = w("A/indirection/jspace", True)
+        out["A6_indirection"] = ("closed: an audit calibrated on the canonical key transfers to the "
+                                 "pointer path" if ind <= 0.10 else
+                                 "open: the audit loses sensitivity through the pointer" if ind >= 0.20
+                                 else "inconclusive between 0.10 and 0.20")
+        d, a = w("A/shred_residual_direct", False), w("A/shred_residual_alias", True)
+        out["A7_shred_residual"] = ("asymmetric (DISCLOSED POST-HOC ROW): a shredded pod stays "
+                                    "decodable from the final state when addressed by its own key and "
+                                    "not through a pointer" if (d >= 0.20 and d - a >= 0.20)
+                                    else "no asymmetry recorded; table only")
+    return out
+
+
+def record(per_seed: List[Dict[str, Any]], args) -> Dict[str, Any]:
+    keys = [k for k in per_seed[0] if isinstance(per_seed[0][k], (int, float))
+            and k not in ("seed",)]
+    agg = ledger.aggregate(per_seed, keys)
+    check = ledger.check_criteria(agg, criteria())
+    verdict = decide(agg)
+    rows = [(k, f"{agg[k]['mean']:.4f}", f"{ledger.worst(agg[k], k in LOWER):.4f}")
+            for k in SUMMARY_KEYS if k in agg]
+    ts = [t for t in args.templates if f"partB/t{t}/full/alias" in per_seed[0]]
+    # 'full' and the null are capability rows (worst = min); every other arm is a leak row (worst = max)
+    arm_rows = [[f"t{t}"] + [f"{ledger.worst(agg[f'partB/t{t}/{a}/alias'], a not in ('full', 'dropT_n')):.4f}"
+                             for a in PART_B_ARMS] for t in ts]
+    fam_rows = [[f] + [f"{ledger.worst(agg[f'partA/{mode}/{site}/{f}/active_minus_never'], False):.4f}"
+                       for mode in ("direct", "alias") for site in ("mid", "final")]
+                for f in ("jspace", "random", "pca", "unembed", "raw")
+                if f"partA/alias/mid/{f}/active_minus_never" in agg]
+    rec = {
+        "experiment": "WSC-001",
+        "title": "Where an accessibility audit of an external memory must read",
+        "evidence_level": "E5",
+        "preregistration": "docs/novelty/wsc001-preregister.md",
+        "claim_supported": check["claim_supported"],
+        "verdict": verdict,
+        "not_claimed": ("the Jacobian lens, J-lens auditing, probing, projection, external memory, pods or "
+                        "pointer aliases; no deletion guarantee; the atom arm is an ORACLE and is never a "
+                        "capability comparison"),
+        "by_construction": ["keep/drop of the first-order term (ledger 31.39)",
+                            "atom/alias = 1.0 (the arm is handed the ground-truth object)",
+                            "at read layer 10 the atoms are the unembedding rows (31.56)"],
+        "config": {"seeds": args.seeds, "templates": args.templates, "n_groups": args.n_groups,
+                   "n_direct": args.n_direct, "lens_corpus": LENS_CORPUS, "arms": list(PART_B_ARMS)},
+        "criteria": check["criteria"], "per_seed": per_seed, "aggregate": agg,
+    }
+    md = "\n".join([
+        "# WSC-001 — where an accessibility audit of an external memory must read", "",
+        f"Pre-registered: `docs/novelty/wsc001-preregister.md`. Seeds {args.seeds}; worst seed reported.",
+        f"Validity: **{verdict['validity']}**.  Part A: **{verdict.get('partA','-')}**.  "
+        f"Part B: **{verdict.get('partB','-')}**.", "",
+        "## Part B — the causal side (alias reads, worst seed)", "",
+        ledger.table(["template"] + list(PART_B_ARMS), arm_rows), "",
+        "## Part A — the readout side (probe trained on ACTIVE only, worst seed)", "",
+        ledger.table(["family", "direct mid A−N", "direct final A−N", "alias mid A−N", "alias final A−N"],
+                     fam_rows), "",
+        "## Summary rows", "", ledger.table(["measure", "mean over seeds", "worst seed"], rows), "",
+        "## Pre-registered criteria (worst seed)", "", ledger.criteria_table(check), "",
+        "By construction: " + "; ".join(rec["by_construction"]) + ".", "",
+        "Not claimed: " + rec["not_claimed"],
+    ])
+    path = ledger.save("wsc001_workspace_share", rec, md)
+    print(md); print(f"\nsaved {path}")
+    return rec
+
+
+LOWER = {"B/dropW_alias_max", "B/dropW_n_alias_max", "B/perm_alias_max", "B/none_alias_max",
+         "B/atom_dropW_alias_max", "A/mid_max_active_minus_never", "A/mid_jspace_amn",
+         "A/mid_jspace_shred_minus_never", "A/final_raw_shred_minus_never"}
+
+
 def main(argv: Optional[List[str]] = None) -> Dict[str, Any]:
     ap = argparse.ArgumentParser()
     ap.add_argument("--seeds", type=int, nargs="*", default=[0, 1, 2])
@@ -348,8 +538,9 @@ def main(argv: Optional[List[str]] = None) -> Dict[str, Any]:
     if args.smoke:
         print("SMOKE ONLY -- nothing recorded")
         return {"per_seed": per_seed, "smoke": True}
-    raise SystemExit("WSC-001 is not scored until docs/novelty/wsc001-preregister.md is committed; "
-                     "this line is then replaced by the scoring block.")
+    for m in per_seed:
+        m.update(summarise(m, args.templates))
+    return record(per_seed, args)
 
 
 if __name__ == "__main__":

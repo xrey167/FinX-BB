@@ -136,6 +136,26 @@ CONFIRMATION on ten further templates and two further seeds, not a discovery, an
 wherever it is reported. B3, the null, has not fired at either seen template and remains the row that
 can void the part. Part A's bars were set on the E-000063 table alone.
 
+**Seen after the bars above were written, and disclosed here rather than folded in.** A plumbing
+validation of the address-mode split (seed 0, 10 pods, one template, 1 thread) produced the part-A
+table before the recorded run. Its structure: at the write site every family in BOTH address modes
+reads ACTIVE - NEVER within +/-0.021 of zero, the raw 768-dimensional state included (alias +0.0071,
+direct +0.0143); at the final state every family separates strongly (alias +0.800 to +0.893, direct
++0.843 to +0.957). Two things in it were not anticipated by any bar above and are therefore added as
+ROWS WITH BARS SET KNOWING THEM, labelled so wherever they are reported:
+
+- `A6` **indirection**: `direct/final/jspace - alias/final/jspace`. Seen at +0.064 on the plumbing
+  cell. Bar: an audit calibrated on the canonical key transfers to the pointer path if this is
+  <= 0.10 on the worst seed, and does not if it is >= 0.20. Between the two, no sentence.
+- `A7` **what a deletion leaves in the model's state, by address mode**:
+  `final/raw/(SHRED - NEVER)` for each mode. Seen at +0.457 direct against -0.021 alias on the
+  plumbing cell -- a shredded pod's identity decodable from the final state when the pod is addressed
+  by its own key, and not when it is reached through a pointer. Bar: the asymmetry is recorded only if
+  direct >= 0.20 AND direct - alias >= 0.20 on the worst seed, with `shred_alias_true_object <= 0.05`
+  from E-000063 as the validity floor that the OUTPUT is closed in both modes. Otherwise it is
+  reported as a table and no sentence is drawn. This row is a DISCLOSED POST-HOC ADDITION: it was not
+  in the design, it was found by a plumbing run, and it is the row a reader should discount most.
+
 **What is still blind:** seeds 1 and 2 entirely (their checkpoints did not exist when this was
 written), ten of the twelve templates, the direct-read rows, part A at full size, and every
 per-template ordering.
