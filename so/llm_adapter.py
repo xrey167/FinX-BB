@@ -163,6 +163,7 @@ class KnowledgeAdapterLM(nn.Module):
         self._ctx: Optional[Dict] = None
         self._inject_projection = None      # evaluation-only; see set_inject_projection
         self._inject_override = None        # evaluation-only; see set_inject_override
+        self._inject_scale = None           # evaluation-only; see set_inject_scale
         blocks = transformer_blocks(lm)
         self._hooks = [blocks[l].register_forward_hook(self._make_hook(i, l)) for i, l in enumerate(cfg.read_layers)]
 
@@ -352,6 +353,59 @@ class KnowledgeAdapterLM(nn.Module):
             out = out * (read.norm(dim=-1, keepdim=True) / out.norm(dim=-1, keepdim=True).clamp_min(1e-6))
         return out
 
+    # -------------------------------------------------- the injected read, at a fraction of its size
+    #
+    # EVALUATION-ONLY INSTRUMENT, off by default, so every recorded number is unaffected: with no
+    # scale set this is the identity and the forward is bit-identical to the one that produced the
+    # records (pinned by so/tests/test_inject_scale.py).
+    #
+    # WHY IT EXISTS. ``set_inject_projection(..., "zero")`` gives a write of nothing and the trained
+    # forward gives a write of everything, and between those two there was no state this harness could
+    # ask about. An audit that reports "no residual trace after deletion" is making a claim about
+    # everything in between: it is asserting that had a residue been there, it would have been seen.
+    # Nothing in this repository, and nothing in the accessibility-audit literature the ledger cites,
+    # has ever measured the smallest residue such an audit can actually see, because a residue is not
+    # a thing a parametric memory can be given in a known amount. Here the write is a tensor this
+    # harness holds, so it can be given in a known amount: ``alpha`` is the fraction of the trained
+    # write that survives, 0.0 is the no-memory floor and 1.0 is the trained forward.
+    #
+    # WHAT IT IS AND IS NOT. It is a MAGNITUDE ladder on the adapter's write, applied after gating,
+    # RMS matching, any override and any projection, at the site named. It is NOT a model of how a
+    # partial deletion arises in the store -- the store's own graded dial is the marker chord, which
+    # moves the gate ``g`` in ``encode_bank`` and attenuates the payload TOWARD ' unknown' rather than
+    # toward zero. The two axes answer different questions and an experiment that wants the second
+    # must move the marker, not this. Both are reported separately wherever both are run.
+    def set_inject_scale(self, alpha: Optional[float], layers: Optional[Sequence[int]] = None) -> None:
+        """Inject ``alpha`` times the write this forward would otherwise make, or None to restore it.
+
+        ``alpha`` is a non-negative float; 1.0 is the trained behaviour and 0.0 injects nothing (and is
+        therefore the same state as ``set_inject_projection(None, "zero")`` at the same sites). Values
+        above 1.0 are permitted so that the ladder can bracket the trained write from both sides, which
+        is what distinguishes "the audit is saturated here" from "the audit is blind here".
+
+        ``layers`` may name a subset of the read layers; sites not named keep the trained write. The
+        subset exists for the same reason it exists on ``set_inject_projection``: restricting an
+        earlier write changes which cell a later read routes to (ledger 31.56), so a ladder applied at
+        every site is a different object from one applied at a single site.
+        """
+        if alpha is None:
+            self._inject_scale = None
+            return
+        a = float(alpha)
+        if not (a >= 0.0) or a != a:                      # rejects negatives and NaN
+            raise ValueError(f"alpha must be a non-negative float, got {alpha!r}")
+        sites = tuple(self.cfg.read_layers if layers is None else layers)
+        unknown = [l for l in sites if l not in self.cfg.read_layers]
+        if unknown:
+            raise ValueError(f"layers {unknown} are not read layers {tuple(self.cfg.read_layers)}")
+        self._inject_scale = {int(l): a for l in sites}
+
+    def _scale_injection(self, read: torch.Tensor, layer: int) -> torch.Tensor:
+        s = getattr(self, "_inject_scale", None)
+        if not s or layer not in s:
+            return read
+        return read * s[layer]
+
     def _make_hook(self, read_index: int, layer: int):
         def hook(module, inputs, output):
             if self._ctx is None:
@@ -428,7 +482,8 @@ class KnowledgeAdapterLM(nn.Module):
                 ref = self.o_proj[str(layer)](val)
                 rms_r = ref.pow(2).mean(-1, keepdim=True).sqrt().clamp_min(1e-3 * rms_h + 1e-6)
                 read = read * (rms_h / rms_r) * self.inject_gain[read_index]
-            read = self._project_injection(self._override_injection(read, layer), layer)
+            read = self._scale_injection(
+                self._project_injection(self._override_injection(read, layer), layer), layer)
             ctx.setdefault("injected", []).append(read.detach())
             delta = torch.zeros_like(h)
             delta[ar, ctx["last_idx"]] = read
