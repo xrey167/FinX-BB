@@ -456,6 +456,25 @@ remains true is the general form: a green run is a statement about the bindings 
 bindings that exist are the ones somebody thought to write. The difference is that the paper now
 reports how many that is.
 
+**Then two kinds of claim that were not numbers at all.** The tables also have verdict columns —
+`CERTIFIED` four times in §4, `yes`/`no` five times in §3 — and nothing bound any of them; a wrong
+decimal misstates a magnitude, a wrong `CERTIFIED` misstates whether the central claim holds. All
+nineteen are now bound to the record boolean behind them, each checked against **its own table row**,
+since `CERTIFIED` appears four times and a document-wide test would let any of them pass on
+another's evidence. Sweeping for verdict rows also found one that cannot be bound and should not
+be — §7's "a certificate is even available", which follows from a LoRA having no finite payload
+domain rather than from any measurement, and which had been sitting among six measured rows looking
+identical to them.
+
+And finally: **do the pointers point at anything?** §0 promises every number is reproducible by the
+`make` target named beside it, and a target that does not exist makes that promise false in a way no
+amount of correct arithmetic would reveal. All forty pointers now resolve — every backticked `make`
+target against the Makefile, every cited experiment against `so/results/`, every §-reference against
+this paper's own headings, every quoted path and embedded figure against the disk. The one finding
+was structural rather than broken: **E-000033 is the only experiment identifier here with no record**,
+because it has never been run, and citing it is honest only because §13(b) says so in those words —
+which the check now requires.
+
 Calibrating it made the same point a third time. Its presence test began as a substring search,
 which is nearly vacuous for a short token — `0.0` is inside `0.0040` — and requiring a standalone
 match immediately found two figures it had been passing on a coincidence. For a figure round enough
@@ -535,7 +554,9 @@ arms, so §8's "nothing recoverable" is value-channel-only for those arms. Named
 
 **(b) The closure reproduced in a chunked vector index.** Until §6's closure is shown in the
 arrangement almost every deployed system uses, the result is about one store implementation rather
-than about the pattern. The target exists (`make retrieval`, E-000033).
+than about the pattern. **The target exists and has never been run**: `make retrieval`, E-000033,
+with no record in `so/results/`. It is the one experiment identifier this paper cites that has no
+record behind it, and the only reason citing it is honest is this sentence.
 
 **(c) The one that decides whether this matters outside the project.** Run §3's instrument against a
 *published* system with its own reported deletion metric — a codebook editor, an episodic memory, or

@@ -785,6 +785,75 @@ _NOT_A_MEASUREMENT: tuple[tuple[str, str], ...] = (
 )
 
 
+MAKEFILE = Path("Makefile")
+
+# An experiment the paper cites without a record is honest only if the paper says it has not been
+# run. Each entry pairs the id with the words that must appear for the citation to stand.
+_CITED_BUT_UNRUN: dict[str, str] = {
+    "E-000033": "The target exists and has never been run",
+}
+
+
+def check_references(paper_text: str | None = None) -> list[dict]:
+    """The fifth kind of claim: that the paper's pointers point at something.
+
+    Numbers, extent, coverage and verdicts are all checked. None of them looks at whether `make
+    certify` is a target, whether a cited E-id has a record, whether a §-reference resolves, or
+    whether a quoted repository path exists. §0 promises every number is "reproducible by the `make`
+    target named beside it" -- a target that does not exist makes that promise false in a way no
+    amount of correct arithmetic would reveal.
+    """
+    text = paper_text if paper_text is not None else PAPER.read_text(encoding="utf-8")
+    rows: list[dict] = []
+
+    # (a) every backticked `make X` names a real target
+    makefile = MAKEFILE.read_text(encoding="utf-8") if MAKEFILE.exists() else ""
+    targets = set(re.findall(r"^([a-z][a-z0-9_-]*):", makefile, flags=re.M))
+    cited: set[str] = set()
+    for m in re.finditer(r"`make ([a-z0-9_ -]+)`", text):
+        cited.update(m.group(1).split())
+    for t in sorted(cited):
+        rows.append({"kind": "make target", "name": t,
+                     "status": "OK" if t in targets else "MISSING",
+                     "detail": "in the Makefile" if t in targets else "no such Makefile target"})
+
+    # (b) every cited experiment has a record, or is declared unrun in the text
+    records = {p.name for p in RESULTS.glob("**/*.json")}
+    for eid in sorted(set(re.findall(r"E-\d{6}", text))):
+        stem = "e" + eid.split("-")[1]
+        if any(r.startswith(stem) for r in records):
+            rows.append({"kind": "experiment", "name": eid, "status": "OK", "detail": "record present"})
+        elif eid in _CITED_BUT_UNRUN and _CITED_BUT_UNRUN[eid] in text:
+            rows.append({"kind": "experiment", "name": eid, "status": "OK",
+                         "detail": f"no record, and the paper says so ({_CITED_BUT_UNRUN[eid]!r})"})
+        elif eid in _CITED_BUT_UNRUN:
+            rows.append({"kind": "experiment", "name": eid, "status": "UNDISCLOSED",
+                         "detail": "cited with no record, and the paper no longer says it is unrun"})
+        else:
+            rows.append({"kind": "experiment", "name": eid, "status": "MISSING",
+                         "detail": "cited, but no record and not declared unrun"})
+
+    # (c) every §N points at a section that exists (§31.x refers to the ledger, not this paper)
+    sections = set(re.findall(r"^#{1,3} (\d+)\.", text, flags=re.M))
+    for ref in sorted(set(re.findall(r"§(\d+)(?!\.\d)", text)), key=int):
+        ok = ref in sections
+        rows.append({"kind": "section", "name": f"§{ref}",
+                     "status": "OK" if ok else "MISSING",
+                     "detail": "section exists" if ok else "no such section in this paper"})
+
+    # (d) every quoted repository path, and every embedded figure, exists on disk
+    for path in sorted(set(re.findall(r"`((?:so|docs)/[A-Za-z0-9_.-]+(?:/[A-Za-z0-9_.-]+)*/?)`", text))):
+        ok = Path(path).exists()
+        rows.append({"kind": "path", "name": path, "status": "OK" if ok else "MISSING",
+                     "detail": "exists" if ok else "no such file or directory"})
+    for fig in sorted(set(re.findall(r"\(figures/([^)]+\.svg)\)", text))):
+        ok = (FIGURES / fig).exists()
+        rows.append({"kind": "figure", "name": fig, "status": "OK" if ok else "MISSING",
+                     "detail": "exists" if ok else "embedded but not on disk"})
+
+    return rows
+
+
 def check_self_description(paper_text: str | None = None,
                            claims: tuple[Claim, ...] | None = None,
                            figure_claims: tuple[FigureClaim, ...] | None = None,
@@ -891,6 +960,13 @@ def main() -> None:
         mark = " ok " if r["status"] == "OK" else r["status"]
         print(f"[{mark:>11}] {('self-description: ' + r['where']):<52} {r['detail']}")
 
+    ref_rows = check_references()
+    for r in ref_rows:
+        if r["status"] != "OK":
+            print(f"[{r['status']:>11}] {(r['kind'] + ' ' + r['name']):<52} {r['detail']}")
+    bad_refs = [r for r in ref_rows if r["status"] != "OK"]
+    print(f"[{(' ok ' if not bad_refs else 'REFS'):>11}] {'references':<52} {len(ref_rows)} checked, {len(bad_refs)} failing")
+
     cov = unregistered()
     print()
     print(f"coverage: {cov['distinct_numeric_tokens']} distinct numeric tokens in the paper, "
@@ -908,7 +984,7 @@ def main() -> None:
         print(f"{len(weak)} figures are round enough to recur; their presence test does not "
               f"discriminate and only the record comparison counts for them.")
     failed_self = [r for r in self_rows if r["status"] != "OK"]
-    if not report["clean"] or failed_self or cov["unbound_count"]:
+    if not report["clean"] or failed_self or cov["unbound_count"] or bad_refs:
         raise SystemExit(1)
 
 

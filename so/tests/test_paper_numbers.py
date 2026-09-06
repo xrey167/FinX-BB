@@ -20,8 +20,10 @@ from so.paper_numbers import (
     ScopeClaim,
     VERDICT_CLAIMS,
     VerdictClaim,
+    _CITED_BUT_UNRUN,
     _NOT_A_MEASUREMENT,
     _figure_text,
+    check_references,
     _fmt,
     _resolve,
     check,
@@ -380,6 +382,66 @@ def test_the_wrong_numbers_survive_only_where_the_paper_reports_them_as_wrong():
     # where they do survive, they are backticked -- the paper's mark for a numeral being discussed
     for quoted in ("`137`", "`311`", "`8.49e+06`"):
         assert quoted in _PAPER_TEXT
+
+
+# --------------------------------------------------------------------------- references
+
+def test_every_pointer_in_the_paper_points_at_something():
+    """The fifth kind of claim: §0 promises reproducibility "by the `make` target named beside it".
+
+    A target that does not exist makes that promise false in a way no amount of correct arithmetic
+    would reveal, and nothing checked it until now.
+    """
+    rows = check_references()
+    bad = [r for r in rows if r["status"] != "OK"]
+    assert bad == [], bad
+    kinds = {r["kind"] for r in rows}
+    assert kinds == {"make target", "experiment", "section", "path", "figure"}, kinds
+    assert len(rows) > 30
+
+
+def test_a_make_target_that_does_not_exist_is_caught():
+    text = _PAPER_TEXT + "\n\nReproduce it with `make nosuchtarget`.\n"
+    rows = check_references(text)
+    assert any(r["name"] == "nosuchtarget" and r["status"] == "MISSING" for r in rows)
+
+
+def test_an_experiment_cited_with_no_record_is_caught():
+    text = _PAPER_TEXT + "\n\nSee also E-999999 for the follow-up.\n"
+    rows = check_references(text)
+    row = next(r for r in rows if r["name"] == "E-999999")
+    assert row["status"] == "MISSING"
+    assert "not declared unrun" in row["detail"]
+
+
+def test_the_one_recordless_citation_is_honest_only_while_the_paper_says_so():
+    """E-000033 is cited and has no record. That is fine *because* §13(b) says it is unrun."""
+    eid, sentence = next(iter(_CITED_BUT_UNRUN.items()))
+    assert sentence in _PAPER_TEXT
+    ok = next(r for r in check_references() if r["name"] == eid)
+    assert ok["status"] == "OK" and "the paper says so" in ok["detail"]
+
+    stripped = _PAPER_TEXT.replace(sentence, "<removed>")
+    row = next(r for r in check_references(stripped) if r["name"] == eid)
+    assert row["status"] == "UNDISCLOSED", row
+
+
+def test_a_dangling_section_reference_is_caught():
+    text = _PAPER_TEXT + "\n\nAs shown in §99, this holds generally.\n"
+    rows = check_references(text)
+    assert any(r["name"] == "§99" and r["status"] == "MISSING" for r in rows)
+
+
+def test_a_quoted_path_that_does_not_exist_is_caught():
+    text = _PAPER_TEXT + "\n\nThe harness lives in `so/no_such_module.py`.\n"
+    rows = check_references(text)
+    assert any(r["name"] == "so/no_such_module.py" and r["status"] == "MISSING" for r in rows)
+
+
+def test_an_embedded_figure_missing_from_disk_is_caught():
+    text = _PAPER_TEXT + "\n\n![Nope](figures/fig9-not-real.svg)\n"
+    rows = check_references(text)
+    assert any(r["name"] == "fig9-not-real.svg" and r["status"] == "MISSING" for r in rows)
 
 
 # --------------------------------------------------------------- the paper's self-description

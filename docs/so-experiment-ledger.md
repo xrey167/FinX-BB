@@ -3383,6 +3383,36 @@ verdicts -- and each was built only after the previous one's silence was mistake
 honest summary is not that the paper is now checked; it is that four kinds of claim are, and nobody
 has yet asked what the fifth is.
 
+### 31.53 The fifth kind: do the pointers point at anything? (2026-09-06, reference integrity)
+
+§31.52 ended by naming the gap rather than filling it: four kinds of claim were checked -- numbers,
+extent, coverage, verdicts -- and "nobody has yet asked what the fifth is". It is **reference
+integrity**, and it was worth asking, because §0 of the paper makes a promise none of the four could
+test: *every number is reproducible by the `make` target named beside it.* A target that does not
+exist makes that promise false in a way no amount of correct arithmetic would reveal.
+
+`check_references` resolves five kinds of pointer, forty in total: every backticked `make` target
+against the Makefile, every cited `E-\d{6}` against `so/results/`, every `§N` against the paper's own
+headings, every quoted `so/`or `docs/` path against the disk, and every embedded figure against
+`docs/paper/figures/`. All forty resolve.
+
+**The one finding is structural rather than broken.** `E-000033` is the only experiment identifier in
+the paper with no record behind it, because it has never been run -- §13(b) names it as the closure
+reproduced in a chunked vector index. Citing an id with no record is honest only if the text says so,
+so `_CITED_BUT_UNRUN` pairs the id with the sentence that must be present, §13(b) now says "The
+target exists and has never been run" in those words, and removing that sentence turns the row
+`UNDISCLOSED`. It is the scope-claim pattern applied to a citation.
+
+**The first draft of the checker was too loose and said so.** Matching `make (\w+)` without backticks
+reported `make of`, `make the`, `make this` and `make unanswerable` as missing targets -- all prose
+("the question an erasure guarantee is supposed to make unanswerable"). Requiring the backticks is
+the same convention §31.51 found for numerals: the paper marks a thing being *named* differently from
+a thing being *said*, and it had been doing so consistently without stating it.
+
+Five kinds of claim now, five instruments, each built after the previous one's silence was mistaken
+for evidence. The pattern has not yet stopped producing findings, which is the only reason to expect
+a sixth.
+
 ### 31.8 Boundary
 
 CPU only, no GPU, no LLM above 124M parameters, synthetic worlds, single-token entities, two surface forms per relation, one session. Nothing here shows unlearning of facts already encoded in pretrained weights. Evidence levels recorded: E3–E4 for the synthetic system (F4 for SHRED with the verified gate, E-000010 — **on the value channel only**: E-000028 recovers the shredded object at 1.0000 through the ungated reverse key, where REVOKE and DELETE are at chance, so F4 for SHRED is a claim about answers, logits, hidden states and probes and not about routing); E5 as substrate for the frozen-GPT-2 experiment, with reading, composition, update and the copy bound supported and behavioural deletion not yet supported at the pre-registered thresholds.
