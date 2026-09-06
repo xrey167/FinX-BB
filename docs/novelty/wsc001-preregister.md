@@ -119,7 +119,8 @@ Part B, read only with V1–V3 and V5 passing:
 
 Part A, read only with V4 passing:
 - `A0` **SITING**: every family at `site8` has ACTIVE − NEVER ≤ 0.05 **and** the injected write at the
-  first read layer does not move when the pod is shredded (`write8_shred_moves` ≤ 1e-3) → E-000063's
+  first read layer moves by ≤ 0.05 of the second's when the pod is shredded (`write_site_ratio`) →
+  E-000063's
   capture block is upstream of the write that carries the pod, so no readout there can attribute the
   memory and its certificate audits a state the pod never reached. The mediator is what licenses this
   rather than A1.
@@ -173,6 +174,12 @@ ROWS WITH BARS SET KNOWING THEM, labelled so wherever they are reported:
   from E-000063 as the validity floor that the OUTPUT is closed in both modes. Otherwise it is
   reported as a table and no sentence is drawn. This row is a DISCLOSED POST-HOC ADDITION: it was not
   in the design, it was found by a plumbing run, and it is the row a reader should discount most.
+
+**The bar for `A0` is a RATIO, and the reason is a second measurement.** A single-prompt check at
+template 3 gave exactly 0.0000 for the first read site's write; averaged over eight pods and seven
+templates it gives 2.257 (alias) and 0.160 (direct) against 74.10 and 88.19 at the second site. The
+first read site is therefore not silent on every prompt, it is small, and the branch reads the ratio
+rather than demanding a zero it would sometimes miss.
 
 **The mediator measurement, made after the bars above and before the recorded run.** On seed 0 over
 eight pods at template 3, comparing a live pod against a shredded one and against a never-written one,

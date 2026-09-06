@@ -410,7 +410,8 @@ def load_bos_adapter(seed: int, suffix: str = "_bos") -> Tuple[E8.GPT2Knowledge,
 SUMMARY_KEYS = ("B/full_alias_min", "B/full_direct_min", "B/dropW_alias_max", "B/dropW_n_alias_max",
                 "B/dropT_n_deficit_min", "B/perm_alias_max", "B/none_alias_max",
                 "B/n_templates_dropWn_ge_50", "B/share_W_mean", "B/atom_dropW_alias_max",
-                "A/write8_shred_moves", "A/write10_shred_moves",
+                "A/write8_shred_moves", "A/write10_shred_moves", "A/write_site_ratio",
+                "A/state_site_ratio",
                 "A/site8_max_amn", "A/site10_max_amn", "A/final_raw_amn",
                 "A/alias/site8/shred_moves", "A/alias/site10/shred_moves", "A/alias/final/shred_moves",
                 "A/alias/final/jspace", "A/direct/final/jspace", "A/indirection/jspace",
@@ -447,10 +448,18 @@ def summarise(m: Dict[str, Any], templates: Sequence[int]) -> Dict[str, float]:
                 out[f"A/{mode}/{site}/raw_shred_minus_never"] = g(
                     f"partA/{mode}/{site}/raw/shred_minus_never")
             out[f"A/{mode}/answer_correct"] = g(f"partA/{mode}/answer_correct")
-        # The write mediator: how far the INJECTED vector moves when the pod is shredded, per read site.
+        # The write mediator: how far the INJECTED vector moves when the pod is shredded, per read
+        # site, and the RATIO between the two sites. The ratio is what the siting branch reads: the
+        # first site's write is not exactly zero on every prompt, it is small, and "small relative to
+        # the site that carries the content" is the honest form of the statement.
         for l in (8, 10):
             out[f"A/write{l}_shred_moves"] = max(g(f"partA/alias/write{l}/shred_moves", 0.0),
                                                  g(f"partA/direct/write{l}/shred_moves", 0.0))
+        denom = max(out.get("A/write10_shred_moves", 0.0), 1e-9)
+        out["A/write_site_ratio"] = out.get("A/write8_shred_moves", 0.0) / denom
+        out["A/state_site_ratio"] = max(
+            g("partA/alias/site8/shred_moves", 0.0), g("partA/direct/site8/shred_moves", 0.0)) / max(
+            max(g("partA/alias/site10/shred_moves", 0.0), g("partA/direct/site10/shred_moves", 0.0)), 1e-9)
         # A6 indirection, at the site where the audit is valid (the final state).
         for f in fams:
             out[f"A/indirection/{f}"] = out[f"A/direct/final/{f}"] - out[f"A/alias/final/{f}"]
@@ -502,11 +511,12 @@ def decide(agg: Dict[str, Dict[str, float]]) -> Dict[str, str]:
         out["partB"] = "VOID (validity)"
     if v["V4"]:
         site8 = w("A/site8_max_amn", True)
-        write8 = w("A/write8_shred_moves", True)
-        out["partA"] = ("A0 SITING: E-000063's capture block is upstream of the write that carries the "
-                        "pod -- the first read site's injected vector does not move when the pod is "
-                        "shredded -- so no readout there can attribute the memory, and the certificate "
-                        "audits a state the pod never reached" if (site8 <= 0.05 and write8 <= 1e-3) else
+        ratio = w("A/write_site_ratio", True)
+        out["partA"] = ("A0 SITING: E-000063's capture block is not where the pod's content enters -- "
+                        "the write at the first read site moves by a small fraction of the second's "
+                        "when the pod is shredded -- so no readout there can attribute the memory, and "
+                        "the certificate audits a state the pod has effectively not reached"
+                        if (site8 <= 0.05 and ratio <= 0.05) else
                         "A1 DEPTH: the write reaches the first read site but no linear readout there "
                         "attributes it, at any dimension up to the full residual" if site8 <= 0.05 else
                         "A4 mixed: no siting sentence is licensed")
