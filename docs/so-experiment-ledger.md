@@ -3350,6 +3350,39 @@ reading JSON, one by reading the paper, three by measuring what the check did no
 progression is the point -- each instrument found what the previous one could not, and none of them
 found what came after.
 
+### 31.52 The verdict columns were never checked at all (2026-09-06, verdict claims)
+
+§31.51 got coverage of the paper's *numbers* to zero unbound and stopped there, which left the
+obvious question unasked: the tables also have columns that are not numbers. §4's certificate table
+says `CERTIFIED` four times. §3's policy table says `yes` twice and `no` three times. **Nothing bound
+any of them.** A wrong decimal misstates a magnitude; a wrong `CERTIFIED` misstates whether the
+paper's central claim holds.
+
+`VerdictClaim` binds a categorical cell to the record boolean behind it -- and checks it against
+**its own table row**, not the document, because `**CERTIFIED**` appears four times in §4 and a
+document-wide substring test would let any of them pass on another's evidence. A test asserts that
+misdirection is caught.
+
+All 19 were already correct, which is the expected and least interesting outcome. Two things came
+out of building them anyway.
+
+**A verdict row nobody could bind.** Sweeping for yes/no rows found §7's `a certificate is even
+available | yes | no | no`, which is in no record and could not be: it follows from a LoRA having no
+finite payload domain to sweep, a property of the representation rather than an outcome. It had been
+sitting among six measured rows looking identical to them. The paper now says it is an argument, and
+a test requires that sentence to stay.
+
+**And §2's table was point estimates.** E-000028 records exact Clopper--Pearson intervals per arm and
+whether each contains chance; the paper printed neither, in a paper whose §9 makes an interval
+load-bearing. The table now carries them: shred at [0.9926, 1.0000] excluding chance is the finding
+stated as evidence rather than as a number to be trusted. `contains_chance` is itself bound as a
+verdict on all three arms.
+
+The pattern across §31.49 to §31.52 is one instrument per kind of claim -- numbers, extent, coverage,
+verdicts -- and each was built only after the previous one's silence was mistaken for evidence. The
+honest summary is not that the paper is now checked; it is that four kinds of claim are, and nobody
+has yet asked what the fifth is.
+
 ### 31.8 Boundary
 
 CPU only, no GPU, no LLM above 124M parameters, synthetic worlds, single-token entities, two surface forms per relation, one session. Nothing here shows unlearning of facts already encoded in pretrained weights. Evidence levels recorded: E3–E4 for the synthetic system (F4 for SHRED with the verified gate, E-000010 — **on the value channel only**: E-000028 recovers the shredded object at 1.0000 through the ungated reverse key, where REVOKE and DELETE are at chance, so F4 for SHRED is a claim about answers, logits, hidden states and probes and not about routing); E5 as substrate for the frozen-GPT-2 experiment, with reading, composition, update and the copy bound supported and behavioural deletion not yet supported at the pre-registered thresholds.

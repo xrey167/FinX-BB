@@ -18,6 +18,8 @@ from so.paper_numbers import (
     Claim,
     FigureClaim,
     ScopeClaim,
+    VERDICT_CLAIMS,
+    VerdictClaim,
     _NOT_A_MEASUREMENT,
     _figure_text,
     _fmt,
@@ -100,6 +102,72 @@ def test_the_figure_text_reader_finds_the_drawn_numbers_and_not_the_geometry():
     assert "0.2191" in drawn and "2,199,996" in drawn
     assert "M137.2,72.0" not in drawn          # the series path is geometry, not a claim
     assert "137.2" not in drawn
+
+
+@pytest.mark.parametrize("v", VERDICT_CLAIMS, ids=[v.label for v in VERDICT_CLAIMS])
+def test_every_verdict_can_fail_when_the_record_says_the_opposite(v):
+    """Floor: a CERTIFIED the record does not support must be reported, not assumed."""
+    flipped = VerdictClaim(v.label, v.record, v.path, not v.expect, v.row_prefix, v.says)
+    rows = check(_PAPER_TEXT, claims=(), scope_claims=(), figure_claims=(),
+                 verdict_claims=(flipped,))["verdicts"]
+    assert [r["status"] for r in rows] == ["MISMATCH"], rows
+
+
+@pytest.mark.parametrize("v", VERDICT_CLAIMS, ids=[v.label for v in VERDICT_CLAIMS])
+def test_every_verdict_can_fail_when_its_row_stops_saying_it(v):
+    """Floor: the record still agrees, but the table cell no longer carries the verdict."""
+    text = "\n".join(
+        ln.replace(v.says, " — ") if ln.startswith(v.row_prefix) else ln
+        for ln in _PAPER_TEXT.splitlines()
+    )
+    rows = check(text, claims=(), scope_claims=(), figure_claims=(), verdict_claims=(v,))["verdicts"]
+    assert [r["status"] for r in rows] == ["CONTRADICTED"], rows
+
+
+def test_a_verdict_whose_row_is_gone_is_reported_not_skipped():
+    v = VERDICT_CLAIMS[0]
+    gone = VerdictClaim(v.label, v.record, v.path, v.expect, "| no such row |", v.says)
+    rows = check(_PAPER_TEXT, claims=(), scope_claims=(), figure_claims=(),
+                 verdict_claims=(gone,))["verdicts"]
+    assert rows[0]["status"] == "ABSENT"
+    assert "0 rows start" in rows[0]["detail"]
+
+
+def test_a_verdict_is_checked_against_its_own_row_not_the_document():
+    """`CERTIFIED` appears four times in §4; a claim must not pass on somebody else's row."""
+    v = next(c for c in VERDICT_CLAIMS if c.label == "E30 soft-gate SHRED not certified")
+    assert "**CERTIFIED**" in _PAPER_TEXT
+    misdirected = VerdictClaim(v.label, v.record, v.path, v.expect, v.row_prefix, "**CERTIFIED**")
+    rows = check(_PAPER_TEXT, claims=(), scope_claims=(), figure_claims=(),
+                 verdict_claims=(misdirected,))["verdicts"]
+    assert rows[0]["status"] == "CONTRADICTED", rows
+
+
+def test_every_row_of_the_certificate_table_has_a_bound_verdict():
+    """An unbound verdict cell is worse than an unbound number: it states whether the claim holds."""
+    rows = [ln for ln in _PAPER_TEXT.splitlines()
+            if ln.startswith("| synthetic |") or ln.startswith("| frozen GPT-2,")]
+    assert len(rows) == 7, rows
+    prefixes = {v.row_prefix for v in VERDICT_CLAIMS}
+    for row in rows:
+        assert any(row.startswith(p) for p in prefixes), f"unbound verdict row: {row}"
+
+
+def test_every_yes_no_row_in_the_paper_is_bound_or_declared_an_argument():
+    """Sweeping for verdict rows found one nobody had bound: §7's "a certificate is even available".
+
+    It is not in any record and could not be -- it follows from a LoRA having no finite payload
+    domain, which is a property of the representation, not an outcome. So it is the one exception,
+    and the paper must say so rather than let it sit among the measured cells looking identical.
+    """
+    rows = [ln for ln in _PAPER_TEXT.splitlines()
+            if ln.startswith("| ") and ln.rstrip().endswith(("| no |", "| **yes** |"))]
+    prefixes = {v.row_prefix for v in VERDICT_CLAIMS}
+    argued = "| **a certificate is even available** |"
+    unbound = [r for r in rows if not any(r.startswith(p) for p in prefixes)]
+    assert [r for r in unbound if not r.startswith(argued)] == [], unbound
+    assert len(rows) - len(unbound) == 5, "the five PDX-001 policy rows must all be bound"
+    assert "an argument, not a measurement" in _PAPER_TEXT
 
 
 @pytest.mark.parametrize("scope", SCOPE_CLAIMS, ids=[s.label for s in SCOPE_CLAIMS])

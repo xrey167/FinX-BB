@@ -109,6 +109,24 @@ class FigureClaim:
 
 
 @dataclass(frozen=True)
+class VerdictClaim:
+    """A categorical cell — CERTIFIED, yes, no — bound to the record boolean behind it.
+
+    The registry binds numbers, and a table's verdict column carries more weight than any of them:
+    a wrong decimal misstates a magnitude, a wrong ``CERTIFIED`` misstates whether the paper's
+    central claim holds at all. These are checked against the specific table *row*, not against the
+    document, so a verdict cannot pass by appearing somewhere else on the page.
+    """
+
+    label: str
+    record: str
+    path: str
+    expect: object      # what the record must hold for the paper's cell to be honest
+    row_prefix: str     # identifies one table row, e.g. "| frozen GPT-2, hard gate | SHRED |"
+    says: str           # the verdict text that row must carry
+
+
+@dataclass(frozen=True)
 class ScopeClaim:
     """A fact about the record's extent that the paper must state in words."""
 
@@ -194,6 +212,11 @@ CLAIMS: tuple[Claim, ...] = (
     Claim("E28 shred mean rank", "e000028_key_channel.json", "aggregate/shred/object_mean_rank/mean", "0.0", "dp1"),
     Claim("E28 chance top-1", "e000028_key_channel.json", "pooled_vs_chance/chance", "0.0039", "dp4"),
     Claim("E28 pooled targets", "e000028_key_channel.json", "pooled_vs_chance/n", "500", "int"),
+    # §2's exact intervals: the point estimates alone asked the reader to take the finding on trust
+    Claim("E28 active interval lower", "e000028_key_channel.json", "pooled_vs_chance/active/lower", "0.9926", "dp4"),
+    Claim("E28 shred interval lower", "e000028_key_channel.json", "pooled_vs_chance/shred/lower", "0.9926", "dp4"),
+    Claim("E28 revoke interval lower", "e000028_key_channel.json", "pooled_vs_chance/revoke/lower", "0.0005", "dp4"),
+    Claim("E28 revoke interval upper", "e000028_key_channel.json", "pooled_vs_chance/revoke/upper", "0.0144", "dp4"),
 
     # PDX-001 — the same attack over an abstract store, selected by policy name not by position
     Claim("PDX value-gated top-1", "pdx001/pdx001_payload_derived_index_audit.json",
@@ -399,6 +422,76 @@ FIGURE_CLAIMS: tuple[FigureClaim, ...] = (
 )
 
 
+_E30 = "e000030_deletion_certificate.json"
+
+VERDICT_CLAIMS: tuple[VerdictClaim, ...] = (
+    # §4 — the certificate table. Seven cells, seven record booleans.
+    VerdictClaim("E30 synthetic REVOKE not interface-certified", _E30,
+                 "per_seed/0/revoke/interface_certified", False,
+                 "| synthetic | REVOKE |", "no (certified on 838 swept questions)"),
+    VerdictClaim("E30 synthetic REVOKE certified on the swept questions", _E30,
+                 "per_seed/0/revoke/outputs_certified", True,
+                 "| synthetic | REVOKE |", "certified on 838 swept questions"),
+    VerdictClaim("E30 synthetic SHRED not certified", _E30,
+                 "per_seed/0/shred/outputs_certified", False,
+                 "| synthetic | SHRED |", " no "),
+    VerdictClaim("E30 synthetic DELETE is structural", _E30,
+                 "per_seed/0/delete/structural", True,
+                 "| synthetic | DELETE |", "yes, structurally"),
+    VerdictClaim("E30 soft-gate REVOKE certified", _E30,
+                 "gpt2/0/gpt2_soft/revoke/interface_certified", True,
+                 "| frozen GPT-2, soft gate | REVOKE |", "**CERTIFIED**"),
+    VerdictClaim("E30 soft-gate SHRED not certified", _E30,
+                 "gpt2/0/gpt2_soft/shred/interface_certified", False,
+                 "| frozen GPT-2, soft gate | SHRED |", " no "),
+    VerdictClaim("E30 hard-gate REVOKE certified", _E30,
+                 "gpt2/0/gpt2_hard/revoke/interface_certified", True,
+                 "| frozen GPT-2, hard gate | REVOKE |", "**CERTIFIED**"),
+    VerdictClaim("E30 hard-gate SHRED certified", _E30,
+                 "gpt2/0/gpt2_hard/shred/interface_certified", True,
+                 "| frozen GPT-2, hard gate | SHRED |", "**CERTIFIED**"),
+    # the guard that can void a certificate must have held wherever one was issued
+    VerdictClaim("E30 hard-gate SHRED mediation guard held", _E30,
+                 "gpt2/0/gpt2_hard/shred/mediation_consistent", True,
+                 "| frozen GPT-2, hard gate | SHRED |", "**CERTIFIED**"),
+
+    # §3 — PDX-001's certified column, addressed by policy name
+    VerdictClaim("PDX value-gated not certified", _PDX,
+                 "policies/policy=value_gated_shred/certified", False,
+                 "| gated value, ungated derived key |", " no |"),
+    VerdictClaim("PDX tombstone not certified", _PDX,
+                 "policies/policy=hnsw_tombstone/certified", False,
+                 "| tombstoned index node, edges kept |", " no |"),
+    VerdictClaim("PDX codebook not certified", _PDX,
+                 "policies/policy=codebook_key/certified", False,
+                 "| cleared value, codebook key kept |", " no |"),
+    VerdictClaim("PDX unindexed certified", _PDX,
+                 "policies/policy=revoke_unindex/certified", True,
+                 "| row removed from addressable set |", "**yes**"),
+    VerdictClaim("PDX gate-all certified", _PDX,
+                 "policies/policy=gate_all_derived/certified", True,
+                 "| every derived quantity gated |", "**yes**"),
+    # the paper says attack and certificate "agree on every policy" -- that is a per-row claim
+    VerdictClaim("PDX attack and certificate agree, tombstone", _PDX,
+                 "policies/policy=hnsw_tombstone/certificate_matches_attack", True,
+                 "| tombstoned index node, edges kept |", "0.391667"),
+    VerdictClaim("PDX attack and certificate agree, unindexed", _PDX,
+                 "policies/policy=revoke_unindex/certificate_matches_attack", True,
+                 "| row removed from addressable set |", "**yes**"),
+
+    # §2 — whether each arm's interval covers chance is the finding, so it is a verdict too
+    VerdictClaim("E28 shred's interval excludes chance", "e000028_key_channel.json",
+                 "pooled_vs_chance/shred/contains_chance", False,
+                 "| **shred** |", "**[0.9926, 1.0000]**"),
+    VerdictClaim("E28 active's interval excludes chance", "e000028_key_channel.json",
+                 "pooled_vs_chance/active/contains_chance", False,
+                 "| active (validity control) |", "[0.9926, 1.0000]"),
+    VerdictClaim("E28 revoke's interval contains chance", "e000028_key_channel.json",
+                 "pooled_vs_chance/revoke/contains_chance", True,
+                 "| revoke / delete |", "[0.0005, 0.0144]"),
+)
+
+
 SCOPE_CLAIMS: tuple[ScopeClaim, ...] = (
     ScopeClaim(
         "E28's attack pooled five seeds",
@@ -534,6 +627,7 @@ def check(
     scope_claims: tuple[ScopeClaim, ...] | None = None,
     figure_claims: tuple[FigureClaim, ...] | None = None,
     figure_texts: dict[str, str] | None = None,
+    verdict_claims: tuple[VerdictClaim, ...] | None = None,
 ) -> dict:
     """Check the paper, and the figures, against the records.
 
@@ -545,6 +639,7 @@ def check(
     claims = CLAIMS if claims is None else claims
     scope_claims = SCOPE_CLAIMS if scope_claims is None else scope_claims
     figure_claims = FIGURE_CLAIMS if figure_claims is None else figure_claims
+    verdict_claims = VERDICT_CLAIMS if verdict_claims is None else verdict_claims
     cache: dict[str, object] = {}
     figtext: dict[str, str | None] = dict(figure_texts or {})
     rows = []
@@ -570,6 +665,34 @@ def check(
             continue
         figure_rows.append({**_check_value_claim(c, doc, c.figure, drawn), "figure": c.figure})
 
+    verdict_rows = []
+    lines = text.splitlines()
+    for v in verdict_claims:
+        doc = cache.setdefault(v.record, _load(v.record))
+        if doc is None:
+            verdict_rows.append({"label": v.label, "status": "PATH", "detail": f"no record {v.record}"})
+            continue
+        value, err = _resolve(doc, v.path)
+        if err:
+            verdict_rows.append({"label": v.label, "status": "PATH", "detail": f"{v.path}: {err}"})
+            continue
+        if value != v.expect:
+            verdict_rows.append({"label": v.label, "status": "MISMATCH",
+                                 "detail": f"{v.path} is {value!r}, the paper's cell needs {v.expect!r}"})
+            continue
+        matching = [ln for ln in lines if ln.startswith(v.row_prefix)]
+        if len(matching) != 1:
+            verdict_rows.append({"label": v.label, "status": "ABSENT",
+                                 "detail": f"{len(matching)} rows start {v.row_prefix!r}, need exactly 1"})
+            continue
+        if v.says not in matching[0]:
+            verdict_rows.append({"label": v.label, "status": "CONTRADICTED",
+                                 "detail": f"record says {v.expect!r} but the row does not say {v.says!r}: "
+                                           f"{matching[0].strip()}"})
+            continue
+        verdict_rows.append({"label": v.label, "status": "OK",
+                             "detail": f"{v.says.strip()} = {v.path} is {v.expect!r}"})
+
     scope_rows = []
     for s in scope_claims:
         doc = cache.setdefault(s.record, _load(s.record))
@@ -590,14 +713,16 @@ def check(
             continue
         scope_rows.append({"label": s.label, "status": "OK", "detail": s.must_appear})
 
-    failures = [r for r in rows + figure_rows + scope_rows if r["status"] != "OK"]
+    failures = [r for r in rows + figure_rows + verdict_rows + scope_rows if r["status"] != "OK"]
     weak = [r["label"] for r in rows + figure_rows if r.get("presence_discriminating") is False]
     return {
         "registered_figures": len(claims),
         "registered_drawn_figures": len(figure_claims),
+        "registered_verdicts": len(verdict_claims),
         "registered_scope_claims": len(scope_claims),
         "figures": rows,
         "drawn": figure_rows,
+        "verdicts": verdict_rows,
         "scope": scope_rows,
         "failures": failures,
         "clean": not failures,
@@ -633,7 +758,8 @@ _NOT_A_MEASUREMENT: tuple[tuple[str, str], ...] = (
     (r"(?m)^\d+\. ",          "numbered list item in §11"),
     (r"\*Figure \d+ —",       "figure caption number"),
     (r"\b1 in 256\b",         "chance stated in words; the figure itself is bound as 0.0039"),
-    (r"\b\d+ (?:figures printed in this text|more printed inside|\*\*scope claims\*\*|figures in the prose|in the drawn figures|scope\nclaims)",
+    (r"\b\d+ (?:figures printed in this text|more printed inside|\*\*verdicts\*\*|verdicts,"
+     r"|\*\*scope claims\*\*|\*\*scope\s+claims\*\*|figures in the prose|in the drawn figures|scope\s+claims)",
                               "the registry's own size: checked by check_self_description, not bound to a record"),
     (r"PDX-\d+|NOV-\d+",      "experiment identifier"),
     (r"\bF[123]\b",           "sub-question label"),
@@ -662,7 +788,8 @@ _NOT_A_MEASUREMENT: tuple[tuple[str, str], ...] = (
 def check_self_description(paper_text: str | None = None,
                            claims: tuple[Claim, ...] | None = None,
                            figure_claims: tuple[FigureClaim, ...] | None = None,
-                           scope_claims: tuple[ScopeClaim, ...] | None = None) -> list[dict]:
+                           scope_claims: tuple[ScopeClaim, ...] | None = None,
+                           verdict_claims: tuple[VerdictClaim, ...] | None = None) -> list[dict]:
     """§9 and the Reproduction note state how big this registry is. Check that they are right.
 
     These three numbers are the one set the registry cannot bind to a record, because their source
@@ -674,12 +801,13 @@ def check_self_description(paper_text: str | None = None,
     sizes = {
         "prose figures": len(CLAIMS if claims is None else claims),
         "drawn figures": len(FIGURE_CLAIMS if figure_claims is None else figure_claims),
+        "verdicts": len(VERDICT_CLAIMS if verdict_claims is None else verdict_claims),
         "scope claims": len(SCOPE_CLAIMS if scope_claims is None else scope_claims),
     }
-    # both places the paper states them, in the order prose / drawn / scope
+    # both places the paper states them, in the order prose / drawn / verdicts / scope
     patterns = {
-        "§9": r"binding (\d+) figures printed in this text\s+and (\d+) more printed inside the three drawn figures.*?plus (\d+) \*\*scope claims\*\*",
-        "Reproduction": r"`make papernums` \((\d+) figures in the prose, (\d+) in the drawn figures, (\d+) scope\s+claims",
+        "§9": r"binding (\d+) figures printed in this text\s+and (\d+) more printed inside the three drawn figures.*?plus (\d+) \*\*verdicts\*\*.*?and (\d+) \*\*scope\s+claims\*\*",
+        "Reproduction": r"`make papernums` \((\d+) figures in the prose, (\d+) in the drawn figures, (\d+) verdicts, (\d+) scope\s+claims",
     }
     rows = []
     for where, pattern in patterns.items():
@@ -754,7 +882,7 @@ def coverage() -> dict:
 
 def main() -> None:
     report = check()
-    for r in report["figures"] + report["drawn"] + report["scope"]:
+    for r in report["figures"] + report["drawn"] + report["verdicts"] + report["scope"]:
         mark = " ok " if r["status"] == "OK" else r["status"]
         print(f"[{mark:>11}] {r['label']:<52} {r['detail']}")
 
@@ -772,6 +900,7 @@ def main() -> None:
     print()
     print(f"{report['registered_figures']} figures in the prose + "
           f"{report['registered_drawn_figures']} in the drawn figures + "
+          f"{report['registered_verdicts']} verdicts + "
           f"{report['registered_scope_claims']} scope claims; "
           f"{len(report['failures'])} failing")
     weak = report["weak_presence_tests"]

@@ -114,12 +114,17 @@ E-000028 on seeds 0–4 — the selection seeds — with 100 targets each. Held-
 on the overlap. But the two rows are not the same trials and the paper should not be read as if a
 fifth attack were added to the same battery.
 
-| condition | object recovered top-1 | mean rank | winning margin |
-|---|---|---|---|
-| active (validity control) | 1.0000 | 0.0 | 0.6195 |
-| **shred** | **1.0000** | **0.0** | **0.6195** |
-| revoke / delete | 0.0040 | 128.02 | 0.0022 |
-| chance | 0.0039 | 127.5 | — |
+| condition | object recovered top-1 | exact 95% interval | mean rank | winning margin |
+|---|---|---|---|---|
+| active (validity control) | 1.0000 | [0.9926, 1.0000] | 0.0 | 0.6195 |
+| **shred** | **1.0000** | **[0.9926, 1.0000]** | **0.0** | **0.6195** |
+| revoke / delete | 0.0040 | [0.0005, 0.0144] | 128.02 | 0.0022 |
+| chance | 0.0039 | — | 127.5 | — |
+
+The intervals are Clopper–Pearson over the 500 pooled targets. Only revoke/delete's contains the
+chance level; shred's excludes it, which is the whole finding — and §9's rule makes an interval
+load-bearing, so the table shows them rather than asking the reader to take the point estimates on
+trust.
 
 The shredded row is not leaky. It is *unchanged*: on every one of the five seeds the shred arm's
 top-1, top-5, mean rank and margin are bit-identical to the active arm's, not equal to some number of
@@ -323,6 +328,13 @@ domain to sweep and no interface the data passes through. **Putting facts in row
 deletion certifiable at all** — which is the precondition F2's answer quietly assumes, stated
 explicitly.
 
+**That last row is an argument, not a measurement**, and it is the only cell in this paper's tables
+that is. Every other verdict here — §3's `certified` column, §4's seven certificate cells — is bound
+to a boolean in a record and re-read by `make papernums`. "A certificate is even available" is not
+in any record, because no experiment could produce it: it follows from the absence of a finite
+payload domain in a LoRA, which is a property of the representation and not an outcome we measured.
+Read it as reasoning, and disagree with the reasoning if you can.
+
 **F2 is answered.** Independence is provable, exhaustively and cheaply, given rows and a mediated
 interface — but only over a record, and the fact-level statement needs a store-side closure the model
 knows nothing about.
@@ -411,10 +423,12 @@ is cheap.
 and `so/results/`, and each was caught by a person opening a JSON file: a mean rank written 128.0
 where the record says 128.02; an accept rate written 1.0000 where the sweep says 0.9999; and §7's
 table presented with no seed count where the record is one seed. Three for three is the absence of
-an instrument, so there is now a registry (`make papernums`) binding 87 figures printed in this text
+an instrument, so there is now a registry (`make papernums`) binding 91 figures printed in this text
 and 31 more printed inside the three drawn figures to the record paths they came from, re-rendered
-under the rounding rule used, plus 10 **scope claims** — a fact about a record's extent that this text
-must state in words, which is what caught §7. It fails when prose and record part. Its own floor
+under the rounding rule used, plus 19 **verdicts** — categorical cells like `CERTIFIED`, each
+bound to the record boolean behind it and checked against its own table row — and 10 **scope
+claims**, a fact about a record's extent that this text must state in words, which is what
+caught §7. It fails when prose and record part. Its own floor
 mutates each registered figure and requires the check to notice, for all of them rather than a
 sample, since a claim whose path silently failed to resolve would pass a clean run too.
 
@@ -548,5 +562,5 @@ are what a practitioner will act on.
 
 Every number above: `make keychannel certify closure retrieval disclosure compare pdxaudit`. Records
 in `so/results/`. Instrument audits: `make calibrate charged unread auditinstr`. To check this text
-against those records: `make papernums` (87 figures in the prose, 31 in the drawn figures, 10 scope
+against those records: `make papernums` (91 figures in the prose, 31 in the drawn figures, 19 verdicts, 10 scope
 claims; non-zero exit when any of them parts from its record).
