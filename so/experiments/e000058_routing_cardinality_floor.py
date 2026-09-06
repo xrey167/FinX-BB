@@ -155,6 +155,16 @@ def topk_routing(k: Optional[int]):
         yield
         return
     hop_original, deref_original = HopBlock.read, DerefBlock.forward
+    softmax_original = torch.softmax
+
+    def patched_softmax(x, dim=-1, **kw):
+        # The GPT-2 adapter routes inside `_make_hook`'s closure (so/llm_adapter.py:264-287), which no
+        # class-level patch can reach. Its two routing softmaxes are the only 2-D ones in that forward;
+        # the frozen core's attention is 4-D. Restricting to ndim == 2 therefore sparsifies routing and
+        # nothing else. The effectiveness guard below is what actually proves the patch bit.
+        if x.ndim == 2 and dim in (-1, 1) and x.shape[-1] > 2:
+            return softmax_original(_sparsify(x, k, keep_last=True), dim=dim, **kw)
+        return softmax_original(x, dim=dim, **kw)
 
     def hop_read(self, h, rel, hop_emb, k_f, v_f, k_r, v_r, is_fwd, allowed):
         q = self.q(self.ln_q(h + rel + hop_emb))
@@ -176,10 +186,12 @@ def topk_routing(k: Optional[int]):
         return out, p
 
     HopBlock.read, DerefBlock.forward = hop_read, deref_forward
+    torch.softmax = patched_softmax
     try:
         yield
     finally:
         HopBlock.read, DerefBlock.forward = hop_original, deref_original
+        torch.softmax = softmax_original
 
 
 def run_seed(seed: int, n_pods: int, threads: int, n_hardgate: int, reader: str = "syn") -> Dict[str, Any]:
@@ -224,7 +236,17 @@ def main(argv: Optional[List[str]] = None) -> int:
     agg = ledger.aggregate([{k: v for k, v in r.items() if k != "seed"} for r in per_seed], keys)
     check = ledger.check_criteria(agg, {k: v for k, v in BARS.items() if k in agg})
 
+    # PATCH-EFFECTIVENESS GUARD. A sparsified mode that reproduces dense to the last bit did not run:
+    # the patch missed the routing path. The first gpt2 attempt returned four bit-identical modes and
+    # reported them as a result, which is exactly the failure this repository calls "an instrument that
+    # certified by not testing". Such a mode is VOID, never a finding.
+    def _vec(row, mode):
+        return tuple(round(v, 12) for k, v in sorted(row.items())
+                     if k.startswith(mode + "/") and isinstance(v, float) and not k.endswith("seconds"))
+    ineffective = [m for m in MODES if m != "dense"
+                   and all(_vec(r, m) == _vec(r, "dense") for r in per_seed)]
     voids = [m for m in MODES if not check["criteria"].get(f"{m}/present/auc_i", {}).get("pass", False)]
+    voids = sorted(set(voids) | set(ineffective))
     localised = all(
         check["criteria"].get(f"{m}/add2/auc_ii", {}).get("pass", False)
         for m in MODES if m != "dense" and m not in voids
@@ -241,6 +263,7 @@ def main(argv: Optional[List[str]] = None) -> int:
         "aggregate": agg,
         **check,
         "void_modes": voids,
+        "patch_ineffective_modes": ineffective,
         "floor_is_dense_routing": bool(localised),
         "reported_not_scored": {f"{m}/{r}": agg[f"{m}/{r}"] for m in MODES for r in REPORTED
                                 if f"{m}/{r}" in agg},
@@ -259,7 +282,8 @@ def main(argv: Optional[List[str]] = None) -> int:
     out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text(json.dumps(record, indent=1, default=float))
     print(json.dumps({"checks": check["criteria"], "claim_supported": check["claim_supported"],
-                      "void_modes": voids, "floor_is_dense_routing": localised}, indent=1, default=float))
+                      "void_modes": voids,
+        "patch_ineffective_modes": ineffective, "floor_is_dense_routing": localised}, indent=1, default=float))
     return 0
 
 
