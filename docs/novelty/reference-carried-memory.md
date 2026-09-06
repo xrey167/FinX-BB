@@ -81,8 +81,11 @@ A knowledge-free surrogate is substituted for the value, the frozen model comput
 through every layer — so it enters persisted state more thoroughly than a mid-stack injection — the
 mapping is held outside the model, and the true value is bound back only after generation. That system
 already has the asserted invariance; it goes unstated there because in that setting it is obvious. The
-entire delta of this claim over it was carrier-as-mid-stack-vector rather than carrier-as-token, and
-that delta currently measures 0.0.
+entire delta of this claim over it is carrier-as-mid-stack-vector rather than carrier-as-token. That
+delta is being re-measured: the reading that put it at 0.0 was the collinear-handle artefact of
+section 3, so whether it is worth anything is open again. Even a positive answer leaves the concept
+inside this patent's scope; what it would change is whether there is a mechanism worth distinguishing
+at all.
 
 Also occupying or narrowing the same point, all verified by fetch:
 
@@ -94,7 +97,7 @@ Also occupying or narrowing the same point, all verified by fetch:
 Owning the ingredients, all verified by fetch:
 
 - Feng & Steinhardt, ICLR 2024, arXiv:2310.17191 — additive content-independent binding-ID vectors in a frozen LM's activations. It also reports that *random* vectors are not valid binding IDs, which is a risk to this construction rather than a collision.
-- LLM Self-Recognition, arXiv:2606.06315 — a random semantically-empty vector injected into a frozen residual stream, participating and linearly recoverable downstream at >98%. **This owns E-000085's result outright.**
+- LLM Self-Recognition, arXiv:2606.06315 — a random semantically-empty vector injected into a frozen residual stream, participating and linearly recoverable downstream at >98%. **This owns E-000085's result outright**, and its >98% is what a correctly separated handle family reproduces (0.9834 with no learning); the 0.0503 this programme measured against it should have been read as a bug report about its own carrier, not as a disagreement with a published result.
 - Yang, Campbell et al., ICML 2025, arXiv:2502.20332 — abstract variables mid-stack, concrete value rebound at readout.
 - Retrieval-conditioned rebinding, arXiv:2606.08644 — a relink applied at readout over content-free binding IDs.
 - PANM, arXiv:2404.11870 — external neural memory with explicitly content-free address vectors, pointer assign and dereference.
