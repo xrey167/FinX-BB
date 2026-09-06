@@ -245,12 +245,18 @@ def main(argv: Optional[List[str]] = None) -> int:
                      if k.startswith(mode + "/") and isinstance(v, float) and not k.endswith("seconds"))
     ineffective = [m for m in MODES if m != "dense"
                    and all(_vec(r, m) == _vec(r, "dense") for r in per_seed)]
+    # E-000051's OWN void rule, which this experiment failed to carry over and must:
+    #   "If perm AUC > 0.60 every AUC row is void (the adversary reads summation order)."
+    # The float floor is the probe's calibration. A mode where two banks differing only by summation
+    # order are separable is a mode whose every AUC is unreadable, however clean present/auc_i looks.
+    perm_void = [m for m in MODES
+                 if max(r.get(f"{m}/perm/auc_ii", 0.0) for r in per_seed) > 0.60
+                 or max(r.get(f"{m}/perm/auc_iii", 0.0) for r in per_seed) > 0.60]
     voids = [m for m in MODES if not check["criteria"].get(f"{m}/present/auc_i", {}).get("pass", False)]
-    voids = sorted(set(voids) | set(ineffective))
-    localised = all(
-        check["criteria"].get(f"{m}/add2/auc_ii", {}).get("pass", False)
-        for m in MODES if m != "dense" and m not in voids
-    ) and any(m not in voids for m in MODES if m != "dense")
+    voids = sorted(set(voids) | set(ineffective) | set(perm_void))
+    live_modes = [m for m in MODES if m != "dense" and m not in voids]
+    localised = bool(live_modes) and all(
+        check["criteria"].get(f"{m}/add2/auc_ii", {}).get("pass", False) for m in live_modes)
 
     record = {
         "experiment": "E-000058",
@@ -264,6 +270,7 @@ def main(argv: Optional[List[str]] = None) -> int:
         **check,
         "void_modes": voids,
         "patch_ineffective_modes": ineffective,
+        "perm_floor_void_modes": perm_void,
         "floor_is_dense_routing": bool(localised),
         "reported_not_scored": {f"{m}/{r}": agg[f"{m}/{r}"] for m in MODES for r in REPORTED
                                 if f"{m}/{r}" in agg},
@@ -283,7 +290,8 @@ def main(argv: Optional[List[str]] = None) -> int:
     out.write_text(json.dumps(record, indent=1, default=float))
     print(json.dumps({"checks": check["criteria"], "claim_supported": check["claim_supported"],
                       "void_modes": voids,
-        "patch_ineffective_modes": ineffective, "floor_is_dense_routing": localised}, indent=1, default=float))
+        "patch_ineffective_modes": ineffective,
+        "perm_floor_void_modes": perm_void, "floor_is_dense_routing": localised}, indent=1, default=float))
     return 0
 
 
