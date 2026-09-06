@@ -1,0 +1,56 @@
+name: E000084 deep read late write
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [claude/vision-technical-novelty-cfj0ei]
+    paths:
+      - 'so/experiments/e000084_deep_read_late_write.py'
+      - 'so/llm_adapter.py'
+      - '.github/workflows/e000084-deep-read-late-write.yml'
+
+jobs:
+  screen:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 180
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { arm: E, seed: 0 }
+          - { arm: E, seed: 1 }
+          - { arm: E, seed: 2 }
+          - { arm: D, seed: 0 }
+          - { arm: D, seed: 1 }
+          - { arm: D, seed: 2 }
+          - { arm: A, seed: 2 }
+    env:
+      SO_THREADS: '2'
+      SO_BOS: '1'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+          cache-dependency-path: so/requirements.txt
+      - name: Install CPU dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install torch --index-url https://download.pytorch.org/whl/cpu
+          python -m pip install -r so/requirements.txt
+      - name: Contract tests for the write-layer option
+        run: python -m pytest so/tests/test_write_layer.py so/tests/test_llm_adapter.py -q
+      - name: Run capability screen
+        continue-on-error: true
+        run: |
+          mkdir -p ci-e84
+          python -m so.experiments.e000084_deep_read_late_write \
+            --arm '${{ matrix.arm }}' --seeds '${{ matrix.seed }}' --steps 3000 --groups 100 \
+            --consistency 0.15 --alt-supervision 0.5 \
+            --threads 2 --results-dir ci-e84
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: e000084-arm${{ matrix.arm }}-seed${{ matrix.seed }}
+          path: ci-e84/

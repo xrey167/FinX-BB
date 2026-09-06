@@ -1,0 +1,91 @@
+{
+  "experiment": "E-000084",
+  "arm": "A",
+  "placement": {
+    "read_layers": [
+      8,
+      10
+    ],
+    "write_layer": null
+  },
+  "rows": [
+    {
+      "arm": "A",
+      "seed": 2,
+      "steps": 3000,
+      "consistency": 0.15,
+      "alt_supervision": 0.5,
+      "read_layers": [
+        8,
+        10
+      ],
+      "write_layer": null,
+      "n_decoder_blocks": 12,
+      "bos_enabled": true,
+      "groups": 100,
+      "n_alias_eval": 200,
+      "per_heldout_template": {
+        "8": {
+          "candidate_correct": 0.985,
+          "full_vocab_top1_correct": 0.985
+        },
+        "9": {
+          "candidate_correct": 0.96,
+          "full_vocab_top1_correct": 0.96
+        },
+        "10": {
+          "candidate_correct": 0.995,
+          "full_vocab_top1_correct": 0.995
+        },
+        "11": {
+          "candidate_correct": 0.995,
+          "full_vocab_top1_correct": 0.995
+        }
+      },
+      "template9_candidate_correct": 0.96,
+      "heldout_candidate_mean": 0.98375,
+      "heldout_candidate_min": 0.96,
+      "heldout_full_vocab_mean": 0.98375,
+      "heldout_full_vocab_min": 0.96,
+      "exposure": {
+        "kv_maxabs": 7.2838592529296875,
+        "block_input_maxabs": 65.99659729003906,
+        "last_logit_maxabs": 76.17282104492188,
+        "n_prompts": 16,
+        "prompt_tokens_max": 7
+      },
+      "checks": {
+        "strict_template9_real_symlink_gate": true,
+        "heldout_paraphrase_mean_ge_095": true,
+        "heldout_every_template_ge_095": true,
+        "heldout_full_vocab_mean_ge_095": true,
+        "heldout_full_vocab_every_template_ge_095": true
+      },
+      "by_construction": {
+        "participation_depth": null,
+        "expected_kv_exposure_zero": false,
+        "kv_exposure_is_zero": false,
+        "memory_is_material": true,
+        "pipeline_ok": true
+      },
+      "strict_pass": true,
+      "train_seconds": 3981.6483974456787,
+      "last_training_record": {
+        "step": 3000,
+        "loss": 1.7935457229614258,
+        "answer_loss": 0.9052313566207886,
+        "route_loss": 0.8170303702354431,
+        "gate_loss": 0.0013426373479887843,
+        "alt_supervised_loss": 0.06859198957681656,
+        "consistency_loss": 0.20183266699314117,
+        "paired_rows": 8,
+        "batch_acc": 0.875,
+        "elapsed_s": 3981.647612094879
+      }
+    }
+  ],
+  "all_strict_pass": true,
+  "all_pipeline_ok": true,
+  "gate_unchanged": "candidate and full-vocabulary held-out >= 0.95 on every template and every seed; same trainer, worlds and templates as E-000081 / E-000083",
+  "not_claimed": "late binding, decoupled read/write placement, cache purity, symlink routing or capability training as novelty; this is a capability screen that decides whether E-000083's failure was addressing depth or payload processing"
+}
