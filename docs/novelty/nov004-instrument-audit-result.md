@@ -77,7 +77,8 @@ Two refinements brought it to 3:
 
 ## Class B — loop-invariant work inside a loop
 
-**94 candidates across 43 files, and they are candidates, not findings.**
+**61 candidates after two scanner fixes, and they are candidates, not findings.** The first run
+reported 94; the triage section below explains what came out and why.
 
 This is the pattern NOV-003 found in E-000103, where `woodbury_rankk_solution` rebuilds `inv_u` and
 `middle_inv` on every one of 24 sessions. It is a defect *only when it sits on the baseline arm*,
@@ -87,6 +88,47 @@ plenty of cases the call is doing necessary work the heuristic cannot see.
 Reading this list as 94 defects would be §31.46's error repeated — scoring something the instrument
 cannot resolve. It is a work queue for review, ordered by nothing, and nothing in this document
 claims any entry beyond E-000103 is real.
+
+## Class B triaged, 94 → 61 → 18 → 2
+
+The Class B list was worked the same way Class A was, and it cost the scanner two more bugs.
+
+**Bug 1: mutation that rebinds nothing.** `_bound_names` counted only `ast.Name` stores, so
+`aff[idx] = new` — a write through a subscript — did not count as moving `aff`. The scanner therefore
+reported `compose_all(aff, ...)` in E-000097 as loop-invariant when `aff` is written on the line
+directly above it. Method calls have the same problem: `tree.update(idx, new)` mutates its receiver
+and rebinds nothing. Counting in-place mutation removed **every** E-000097 site and took the total
+from 94 to 70. This is the same error the Class A window would make if it ignored intervening writes,
+and it produced false positives for the same reason.
+
+**Bug 2: nondeterministic calls.** `idx = rng.randrange(length)` is loop-invariant by the syntax and
+draws a different value every iteration. Filtering those took 70 to 61.
+
+Then the triage. Of the 61, **18** are in the reduction family (E-000086 … E-000108), and of those
+exactly **2** sit on a baseline arm — the only place a loop-invariant call inflates a candidate's
+margin. Both are in E-000102, and only one of them is cost-relevant:
+
+- **`e000102:250`** — `old_fresh = fresh_numeric(family, coeffs, old_values)` inside `for edited in
+  edited_indices`, where `old_values` does not move. Genuinely invariant, and **not a defect**:
+  `old_fresh` feeds a correctness assertion, not the work comparison.
+- **`e000102:296`** — `generic = GenericDependencyProduct(factors)` inside the same loop shape, where
+  `factors` does not move. This one *is* on the cost-compared arm. Its `__init__` builds the whole
+  product DAG at `size − 1` multiplications, and `generic_ops = generic.update(...)` counts **only
+  the update walk**, so the generic's per-event cost is understated by the construction. The
+  candidate, `specialized_lifecycle_product_update`, is a pure function needing no such reset.
+
+**And the honest reading of that second one, which cuts against the obvious conclusion.** Charging
+the construction would move E-000102 *toward* the candidate — the opposite direction from E-000105.
+But it would be charging the baseline for the harness's choice rather than the algorithm's: a real
+generic keeps one DAG and updates it incrementally, and rebuilds only because this loop needs to
+reset mutable state per edit. Charging it would be NOV-003's lesson run backwards — denying the
+baseline an optimisation, then billing it for the denial.
+
+So the finding is narrow and it is about measurement, not about the verdict: **E-000102's work
+comparison counts update cost on both arms while one arm additionally pays an uncounted O(n) reset.**
+The fix is to the harness — construct the generic once outside the loop and reset it cheaply — after
+which the comparison measures what it claims. Until then the number is not wrong so much as not the
+number being described. No verdict is revisited on this evidence.
 
 ## What this settles
 

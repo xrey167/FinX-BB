@@ -65,15 +65,41 @@ def _call_name(node: ast.Call) -> str | None:
     return None
 
 
+def _root_name(node: ast.AST) -> str | None:
+    """The base name of an assignment target: `aff` for `aff[idx]`, `o` for `o.field`."""
+    while isinstance(node, (ast.Subscript, ast.Attribute)):
+        node = node.value
+    return node.id if isinstance(node, ast.Name) else None
+
+
 def _bound_names(loop: ast.For) -> set[str]:
-    """Every name the loop binds: its target, plus anything assigned inside its body."""
+    """Every name the loop moves — rebound *or mutated in place*.
+
+    Rebinding is not the only way a value changes between iterations. `aff[idx] = new` mutates
+    through a subscript and rebinds nothing, and `tree.update(...)` mutates through a method. The
+    first version of this scanner counted only `ast.Name` stores and therefore reported
+    `compose_all(aff, ...)` in E-000097 as loop-invariant when `aff` is written on the line above it.
+    Missing in-place mutation is the same error the Class A window makes if it ignores intervening
+    writes, and it produced false positives for the same reason.
+    """
     names: set[str] = set()
     for n in ast.walk(loop.target):
         if isinstance(n, ast.Name):
             names.add(n.id)
     for stmt in loop.body:
         for n in ast.walk(stmt):
-            if isinstance(n, ast.Name) and isinstance(n.ctx, (ast.Store, ast.AugStore)):
+            if isinstance(n, (ast.Assign, ast.AugAssign, ast.AnnAssign)):
+                targets = n.targets if isinstance(n, ast.Assign) else [n.target]
+                for t in targets:
+                    root = _root_name(t)
+                    if root:
+                        names.add(root)
+            elif isinstance(n, ast.Call) and isinstance(n.func, ast.Attribute):
+                # a method call may mutate its receiver
+                root = _root_name(n.func.value)
+                if root:
+                    names.add(root)
+            elif isinstance(n, ast.Name) and isinstance(n.ctx, ast.Store):
                 names.add(n.id)
             elif isinstance(n, ast.For):
                 for t in ast.walk(n.target):
@@ -107,7 +133,7 @@ def _compared_together(scope: ast.AST, a: str, b: str) -> bool:
 
 
 # Calls whose two invocations legitimately differ, so duplication says nothing.
-_NONDETERMINISTIC = {"randn", "rand", "random", "normal", "integers", "randint", "sample", "time",
+_NONDETERMINISTIC = {"randn", "rand", "random", "normal", "integers", "randint", "sample", "time", "randrange",
                      "Event", "Lock", "Thread", "uuid4", "shuffle", "choice"}
 
 
@@ -173,8 +199,8 @@ def scan_class_b(tree: ast.AST) -> list[dict]:
                 continue
             call = stmt.value
             name = _call_name(call)
-            if name is None or name in _IGNORED_CALLS:
-                continue
+            if name is None or name in _IGNORED_CALLS or name in _NONDETERMINISTIC:
+                continue  # a fresh draw every iteration is the point, not a defect
             args_free: set[str] = set()
             for a in list(call.args) + [k.value for k in call.keywords]:
                 args_free |= _free_names(a)

@@ -3189,6 +3189,40 @@ No verdict is revisited. The pattern is a reporting and screening defect, not so
 E-000104's and E-000105's kills survive a proper accounting (§31.44) and E-000107's rests on its
 witnesses.
 
+### 31.48 Class B triaged 94 to 2, at the cost of two more bugs in the scanner (2026-09-06, NOV-004 addendum)
+
+§31.47 left 94 Class B candidates unsorted. Working them the way Class A was worked cost the scanner
+two more bugs, both of the same shape as the ones it was built to find.
+
+**Mutation that rebinds nothing.** `_bound_names` counted only `ast.Name` stores, so `aff[idx] = new`
+-- a write through a subscript -- did not count as moving `aff`, and `compose_all(aff, ...)` in
+E-000097 was reported loop-invariant with `aff` written on the line above it. Method calls are the
+same: `tree.update(idx, new)` mutates its receiver and rebinds nothing. Counting in-place mutation
+removed every E-000097 site, 94 to 70. **Nondeterministic calls.** `idx = rng.randrange(length)` is
+invariant by the syntax and different every iteration; 70 to 61.
+
+Of the 61, 18 are in the reduction family and exactly **2** sit on a baseline arm, both in E-000102.
+`e000102:250` (`old_fresh = fresh_numeric(...)`) is genuinely invariant and not a defect -- it feeds
+a correctness assertion, not the work comparison. `e000102:296` (`generic =
+GenericDependencyProduct(factors)`) is on the cost-compared arm: `__init__` builds the product DAG at
+`size-1` multiplications and `generic_ops = generic.update(...)` counts only the update walk, so the
+generic's per-event cost is understated by the construction, while the candidate is a pure function
+needing no reset.
+
+**And the reading that cuts against the obvious one.** Charging that construction would move E-000102
+*toward* the candidate -- opposite to §31.44's E-000105 -- but it would charge the baseline for the
+harness's choice, not the algorithm's: a real generic keeps one DAG and updates incrementally, and
+rebuilds here only because the loop must reset mutable state per edit. Charging it would be §31.46
+run backwards: deny the baseline an optimisation, then bill it for the denial. So the finding is
+about measurement, not verdict -- E-000102's work comparison counts update cost on both arms while
+one arm pays an uncounted O(n) reset. Fix the harness, then the comparison measures what it claims.
+No verdict revisited.
+
+Three scanner bugs now, all caught by its own outputs rather than by review: the glob that excluded
+E-000100 onward, syntactic identity without a mutation window (87 to 3), and mutation that rebinds
+nothing (94 to 61). An instrument built to find instruments that cannot fail keeps failing, which is
+the only evidence available that it can.
+
 ### 31.8 Boundary
 
 CPU only, no GPU, no LLM above 124M parameters, synthetic worlds, single-token entities, two surface forms per relation, one session. Nothing here shows unlearning of facts already encoded in pretrained weights. Evidence levels recorded: E3–E4 for the synthetic system (F4 for SHRED with the verified gate, E-000010 — **on the value channel only**: E-000028 recovers the shredded object at 1.0000 through the ungated reverse key, where REVOKE and DELETE are at chance, so F4 for SHRED is a claim about answers, logits, hidden states and probes and not about routing); E5 as substrate for the frozen-GPT-2 experiment, with reading, composition, update and the copy bound supported and behavioural deletion not yet supported at the pre-registered thresholds.

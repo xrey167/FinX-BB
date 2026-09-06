@@ -124,3 +124,48 @@ def test_class_b_is_reported_as_candidates_not_findings():
     assert "class_b_candidates" in _R
     assert "candidate" in _R["how_to_read_this"].lower()
     assert _R["class_b_count"] > 0
+
+
+def test_class_b_sees_mutation_through_a_subscript():
+    """`aff[idx] = new` moves `aff` without rebinding it — E-000097's false positive."""
+    src = """
+def f(rows, aff):
+    for r in rows:
+        aff[r] = r
+        gold = compose_all(aff)
+    return gold
+"""
+    assert scan_class_b(ast.parse(src)) == []
+
+
+def test_class_b_sees_mutation_through_a_method_call():
+    src = """
+def f(rows, tree):
+    for r in rows:
+        tree.update(r)
+        gold = summarise(tree)
+    return gold
+"""
+    assert scan_class_b(ast.parse(src)) == []
+
+
+def test_class_b_still_flags_a_genuinely_invariant_call():
+    """The mutation fix must not silence the real pattern."""
+    src = """
+def f(rows, m):
+    for r in rows:
+        setup = expensive(m)
+        use(setup, r)
+"""
+    assert any(s["callee"] == "expensive" for s in scan_class_b(ast.parse(src)))
+
+
+def test_class_b_ignores_nondeterministic_calls():
+    """A fresh draw every iteration is the point, not a defect."""
+    src = """
+def f(rows, rng):
+    for r in rows:
+        idx = rng.randrange(10)
+        use(idx)
+"""
+    assert scan_class_b(ast.parse(src)) == []

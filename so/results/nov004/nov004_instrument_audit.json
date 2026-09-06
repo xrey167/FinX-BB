@@ -307,32 +307,6 @@
   "class_b_candidates": [
     {
       "assigned_to": [
-        "other"
-      ],
-      "callee": "sample",
-      "file": "e000002_memorization_control.py",
-      "invariant_in": [
-        "np",
-        "seed"
-      ],
-      "line": 105,
-      "loop_line": 101
-    },
-    {
-      "assigned_to": [
-        "mask"
-      ],
-      "callee": "ones",
-      "file": "e000005_causal_interventions.py",
-      "invariant_in": [
-        "bool",
-        "store"
-      ],
-      "line": 49,
-      "loop_line": 40
-    },
-    {
-      "assigned_to": [
         "gk"
       ],
       "callee": "GPT2Knowledge",
@@ -508,84 +482,6 @@
     },
     {
       "assigned_to": [
-        "idx"
-      ],
-      "callee": "integers",
-      "file": "e000024_weights_vs_cells.py",
-      "invariant_in": [
-        "batch_size",
-        "len",
-        "pool"
-      ],
-      "line": 293,
-      "loop_line": 291
-    },
-    {
-      "assigned_to": [
-        "score"
-      ],
-      "callee": "weights_scorer",
-      "file": "e000024_weights_vs_cells.py",
-      "invariant_in": [
-        "gk"
-      ],
-      "line": 302,
-      "loop_line": 291
-    },
-    {
-      "assigned_to": [
-        "ti"
-      ],
-      "callee": "integers",
-      "file": "e000024_weights_vs_cells.py",
-      "invariant_in": [
-        "len",
-        "tgt_pool"
-      ],
-      "line": 342,
-      "loop_line": 340
-    },
-    {
-      "assigned_to": [
-        "ri"
-      ],
-      "callee": "integers",
-      "file": "e000024_weights_vs_cells.py",
-      "invariant_in": [
-        "len",
-        "ret_pool"
-      ],
-      "line": 343,
-      "loop_line": 340
-    },
-    {
-      "assigned_to": [
-        "idx"
-      ],
-      "callee": "integers",
-      "file": "e000024_weights_vs_cells.py",
-      "invariant_in": [
-        "len",
-        "pool"
-      ],
-      "line": 472,
-      "loop_line": 470
-    },
-    {
-      "assigned_to": [
-        "idx"
-      ],
-      "callee": "integers",
-      "file": "e000024_weights_vs_cells.py",
-      "invariant_in": [
-        "len",
-        "pool"
-      ],
-      "line": 503,
-      "loop_line": 501
-    },
-    {
-      "assigned_to": [
         "after"
       ],
       "callee": "lora_state",
@@ -608,54 +504,6 @@
       ],
       "line": 104,
       "loop_line": 103
-    },
-    {
-      "assigned_to": [
-        "bank"
-      ],
-      "callee": "bank_from_store",
-      "file": "e000030_deletion_certificate.py",
-      "invariant_in": [
-        "store"
-      ],
-      "line": 126,
-      "loop_line": 123
-    },
-    {
-      "assigned_to": [
-        "bank"
-      ],
-      "callee": "bank_from_store",
-      "file": "e000030_deletion_certificate.py",
-      "invariant_in": [
-        "store"
-      ],
-      "line": 267,
-      "loop_line": 262
-    },
-    {
-      "assigned_to": [
-        "bank"
-      ],
-      "callee": "bank_from_store",
-      "file": "e000030_deletion_certificate.py",
-      "invariant_in": [
-        "store"
-      ],
-      "line": 267,
-      "loop_line": 264
-    },
-    {
-      "assigned_to": [
-        "bank_before"
-      ],
-      "callee": "bank_from_store",
-      "file": "e000032_deletion_closure.py",
-      "invariant_in": [
-        "store"
-      ],
-      "line": 324,
-      "loop_line": 304
     },
     {
       "assigned_to": [
@@ -684,31 +532,6 @@
       ],
       "line": 101,
       "loop_line": 100
-    },
-    {
-      "assigned_to": [
-        "t_all"
-      ],
-      "callee": "tie_tensor",
-      "file": "e000039_address_tying.py",
-      "invariant_in": [
-        "model"
-      ],
-      "line": 215,
-      "loop_line": 175
-    },
-    {
-      "assigned_to": [
-        "mask"
-      ],
-      "callee": "zeros",
-      "file": "e000039_address_tying.py",
-      "invariant_in": [
-        "bank",
-        "torch"
-      ],
-      "line": 311,
-      "loop_line": 310
     },
     {
       "assigned_to": [
@@ -841,20 +664,6 @@
     },
     {
       "assigned_to": [
-        "r"
-      ],
-      "callee": "randn",
-      "file": "e000045_fanout.py",
-      "invariant_in": [
-        "a",
-        "carrier",
-        "g"
-      ],
-      "line": 223,
-      "loop_line": 216
-    },
-    {
-      "assigned_to": [
         "V"
       ],
       "callee": "stack",
@@ -879,46 +688,6 @@
       ],
       "line": 221,
       "loop_line": 217
-    },
-    {
-      "assigned_to": [
-        "r"
-      ],
-      "callee": "randn",
-      "file": "e000045_fanout.py",
-      "invariant_in": [
-        "a",
-        "carrier",
-        "g"
-      ],
-      "line": 223,
-      "loop_line": 217
-    },
-    {
-      "assigned_to": [
-        "orph"
-      ],
-      "callee": "_orphans",
-      "file": "e000046_currency.py",
-      "invariant_in": [
-        "base",
-        "st"
-      ],
-      "line": 81,
-      "loop_line": 80
-    },
-    {
-      "assigned_to": [
-        "orph"
-      ],
-      "callee": "_orphans",
-      "file": "e000046_currency.py",
-      "invariant_in": [
-        "base",
-        "st"
-      ],
-      "line": 90,
-      "loop_line": 89
     },
     {
       "assigned_to": [
@@ -958,19 +727,6 @@
     },
     {
       "assigned_to": [
-        "mask"
-      ],
-      "callee": "zeros",
-      "file": "e000050_bos_artefact.py",
-      "invariant_in": [
-        "bank",
-        "torch"
-      ],
-      "line": 254,
-      "loop_line": 253
-    },
-    {
-      "assigned_to": [
         "m"
       ],
       "callee": "e13_override_revert",
@@ -982,50 +738,6 @@
       ],
       "line": 463,
       "loop_line": 460
-    },
-    {
-      "assigned_to": [
-        "m"
-      ],
-      "callee": "measure",
-      "file": "e000053_hard_match_frontier.py",
-      "invariant_in": [
-        "gk",
-        "np",
-        "seed",
-        "trained"
-      ],
-      "line": 151,
-      "loop_line": 147
-    },
-    {
-      "assigned_to": [
-        "m"
-      ],
-      "callee": "evaluate",
-      "file": "e000055_relevance_calibration.py",
-      "invariant_in": [
-        "centre",
-        "gk",
-        "seed"
-      ],
-      "line": 137,
-      "loop_line": 134
-    },
-    {
-      "assigned_to": [
-        "world"
-      ],
-      "callee": "sample",
-      "file": "e000055_relevance_calibration.py",
-      "invariant_in": [
-        "E18",
-        "gk",
-        "int",
-        "rng"
-      ],
-      "line": 79,
-      "loop_line": 77
     },
     {
       "assigned_to": [
@@ -1089,21 +801,6 @@
     },
     {
       "assigned_to": [
-        "m"
-      ],
-      "callee": "evaluate_templates",
-      "file": "e000059_semantic_bypass.py",
-      "invariant_in": [
-        "E18",
-        "centre",
-        "gk",
-        "seed"
-      ],
-      "line": 92,
-      "loop_line": 90
-    },
-    {
-      "assigned_to": [
         "perm"
       ],
       "callee": "permutation",
@@ -1141,19 +838,6 @@
     },
     {
       "assigned_to": [
-        "w"
-      ],
-      "callee": "zeros",
-      "file": "e000063_workspace_pod_certificate.py",
-      "invariant_in": [
-        "active",
-        "n_class"
-      ],
-      "line": 117,
-      "loop_line": 113
-    },
-    {
-      "assigned_to": [
         "b"
       ],
       "callee": "zeros",
@@ -1163,18 +847,6 @@
       ],
       "line": 118,
       "loop_line": 113
-    },
-    {
-      "assigned_to": [
-        "never_store"
-      ],
-      "callee": "deepcopy",
-      "file": "e000063_workspace_pod_certificate.py",
-      "invariant_in": [
-        "store"
-      ],
-      "line": 184,
-      "loop_line": 174
     },
     {
       "assigned_to": [
@@ -1263,60 +935,6 @@
       ],
       "line": 173,
       "loop_line": 172
-    },
-    {
-      "assigned_to": [
-        "idx"
-      ],
-      "callee": "randrange",
-      "file": "e000097_associative_transport_reduction.py",
-      "invariant_in": [
-        "length"
-      ],
-      "line": 120,
-      "loop_line": 119
-    },
-    {
-      "assigned_to": [
-        "gold_root"
-      ],
-      "callee": "compose_all",
-      "file": "e000097_associative_transport_reduction.py",
-      "invariant_in": [
-        "aff",
-        "affine_compose",
-        "l",
-        "p",
-        "r"
-      ],
-      "line": 126,
-      "loop_line": 119
-    },
-    {
-      "assigned_to": [
-        "idx"
-      ],
-      "callee": "randrange",
-      "file": "e000097_associative_transport_reduction.py",
-      "invariant_in": [
-        "length"
-      ],
-      "line": 146,
-      "loop_line": 145
-    },
-    {
-      "assigned_to": [
-        "gold_root"
-      ],
-      "callee": "compose_all",
-      "file": "e000097_associative_transport_reduction.py",
-      "invariant_in": [
-        "ident",
-        "lookup_compose",
-        "maps"
-      ],
-      "line": 152,
-      "loop_line": 145
     },
     {
       "assigned_to": [
@@ -1476,54 +1094,6 @@
     },
     {
       "assigned_to": [
-        "old_state"
-      ],
-      "callee": "evaluate",
-      "file": "e000106_region_transition_witness_reduction.py",
-      "invariant_in": [
-        "endpoints"
-      ],
-      "line": 180,
-      "loop_line": 174
-    },
-    {
-      "assigned_to": [
-        "current_state"
-      ],
-      "callee": "evaluate",
-      "file": "e000106_region_transition_witness_reduction.py",
-      "invariant_in": [
-        "endpoints"
-      ],
-      "line": 181,
-      "loop_line": 174
-    },
-    {
-      "assigned_to": [
-        "old_state"
-      ],
-      "callee": "evaluate",
-      "file": "e000106_region_transition_witness_reduction.py",
-      "invariant_in": [
-        "endpoints"
-      ],
-      "line": 180,
-      "loop_line": 175
-    },
-    {
-      "assigned_to": [
-        "current_state"
-      ],
-      "callee": "evaluate",
-      "file": "e000106_region_transition_witness_reduction.py",
-      "invariant_in": [
-        "endpoints"
-      ],
-      "line": 181,
-      "loop_line": 175
-    },
-    {
-      "assigned_to": [
         "d1"
       ],
       "callee": "projected_vector_state",
@@ -1538,10 +1108,8 @@
       "loop_line": 130
     }
   ],
-  "class_b_count": 94,
+  "class_b_count": 61,
   "class_b_files": [
-    "e000002_memorization_control.py",
-    "e000005_causal_interventions.py",
     "e000008_gpt2_adapter.py",
     "e000011_gpt2_v2.py",
     "e000012_status_gated_revoke.py",
@@ -1553,35 +1121,27 @@
     "e000023_alias_curriculum.py",
     "e000024_weights_vs_cells.py",
     "e000027_untied_model.py",
-    "e000030_deletion_certificate.py",
-    "e000032_deletion_closure.py",
     "e000034_pointer_separability.py",
     "e000039_address_tying.py",
     "e000040_dangling_readers.py",
     "e000042_certified_closure.py",
     "e000043_allocation.py",
     "e000045_fanout.py",
-    "e000046_currency.py",
     "e000049_template_nullspace_addressing.py",
     "e000050_bos_artefact.py",
-    "e000053_hard_match_frontier.py",
-    "e000055_relevance_calibration.py",
     "e000057_three_state_router.py",
     "e000058_single_read_three_state.py",
-    "e000059_semantic_bypass.py",
     "e000062_jspace_address_abi.py",
     "e000063_workspace_pod_certificate.py",
     "e000079_generation_kv_lineage_race.py",
     "e000080_object_scoped_kv_lineage.py",
     "e000089_cross_model_generation_attestation.py",
     "e000090_inband_generation_signature.py",
-    "e000097_associative_transport_reduction.py",
     "e000099_dense_influence_sparse_repair.py",
     "e000100_oracle_sparse_flop_ceiling.py",
     "e000102_symbolic_pod_algebra_reduction.py",
     "e000104_tensor_train_lifecycle_quotient_reduction.py",
     "e000105_stable_gate_cohort_transport_reduction.py",
-    "e000106_region_transition_witness_reduction.py",
     "e000107_state_only_causal_lineage_identifiability.py"
   ],
   "decision": "SCANNER_VALID",
