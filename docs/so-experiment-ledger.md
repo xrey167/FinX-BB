@@ -3609,7 +3609,7 @@ against their sources.
 | Alias-by-radius (GRACE) against alias-by-pointer | GRACE's expand rule and EasyEdit's `delete_key` make both halves by construction of the published algorithm. |
 | A graded forgetting dial in the marker | The line `v_f = v_f * g` (`so/model.py:221`); a dose-response curve of a sigmoid. |
 | An abstention horizon from the null key's softmax share | Owned by the log-n scaling literature (Chiang & Cholak 2022) and unconstructible on E-000015: 256 × 6 = 1536 keys, and the bank already holds 55–68% of them. |
-| The last-token key's position-0 transport on CounterFact | Refuted by data already on this box: the product surface reads bare at 0.90/0.93 with a BOS gain of 0.09, not ≥ 0.15 (R1 below). |
+| The last-token key's position-0 transport on CounterFact | Refuted by data already on this box: the product surface reads bare at 0.90/0.93 with a BOS gain of 0.09, not ≥ 0.15 (R1 below, since confirmed on three seeds). |
 | Held-out entities as a general key map | KBLaM, E-BERT, TOME and LRE own the design and predict partial transfer; the measurement is a substrate replication (R4 below). |
 
 The judge's verdict, kept in its own words because it is the finding of this section: *"There is no
@@ -3625,19 +3625,24 @@ the recorded 0.5667, alias 0.6850 against 0.5200, `shred_target/alias_unknown` 1
 old record**, and "worst of three seeds" now means the worst of three fresh trainings; the recorded
 0.175 / 0.125 / 0.010 spread of the BLANK row is partly retrain variance.
 
-**R1 — E-000054 seed 0, the registered two-token surfaces.** One seed of a registered three (seeds 1–2
-running); n = 100 targets per template, held-out subject-initial the minimum over t8 and t11, held-out
-medial t9 alone, numbers read from the run log at two decimals since `ledger.save` fires only after
-the last seed. On E-000017-B's trainer at the same 3000-step budget, trained without a BOS: a 16 × 16
-**product code** whose position-0 token carries half of each subject's identity reads the held-out
-subject-initial forms bare at **0.90 / 0.93** (trained subject-initial 0.98, held-out reading 0.9437)
-and at 1.00 / 1.00 with a lone space at inference on the same weights (0.99 / 1.00 with a BOS); the
-**second-token** surface reads them bare at **1.00 / 1.00** (medial 1.00 / 1.00). Against the recorded
-single-token surface's 0.37 / 0.54 bare, H1's bare row fails at 0.90 against its ≤ 0.50 bar and the
-pre-registered branch fires: *the single-token case is special*. The position-0 price of this learned
-last-token router falls from 0.60 / 0.44 on a single-token subject to 0.10 / 0.07 on a product code
-and is **not zero**. Seed 1's product surface reads 0.91 / 0.93 bare, so the fired branch is not a
-one-seed accident; the residual price is one seed until seeds 1–2 land.
+**R1 — E-000054, the registered two-token surfaces, three seeds (recorded 2026-09-06,
+`so/results/e000054_two_token_subjects.json`).** Worst seed everywhere; n = 100 targets per template,
+held-out subject-initial the minimum over t8 and t11, held-out medial t9 alone. On E-000017-B's
+trainer at the same 3000-step budget, trained without a BOS: a 16 × 16 **product code** whose
+position-0 token carries half of each subject's identity reads the held-out subject-initial forms bare
+at **0.90 / 0.93** (per seed 0.90, 0.91, 0.90; trained subject-initial 0.96, held-out reading 0.9412)
+and at 0.98 / 1.00 with a lone space at inference on the same weights (0.99 / 0.99 with a BOS); the
+**second-token** surface reads them bare at **1.00 / 0.98** (medial 0.99 / 0.97). Against the recorded
+single-token surface's 0.37 / 0.54 bare, H1's bare row fails at 0.91 against its ≤ 0.50 bar (the
+worst-seed direction for a `≤` criterion is the maximum) and the pre-registered branch fires: *the
+single-token case is special — E-000050's failure is Yang et al.'s 0.36% condition and does not extend
+even to a product code.* Both V rows hold (trained medial 0.97 and 0.95 against ≥ 0.85) and both M
+rows hold (0.91 and 0.99 against ≥ 0.90), so the branch is read and not voided. The position-0 price
+of this learned last-token router falls from 0.60 / 0.44 on a single-token subject to **0.08 / 0.07**
+on a product code (bare 0.90 / 0.93 against the same weights' 0.98 / 1.00 under a lone space) and is
+**not zero**; on the second-token surface it is 0.00 / 0.00. The prices of a prefix are reported and
+never scored: a BOS costs the product surface's held-out medial row 0.91 → 0.73 and the second
+surface's 0.99 → 0.91, a lone space costs neither (0.91, 0.99).
 *By construction, declared:* the surface layout rows (two tokens per name, the first at index 0 on the
 subject-initial templates) are `surface_positions`' construction and are validity checks. H2 and the
 two recovery rows are §31.46's row — any token at position 0 restores the subject-initial forms by
@@ -3645,7 +3650,7 @@ two recovery rows are §31.46's row — any token at position 0 restores the sub
 The routing key remains `w_in[entity_token_ids[subject]]`, a token that no longer appears in any prompt,
 so the map from a two-token surface to that key is per-entity memorisation (R4), not a property of
 position 0. *Missing control:* the single-token surface was NOT retrained in this session, so the
-0.60 → 0.10 contrast is record-against-retrain, not a paired arm.
+0.60 → 0.08 contrast is record-against-retrain, not a paired arm.
 *Prior art:* the condition and its diagnosis are Yang et al., "The Fall of ROME" (Findings of EMNLP
 2024, arXiv:2406.11263) §3.3 — collapse subjects are "a single word, which is encoded as a single
 token and positioned at the beginning", and the anomaly is "not related to the editing process";
@@ -3754,10 +3759,11 @@ value is refused. *What it is:* SQL-92's `ON DELETE SET NULL` given a target the
 verbalise. *What it is not:* a mechanism, a certificate, or a claim. It is one measurement (the export
 decides the row, the subject component carries it) and one option.
 
-**Registered and running.** E-000054 seeds 1–2 (the worst-of-three rule; seed 1's product surface is
-in at 0.91 / 0.93 bare). E-000052's substrates (the BOS-trained symlink adapter and its link-free arm,
-three seeds each) and then its battery, which will read the BLANK row on a substrate trained with the
-prefix — where the option above can be measured against a retrain instead of an export. Not run:
+**Registered and running.** E-000054 is complete on three seeds (record 2026-09-06; R1 above carries
+the worst-seed numbers and the fired branch). E-000052's substrates (the BOS-trained symlink adapter
+and its link-free arm, three seeds each) and then its battery, which will read the BLANK row on a
+substrate trained with the prefix — where the option above can be measured against a retrain instead
+of an export. Not run:
 E-000055, E-000047, E-000048, and the identity-wire control that would decide whether the frozen blocks
 can carry a planted pointer to the layer-10 query (both outcomes owned, per R2).
 
