@@ -17,25 +17,38 @@ certifying gone. This programme has caught that failure mode ten times under the
 that cannot fail is not evidence*; here it is an instrument that cannot SEE, and E-000063's own
 validity bar caught it.
 
-WHAT THIS FILE ASKS. Why is the workspace readout blind, and is anything else? Three explanations are
-distinguishable and only one of them is about the workspace:
+WHAT THIS FILE ASKS, AND THE ANSWER IT FOUND. Why is the workspace readout blind, and is anything
+else? FOUR explanations are distinguishable, and the first was added after a measurement, not from the
+armchair -- the first draft of this file listed only the last three:
 
-    DIMENSION  k coordinates are not enough, whatever they are
-    DIRECTION  k coordinates are enough, but not those k
-    DEPTH      the memory is not yet in linearly decodable form at the site the audit reads
+    SITING     the audit reads a state the memory has not reached yet
+    DEPTH      the write reaches that state but is not linearly decodable there
+    DIRECTION  k coordinates suffice there, but not those k
+    DIMENSION  k coordinates are too few, whatever they are
+
+Separating SITING from the rest needs a MEDIATOR, and that is what the first draft lacked: at every
+candidate site, how far does the state move when the pod is shredded, and when it was never written?
+A readout that sees nothing where the state does not move is not blind, it is correctly sited and
+pointed at the wrong block. Measured on three seeds: the injected write at the FIRST read site moves
+2.81 when a pod is shredded and 89.70 at the second, a ratio of 0.032, and E-000063 captures the
+first. The answer is SITING.
 
 PART A, the readout side. Probes trained on ACTIVE states ONLY and applied unchanged to SHRED and
-NEVER (E-000063's transfer probe), over five matched feature families at the audit's own site and at
-the final state: the J-lens atoms of the pod objects (the audit), an equally sized random projection
-(the dimension-matched null), the top-k principal components of the ACTIVE states (the best k-dimensional
-linear readout there is), the objects' unembedding rows (the vocabulary-basis analogue), and the raw
-state (the capacity ceiling).
+NEVER (E-000063's transfer probe), over five matched feature families -- the J-lens atoms of the pod
+objects (the audit), an equally sized random projection (dimension-matched), the top-k principal
+components of the ACTIVE states (the best k-dimensional linear readout there is), the objects'
+unembedding rows (the vocabulary-basis analogue), and the raw state (the capacity ceiling) -- at every
+candidate site (blocks 8, 9, 10 and the final state), under two ADDRESS MODES: the pod's own canonical
+key, and a LINK alias the model must dereference. Each site carries its own mediator.
 
-PART B, the causal side. A probe says what is readable; it does not say what the model uses. The write
-is a tensor this harness holds, so it can be injected with the entire first-order channel removed:
-projecting it out of the span of the J-lens atoms of ALL 257 scored tokens leaves a write whose
-first-order effect on every scored logit is exactly zero (measured retention 1e-6 at full rank). If
-the answer survives that, the audit's basis is not where the answer comes from.
+PART B, the causal side -- AND ITS RESULT IS VOID, WHICH IS RECORDED HERE SO THE FILE IS NOT READ AS
+IF IT STOOD. A probe says what is readable; it does not say what the model uses. The write is a tensor
+this harness holds, so it can be injected with the entire first-order channel removed: projecting it
+out of the span of the J-lens atoms of ALL 257 scored tokens leaves a write whose first-order effect
+on every scored logit is exactly zero (measured retention 1e-6 at full rank). On the recorded run the
+TOKEN-MATCHED NULL fired -- a span built identically over 257 tokens that are NOT scored costs the
+answer up to 0.26 against a 0.20 bar -- so the registered sentence is not licensed and part B is void.
+Its numbers are kept as a table with no sentence attached. See docs/novelty/audit-siting-claim.md.
 
 BY CONSTRUCTION, DECLARED BEFORE THE RUN.
   * keep(W) ~= FULL and drop(W) ~= floor on the FIRST-ORDER term is algebra, not a finding: the atoms
