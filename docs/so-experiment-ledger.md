@@ -3083,6 +3083,34 @@ not hold. The dichotomy stands and now rests on measured cost on both arms. **Wh
 Two of twenty-three; nothing about the other twenty-one; and neither original instruments memory
 traffic or sequential depth, so §31.42's M1/M2 defects remain untested on this pair.
 
+### 31.45 The screen replaced, with the vacuity defect made unrepresentable (2026-09-06, so/screen.py)
+
+§31.42 found three defects in the reduction screen and §31.44 showed the third of them did not
+produce the two kills most likely to have been produced by it. The verdicts stand; the predicate
+still had to be replaced, because an instrument that can pass a strict regression will eventually
+pass one.
+
+`so/screen.py` closes all three -- promote on a strict improvement rather than on any difference of
+counts, read every declared coordinate rather than multiplies alone, charge the representation to
+whoever builds it -- and adds the guard the old predicate had no way to express. A `Measurement` must
+name where its cost figure came from, and two arms carrying the same provenance label raise
+`VacuousComparison`. The `mutation_multiplies(net)` / `local_update_multiplies(rank)` pattern of
+e000105:176-177 and e000104:224-225 becomes unrepresentable rather than remembered: §31.15 enforced
+by the type rather than by whoever reads the diff next. The guard refuses a shared *source*, not a
+tied *number* -- two independently measured arms that cost the same are a real tie and kill normally,
+and there is a test for that, since a guard that refused genuine ties would be the same error
+mirrored.
+
+**Nothing recorded is touched.** E-000102..E-000108 keep the predicate that produced their records,
+with §31.42 and §31.44 attached saying what it was. Rewriting an instrument underneath a recorded
+result is how a ledger stops meaning anything, and this programme has paid three times already for
+instruments that were not what they were believed to be. New work imports from `so.screen`.
+
+One thing the replacement makes visible that the old one could not: `unread_coordinates`. §31.44
+could not test the M1 and M2 defects against E-000104 or E-000105 because neither original
+instruments memory traffic or sequential depth, and under the old predicate that absence had nowhere
+to appear. It now appears in every verdict.
+
 ### 31.8 Boundary
 
 CPU only, no GPU, no LLM above 124M parameters, synthetic worlds, single-token entities, two surface forms per relation, one session. Nothing here shows unlearning of facts already encoded in pretrained weights. Evidence levels recorded: E3–E4 for the synthetic system (F4 for SHRED with the verified gate, E-000010 — **on the value channel only**: E-000028 recovers the shredded object at 1.0000 through the ungated reverse key, where REVOKE and DELETE are at chance, so F4 for SHRED is a claim about answers, logits, hidden states and probes and not about routing); E5 as substrate for the frozen-GPT-2 experiment, with reading, composition, update and the copy bound supported and behavioural deletion not yet supported at the pre-registered thresholds.

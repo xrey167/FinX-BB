@@ -10,6 +10,9 @@ on:
       - "docs/novelty/pdx001-payload-derived-index-audit.md"
       - "docs/novelty/pdx001-payload-derived-index-audit-result.md"
       - "docs/novelty/nov002-charged-rerun-e104-e105-result.md"
+      - "docs/novelty/screen-v2-2026-09-06.md"
+      - "so/screen.py"
+      - "so/tests/test_screen.py"
       - "so/experiments/nov001_screen_calibration.py"
       - "so/experiments/nov002_charged_rerun_e104_e105.py"
       - "so/experiments/pdx001_payload_derived_index_audit.py"
@@ -35,12 +38,14 @@ jobs:
           python -m py_compile so/experiments/nov001_screen_calibration.py
           python -m py_compile so/experiments/pdx001_payload_derived_index_audit.py
           python -m py_compile so/experiments/nov002_charged_rerun_e104_e105.py
+          python -m py_compile so/screen.py
       - name: Focused regressions
         run: |
           python -m pytest -q \
             so/tests/test_nov001_screen_calibration.py \
             so/tests/test_pdx001_payload_derived_index_audit.py \
-            so/tests/test_nov002_charged_rerun_e104_e105.py
+            so/tests/test_nov002_charged_rerun_e104_e105.py \
+            so/tests/test_screen.py
       - name: NOV001 registered screen calibration
         run: |
           mkdir -p ci-nov001
@@ -69,6 +74,9 @@ jobs:
             docs/novelty/nov002-charged-rerun-e104-e105-result.md \
             so/experiments/nov002_charged_rerun_e104_e105.py \
             so/tests/test_nov002_charged_rerun_e104_e105.py \
+            docs/novelty/screen-v2-2026-09-06.md \
+            so/screen.py \
+            so/tests/test_screen.py \
             > ci-nov001/source-sha256.txt
           find ci-nov001 ci-pdx001 ci-nov002 -maxdepth 1 -name '*.json' -print0 | sort -z \
             | xargs -0 -r sha256sum > ci-nov001/result-sha256.txt
