@@ -2991,6 +2991,63 @@ marker channel), the two-clause store/reader structure (Garg, Goldwasser and Vas
 half is queued behind E-000050 and decides whether a frozen language model's adapter, which routes
 with the same dense softmax, carries the same two channels.
 
+### 31.42 The screen that returned twenty-three kills had never had a positive control (2026-09-06, NOV-001)
+
+E-000086 to E-000108 return the same verdict twenty-three times. All of them come from one screen,
+written the same way each time: kill when a generic baseline, handed the candidate's own
+representation, reaches identical exact states with an identical multiply count. NOV-001 ran
+mechanisms of known standing through it, which is what E-000019 does for its attacks — the probe
+reads live cells at 0.893-0.927, so "at chance" means something — and had never been done for the
+screen.
+
+Three defects, each with an exact witness. **False kill:** identical states, multiplies 72 = 72,
+slow-memory traffic 36 against 60, refused, because the coordinate it wins on is not read. **False
+promote:** identical result at 32 multiplies against 16, better at nothing, passed, because the
+predicate asks whether the counts differ rather than whether the candidate is better. **Subsidy:**
+handed its own precomputed table a baseline ties and the candidate dies; charged for building it, the
+same candidate on the same states and the same queries lives, 16 against 121. Every candidate from
+E-000102 onward is representation-based, which is the class the subsidy ties by construction.
+
+And in E-000105 itself, lines 176-178: `candidate_work` and `generic_work` are both
+`mutation_multiplies(net)` on the same `net`. 512 inputs, 0 mismatches, unreachable. Both work terms
+in that kill predicate are tautologies, so the kill rests on exact-state equality alone — and the
+frontier update reported "exactly the same mutation work" as a measured quantity. **§31.15 for the
+fourth time, and the first on the screen rather than on an audit instrument: an instrument that
+cannot fail is not evidence.**
+
+No kill is claimed to reverse; NOV-001 re-runs none of them, and the screen is genuinely passable —
+it promotes a pure arithmetic schedule. What is owed is E-000104 and E-000105 re-run with the full
+cost vector on both arms and the representation charged, those two because each reported a large
+arithmetic reduction (3.0x-9.8x, 89.78x-541.33x) and was killed anyway.
+
+### 31.43 E-000028 leaves the repository, and its own headline metric would have missed the vector index (2026-09-06, PDX-001)
+
+The novelty statement of 2026-09-04 §5 named one small experiment — port E-000028 to a store someone
+else built — and thirty experiments were run after it, none of them that one. What blocked it was
+mechanical: the attack is welded to `so/model.py`, the E-000010 checkpoints and torch.
+
+PDX-001 unwelds it. The audit takes a store as an argument and does both halves exhaustively over a
+256-value payload domain: sweep every value and keep the candidates consistent with what the store
+exposes, and sweep again to check whether any observable moves at all. Validity floor met — the same
+attack reads a live payload at 1.0000 — and the two halves agree on all five policies.
+
+The channel is not about `k_rev`. A gated value beside an ungated payload-derived reverse key, and a
+cleared value beside a codebook key derived from it, both name the payload at top-1 1.0000. Removing
+the row from the addressable set, and gating every derived quantity, both reach chance and are
+certified over the whole domain — no attack of this shape exists, rather than none was found.
+
+**The row that corrects E-000028's own reporting:** a tombstoned vector-index node keeping the
+adjacency list built from its own embedding scores top-1 **0.0000** and leaks anyway, narrowing 256
+candidates to 2.92 — posterior 0.3917 against chance 0.0039, an 88x cut in the search space. Under a
+top-1 headline that is a clean deletion. It is not. §8 of the findings document had already named
+this arrangement — "every soft-deleting vector index that keeps its edges" — and it is now measured,
+with the metric that makes it visible. Any run of this audit against a real index must report the
+candidate-set posterior or it will report a false negative.
+
+§5 is not discharged: no published system has been run, there being no checkpoints, torch or network
+here, and the five policies are reconstructions of shapes. What changed is that running it is now
+configuration rather than a rewrite.
+
 ### 31.8 Boundary
 
 CPU only, no GPU, no LLM above 124M parameters, synthetic worlds, single-token entities, two surface forms per relation, one session. Nothing here shows unlearning of facts already encoded in pretrained weights. Evidence levels recorded: E3–E4 for the synthetic system (F4 for SHRED with the verified gate, E-000010 — **on the value channel only**: E-000028 recovers the shredded object at 1.0000 through the ungated reverse key, where REVOKE and DELETE are at chance, so F4 for SHRED is a claim about answers, logits, hidden states and probes and not about routing); E5 as substrate for the frozen-GPT-2 experiment, with reading, composition, update and the copy bound supported and behavioural deletion not yet supported at the pre-registered thresholds.
