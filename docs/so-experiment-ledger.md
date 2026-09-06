@@ -3048,6 +3048,41 @@ candidate-set posterior or it will report a false negative.
 here, and the five policies are reconstructions of shapes. What changed is that running it is now
 configuration rather than a rewrite.
 
+### 31.44 The subsidy was real and did not produce the two kills that mattered most (2026-09-06, NOV-002)
+
+§31.42 left one thing open and named the run that would close it: re-screen E-000104 and E-000105
+with the representation charged, those two because each reported a large arithmetic reduction and was
+killed anyway. Done. **Both kills survive**, and the two survive for different reasons, which is why
+they could not be treated as one family.
+
+E-000104's arms consume the same cached environments and do arithmetic of identical shape --
+`candidate_local_update` and `generic_cached_environment_update` are two spellings of (1xR)(RxR) then
+(1xR)(Rx1). Build ratio candidate/generic is exactly **1.00**, charged totals 503,040 against
+503,040. There was no asymmetry for a subsidy to hide.
+
+E-000105's arms build the sensitivity matrix by different algorithms, and this is the sharp one:
+`candidate_sensitivity` propagates a matrix at `depth*(w^3 + w^2*pd) + od*w*pd`, the generic
+propagates one column at a time at `pd*(depth*w^2 + od*w)`. Build ratio **3.04**, charged totals
+937,728 against 329,472. Charging the representation does not rescue the candidate -- it exposes a
+regression the original accounting was concealing **in the candidate's favour**. The screen was
+subsidising the arm that spends more.
+
+Counted variants were validated against the originals operation for operation (0 disagreements) and
+the arms still reach identical exact states, so this is an accounting change and not an arithmetic
+one. Against full replay both mechanisms remain far cheaper -- 1,542,400 and 8,008,704 against
+503,040 and 329,472 -- so the verdict is "no advantage over the generic arm", never "no advantage
+over recomputation".
+
+Also recorded: §31.42's work-term tautology holds in E-000104 as well (lines 224-225, the same pure
+function twice on one argument), so both of these kills rested on exact-state equality alone. That is
+still worth fixing and is still not what produced them.
+
+**What it settles.** The strongest objection to the programme's own reading of its record -- that the
+kills might be an artefact of a broken screen -- has been tested on its two best candidates and does
+not hold. The dichotomy stands and now rests on measured cost on both arms. **What it does not.**
+Two of twenty-three; nothing about the other twenty-one; and neither original instruments memory
+traffic or sequential depth, so §31.42's M1/M2 defects remain untested on this pair.
+
 ### 31.8 Boundary
 
 CPU only, no GPU, no LLM above 124M parameters, synthetic worlds, single-token entities, two surface forms per relation, one session. Nothing here shows unlearning of facts already encoded in pretrained weights. Evidence levels recorded: E3–E4 for the synthetic system (F4 for SHRED with the verified gate, E-000010 — **on the value channel only**: E-000028 recovers the shredded object at 1.0000 through the ungated reverse key, where REVOKE and DELETE are at chance, so F4 for SHRED is a claim about answers, logits, hidden states and probes and not about routing); E5 as substrate for the frozen-GPT-2 experiment, with reading, composition, update and the copy bound supported and behavioural deletion not yet supported at the pre-registered thresholds.
