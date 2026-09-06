@@ -1,8 +1,9 @@
 # Reference-carried memory — withdrawn, and what the attempt measured
 
 Date: 2026-09-05
-Status: **withdrawn as a novelty claim.** Twelfth retraction. What survives is a negative result and a
-corrected record. Nothing here is a legal novelty or patentability opinion.
+Status: **withdrawn as a novelty claim** on prior-art and invariance-attribution grounds, which stand.
+The CAPABILITY closure is itself retracted — see section 3 — and arm E is rerunning. Twelfth
+retraction, with a thirteenth inside it. Nothing here is a legal novelty or patentability opinion.
 
 An earlier version of this document claimed that a knowledge-free reference, carried through a frozen
 model's participating state with the value bound after the last cache-writing block, made persisted
@@ -37,52 +38,36 @@ a permutation to a fixed row set — an instrument that could not fail, which is
 standing rule broken for the third time. The suite now measures and pins all five mutations for all
 three arms, including the two rows where the carrier is **not** invariant.
 
-**3. The capability the whole claim was conditioned on came back 0.0.** Arm E, seed 0, 3000 steps,
-identical recipe: held-out candidate correctness **0.0000** on all four templates, against arm A at
-0.955/0.990 and arm C at 0.621/0.645/0.664. Record kept at
-`so/results/e000084_armE_s0_UNSUPERVISED_BIND_FAILED.json`.
+**3. The capability question is REOPENED, and the reason it looked closed was a defect of mine.**
+Arm E first read 0.0000 on all four held-out templates, on three seeds, with and without the boundary
+decode supervised. On the strength of that I closed the design and published a general claim: that a
+frozen model cannot dereference an address it was never taught. **That claim is retracted.**
 
-Supervising the boundary decode did not fix it, on any seed. With `bind_supervision` on, arm E scored
-**0.0000** on all four held-out templates on all three seeds (run 33986135519, artifact digests
-`bfba830b…`, `b8befffd…`, `589afdf2…`, each verified against GitHub before the file was read):
+`handles_for` was expanding the raw two's-complement bits of the identity through a 64-column basis.
+Consecutive small integers agree in nearly every high bit, so the handles were very nearly the same
+vector — over 128 identities at d=768, **mean pairwise |cos| 0.878 and rank 8**. Not 64. Eight. No
+readout could tell them apart, and the frozen model was never the constraint. The test meant to catch
+this asserted the closest pair was at least a tenth of a handle's norm; near-parallel vectors still sit
+at nonzero distance, so it passed on a family thirty times its own random baseline. Separation is an
+angle, not a distance — the third instrument-that-cannot-fail in this line, and the second I wrote.
 
-| Seed | held-out mean | final bind loss (uniform = 6.55) | training-template accuracy |
-|---:|---:|---:|---:|
-| 0 | 0.0000 | 5.70 | 0.406 |
-| 1 | 0.0000 | 5.85 | 0.469 |
-| 2 | 0.0000 | 5.98 | 0.406 |
+With handles rebuilt as hashed full-dimensional directions (mean |cos| 0.041 at both 128 and 1024
+identities, full rank, unbounded identity range), on frozen GPT-2 over 256 identities, chance 0.0039:
 
-The boundary decode barely learned even with a direct target, while the training templates reached
-0.41–0.47. That gap is the tell, and chasing it produced the finding that closes the design.
-
-**The carrier does not transport in the sense the design needs, and my own diagnostic said otherwise
-because it asked the wrong question.** E-000085 first held out *prompts*: it fitted a readout on some
-contexts for a fixed set of identities and tested other contexts for those same identities, read
-1.0000, and I reported it as "the carrier transports". A mutable memory needs more than that — its
-identity set changes, so the readout must work for an identity it has never seen. With that split, on
-frozen GPT-2, the same readout scores:
-
-| Split | top-1 | chance |
+| Readout | crowded handles | fixed handles |
 |---|---:|---:|
-| held-out prompts, identities seen | 1.0000 | 0.0039 |
-| identities seen (fit half) | 1.0000 | 0.0039 |
-| **held-out identities** | **0.0000** | 0.0039 |
+| store-supplied, **no learning at all** | 0.0503 | **0.9834** |
+| learned, identities seen | 1.0000 | 1.0000 |
+| learned, identities **never seen** | 0.0000 | **0.9844** |
+| clean control (no handle injected) | 0.0039 | 0.0039 |
 
-The prompt-split number was memorisation of a fixed identity set. Both splits are now part of
-E-000085 so the instrument can fail. Arm E's 0.0000 follows directly: it is evaluated on a fresh
-world, so every identity is new, and the boundary decode is at chance.
+So the frozen stack does transport an arbitrary knowledge-free reference; identity is recoverable with
+no learning at all, because the store already knows the handle table; and a learned readout generalises
+to identities it has never seen. Arm E is retraining on three seeds and its capability is an open
+question again, not a closed one.
 
-**Why the payload works where a reference cannot, which is the general statement.** The payload arm
-does not depend on any learned association surviving to new identities: the injected value *is* the
-frozen model's own output-embedding row for the answer, so adding it to the residual raises that
-token's logit through the unchanged head. That mechanism is identity-independent by construction. An
-arbitrary handle has no such relationship to the head — it means nothing to a model that was never
-trained to dereference it — so recovering it requires a learned per-identity association, and that is
-exactly what does not generalise.
-
-So, on a frozen model, a carrier only works if it is already interpretable by the model's own output
-geometry. "Put the address in, not the value" fails for frozen models for that reason, and no amount
-of supervision repairs it.
+The rank-7.2 transport-channel measurement stands as arithmetic and is withdrawn as an explanation: a
+channel that carries near-orthogonal directions at 0.98 was never the binding constraint.
 
 **4. The point was occupied, by granted patent art.** The claim asserted that every neighbour either
 puts knowledge into persisted state and repairs it, or keeps it out by not participating. That was
@@ -141,11 +126,12 @@ a placement that already gives total invariance and cannot read.
 
 ## What is still worth running, and why it is not a claim
 
-1. ~~Arm E with `bind_supervision`~~ — done, and it did not read: 0.0000 on all four held-out
-   templates with the boundary decode supervised, explained by the identity split above. **The design
-   is closed**, not pending.
-2. ~~Confirm on seeds 1 and 2~~ — done: all three seeds read 0.0000 with the boundary decode
-   supervised, so the design is closed on the standing three-seed bar, not on one seed.
+1. **A store-supplied bind instead of a learned one.** The no-learning readout reaches 0.9834, so the
+   boundary decode need not be learned at all: the store knows the handle table and can supply the
+   projection. That removes the only component that could fail to generalise, and it is the first
+   thing to try if the retrained arm E still misses.
+2. **Arm E on three seeds with the corrected handles.** The three seeds that read 0.0000 were all run
+   against the collinear handle family and say nothing about the design. Rerunning.
 3. **Per-read write placement**, to separate the routing feedback from a depth threshold above one
    block in the arm A/C/D comparison. That question is still open and is about placement, not carriers.
 4. **A real patent search.** Nothing above may be called cleared until USPTO, Espacenet, Patentscope
@@ -160,7 +146,10 @@ a placement that already gives total invariance and cannot read.
 - listed "a lifecycle status change" among the bit-identical operations — untested, and measured at
   7.1e-01 once a revoked row is made unroutable;
 - asserted the design point was unoccupied without having run the search that found it occupied;
-- reported E-000085's held-out-PROMPT score of 1.0000 as evidence that the carrier transports, when the
-  split that the design actually needs — held-out IDENTITIES — reads 0.0000, below chance. The
-  diagnostic had a clean control for the prompt axis and none for the identity axis, which is the same
-  "an instrument that cannot fail" error as the reordering test, found the same day, in my own work.
+- reported E-000085's held-out-PROMPT score of 1.0000 as evidence that the carrier transports, when
+  the design needs the held-out-IDENTITY split. The diagnostic had a clean control for the prompt axis
+  and none for the identity axis;
+- then, worse, read the resulting 0.0000 as a property of frozen models and published it as a general
+  claim, when it was a property of a handle family I had built 87.8% collinear and rank 8. The
+  separation test asserted a distance where only an angle can decide. Two instruments that could not
+  fail, both mine, both in the work that criticised a third.

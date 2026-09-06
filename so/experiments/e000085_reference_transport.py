@@ -13,10 +13,16 @@ If it does, the remaining risk in arm E is the routing and the training, not the
 The experiment asks that question two ways, and the second is the one that decides the design.  Holding
 out PROMPTS asks whether the readout survives a new context for an identity it has already seen.  A
 mutable memory needs more: its identity set changes, so the readout must work for an identity it has
-NEVER seen.  The first version of this experiment ran only the prompt split, read 1.0000 and was taken
-as evidence that the carrier transports.  It was not: with the identity split the same readout scores
-1.0000 on identities it was fitted on and 0.0000 -- below chance -- on identities it was not, so the
-prompt-split number was memorisation of a fixed identity set.  Both are reported.
+NEVER seen.  Both are reported.
+
+Read the history of this file's own numbers before trusting any of them.  The first version ran only
+the prompt split and read 1.0000.  Adding the identity split then read 0.0000 -- below chance -- and
+that was taken as proof that a frozen model cannot carry an arbitrary reference.  BOTH readings were
+about the handle family, not the model: `handles_for` was expanding the raw bits of the identity, so
+128 handles had mean pairwise |cos| 0.878 and rank 8, i.e. they were nearly the same vector.  With
+handles rebuilt as hashed full-dimensional directions (mean |cos| 0.041, full rank) the same
+experiment reads 0.9834 with NO learning at all and 0.9844 on identities never seen.  The frozen model
+transports an arbitrary reference; a crowded carrier alphabet was the whole of the earlier result.
 
 This is a diagnostic on frozen weights with a closed-form readout.  No adapter is trained, no world is
 used, and nothing here is a capability result or a novelty claim.  The readout is deliberately the same

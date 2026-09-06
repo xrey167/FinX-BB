@@ -16,7 +16,7 @@
       "train_top1": 1.0,
       "heldout_prompt_top1": 1.0,
       "seen_identity_top1": 1.0,
-      "heldout_identity_top1": 0.0,
+      "heldout_identity_top1": 0.984375,
       "clean_control_top1": 0.00390625,
       "chance": 0.00390625
     }
