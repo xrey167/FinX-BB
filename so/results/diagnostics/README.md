@@ -18,4 +18,5 @@ one machine, not to a record.
 | `pilot_entity_seed0.json` | entity-table swap: held-out subjects and objects (§31.48 R4) | same |
 | `blank_attrib_seed0.json` | BLANK export arms with the bare-LM and alias-masked floors, McNemar (§31.48 R5) | same |
 | `blank_option_check_seed0.json` | `MVCCStore(blank_export=...)` end to end through the store path | same |
+| `key_span_seed0.json` | the trained span of `k_proj`'s inputs and the off-span energy of held-out subjects, against routing success at matched key norm (§31.49) | same |
 | `e56_clockgate_v2.json` | recorded-gate acceptance by shell; the clock-gate benchmark (§31.48 R3) | `e000015_deref1_seed{0,1,2}.pt` |

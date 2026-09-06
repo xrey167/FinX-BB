@@ -3711,13 +3711,31 @@ in-vocabulary control reads 0.97–1.00 at routing 0.97–1.00. With a frequency
 (odd positions of the first 512 regex matches, so held-out and trained tokens are interleaved in BPE
 id order), a bank whose **subjects** are held out routes at **0.10–0.25** while reading 0.97–1.00 of
 what it does route, and a bank whose **objects** are held out routes at 0.96–0.99 and reads
-**0.10–0.16**. The frequency-confounded next-256 set reads 0.01–0.03 at routing 0.15–0.29. So both the
-key map `k_proj∘LN(W_in[s] + r)` and the payload map `v_proj(W_out[o])` are per-entity memorisation on
-this substrate, and "knowledge added like a container" does not extend to entities the reader was not
-trained on. *By construction:* the buffers are a lookup table, so the swap is a table change and not a
+**0.10–0.16**. The frequency-confounded next-256 set reads 0.01–0.03 at routing 0.15–0.29. So neither
+the key map `k_proj∘LN(W_in[s] + r)` nor the payload map `v_proj(W_out[o])` transfers to entities the
+reader was not trained on, and "knowledge added like a container" does not extend to them.
+*By construction:* the buffers are a lookup table, so the swap is a table change and not a
 retraining; the reading is single-seed and single-adapter. *Prior art:* KBLaM, E-BERT, TOME and LRE own
 the design and predict partial transfer; this is the number for this substrate, and it is the one
 result of the round that a product decision turns on.
+
+*Correction, 2026-09-06 (`so/diagnostics/key_span.py`, `so/results/diagnostics/key_span_seed0.json`).*
+This paragraph first read "both maps are **per-entity memorisation**", which claims more than the
+measurement licenses, and the design round that followed (§31.49) named the reason: `k_proj` is
+`nn.Linear(768, 256, bias=False)` (`so/llm_adapter.py:115`), so 256 trained subjects × 4 relations
+constrain it on a proper subspace of its 768-dimensional input and the routing loss says nothing about
+the orthogonal complement except through weight decay. Measured on the same checkpoint, zero training:
+the 1024 training inputs `ln_key(W_in[s] + rel_emb[r])` have effective rank **174** at 95% and **223**
+at 99% energy; a trained subject's key input carries **0.0907** of its energy off that span, a
+frequency-matched held-out subject **0.6439**, and the next-256 set 0.6465 — at **matched key norm**
+(21.25 against 21.24), which is the control that rules out a norm-threshold explanation. Routing
+success is ordered by off-span energy: Spearman **−0.542** (t1) and **−0.673** (t9) over all 256
+subjects of the interleaved table. The sentence the record may carry is therefore *the key map was
+never constrained off the 223-dimensional span of its training subjects*, not *it memorised them*, and
+the remedy that follows is a spanning training set rather than per-entity retraining. What is NOT
+shown: that a spanning set would work. Within the held-out subjects alone the ordering is weak
+(−0.230, −0.124) — they all sit far off-span — so this decides the reading of the failure, not the
+success of the fix.
 
 **R5 — the SET NULL row, attributed, and an option in the store.** BLANK is the only lifecycle row
 that fails on the real model (§31.45: 0.825 UNKNOWN against a 0.90 bar). On the retrained seed-0
