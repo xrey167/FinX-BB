@@ -200,7 +200,7 @@ def main(argv: Optional[List[str]] = None) -> int:
         print(f"seed {seed}:", flush=True)
         per_seed.append(run_seed(seed, args.n_pods, args.threads, args.n_hardgate))
 
-    keys = sorted(set.intersection(*[set(r) for r in per_seed]))
+    keys = sorted(set.intersection(*[set(r) for r in per_seed]) - {"seed"})
     agg = ledger.aggregate([{k: v for k, v in r.items() if k != "seed"} for r in per_seed], keys)
     check = ledger.check_criteria(agg, {k: v for k, v in BARS.items() if k in agg})
 

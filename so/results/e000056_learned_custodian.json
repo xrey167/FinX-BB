@@ -1,0 +1,2331 @@
+{
+ "experiment": "E-000056",
+ "question": "Can a learned acceptance function host the store's lifecycle predicate?",
+ "discharges": [
+  "ledger \u00a731.12 open question",
+  "ledger \u00a731.47 registration"
+ ],
+ "withdrawn_framing": "'Revocation cannot be delegated to a frozen LEARNED acceptance function' is withdrawn. Its metric was arithmetically unsatisfiable and its numbers are reproduced by the store's own hand-written predicate; the variable is liveness of the reference, not learning, which \u00a731.47 already concluded and Needham-Schroeder 1978 and Christ & Bonneau (FC 2023) own.",
+ "per_seed": [
+  {
+   "seed": 0,
+   "declared_radius": 0.35,
+   "margin": {
+    "band_accept": [
+     1.0,
+     1.0,
+     1.0,
+     1.0,
+     1.0,
+     1.0,
+     1.0,
+     1.0,
+     1.0,
+     1.0,
+     1.0,
+     1.0,
+     1.0,
+     1.0,
+     0.71925,
+     0.001,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0
+    ],
+    "operational_radius": 0.85,
+    "annulus_accept": 1.0,
+    "signed_accept": 1.0,
+    "false_accept_rejection_sampled": 0.00049,
+    "false_accept_declared_region": 0.38294
+   },
+   "boundary": {
+    "band_accept": [
+     1.0,
+     1.0,
+     1.0,
+     1.0,
+     1.0,
+     1.0,
+     1.0,
+     0.51125,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0
+    ],
+    "operational_radius": 0.45,
+    "annulus_accept": 0.119875,
+    "signed_accept": 1.0,
+    "false_accept_declared_region": 0.04619
+   },
+   "epoch": {
+    "frozen_gate": {
+     "grid": [
+      {
+       "centre_distance": 0.05,
+       "new": 1.0,
+       "prev": 1.0
+      },
+      {
+       "centre_distance": 0.1,
+       "new": 1.0,
+       "prev": 1.0
+      },
+      {
+       "centre_distance": 0.15,
+       "new": 1.0,
+       "prev": 1.0
+      },
+      {
+       "centre_distance": 0.2,
+       "new": 1.0,
+       "prev": 1.0
+      },
+      {
+       "centre_distance": 0.25,
+       "new": 1.0,
+       "prev": 1.0
+      },
+      {
+       "centre_distance": 0.3,
+       "new": 1.0,
+       "prev": 1.0
+      },
+      {
+       "centre_distance": 0.35,
+       "new": 1.0,
+       "prev": 1.0
+      },
+      {
+       "centre_distance": 0.4,
+       "new": 1.0,
+       "prev": 1.0
+      },
+      {
+       "centre_distance": 0.45,
+       "new": 1.0,
+       "prev": 1.0
+      },
+      {
+       "centre_distance": 0.5,
+       "new": 1.0,
+       "prev": 1.0
+      },
+      {
+       "centre_distance": 0.55,
+       "new": 1.0,
+       "prev": 1.0
+      },
+      {
+       "centre_distance": 0.6,
+       "new": 0.99725,
+       "prev": 1.0
+      },
+      {
+       "centre_distance": 0.65,
+       "new": 0.97,
+       "prev": 1.0
+      },
+      {
+       "centre_distance": 0.7,
+       "new": 0.8425,
+       "prev": 1.0
+      },
+      {
+       "centre_distance": 0.75,
+       "new": 0.20275,
+       "prev": 1.0
+      },
+      {
+       "centre_distance": 0.8,
+       "new": 0.206,
+       "prev": 1.0
+      },
+      {
+       "centre_distance": 0.85,
+       "new": 0.026,
+       "prev": 1.0
+      },
+      {
+       "centre_distance": 0.9,
+       "new": 0.0005,
+       "prev": 1.0
+      },
+      {
+       "centre_distance": 0.95,
+       "new": 0.0,
+       "prev": 1.0
+      },
+      {
+       "centre_distance": 1.0,
+       "new": 0.0,
+       "prev": 1.0
+      },
+      {
+       "centre_distance": 1.05,
+       "new": 0.0,
+       "prev": 1.0
+      },
+      {
+       "centre_distance": 1.1,
+       "new": 0.0,
+       "prev": 1.0
+      },
+      {
+       "centre_distance": 1.15,
+       "new": 0.0,
+       "prev": 1.0
+      },
+      {
+       "centre_distance": 1.2,
+       "new": 0.0,
+       "prev": 1.0
+      },
+      {
+       "centre_distance": 1.25,
+       "new": 0.0,
+       "prev": 1.0
+      },
+      {
+       "centre_distance": 1.3,
+       "new": 0.0,
+       "prev": 1.0
+      },
+      {
+       "centre_distance": 1.35,
+       "new": 0.0,
+       "prev": 1.0
+      },
+      {
+       "centre_distance": 1.4,
+       "new": 0.0,
+       "prev": 1.0
+      }
+     ],
+     "max_usable_distance": 0.65,
+     "min_revoking_distance": null,
+     "hostable_revocable_epochs": 0,
+     "gap": null
+    },
+    "store_frozen": {
+     "grid": [
+      {
+       "centre_distance": 0.05,
+       "new": 1.0,
+       "prev": 1.0
+      },
+      {
+       "centre_distance": 0.1,
+       "new": 1.0,
+       "prev": 1.0
+      },
+      {
+       "centre_distance": 0.15,
+       "new": 0.9935,
+       "prev": 1.0
+      },
+      {
+       "centre_distance": 0.2,
+       "new": 0.95875,
+       "prev": 1.0
+      },
+      {
+       "centre_distance": 0.25,
+       "new": 0.81425,
+       "prev": 1.0
+      },
+      {
+       "centre_distance": 0.3,
+       "new": 0.49825,
+       "prev": 1.0
+      },
+      {
+       "centre_distance": 0.35,
+       "new": 0.17525,
+       "prev": 1.0
+      },
+      {
+       "centre_distance": 0.4,
+       "new": 0.026,
+       "prev": 1.0
+      },
+      {
+       "centre_distance": 0.45,
+       "new": 0.00125,
+       "prev": 1.0
+      },
+      {
+       "centre_distance": 0.5,
+       "new": 0.0,
+       "prev": 1.0
+      },
+      {
+       "centre_distance": 0.55,
+       "new": 0.0,
+       "prev": 1.0
+      },
+      {
+       "centre_distance": 0.6,
+       "new": 0.0,
+       "prev": 1.0
+      },
+      {
+       "centre_distance": 0.65,
+       "new": 0.0,
+       "prev": 1.0
+      },
+      {
+       "centre_distance": 0.7,
+       "new": 0.0,
+       "prev": 1.0
+      },
+      {
+       "centre_distance": 0.75,
+       "new": 0.0,
+       "prev": 1.0
+      },
+      {
+       "centre_distance": 0.8,
+       "new": 0.0,
+       "prev": 1.0
+      },
+      {
+       "centre_distance": 0.85,
+       "new": 0.0,
+       "prev": 1.0
+      },
+      {
+       "centre_distance": 0.9,
+       "new": 0.0,
+       "prev": 1.0
+      },
+      {
+       "centre_distance": 0.95,
+       "new": 0.0,
+       "prev": 1.0
+      },
+      {
+       "centre_distance": 1.0,
+       "new": 0.0,
+       "prev": 1.0
+      },
+      {
+       "centre_distance": 1.05,
+       "new": 0.0,
+       "prev": 1.0
+      },
+      {
+       "centre_distance": 1.1,
+       "new": 0.0,
+       "prev": 1.0
+      },
+      {
+       "centre_distance": 1.15,
+       "new": 0.0,
+       "prev": 1.0
+      },
+      {
+       "centre_distance": 1.2,
+       "new": 0.0,
+       "prev": 1.0
+      },
+      {
+       "centre_distance": 1.25,
+       "new": 0.0,
+       "prev": 1.0
+      },
+      {
+       "centre_distance": 1.3,
+       "new": 0.0,
+       "prev": 1.0
+      },
+      {
+       "centre_distance": 1.35,
+       "new": 0.0,
+       "prev": 1.0
+      },
+      {
+       "centre_distance": 1.4,
+       "new": 0.0,
+       "prev": 1.0
+      }
+     ],
+     "max_usable_distance": 0.2,
+     "min_revoking_distance": null,
+     "hostable_revocable_epochs": 0,
+     "gap": null
+    },
+    "sphere_frozen": {
+     "grid": [
+      {
+       "centre_distance": 0.05,
+       "new": 1.0,
+       "prev": 1.0
+      },
+      {
+       "centre_distance": 0.1,
+       "new": 1.0,
+       "prev": 1.0
+      },
+      {
+       "centre_distance": 0.15,
+       "new": 1.0,
+       "prev": 1.0
+      },
+      {
+       "centre_distance": 0.2,
+       "new": 1.0,
+       "prev": 1.0
+      },
+      {
+       "centre_distance": 0.25,
+       "new": 1.0,
+       "prev": 1.0
+      },
+      {
+       "centre_distance": 0.3,
+       "new": 1.0,
+       "prev": 1.0
+      },
+      {
+       "centre_distance": 0.35,
+       "new": 1.0,
+       "prev": 1.0
+      },
+      {
+       "centre_distance": 0.4,
+       "new": 1.0,
+       "prev": 1.0
+      },
+      {
+       "centre_distance": 0.45,
+       "new": 1.0,
+       "prev": 1.0
+      },
+      {
+       "centre_distance": 0.5,
+       "new": 1.0,
+       "prev": 1.0
+      },
+      {
+       "centre_distance": 0.55,
+       "new": 1.0,
+       "prev": 1.0
+      },
+      {
+       "centre_distance": 0.6,
+       "new": 1.0,
+       "prev": 1.0
+      },
+      {
+       "centre_distance": 0.65,
+       "new": 1.0,
+       "prev": 1.0
+      },
+      {
+       "centre_distance": 0.7,
+       "new": 1.0,
+       "prev": 1.0
+      },
+      {
+       "centre_distance": 0.75,
+       "new": 0.99875,
+       "prev": 1.0
+      },
+      {
+       "centre_distance": 0.8,
+       "new": 0.97375,
+       "prev": 1.0
+      },
+      {
+       "centre_distance": 0.85,
+       "new": 0.80775,
+       "prev": 1.0
+      },
+      {
+       "centre_distance": 0.9,
+       "new": 0.4035,
+       "prev": 1.0
+      },
+      {
+       "centre_distance": 0.95,
+       "new": 0.08475,
+       "prev": 1.0
+      },
+      {
+       "centre_distance": 1.0,
+       "new": 0.0065,
+       "prev": 1.0
+      },
+      {
+       "centre_distance": 1.05,
+       "new": 0.0005,
+       "prev": 1.0
+      },
+      {
+       "centre_distance": 1.1,
+       "new": 0.0,
+       "prev": 1.0
+      },
+      {
+       "centre_distance": 1.15,
+       "new": 0.0,
+       "prev": 1.0
+      },
+      {
+       "centre_distance": 1.2,
+       "new": 0.0,
+       "prev": 1.0
+      },
+      {
+       "centre_distance": 1.25,
+       "new": 0.0,
+       "prev": 1.0
+      },
+      {
+       "centre_distance": 1.3,
+       "new": 0.0,
+       "prev": 1.0
+      },
+      {
+       "centre_distance": 1.35,
+       "new": 0.0,
+       "prev": 1.0
+      },
+      {
+       "centre_distance": 1.4,
+       "new": 0.0,
+       "prev": 1.0
+      }
+     ],
+     "max_usable_distance": 0.8,
+     "min_revoking_distance": null,
+     "hostable_revocable_epochs": 0,
+     "gap": null
+    },
+    "store_live": {
+     "grid": [
+      {
+       "centre_distance": 0.05,
+       "new": 1.0,
+       "prev": 1.0
+      },
+      {
+       "centre_distance": 0.1,
+       "new": 1.0,
+       "prev": 0.99975
+      },
+      {
+       "centre_distance": 0.15,
+       "new": 1.0,
+       "prev": 0.99725
+      },
+      {
+       "centre_distance": 0.2,
+       "new": 1.0,
+       "prev": 0.9635
+      },
+      {
+       "centre_distance": 0.25,
+       "new": 1.0,
+       "prev": 0.817
+      },
+      {
+       "centre_distance": 0.3,
+       "new": 1.0,
+       "prev": 0.49825
+      },
+      {
+       "centre_distance": 0.35,
+       "new": 0.99975,
+       "prev": 0.1725
+      },
+      {
+       "centre_distance": 0.4,
+       "new": 1.0,
+       "prev": 0.028
+      },
+      {
+       "centre_distance": 0.45,
+       "new": 1.0,
+       "prev": 0.00125
+      },
+      {
+       "centre_distance": 0.5,
+       "new": 1.0,
+       "prev": 0.0
+      },
+      {
+       "centre_distance": 0.55,
+       "new": 1.0,
+       "prev": 0.0
+      },
+      {
+       "centre_distance": 0.6,
+       "new": 1.0,
+       "prev": 0.0
+      },
+      {
+       "centre_distance": 0.65,
+       "new": 1.0,
+       "prev": 0.0
+      },
+      {
+       "centre_distance": 0.7,
+       "new": 1.0,
+       "prev": 0.0
+      },
+      {
+       "centre_distance": 0.75,
+       "new": 1.0,
+       "prev": 0.0
+      },
+      {
+       "centre_distance": 0.8,
+       "new": 1.0,
+       "prev": 0.0
+      },
+      {
+       "centre_distance": 0.85,
+       "new": 1.0,
+       "prev": 0.0
+      },
+      {
+       "centre_distance": 0.9,
+       "new": 0.99975,
+       "prev": 0.0
+      },
+      {
+       "centre_distance": 0.95,
+       "new": 1.0,
+       "prev": 0.0
+      },
+      {
+       "centre_distance": 1.0,
+       "new": 1.0,
+       "prev": 0.0
+      },
+      {
+       "centre_distance": 1.05,
+       "new": 1.0,
+       "prev": 0.0
+      },
+      {
+       "centre_distance": 1.1,
+       "new": 1.0,
+       "prev": 0.0
+      },
+      {
+       "centre_distance": 1.15,
+       "new": 1.0,
+       "prev": 0.0
+      },
+      {
+       "centre_distance": 1.2,
+       "new": 1.0,
+       "prev": 0.0
+      },
+      {
+       "centre_distance": 1.25,
+       "new": 1.0,
+       "prev": 0.0
+      },
+      {
+       "centre_distance": 1.3,
+       "new": 1.0,
+       "prev": 0.0
+      },
+      {
+       "centre_distance": 1.35,
+       "new": 1.0,
+       "prev": 0.0
+      },
+      {
+       "centre_distance": 1.4,
+       "new": 1.0,
+       "prev": 0.0
+      }
+     ],
+     "max_usable_distance": 1.4,
+     "min_revoking_distance": 0.4,
+     "hostable_revocable_epochs": 21,
+     "gap": -0.9999999999999999
+    },
+    "note": "The three frozen checkers are expected to agree; that agreement is the result. Only the live-reference checker hosts a revocable epoch, so the variable is liveness, not learning."
+   },
+   "live": {
+    "sweep": [
+     {
+      "width": 64,
+      "depth": 1,
+      "steps": 4000,
+      "current_accept": 1.0,
+      "stale_accept": 0.00056
+     },
+     {
+      "width": 256,
+      "depth": 2,
+      "steps": 4000,
+      "current_accept": 0.9998,
+      "stale_accept": 0.00025
+     },
+     {
+      "width": 256,
+      "depth": 2,
+      "steps": 20000,
+      "current_accept": 0.999995,
+      "stale_accept": 1e-05
+     }
+    ],
+    "n": 200000
+   },
+   "oracle": {
+    "signed_accept": 0.9999,
+    "false_accept_declared_region": 0.0
+   },
+   "capacity": [
+    {
+     "width": 256,
+     "depth": 2,
+     "steps": 4000,
+     "signed_accept": 0.9997333333333334,
+     "false_accept_declared_region": 0.0
+    },
+    {
+     "width": 256,
+     "depth": 2,
+     "steps": 20000,
+     "signed_accept": 0.9999,
+     "false_accept_declared_region": 6.5e-05
+    },
+    {
+     "width": 1024,
+     "depth": 2,
+     "steps": 4000,
+     "signed_accept": 0.9999,
+     "false_accept_declared_region": 0.0
+    }
+   ],
+   "metrics": {
+    "anchor_margin_accept_at_0p70": 1.0,
+    "anchor_margin_accept_at_0p90": 0.0,
+    "anchor_margin_annulus_accept": 1.0,
+    "anchor_margin_false_accept": 0.00049,
+    "boundary_annulus_accept": 0.119875,
+    "boundary_false_accept": 0.04619,
+    "capacity_best_false_accept": 0.0,
+    "live_current_accept": 0.9998,
+    "live_stale_accept_best": 1e-05,
+    "oracle_false_accept": 0.0,
+    "epoch_hostable_frozen_gate": 0,
+    "epoch_hostable_store_frozen": 0,
+    "epoch_hostable_sphere_frozen": 0,
+    "epoch_hostable_store_live": 21,
+    "epoch_gap_frozen_gate": null,
+    "epoch_gap_store_frozen": null
+   }
+  },
+  {
+   "seed": 1,
+   "declared_radius": 0.35,
+   "margin": {
+    "band_accept": [
+     1.0,
+     1.0,
+     1.0,
+     1.0,
+     1.0,
+     1.0,
+     1.0,
+     1.0,
+     1.0,
+     1.0,
+     1.0,
+     1.0,
+     1.0,
+     1.0,
+     0.99975,
+     0.09375,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0
+    ],
+    "operational_radius": 0.85,
+    "annulus_accept": 1.0,
+    "signed_accept": 1.0,
+    "false_accept_rejection_sampled": 0.000745,
+    "false_accept_declared_region": 0.407165
+   },
+   "boundary": {
+    "band_accept": [
+     1.0,
+     1.0,
+     1.0,
+     1.0,
+     1.0,
+     1.0,
+     1.0,
+     0.2085,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0
+    ],
+    "operational_radius": 0.45,
+    "annulus_accept": 0.102025,
+    "signed_accept": 1.0,
+    "false_accept_declared_region": 0.04013
+   },
+   "epoch": {
+    "frozen_gate": {
+     "grid": [
+      {
+       "centre_distance": 0.05,
+       "new": 1.0,
+       "prev": 1.0
+      },
+      {
+       "centre_distance": 0.1,
+       "new": 1.0,
+       "prev": 1.0
+      },
+      {
+       "centre_distance": 0.15,
+       "new": 1.0,
+       "prev": 1.0
+      },
+      {
+       "centre_distance": 0.2,
+       "new": 1.0,
+       "prev": 1.0
+      },
+      {
+       "centre_distance": 0.25,
+       "new": 1.0,
+       "prev": 1.0
+      },
+      {
+       "centre_distance": 0.3,
+       "new": 1.0,
+       "prev": 1.0
+      },
+      {
+       "centre_distance": 0.35,
+       "new": 1.0,
+       "prev": 1.0
+      },
+      {
+       "centre_distance": 0.4,
+       "new": 1.0,
+       "prev": 1.0
+      },
+      {
+       "centre_distance": 0.45,
+       "new": 1.0,
+       "prev": 1.0
+      },
+      {
+       "centre_distance": 0.5,
+       "new": 1.0,
+       "prev": 1.0
+      },
+      {
+       "centre_distance": 0.55,
+       "new": 1.0,
+       "prev": 1.0
+      },
+      {
+       "centre_distance": 0.6,
+       "new": 0.9995,
+       "prev": 1.0
+      },
+      {
+       "centre_distance": 0.65,
+       "new": 0.982,
+       "prev": 1.0
+      },
+      {
+       "centre_distance": 0.7,
+       "new": 0.955,
+       "prev": 1.0
+      },
+      {
+       "centre_distance": 0.75,
+       "new": 0.62225,
+       "prev": 1.0
+      },
+      {
+       "centre_distance": 0.8,
+       "new": 0.35925,
+       "prev": 1.0
+      },
+      {
+       "centre_distance": 0.85,
+       "new": 0.0195,
+       "prev": 1.0
+      },
+      {
+       "centre_distance": 0.9,
+       "new": 0.0015,
+       "prev": 1.0
+      },
+      {
+       "centre_distance": 0.95,
+       "new": 0.0,
+       "prev": 1.0
+      },
+      {
+       "centre_distance": 1.0,
+       "new": 0.0,
+       "prev": 1.0
+      },
+      {
+       "centre_distance": 1.05,
+       "new": 0.0,
+       "prev": 1.0
+      },
+      {
+       "centre_distance": 1.1,
+       "new": 0.0,
+       "prev": 1.0
+      },
+      {
+       "centre_distance": 1.15,
+       "new": 0.0,
+       "prev": 1.0
+      },
+      {
+       "centre_distance": 1.2,
+       "new": 0.0,
+       "prev": 1.0
+      },
+      {
+       "centre_distance": 1.25,
+       "new": 0.0,
+       "prev": 1.0
+      },
+      {
+       "centre_distance": 1.3,
+       "new": 0.0,
+       "prev": 1.0
+      },
+      {
+       "centre_distance": 1.35,
+       "new": 0.0,
+       "prev": 1.0
+      },
+      {
+       "centre_distance": 1.4,
+       "new": 0.0,
+       "prev": 1.0
+      }
+     ],
+     "max_usable_distance": 0.7,
+     "min_revoking_distance": null,
+     "hostable_revocable_epochs": 0,
+     "gap": null
+    },
+    "store_frozen": {
+     "grid": [
+      {
+       "centre_distance": 0.05,
+       "new": 1.0,
+       "prev": 1.0
+      },
+      {
+       "centre_distance": 0.1,
+       "new": 0.99975,
+       "prev": 1.0
+      },
+      {
+       "centre_distance": 0.15,
+       "new": 0.9945,
+       "prev": 1.0
+      },
+      {
+       "centre_distance": 0.2,
+       "new": 0.95875,
+       "prev": 1.0
+      },
+      {
+       "centre_distance": 0.25,
+       "new": 0.8205,
+       "prev": 1.0
+      },
+      {
+       "centre_distance": 0.3,
+       "new": 0.50125,
+       "prev": 1.0
+      },
+      {
+       "centre_distance": 0.35,
+       "new": 0.1655,
+       "prev": 1.0
+      },
+      {
+       "centre_distance": 0.4,
+       "new": 0.0255,
+       "prev": 1.0
+      },
+      {
+       "centre_distance": 0.45,
+       "new": 0.00175,
+       "prev": 1.0
+      },
+      {
+       "centre_distance": 0.5,
+       "new": 0.00025,
+       "prev": 1.0
+      },
+      {
+       "centre_distance": 0.55,
+       "new": 0.0,
+       "prev": 1.0
+      },
+      {
+       "centre_distance": 0.6,
+       "new": 0.0,
+       "prev": 1.0
+      },
+      {
+       "centre_distance": 0.65,
+       "new": 0.0,
+       "prev": 1.0
+      },
+      {
+       "centre_distance": 0.7,
+       "new": 0.0,
+       "prev": 1.0
+      },
+      {
+       "centre_distance": 0.75,
+       "new": 0.0,
+       "prev": 1.0
+      },
+      {
+       "centre_distance": 0.8,
+       "new": 0.0,
+       "prev": 1.0
+      },
+      {
+       "centre_distance": 0.85,
+       "new": 0.0,
+       "prev": 1.0
+      },
+      {
+       "centre_distance": 0.9,
+       "new": 0.0,
+       "prev": 1.0
+      },
+      {
+       "centre_distance": 0.95,
+       "new": 0.0,
+       "prev": 1.0
+      },
+      {
+       "centre_distance": 1.0,
+       "new": 0.0,
+       "prev": 1.0
+      },
+      {
+       "centre_distance": 1.05,
+       "new": 0.0,
+       "prev": 1.0
+      },
+      {
+       "centre_distance": 1.1,
+       "new": 0.0,
+       "prev": 1.0
+      },
+      {
+       "centre_distance": 1.15,
+       "new": 0.0,
+       "prev": 1.0
+      },
+      {
+       "centre_distance": 1.2,
+       "new": 0.0,
+       "prev": 1.0
+      },
+      {
+       "centre_distance": 1.25,
+       "new": 0.0,
+       "prev": 1.0
+      },
+      {
+       "centre_distance": 1.3,
+       "new": 0.0,
+       "prev": 1.0
+      },
+      {
+       "centre_distance": 1.35,
+       "new": 0.0,
+       "prev": 1.0
+      },
+      {
+       "centre_distance": 1.4,
+       "new": 0.0,
+       "prev": 1.0
+      }
+     ],
+     "max_usable_distance": 0.2,
+     "min_revoking_distance": null,
+     "hostable_revocable_epochs": 0,
+     "gap": null
+    },
+    "sphere_frozen": {
+     "grid": [
+      {
+       "centre_distance": 0.05,
+       "new": 1.0,
+       "prev": 1.0
+      },
+      {
+       "centre_distance": 0.1,
+       "new": 1.0,
+       "prev": 1.0
+      },
+      {
+       "centre_distance": 0.15,
+       "new": 1.0,
+       "prev": 1.0
+      },
+      {
+       "centre_distance": 0.2,
+       "new": 1.0,
+       "prev": 1.0
+      },
+      {
+       "centre_distance": 0.25,
+       "new": 1.0,
+       "prev": 1.0
+      },
+      {
+       "centre_distance": 0.3,
+       "new": 1.0,
+       "prev": 1.0
+      },
+      {
+       "centre_distance": 0.35,
+       "new": 1.0,
+       "prev": 1.0
+      },
+      {
+       "centre_distance": 0.4,
+       "new": 1.0,
+       "prev": 1.0
+      },
+      {
+       "centre_distance": 0.45,
+       "new": 1.0,
+       "prev": 1.0
+      },
+      {
+       "centre_distance": 0.5,
+       "new": 1.0,
+       "prev": 1.0
+      },
+      {
+       "centre_distance": 0.55,
+       "new": 1.0,
+       "prev": 1.0
+      },
+      {
+       "centre_distance": 0.6,
+       "new": 1.0,
+       "prev": 1.0
+      },
+      {
+       "centre_distance": 0.65,
+       "new": 1.0,
+       "prev": 1.0
+      },
+      {
+       "centre_distance": 0.7,
+       "new": 1.0,
+       "prev": 1.0
+      },
+      {
+       "centre_distance": 0.75,
+       "new": 0.99775,
+       "prev": 1.0
+      },
+      {
+       "centre_distance": 0.8,
+       "new": 0.9705,
+       "prev": 1.0
+      },
+      {
+       "centre_distance": 0.85,
+       "new": 0.81,
+       "prev": 1.0
+      },
+      {
+       "centre_distance": 0.9,
+       "new": 0.383,
+       "prev": 1.0
+      },
+      {
+       "centre_distance": 0.95,
+       "new": 0.0855,
+       "prev": 1.0
+      },
+      {
+       "centre_distance": 1.0,
+       "new": 0.00575,
+       "prev": 1.0
+      },
+      {
+       "centre_distance": 1.05,
+       "new": 0.0,
+       "prev": 1.0
+      },
+      {
+       "centre_distance": 1.1,
+       "new": 0.0,
+       "prev": 1.0
+      },
+      {
+       "centre_distance": 1.15,
+       "new": 0.0,
+       "prev": 1.0
+      },
+      {
+       "centre_distance": 1.2,
+       "new": 0.0,
+       "prev": 1.0
+      },
+      {
+       "centre_distance": 1.25,
+       "new": 0.0,
+       "prev": 1.0
+      },
+      {
+       "centre_distance": 1.3,
+       "new": 0.0,
+       "prev": 1.0
+      },
+      {
+       "centre_distance": 1.35,
+       "new": 0.0,
+       "prev": 1.0
+      },
+      {
+       "centre_distance": 1.4,
+       "new": 0.0,
+       "prev": 1.0
+      }
+     ],
+     "max_usable_distance": 0.8,
+     "min_revoking_distance": null,
+     "hostable_revocable_epochs": 0,
+     "gap": null
+    },
+    "store_live": {
+     "grid": [
+      {
+       "centre_distance": 0.05,
+       "new": 1.0,
+       "prev": 1.0
+      },
+      {
+       "centre_distance": 0.1,
+       "new": 1.0,
+       "prev": 0.999
+      },
+      {
+       "centre_distance": 0.15,
+       "new": 1.0,
+       "prev": 0.99475
+      },
+      {
+       "centre_distance": 0.2,
+       "new": 1.0,
+       "prev": 0.961
+      },
+      {
+       "centre_distance": 0.25,
+       "new": 1.0,
+       "prev": 0.8185
+      },
+      {
+       "centre_distance": 0.3,
+       "new": 1.0,
+       "prev": 0.49325
+      },
+      {
+       "centre_distance": 0.35,
+       "new": 1.0,
+       "prev": 0.17025
+      },
+      {
+       "centre_distance": 0.4,
+       "new": 1.0,
+       "prev": 0.02725
+      },
+      {
+       "centre_distance": 0.45,
+       "new": 1.0,
+       "prev": 0.0025
+      },
+      {
+       "centre_distance": 0.5,
+       "new": 1.0,
+       "prev": 0.0
+      },
+      {
+       "centre_distance": 0.55,
+       "new": 1.0,
+       "prev": 0.0
+      },
+      {
+       "centre_distance": 0.6,
+       "new": 1.0,
+       "prev": 0.0
+      },
+      {
+       "centre_distance": 0.65,
+       "new": 1.0,
+       "prev": 0.0
+      },
+      {
+       "centre_distance": 0.7,
+       "new": 1.0,
+       "prev": 0.0
+      },
+      {
+       "centre_distance": 0.75,
+       "new": 1.0,
+       "prev": 0.0
+      },
+      {
+       "centre_distance": 0.8,
+       "new": 1.0,
+       "prev": 0.0
+      },
+      {
+       "centre_distance": 0.85,
+       "new": 1.0,
+       "prev": 0.0
+      },
+      {
+       "centre_distance": 0.9,
+       "new": 1.0,
+       "prev": 0.0
+      },
+      {
+       "centre_distance": 0.95,
+       "new": 1.0,
+       "prev": 0.0
+      },
+      {
+       "centre_distance": 1.0,
+       "new": 1.0,
+       "prev": 0.0
+      },
+      {
+       "centre_distance": 1.05,
+       "new": 1.0,
+       "prev": 0.0
+      },
+      {
+       "centre_distance": 1.1,
+       "new": 1.0,
+       "prev": 0.0
+      },
+      {
+       "centre_distance": 1.15,
+       "new": 1.0,
+       "prev": 0.0
+      },
+      {
+       "centre_distance": 1.2,
+       "new": 1.0,
+       "prev": 0.0
+      },
+      {
+       "centre_distance": 1.25,
+       "new": 1.0,
+       "prev": 0.0
+      },
+      {
+       "centre_distance": 1.3,
+       "new": 1.0,
+       "prev": 0.0
+      },
+      {
+       "centre_distance": 1.35,
+       "new": 1.0,
+       "prev": 0.0
+      },
+      {
+       "centre_distance": 1.4,
+       "new": 1.0,
+       "prev": 0.0
+      }
+     ],
+     "max_usable_distance": 1.4,
+     "min_revoking_distance": 0.4,
+     "hostable_revocable_epochs": 21,
+     "gap": -0.9999999999999999
+    },
+    "note": "The three frozen checkers are expected to agree; that agreement is the result. Only the live-reference checker hosts a revocable epoch, so the variable is liveness, not learning."
+   },
+   "live": {
+    "sweep": [
+     {
+      "width": 64,
+      "depth": 1,
+      "steps": 4000,
+      "current_accept": 1.0,
+      "stale_accept": 0.00055
+     },
+     {
+      "width": 256,
+      "depth": 2,
+      "steps": 4000,
+      "current_accept": 1.0,
+      "stale_accept": 0.00014
+     },
+     {
+      "width": 256,
+      "depth": 2,
+      "steps": 20000,
+      "current_accept": 1.0,
+      "stale_accept": 7e-05
+     }
+    ],
+    "n": 200000
+   },
+   "oracle": {
+    "signed_accept": 0.9999,
+    "false_accept_declared_region": 0.0
+   },
+   "capacity": [
+    {
+     "width": 256,
+     "depth": 2,
+     "steps": 4000,
+     "signed_accept": 1.0,
+     "false_accept_declared_region": 0.00128
+    },
+    {
+     "width": 256,
+     "depth": 2,
+     "steps": 20000,
+     "signed_accept": 1.0,
+     "false_accept_declared_region": 0.03148
+    },
+    {
+     "width": 1024,
+     "depth": 2,
+     "steps": 4000,
+     "signed_accept": 1.0,
+     "false_accept_declared_region": 0.01276
+    }
+   ],
+   "metrics": {
+    "anchor_margin_accept_at_0p70": 1.0,
+    "anchor_margin_accept_at_0p90": 0.0,
+    "anchor_margin_annulus_accept": 1.0,
+    "anchor_margin_false_accept": 0.000745,
+    "boundary_annulus_accept": 0.102025,
+    "boundary_false_accept": 0.04013,
+    "capacity_best_false_accept": 0.00128,
+    "live_current_accept": 1.0,
+    "live_stale_accept_best": 7e-05,
+    "oracle_false_accept": 0.0,
+    "epoch_hostable_frozen_gate": 0,
+    "epoch_hostable_store_frozen": 0,
+    "epoch_hostable_sphere_frozen": 0,
+    "epoch_hostable_store_live": 21,
+    "epoch_gap_frozen_gate": null,
+    "epoch_gap_store_frozen": null
+   }
+  },
+  {
+   "seed": 2,
+   "declared_radius": 0.35,
+   "margin": {
+    "band_accept": [
+     1.0,
+     1.0,
+     1.0,
+     1.0,
+     1.0,
+     1.0,
+     1.0,
+     1.0,
+     1.0,
+     1.0,
+     1.0,
+     1.0,
+     1.0,
+     1.0,
+     0.9405,
+     0.009,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0
+    ],
+    "operational_radius": 0.85,
+    "annulus_accept": 1.0,
+    "signed_accept": 1.0,
+    "false_accept_rejection_sampled": 0.000595,
+    "false_accept_declared_region": 0.395685
+   },
+   "boundary": {
+    "band_accept": [
+     1.0,
+     1.0,
+     1.0,
+     1.0,
+     1.0,
+     1.0,
+     1.0,
+     0.8215,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0
+    ],
+    "operational_radius": 0.45,
+    "annulus_accept": 0.141625,
+    "signed_accept": 1.0,
+    "false_accept_declared_region": 0.05423
+   },
+   "epoch": {
+    "frozen_gate": {
+     "grid": [
+      {
+       "centre_distance": 0.05,
+       "new": 1.0,
+       "prev": 1.0
+      },
+      {
+       "centre_distance": 0.1,
+       "new": 1.0,
+       "prev": 1.0
+      },
+      {
+       "centre_distance": 0.15,
+       "new": 1.0,
+       "prev": 1.0
+      },
+      {
+       "centre_distance": 0.2,
+       "new": 1.0,
+       "prev": 1.0
+      },
+      {
+       "centre_distance": 0.25,
+       "new": 1.0,
+       "prev": 1.0
+      },
+      {
+       "centre_distance": 0.3,
+       "new": 1.0,
+       "prev": 1.0
+      },
+      {
+       "centre_distance": 0.35,
+       "new": 1.0,
+       "prev": 1.0
+      },
+      {
+       "centre_distance": 0.4,
+       "new": 1.0,
+       "prev": 1.0
+      },
+      {
+       "centre_distance": 0.45,
+       "new": 1.0,
+       "prev": 1.0
+      },
+      {
+       "centre_distance": 0.5,
+       "new": 1.0,
+       "prev": 1.0
+      },
+      {
+       "centre_distance": 0.55,
+       "new": 1.0,
+       "prev": 1.0
+      },
+      {
+       "centre_distance": 0.6,
+       "new": 0.99975,
+       "prev": 1.0
+      },
+      {
+       "centre_distance": 0.65,
+       "new": 0.981,
+       "prev": 1.0
+      },
+      {
+       "centre_distance": 0.7,
+       "new": 0.924,
+       "prev": 1.0
+      },
+      {
+       "centre_distance": 0.75,
+       "new": 0.66625,
+       "prev": 1.0
+      },
+      {
+       "centre_distance": 0.8,
+       "new": 0.1935,
+       "prev": 1.0
+      },
+      {
+       "centre_distance": 0.85,
+       "new": 0.04875,
+       "prev": 1.0
+      },
+      {
+       "centre_distance": 0.9,
+       "new": 0.00075,
+       "prev": 1.0
+      },
+      {
+       "centre_distance": 0.95,
+       "new": 0.0,
+       "prev": 1.0
+      },
+      {
+       "centre_distance": 1.0,
+       "new": 0.0,
+       "prev": 1.0
+      },
+      {
+       "centre_distance": 1.05,
+       "new": 0.0,
+       "prev": 1.0
+      },
+      {
+       "centre_distance": 1.1,
+       "new": 0.0,
+       "prev": 1.0
+      },
+      {
+       "centre_distance": 1.15,
+       "new": 0.0,
+       "prev": 1.0
+      },
+      {
+       "centre_distance": 1.2,
+       "new": 0.0,
+       "prev": 1.0
+      },
+      {
+       "centre_distance": 1.25,
+       "new": 0.0,
+       "prev": 1.0
+      },
+      {
+       "centre_distance": 1.3,
+       "new": 0.0,
+       "prev": 1.0
+      },
+      {
+       "centre_distance": 1.35,
+       "new": 0.0,
+       "prev": 1.0
+      },
+      {
+       "centre_distance": 1.4,
+       "new": 0.0,
+       "prev": 1.0
+      }
+     ],
+     "max_usable_distance": 0.65,
+     "min_revoking_distance": null,
+     "hostable_revocable_epochs": 0,
+     "gap": null
+    },
+    "store_frozen": {
+     "grid": [
+      {
+       "centre_distance": 0.05,
+       "new": 1.0,
+       "prev": 1.0
+      },
+      {
+       "centre_distance": 0.1,
+       "new": 0.99975,
+       "prev": 1.0
+      },
+      {
+       "centre_distance": 0.15,
+       "new": 0.9935,
+       "prev": 1.0
+      },
+      {
+       "centre_distance": 0.2,
+       "new": 0.96375,
+       "prev": 1.0
+      },
+      {
+       "centre_distance": 0.25,
+       "new": 0.8265,
+       "prev": 1.0
+      },
+      {
+       "centre_distance": 0.3,
+       "new": 0.49875,
+       "prev": 1.0
+      },
+      {
+       "centre_distance": 0.35,
+       "new": 0.178,
+       "prev": 1.0
+      },
+      {
+       "centre_distance": 0.4,
+       "new": 0.02575,
+       "prev": 1.0
+      },
+      {
+       "centre_distance": 0.45,
+       "new": 0.0025,
+       "prev": 1.0
+      },
+      {
+       "centre_distance": 0.5,
+       "new": 0.0,
+       "prev": 1.0
+      },
+      {
+       "centre_distance": 0.55,
+       "new": 0.0,
+       "prev": 1.0
+      },
+      {
+       "centre_distance": 0.6,
+       "new": 0.0,
+       "prev": 1.0
+      },
+      {
+       "centre_distance": 0.65,
+       "new": 0.0,
+       "prev": 1.0
+      },
+      {
+       "centre_distance": 0.7,
+       "new": 0.0,
+       "prev": 1.0
+      },
+      {
+       "centre_distance": 0.75,
+       "new": 0.0,
+       "prev": 1.0
+      },
+      {
+       "centre_distance": 0.8,
+       "new": 0.0,
+       "prev": 1.0
+      },
+      {
+       "centre_distance": 0.85,
+       "new": 0.0,
+       "prev": 1.0
+      },
+      {
+       "centre_distance": 0.9,
+       "new": 0.0,
+       "prev": 1.0
+      },
+      {
+       "centre_distance": 0.95,
+       "new": 0.0,
+       "prev": 1.0
+      },
+      {
+       "centre_distance": 1.0,
+       "new": 0.0,
+       "prev": 1.0
+      },
+      {
+       "centre_distance": 1.05,
+       "new": 0.0,
+       "prev": 1.0
+      },
+      {
+       "centre_distance": 1.1,
+       "new": 0.0,
+       "prev": 1.0
+      },
+      {
+       "centre_distance": 1.15,
+       "new": 0.0,
+       "prev": 1.0
+      },
+      {
+       "centre_distance": 1.2,
+       "new": 0.0,
+       "prev": 1.0
+      },
+      {
+       "centre_distance": 1.25,
+       "new": 0.0,
+       "prev": 1.0
+      },
+      {
+       "centre_distance": 1.3,
+       "new": 0.0,
+       "prev": 1.0
+      },
+      {
+       "centre_distance": 1.35,
+       "new": 0.0,
+       "prev": 1.0
+      },
+      {
+       "centre_distance": 1.4,
+       "new": 0.0,
+       "prev": 1.0
+      }
+     ],
+     "max_usable_distance": 0.2,
+     "min_revoking_distance": null,
+     "hostable_revocable_epochs": 0,
+     "gap": null
+    },
+    "sphere_frozen": {
+     "grid": [
+      {
+       "centre_distance": 0.05,
+       "new": 1.0,
+       "prev": 1.0
+      },
+      {
+       "centre_distance": 0.1,
+       "new": 1.0,
+       "prev": 1.0
+      },
+      {
+       "centre_distance": 0.15,
+       "new": 1.0,
+       "prev": 1.0
+      },
+      {
+       "centre_distance": 0.2,
+       "new": 1.0,
+       "prev": 1.0
+      },
+      {
+       "centre_distance": 0.25,
+       "new": 1.0,
+       "prev": 1.0
+      },
+      {
+       "centre_distance": 0.3,
+       "new": 1.0,
+       "prev": 1.0
+      },
+      {
+       "centre_distance": 0.35,
+       "new": 1.0,
+       "prev": 1.0
+      },
+      {
+       "centre_distance": 0.4,
+       "new": 1.0,
+       "prev": 1.0
+      },
+      {
+       "centre_distance": 0.45,
+       "new": 1.0,
+       "prev": 1.0
+      },
+      {
+       "centre_distance": 0.5,
+       "new": 1.0,
+       "prev": 1.0
+      },
+      {
+       "centre_distance": 0.55,
+       "new": 1.0,
+       "prev": 1.0
+      },
+      {
+       "centre_distance": 0.6,
+       "new": 1.0,
+       "prev": 1.0
+      },
+      {
+       "centre_distance": 0.65,
+       "new": 1.0,
+       "prev": 1.0
+      },
+      {
+       "centre_distance": 0.7,
+       "new": 1.0,
+       "prev": 1.0
+      },
+      {
+       "centre_distance": 0.75,
+       "new": 0.99875,
+       "prev": 1.0
+      },
+      {
+       "centre_distance": 0.8,
+       "new": 0.97575,
+       "prev": 1.0
+      },
+      {
+       "centre_distance": 0.85,
+       "new": 0.803,
+       "prev": 1.0
+      },
+      {
+       "centre_distance": 0.9,
+       "new": 0.398,
+       "prev": 1.0
+      },
+      {
+       "centre_distance": 0.95,
+       "new": 0.08775,
+       "prev": 1.0
+      },
+      {
+       "centre_distance": 1.0,
+       "new": 0.00675,
+       "prev": 1.0
+      },
+      {
+       "centre_distance": 1.05,
+       "new": 0.00075,
+       "prev": 1.0
+      },
+      {
+       "centre_distance": 1.1,
+       "new": 0.0,
+       "prev": 1.0
+      },
+      {
+       "centre_distance": 1.15,
+       "new": 0.0,
+       "prev": 1.0
+      },
+      {
+       "centre_distance": 1.2,
+       "new": 0.0,
+       "prev": 1.0
+      },
+      {
+       "centre_distance": 1.25,
+       "new": 0.0,
+       "prev": 1.0
+      },
+      {
+       "centre_distance": 1.3,
+       "new": 0.0,
+       "prev": 1.0
+      },
+      {
+       "centre_distance": 1.35,
+       "new": 0.0,
+       "prev": 1.0
+      },
+      {
+       "centre_distance": 1.4,
+       "new": 0.0,
+       "prev": 1.0
+      }
+     ],
+     "max_usable_distance": 0.8,
+     "min_revoking_distance": null,
+     "hostable_revocable_epochs": 0,
+     "gap": null
+    },
+    "store_live": {
+     "grid": [
+      {
+       "centre_distance": 0.05,
+       "new": 1.0,
+       "prev": 1.0
+      },
+      {
+       "centre_distance": 0.1,
+       "new": 1.0,
+       "prev": 0.99975
+      },
+      {
+       "centre_distance": 0.15,
+       "new": 1.0,
+       "prev": 0.99625
+      },
+      {
+       "centre_distance": 0.2,
+       "new": 1.0,
+       "prev": 0.962
+      },
+      {
+       "centre_distance": 0.25,
+       "new": 1.0,
+       "prev": 0.82825
+      },
+      {
+       "centre_distance": 0.3,
+       "new": 1.0,
+       "prev": 0.49825
+      },
+      {
+       "centre_distance": 0.35,
+       "new": 1.0,
+       "prev": 0.175
+      },
+      {
+       "centre_distance": 0.4,
+       "new": 1.0,
+       "prev": 0.0285
+      },
+      {
+       "centre_distance": 0.45,
+       "new": 1.0,
+       "prev": 0.00225
+      },
+      {
+       "centre_distance": 0.5,
+       "new": 1.0,
+       "prev": 0.0
+      },
+      {
+       "centre_distance": 0.55,
+       "new": 1.0,
+       "prev": 0.0
+      },
+      {
+       "centre_distance": 0.6,
+       "new": 1.0,
+       "prev": 0.0
+      },
+      {
+       "centre_distance": 0.65,
+       "new": 1.0,
+       "prev": 0.0
+      },
+      {
+       "centre_distance": 0.7,
+       "new": 1.0,
+       "prev": 0.0
+      },
+      {
+       "centre_distance": 0.75,
+       "new": 1.0,
+       "prev": 0.0
+      },
+      {
+       "centre_distance": 0.8,
+       "new": 1.0,
+       "prev": 0.0
+      },
+      {
+       "centre_distance": 0.85,
+       "new": 1.0,
+       "prev": 0.0
+      },
+      {
+       "centre_distance": 0.9,
+       "new": 1.0,
+       "prev": 0.0
+      },
+      {
+       "centre_distance": 0.95,
+       "new": 0.99975,
+       "prev": 0.0
+      },
+      {
+       "centre_distance": 1.0,
+       "new": 1.0,
+       "prev": 0.0
+      },
+      {
+       "centre_distance": 1.05,
+       "new": 1.0,
+       "prev": 0.0
+      },
+      {
+       "centre_distance": 1.1,
+       "new": 0.99975,
+       "prev": 0.0
+      },
+      {
+       "centre_distance": 1.15,
+       "new": 1.0,
+       "prev": 0.0
+      },
+      {
+       "centre_distance": 1.2,
+       "new": 1.0,
+       "prev": 0.0
+      },
+      {
+       "centre_distance": 1.25,
+       "new": 1.0,
+       "prev": 0.0
+      },
+      {
+       "centre_distance": 1.3,
+       "new": 1.0,
+       "prev": 0.0
+      },
+      {
+       "centre_distance": 1.35,
+       "new": 1.0,
+       "prev": 0.0
+      },
+      {
+       "centre_distance": 1.4,
+       "new": 0.99975,
+       "prev": 0.0
+      }
+     ],
+     "max_usable_distance": 1.4,
+     "min_revoking_distance": 0.4,
+     "hostable_revocable_epochs": 21,
+     "gap": -0.9999999999999999
+    },
+    "note": "The three frozen checkers are expected to agree; that agreement is the result. Only the live-reference checker hosts a revocable epoch, so the variable is liveness, not learning."
+   },
+   "live": {
+    "sweep": [
+     {
+      "width": 64,
+      "depth": 1,
+      "steps": 4000,
+      "current_accept": 1.0,
+      "stale_accept": 0.000455
+     },
+     {
+      "width": 256,
+      "depth": 2,
+      "steps": 4000,
+      "current_accept": 1.0,
+      "stale_accept": 0.000585
+     },
+     {
+      "width": 256,
+      "depth": 2,
+      "steps": 20000,
+      "current_accept": 1.0,
+      "stale_accept": 0.00015
+     }
+    ],
+    "n": 200000
+   },
+   "oracle": {
+    "signed_accept": 0.9999,
+    "false_accept_declared_region": 0.0
+   },
+   "capacity": [
+    {
+     "width": 256,
+     "depth": 2,
+     "steps": 4000,
+     "signed_accept": 0.9998,
+     "false_accept_declared_region": 5e-06
+    },
+    {
+     "width": 256,
+     "depth": 2,
+     "steps": 20000,
+     "signed_accept": 0.9998333333333334,
+     "false_accept_declared_region": 1e-05
+    },
+    {
+     "width": 1024,
+     "depth": 2,
+     "steps": 4000,
+     "signed_accept": 0.9940666666666667,
+     "false_accept_declared_region": 0.0
+    }
+   ],
+   "metrics": {
+    "anchor_margin_accept_at_0p70": 1.0,
+    "anchor_margin_accept_at_0p90": 0.0,
+    "anchor_margin_annulus_accept": 1.0,
+    "anchor_margin_false_accept": 0.000595,
+    "boundary_annulus_accept": 0.141625,
+    "boundary_false_accept": 0.05423,
+    "capacity_best_false_accept": 0.0,
+    "live_current_accept": 1.0,
+    "live_stale_accept_best": 0.00015,
+    "oracle_false_accept": 0.0,
+    "epoch_hostable_frozen_gate": 0,
+    "epoch_hostable_store_frozen": 0,
+    "epoch_hostable_sphere_frozen": 0,
+    "epoch_hostable_store_live": 21,
+    "epoch_gap_frozen_gate": null,
+    "epoch_gap_store_frozen": null
+   }
+  }
+ ],
+ "checks": {
+  "anchor_margin_accept_at_0p70": true,
+  "anchor_margin_accept_at_0p90": true,
+  "anchor_margin_annulus_accept": true,
+  "anchor_margin_false_accept": true,
+  "boundary_annulus_accept": false,
+  "boundary_false_accept": false,
+  "capacity_best_false_accept": false,
+  "live_current_accept": true,
+  "live_stale_accept_best": false,
+  "oracle_false_accept": true
+ },
+ "observed_worst_seed": {
+  "anchor_margin_accept_at_0p70": 1.0,
+  "anchor_margin_accept_at_0p90": 0.0,
+  "anchor_margin_annulus_accept": 1.0,
+  "anchor_margin_false_accept": 0.000745,
+  "boundary_annulus_accept": 0.141625,
+  "boundary_false_accept": 0.05423,
+  "capacity_best_false_accept": 0.00128,
+  "live_current_accept": 0.9998,
+  "live_stale_accept_best": 0.00015,
+  "oracle_false_accept": 0.0,
+  "epoch_hostable_frozen_gate": 0,
+  "epoch_hostable_store_frozen": 0,
+  "epoch_hostable_sphere_frozen": 0,
+  "epoch_hostable_store_live": 21,
+  "epoch_gap_frozen_gate": null,
+  "epoch_gap_store_frozen": null
+ },
+ "bars": {
+  "anchor_margin_accept_at_0p70": {
+   "op": ">=",
+   "threshold": 0.99
+  },
+  "anchor_margin_accept_at_0p90": {
+   "op": "<=",
+   "threshold": 0.0
+  },
+  "anchor_margin_annulus_accept": {
+   "op": ">=",
+   "threshold": 0.99
+  },
+  "anchor_margin_false_accept": {
+   "op": "<=",
+   "threshold": 0.002
+  },
+  "boundary_annulus_accept": {
+   "op": "<=",
+   "threshold": 0.05
+  },
+  "boundary_false_accept": {
+   "op": "<=",
+   "threshold": 0.001
+  },
+  "capacity_best_false_accept": {
+   "op": "<=",
+   "threshold": 0.001
+  },
+  "live_current_accept": {
+   "op": ">=",
+   "threshold": 0.95
+  },
+  "live_stale_accept_best": {
+   "op": "<=",
+   "threshold": 1e-05
+  },
+  "oracle_false_accept": {
+   "op": "<=",
+   "threshold": 0.001
+  }
+ },
+ "anchor_reproduces_recorded_gate": true,
+ "s31_12_fix_works": false,
+ "learnedness_is_the_variable": false,
+ "liveness_is_the_variable": true,
+ "interpretation_limit": "The gate is trained standalone, which is what so.model reads it as (a function of the marker alone) and how E-000021 scored 11 recorded checkpoints. The anchor bars check that this reproduces the recorded full-model gate before any other arm is read. Nothing here measures the trained adapter's reading behaviour, and nothing here is a security claim: an adversary who can choose the marker is not modelled.",
+ "not_claimed": [
+  "learned gating",
+  "verification losses",
+  "marker/capability schemes",
+  "MVCC",
+  "versioned pointers",
+  "cache invalidation",
+  "leases",
+  "epochs",
+  "nonces",
+  "freshness-requires-liveness",
+  "revocable proof systems (Christ & Bonneau, FC 2023)",
+  "approximation error of learned classifiers"
+ ]
+}

@@ -1,4 +1,23 @@
-# The claim: GRACE's deferral radius is a deletion oracle
+# Not a novelty claim: GRACE's deferral radius is a deletion oracle
+
+> **STATUS, after adversarial review: the finding stands; the NOVELTY does not.** A hostile prior-art
+> examiner confirmed both load-bearing code facts against the live EasyEdit source and found that *no
+> retrieved paper anticipates the exact measurement* — and killed it anyway, on two grounds I accept:
+>
+> 1. **This repository commissioned it.** `docs/so-novelty-2026-09-04.md` §5 already specified this
+>    experiment — the same target ("GRACE's codebook"), the same attack form, the same comparator
+>    ("against that system's own reported deletion metric"), the same two outcomes, and the same word
+>    *port*. I quoted that paragraph in the experiment's own docstring as motivation. Running a to-do
+>    your own novelty document wrote is execution, not discovery. This is the E-000056 C2 death again.
+> 2. **It is not about the pod.** The result is a property of a lazily-deleted, radius-maintained index.
+>    Substituting "such an index" for "pod" changes nothing in the experiment. The pod discipline
+>    supplied the *hypothesis class* — where to look — not the finding. That is how the idea arrived,
+>    not what the finding is a property of.
+>
+> What it is worth, stated plainly: a verified, controlled security finding in a widely used
+> open-source research tool, which should be reported to the EasyEdit and GRACE maintainers. It is a
+> short security note about GRACE. It is not a technical novelty for the Symlink–J-Space–Pod vision,
+> and it is recorded here as neither.
 
 *2026-09-05. One claim, its evidence, the code it is read off, and the prior art it has to survive.
 Every line of GRACE quoted here was fetched at source in this session; every number is from
