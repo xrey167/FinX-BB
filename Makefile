@@ -14,7 +14,7 @@ SEEDS ?= 0 1 2
 RUN = OMP_NUM_THREADS=$(THREADS) SO_THREADS=$(THREADS) $(PY) -m
 
 .PHONY: help test smoke synthetic gpt2 demo compare rescore certify closure retrieval pointers \
-        disclosure traceless keychannel calibrate pdxaudit charged unread untied report clean-results env
+        disclosure traceless keychannel calibrate pdxaudit charged unread auditinstr untied report clean-results env
 
 help:
 	@echo "make test        unit tests, ~3 min (the deletion certificate sweeps its whole payload domain)"
@@ -35,6 +35,7 @@ help:
 	@echo "make pdxaudit    the keychannel attack as a store-independent instrument. Seconds, stdlib only"
 	@echo "make charged     re-screen E-000104 and E-000105 with the representation charged. ~10 s, stdlib only"
 	@echo "make unread      E-000103 on the coordinates nobody counts: depth and resident state. Seconds"
+	@echo "make auditinstr  scan every recorded experiment for the two known instrument defects. Seconds"
 	@echo "make untied      the layer on a model that does not tie its embeddings (downloads Pythia-160m)"
 	@echo "make report      rebuild docs/so-results-2026-09-02.md from so/results/"
 	@echo "make env         print what will be used"
@@ -139,6 +140,11 @@ charged:
 # no model, no numpy, no torch: the two coordinates no experiment here counts, on E-000103. Seconds.
 unread:
 	$(PY) -m so.experiments.nov003_unread_coordinates_e103
+
+# no model, no numpy, no torch: scan all 100 recorded experiments for a comparison whose two sides
+# share a source, and for baseline work rebuilt inside a loop. Seconds.
+auditinstr:
+	$(PY) -m so.experiments.nov004_instrument_audit
 
 # the layer on a model that does NOT tie its embeddings; downloads Pythia-160m once, ~40 min per seed per arm
 untied:

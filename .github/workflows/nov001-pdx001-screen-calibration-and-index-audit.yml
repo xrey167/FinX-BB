@@ -14,6 +14,9 @@ on:
       - "so/screen.py"
       - "docs/novelty/nov003-unread-coordinates-e103-result.md"
       - "so/experiments/nov003_unread_coordinates_e103.py"
+      - "docs/novelty/nov004-instrument-audit-result.md"
+      - "so/experiments/nov004_instrument_audit.py"
+      - "so/tests/test_nov004_instrument_audit.py"
       - "so/tests/test_nov003_unread_coordinates_e103.py"
       - "so/tests/test_screen.py"
       - "so/experiments/nov001_screen_calibration.py"
@@ -43,6 +46,7 @@ jobs:
           python -m py_compile so/experiments/nov002_charged_rerun_e104_e105.py
           python -m py_compile so/screen.py
           python -m py_compile so/experiments/nov003_unread_coordinates_e103.py
+          python -m py_compile so/experiments/nov004_instrument_audit.py
       - name: Focused regressions
         run: |
           python -m pytest -q \
@@ -50,7 +54,8 @@ jobs:
             so/tests/test_pdx001_payload_derived_index_audit.py \
             so/tests/test_nov002_charged_rerun_e104_e105.py \
             so/tests/test_screen.py \
-            so/tests/test_nov003_unread_coordinates_e103.py
+            so/tests/test_nov003_unread_coordinates_e103.py \
+            so/tests/test_nov004_instrument_audit.py
       - name: NOV001 registered screen calibration
         run: |
           mkdir -p ci-nov001
@@ -71,6 +76,11 @@ jobs:
           mkdir -p ci-nov003
           python -m so.experiments.nov003_unread_coordinates_e103 \
             --results-dir ci-nov003 | tee ci-nov003/stdout.txt
+      - name: NOV004 repo-wide instrument audit
+        run: |
+          mkdir -p ci-nov004
+          python -m so.experiments.nov004_instrument_audit \
+            --results-dir ci-nov004 | tee ci-nov004/stdout.txt
       - name: Hash evidence
         run: |
           sha256sum docs/novelty/nov001-screen-calibration.md \
@@ -90,8 +100,11 @@ jobs:
             docs/novelty/nov003-unread-coordinates-e103-result.md \
             so/experiments/nov003_unread_coordinates_e103.py \
             so/tests/test_nov003_unread_coordinates_e103.py \
+            docs/novelty/nov004-instrument-audit-result.md \
+            so/experiments/nov004_instrument_audit.py \
+            so/tests/test_nov004_instrument_audit.py \
             > ci-nov001/source-sha256.txt
-          find ci-nov001 ci-pdx001 ci-nov002 ci-nov003 -maxdepth 1 -name '*.json' -print0 | sort -z \
+          find ci-nov001 ci-pdx001 ci-nov002 ci-nov003 ci-nov004 -maxdepth 1 -name '*.json' -print0 | sort -z \
             | xargs -0 -r sha256sum > ci-nov001/result-sha256.txt
       - uses: actions/upload-artifact@v4
         with:
@@ -101,4 +114,5 @@ jobs:
             ci-pdx001/
             ci-nov002/
             ci-nov003/
+            ci-nov004/
           if-no-files-found: error

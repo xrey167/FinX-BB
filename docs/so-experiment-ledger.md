@@ -3148,6 +3148,47 @@ coordinate" can still be satisfied by noise.
 No mechanism promoted. A candidate that wins small, loses large, and pays roughly twice the
 sequential depth throughout is not an invention.
 
+### 31.47 The vacuity pattern is in a third experiment, and a sweep found it (2026-09-06, NOV-004)
+
+§31.42 found it in E-000105 by reading, §31.44 found it again in E-000104 by reading, §31.46 found a
+second and unrelated class in E-000103 by reading. Two defect classes from three readings is a rate
+that makes hand-reading the remaining twenty both slow and a poor instrument -- whoever reads them
+finds what they are looking for and stops. NOV-004 scans all 100 recorded experiments for exactly the
+two patterns already demonstrated.
+
+**Its own validity floor caught its first bug.** The scanner must rediscover the two known Class A
+sites; the first run reported SCANNER_INVALID because it globbed `e0000*.py`, which silently excludes
+every experiment from E-000100 onward -- where both known sites live. E-000019's discipline, working
+on the file auditing everyone else.
+
+**Class A, 3 confirmed sites.** e000104:224-225 and e000105:176-177 as known, plus a new one:
+**e000107:93-94**, where `oracle` and `direct` are the same pure call on the same arguments
+(`delete_target` copies a tuple and sets one index; `fn` is one of four pure state functions), so
+`oracle_failures` is identically zero for every input. It is nonetheless reported as
+`oracle_history_failures`, is a conjunct of the kill predicate at line 187, and is asserted in
+`test_oracle_history_resolves_registered_ambiguity` as evidence. The comment says "by construction",
+so the tautology was understood when written; what was not carried through is that a quantity true by
+construction must not then be reported, screened and tested as a measurement. §31.15 for the fifth
+time, third distinct experiment. E-000107's substantive result -- the indistinguishable-history
+witnesses -- is untouched; what falls is one of three conjuncts that never guarded anything.
+
+**What the discriminator had to add, and this is the part that generalises.** The first version
+flagged 87 sites on syntactic identity alone and most were legitimate: `bank_from_store(store)`
+before and after a deletion is the same expression and a different value, because the store moved.
+Two refinements brought 87 to 3 -- a window that closes on any statement rebinding the call's free
+names, and a requirement that something actually compare the two results. A duplicated call is only a
+defect when a predicate reads the difference; allocating two zero vectors duplicates the expression,
+not the value. 18 incidental duplicates are recorded separately and are not findings.
+
+**Class B, 94 candidates in 43 files, and they are candidates.** The loop-invariant pattern of
+§31.46, which is a defect only on the baseline arm, where it inflates the candidate's margin for
+free; on the candidate arm it is merely slow. Reading the list as 94 defects would be §31.46's error
+repeated. It is a review queue, and nothing beyond E-000103 is claimed.
+
+No verdict is revisited. The pattern is a reporting and screening defect, not so far a wrong answer:
+E-000104's and E-000105's kills survive a proper accounting (§31.44) and E-000107's rests on its
+witnesses.
+
 ### 31.8 Boundary
 
 CPU only, no GPU, no LLM above 124M parameters, synthetic worlds, single-token entities, two surface forms per relation, one session. Nothing here shows unlearning of facts already encoded in pretrained weights. Evidence levels recorded: E3–E4 for the synthetic system (F4 for SHRED with the verified gate, E-000010 — **on the value channel only**: E-000028 recovers the shredded object at 1.0000 through the ungated reverse key, where REVOKE and DELETE are at chance, so F4 for SHRED is a claim about answers, logits, hidden states and probes and not about routing); E5 as substrate for the frozen-GPT-2 experiment, with reading, composition, update and the copy bound supported and behavioural deletion not yet supported at the pre-registered thresholds.
