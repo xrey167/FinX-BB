@@ -42,10 +42,18 @@ identical recipe: held-out candidate correctness **0.0000** on all four template
 0.955/0.990 and arm C at 0.621/0.645/0.664. Record kept at
 `so/results/e000084_armE_s0_UNSUPERVISED_BIND_FAILED.json`.
 
-Supervising the boundary decode did not fix it. With `bind_supervision` on, arm E seed 0 again scored
-**0.0000** on all four held-out templates after 3000 steps, and the bind loss ended at 5.31 against a
-uniform 6.55 — it barely learned — while training-template accuracy reached 0.406. That gap is the
-tell, and chasing it produced the finding that closes the design.
+Supervising the boundary decode did not fix it, on any seed. With `bind_supervision` on, arm E scored
+**0.0000** on all four held-out templates on all three seeds (run 33986135519, artifact digests
+`bfba830b…`, `b8befffd…`, `589afdf2…`, each verified against GitHub before the file was read):
+
+| Seed | held-out mean | final bind loss (uniform = 6.55) | training-template accuracy |
+|---:|---:|---:|---:|
+| 0 | 0.0000 | 5.70 | 0.406 |
+| 1 | 0.0000 | 5.85 | 0.469 |
+| 2 | 0.0000 | 5.98 | 0.406 |
+
+The boundary decode barely learned even with a direct target, while the training templates reached
+0.41–0.47. That gap is the tell, and chasing it produced the finding that closes the design.
 
 **The carrier does not transport in the sense the design needs, and my own diagnostic said otherwise
 because it asked the wrong question.** E-000085 first held out *prompts*: it fitted a readout on some
@@ -136,8 +144,8 @@ a placement that already gives total invariance and cannot read.
 1. ~~Arm E with `bind_supervision`~~ — done, and it did not read: 0.0000 on all four held-out
    templates with the boundary decode supervised, explained by the identity split above. **The design
    is closed**, not pending.
-2. **Confirm on seeds 1 and 2.** The CI matrix carries them. One seed plus a mechanism that explains
-   it is strong, but three seeds is the standing bar and the row stays provisional until they land.
+2. ~~Confirm on seeds 1 and 2~~ — done: all three seeds read 0.0000 with the boundary decode
+   supervised, so the design is closed on the standing three-seed bar, not on one seed.
 3. **Per-read write placement**, to separate the routing feedback from a depth threshold above one
    block in the arm A/C/D comparison. That question is still open and is about placement, not carriers.
 4. **A real patent search.** Nothing above may be called cleared until USPTO, Espacenet, Patentscope
