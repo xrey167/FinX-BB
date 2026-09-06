@@ -65,6 +65,25 @@ like is stated beside it.
                                          not expected to move it.  A large move is a finding and is
                                          recorded rather than scored.
 
+SELF-AUDIT, RECORDED BEFORE ANY WRITE-UP.  The strongest attack on this design is that the top1 arm
+is TRUE BY CONSTRUCTION: at k=1 the output is invariant to every row that is not the argmax, so two
+added rows that never win produce literally identical outputs and add2 must read 0.5.  That attack is
+half right and the half is conceded here: **the top1 endpoint for add2 is a confirmation, not a
+discovery.**  It does not reach either result.
+
+  * The empirical content is the FLAT REGION, not the endpoint.  Shrinking the mixture from ~850 cells
+    to 4 -- a factor of 200 -- moves add2 from 0.9782 to 0.9833; it RISES.  31.41's `log(n_cells)`
+    attribution predicts decay with the size of the normaliser and there is none, at any k, until the
+    mixture is removed outright.  That is a falsification and it is not by construction.
+  * The dissociation is the CONVERSE of the construction, which is what makes it informative.  By the
+    same invariance argument, any channel carried only by the mixture MUST collapse at k=1.
+    `cascade_soft` does not: 0.9491 / 0.9507 / 0.9602 / 0.9585 across dense / top16 / top4 / top1,
+    flat.  So the marker channel changes WHICH CELL WINS rather than the weights over losers.  That is
+    a positive mechanistic identification, and the by-construction argument is what licenses it.
+  * The "you broke the reader, garbage reads 0.5" attack dies on the same row: at k=1 the reader still
+    separates live from never at present/auc_i = 1.0000 and still carries the marker channel at 0.9585.
+    A degenerate reader can do neither.
+
 NOT CLAIMED.  Nothing here claims novelty for top-k attention, sparse routing, sparse mixture-of-
 experts, attention sparsification, retrieval top-k, or the observation that a softmax normaliser
 depends on its support.  The measured object is narrower: whether the specific off-target residue
