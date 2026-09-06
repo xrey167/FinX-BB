@@ -100,7 +100,18 @@ class MVCCStore:
 
     def __init__(self, marker_dim: int = 16, seed: int = 0, valid_radius: float = 0.35,
                  marker_centre: Optional[np.ndarray] = None, content_markers: bool = False,
-                 marker_key: Optional[bytes] = None):
+                 marker_key: Optional[bytes] = None, blank_export: str = "self"):
+        if blank_export not in ("self", "foreign"):
+            raise ValueError(f"blank_export must be 'self' or 'foreign', not {blank_export!r}")
+        # How ``bank()`` exports a BLANKed link (ledger §31.48). "self": the row's own key, the recorded
+        # behaviour of every run before 2026-09-05. "foreign": an absent key under a subject OTHER than
+        # the row's own -- the lowest subject index with no live cell at the row's relation. Measured on
+        # the retrained E-000020 seed-0 adapter with no weight changed, the wrong-entity rate of a
+        # blanked alias falls from 0.26-0.475 (self) to 0.02-0.07 (foreign): the subject component of
+        # the exported pointer is what the frozen reader verbalises. Side effect, declared: the foreign
+        # key depends on which cells are live, so the export of a blanked row can change when unrelated
+        # rows come and go; the derived marker under ``content_markers`` follows it.
+        self.blank_export = blank_export
         self.marker_dim = marker_dim
         self.seed = seed
         self.rng = np.random.default_rng(seed)
@@ -148,15 +159,48 @@ class MVCCStore:
         """
         if v.kind is CellKind.FACT:
             return ("FACT", int(v.subject), int(v.relation), int(v.obj))
+        ls, lr = self.link_export_key(v)
+        return ("LINK", int(v.subject), int(v.relation), ls, lr)
+
+    def link_export_key(self, v: "Version") -> Tuple[int, int]:
+        """The key ``bank()`` exports for a LINK version: the target's key while it exists, its tombstone
+        key once it is evicted or deleted, and for a BLANKed link the row's own key (``blank_export="self"``)
+        or an absent key under another subject (``"foreign"``)."""
         t = self.cells.get(v.target) if v.target is not None else None
         if t is not None and t.versions:
             tv = t.version_obj(t.active_version)
-            ls, lr = int(tv.subject), int(tv.relation)
-        elif t is not None and t.tombstone_key is not None:
-            ls, lr = int(t.tombstone_key[0]), int(t.tombstone_key[1])
-        else:
-            ls, lr = int(v.subject), int(v.relation)
-        return ("LINK", int(v.subject), int(v.relation), ls, lr)
+            return int(tv.subject), int(tv.relation)
+        if t is not None and t.tombstone_key is not None:
+            return int(t.tombstone_key[0]), int(t.tombstone_key[1])
+        if self.blank_export == "foreign":
+            return self._foreign_absent_key(int(v.subject), int(v.relation))
+        return int(v.subject), int(v.relation)                                   # self-reference = miss
+
+    def _foreign_absent_key(self, subject: int, relation: int) -> Tuple[int, int]:
+        """An absent key under another subject: the first subject, scanning cyclically from a start index
+        that is a fixed function of the row's own key, that is not ``subject`` and holds no live
+        (non-deleted, non-evicted) cell at ``relation``. The start is spread over the subject range so
+        that blanked rows do not all point at the same low-index subject -- measured on the E-000020
+        seed-0 adapter, the lowest-index rule read at 0.265 wrong-entity under a lone-space prefix where
+        a per-row spread reads at 0.07. Only subjects the store has seen are candidates (a reader's
+        entity table need not extend past them); if every seen subject holds the relation, the row's own
+        key is exported, exactly as under ``"self"``."""
+        live = set()
+        top = subject
+        for c in self.cells.values():
+            if c.status in (Status.DELETED, Status.EVICTED) or not c.versions:
+                continue
+            cv = c.version_obj(c.active_version)
+            top = max(top, int(cv.subject))
+            if int(cv.relation) == relation:
+                live.add(int(cv.subject))
+        n = top + 1
+        start = (subject * 7919 + relation * 104729 + 1) % n
+        for k in range(n):
+            s = (start + k) % n
+            if s != subject and s not in live:
+                return s, relation
+        return subject, relation
 
     def _derived_rng(self, content: Tuple[Any, ...], valid: bool) -> np.random.Generator:
         tag = b"valid|" if valid else b"invalid|"
@@ -524,14 +568,10 @@ class MVCCStore:
             # ``obj`` is a constant placeholder for link rows (never the target's object).
             obj.append(0 if link else v.obj)
             if link:
-                t = self.cells.get(v.target)
-                if t is not None and t.versions:
-                    tv = t.version_obj(t.active_version)
-                    l_subj.append(tv.subject); l_rel.append(tv.relation)
-                elif t is not None and t.tombstone_key is not None:
-                    l_subj.append(t.tombstone_key[0]); l_rel.append(t.tombstone_key[1])   # dangling: key kept
-                else:
-                    l_subj.append(v.subject); l_rel.append(v.relation)                    # self-reference = miss
+                # target's key while it exists; its tombstone key once gone (dangling: key kept); for a
+                # blanked link the row's own key, or an absent foreign key under ``blank_export="foreign"``
+                ls, lr = self.link_export_key(v)
+                l_subj.append(ls); l_rel.append(lr)
             else:
                 l_subj.append(0); l_rel.append(0)
         return {

@@ -3576,6 +3576,205 @@ check cannot live in the learned reader on any architecture of this shape, and e
 promises attestation "at the point of neural consumption" reduces to a store-side check before
 materialisation. That is registered as E-000056 and not run.
 
+### 31.48 The twenty-first repetition: eight angles searched against the field, ten candidates, all refuted; five measurement rows and one option in the store (2026-09-05)
+
+The request was put again, in its sharpest form: make the symlink / J-space / pod idea a technical
+novelty, and do not stop before there is one. What follows is the method, the refutations, the rows
+that were measured instead, and the standing. There is no novelty in it. The rows are recorded because
+they were paid for and because two of them change what the repository does.
+
+**The sweep.** Thirty-seven agents in two workflows. Three readers mapped the code (73 facts, every
+by-construction property with its file and line), the ledger §§31.36–31.47 (66 facts) and the parallel
+agent's `research/*` claim documents (78 facts). Eight generators, each with a different angle
+(J-lens, databases and systems, security and attestation, the editing literature, agent-memory
+standards, theory and impossibility, the FinX-Moda application, and a contrarian instrument angle),
+proposed nineteen candidates, each required to name its nearest prior art from web searches run in
+the session — not from memory — and to state the pre-registered outcome that would kill it. Dedup
+merged them to eleven. Each then met two hostile reviewers, one hunting prior art with at least eight
+fresh searches, one hunting by-construction results, criteria that could not fail, and the confound
+pattern of §31.44; disagreements went to a third reviewer who had to verify the decisive citation or
+code line itself. Ten candidates were killed (the eleventh, a duplicate, fell with its group), a judge
+ranked what was left of them, and a completeness critic re-checked five of the load-bearing citations
+against their sources.
+
+**What killed them.** Each row is the reviewers' reason, checked against the source or the code:
+
+| candidate | why it fell |
+| --- | --- |
+| The softmax leave-one-out identity as an impossibility theorem for deletion | CAOTE (arXiv:2504.14051) Eq. 18–19 and Thm 3.2 state it verbatim: `X' = (X − α_j v_j)/(1 − α_j)`, error `α_j/(1−α_j)·‖v_j − X‖`. The exact-zero contrapositive is entmax / Forgetful Attention. |
+| BLANK's self-reference as a mechanism claim | §31.45 records the row; §31.42 disclosed the smoke numbers. An engineering fix, already classified. |
+| A freshness or epoch predicate inside the frozen gate | "At most one monotone transition for a fixed acceptor" is a logical identity for any fixed function of any input. The remedy is generation numbers and expected-version checks (Redell 1974; Gray & Cheriton 1989); MemStrata (arXiv:2606.26511 §2) states in as many words that "the structurally correct mechanism for staleness is temporal and deterministic, not a learned grounding check". |
+| A dereference performed in the residual instead of the deref slot | MemN2N's second hop (arXiv:1503.08895) and Memory Injections (arXiv:2309.05605) own the mechanism in either outcome; Meta's US10664744B2 covers the hop chaining. |
+| Pod knowledge reportable but not composable, by read layer | Sakarvadia et al. own the last-token sweep; the confound is `train_arm`'s 30% two-hop query mix, which the candidate's own design left in. The critic also caught the proposal misquoting arXiv:2601.04600, whose single-hop numbers collapse at layer 20 with the two-hop ones. |
+| Alias-by-radius (GRACE) against alias-by-pointer | GRACE's expand rule and EasyEdit's `delete_key` make both halves by construction of the published algorithm. |
+| A graded forgetting dial in the marker | The line `v_f = v_f * g` (`so/model.py:221`); a dose-response curve of a sigmoid. |
+| An abstention horizon from the null key's softmax share | Owned by the log-n scaling literature (Chiang & Cholak 2022) and unconstructible on E-000015: 256 × 6 = 1536 keys, and the bank already holds 55–68% of them. |
+| The last-token key's position-0 transport on CounterFact | Refuted by data already on this box: the product surface reads bare at 0.90/0.93 with a BOS gain of 0.09, not ≥ 0.15 (R1 below). |
+| Held-out entities as a general key map | KBLaM, E-BERT, TOME and LRE own the design and predict partial transfer; the measurement is a substrate replication (R4 below). |
+
+The judge's verdict, kept in its own words because it is the finding of this section: *"There is no
+defensible technical novelty in this round, at any size a hostile reviewer would credit. All ten
+candidates were killed … As a mechanism, theorem or system, zero."*
+
+**Retraining, and what it costs the record.** No checkpoint in this repository survives (`so/results/checkpoints/`
+is ignored), so every row below is a FRESH training of a named recipe, not a re-score of a recorded
+one. E-000015 (three seeds, 4000 steps, 5.5 min each) and E-000020 seed 0 (3000 steps, 46 min) were
+retrained. The E-000020 retrain reproduces the record's shape and not its level: direct 0.6867 against
+the recorded 0.5667, alias 0.6850 against 0.5200, `shred_target/alias_unknown` 1.0000 against 0.9850,
+`duplicate_update/alias_new_object` 0.0000 in both. **A checkpoint SHA cannot tie a new number to an
+old record**, and "worst of three seeds" now means the worst of three fresh trainings; the recorded
+0.175 / 0.125 / 0.010 spread of the BLANK row is partly retrain variance.
+
+**R1 — E-000054 seed 0, the registered two-token surfaces.** One seed of a registered three (seeds 1–2
+running); n = 100 targets per template, held-out subject-initial the minimum over t8 and t11, held-out
+medial t9 alone, numbers read from the run log at two decimals since `ledger.save` fires only after
+the last seed. On E-000017-B's trainer at the same 3000-step budget, trained without a BOS: a 16 × 16
+**product code** whose position-0 token carries half of each subject's identity reads the held-out
+subject-initial forms bare at **0.90 / 0.93** (trained subject-initial 0.98, held-out reading 0.9437)
+and at 1.00 / 1.00 with a lone space at inference on the same weights (0.99 / 1.00 with a BOS); the
+**second-token** surface reads them bare at **1.00 / 1.00** (medial 1.00 / 1.00). Against the recorded
+single-token surface's 0.37 / 0.54 bare, H1's bare row fails at 0.90 against its ≤ 0.50 bar and the
+pre-registered branch fires: *the single-token case is special*. The position-0 price of this learned
+last-token router falls from 0.60 / 0.44 on a single-token subject to 0.10 / 0.07 on a product code
+and is **not zero**. Seed 1's product surface reads 0.91 / 0.93 bare, so the fired branch is not a
+one-seed accident; the residual price is one seed until seeds 1–2 land.
+*By construction, declared:* the surface layout rows (two tokens per name, the first at index 0 on the
+subject-initial templates) are `surface_positions`' construction and are validity checks. H2 and the
+two recovery rows are §31.46's row — any token at position 0 restores the subject-initial forms by
+0.318–0.326 — with the prefix trained in or applied at inference: predicted, and scarcely able to fail.
+The routing key remains `w_in[entity_token_ids[subject]]`, a token that no longer appears in any prompt,
+so the map from a two-token surface to that key is per-entity memorisation (R4), not a property of
+position 0. *Missing control:* the single-token surface was NOT retrained in this session, so the
+0.60 → 0.10 contrast is record-against-retrain, not a paired arm.
+*Prior art:* the condition and its diagnosis are Yang et al., "The Fall of ROME" (Findings of EMNLP
+2024, arXiv:2406.11263) §3.3 — collapse subjects are "a single word, which is encoded as a single
+token and positioned at the beginning", and the anomaly is "not related to the editing process";
+"The Butterfly Effect of Model Editing" (Findings of ACL 2024) holds the cases; Gupta et al.,
+"Rebuilding ROME" (arXiv:2403.07175) owns the prefixed/unprefixed key asymmetry; Meng et al. (NeurIPS
+2022) and Geva et al. (EMNLP 2023) own identity at the last subject token, which is why H2 is
+predicted; Feucht et al., "Token Erasure" (EMNLP 2024) owns the absorption that lets a second token
+carry the first's half; the sink itself is Xiao et al. (ICLR 2024), Sun et al. (COLM 2024), Gu et al.
+(ICLR 2025) and Ran-Milo et al. (arXiv:2604.14722). What no source records is the number for a learned
+last-token retrieval query on a frozen LM. That is the row: a substrate replication with one unowned
+number, not a finding.
+
+**R2 — where this symlink is dereferenced.** On the retrained E-000020 seed-0 adapter, 200 alias and
+200 direct queries, no weight changed: the layer-8 resolve and dereference slots read the **null
+column at ≥ 0.998 on every query** — by construction of `route_targets_slots`, which supervises
+passthrough at read-layer 0 for every one-hop query — so the layer-8 injection is a bank-independent
+learned bias (`o_proj[8](null_value[8])` at RMS scale, `inject_gain` 0.698) and **no pointer payload
+enters the frozen model between the read layers on this substrate**. The alias is resolved entirely by
+the adapter's layer-10 dereference hop (deref mass 0.82 on the target row; alias reading 0.99 / 0.945
+falls to 0.000 / 0.005 when that hop is forced to passthrough). Forcing layer 8 to passthrough is an
+identity (q_10 changes by 1e-7 to 3e-4 relative), so "never dereferenced by the frozen model" is
+licensed **by the code, not by a measurement**: no LINK payload was ever injected at layer 8, so the
+cross-layer transport question was not tested. Zeroing the layer-8 constant collapses direct reading
+1.00 → 0.265 and 0.95 → 0.03 and the layer-10 route hit 0.92 → 0.03; that is the zero-ablation-of-a-
+learned-bias artefact (Causal Scrubbing; Heimersheim & Nanda arXiv:2404.15255 §2.5), recorded as a
+calibration of the ablation instrument and **not** as evidence of information carried from layer 8.
+*Prior art:* the dereference hop is MemN2N (Sukhbaatar et al., NeurIPS 2015: `u^{k+1} = u^k + o^k`),
+its passthrough column is Gated MemN2N (Perez & Liu, EACL 2017, Eq. 9–10), and Meta's US10664744B2
+covers the chaining; the untested alternative is Memory Injections (Sakarvadia et al., BlackboxNLP
+2023), and both outcomes of it land in latent-multi-hop work (Yang et al. arXiv:2402.16837; Biran et
+al. arXiv:2406.12775; arXiv:2601.03542). **This closes the last reading of "made internal by
+symlinks" that §31.36 left at "half": on this substrate the symlink is resolved in the adapter, by a
+2015 memory-network hop, and the frozen model is not part of the dereference.**
+
+**R3 — E-000056 closes without a mechanism run.** The lemma first, since it is a lemma and not a
+result: a fixed acceptor of the marker alone admits at most one monotone epoch transition, for any
+fixed function of any input. The recorded gates realise **zero**: on the three retrained E-000015
+checkpoints, gate acceptance over 2000 samples per shell is 1.0000 at every chord distance from 0.0 to
+0.7, 0.0055 / 0.0935 / 0.0430 at 0.8 and 0.0000 at 0.9 and beyond — a single radially monotone cap, so
+no rotation of the marker centre is rejected as "previous" while a nearer one is accepted. Handing the
+gate the clock does not rescue it: a 32 → 64 → 1 GELU network of the reader's own gate family, given
+(marker ⊕ current centre) and trained on K random epoch centres with previous-epoch negatives at chord
+0.5 / 0.7 / 1.0 / √2 plus uniform, reaches training FAR/FRR ≤ 0.001 and then fails on 100 **unseen**
+centres at FRR 0.970 / 0.995 / 0.227 for K = 4 / 16 / 64 (FAR 0.176 / 0.006 / 0.002, worst of three
+seeds), while an explicit bilinear gate σ(a·⟨m,c⟩ − b) on the same data is at 0.000 / 0.000 for every
+K. *By construction:* the shell statement is a sample statement — an accepted island of measure below
+about 5e-5 per shell is invisible at 2000 samples per shell — and the bilinear arm is the closed-form
+predicate written down, so its perfection is a ceiling, not a discovery. The reading: **version and
+freshness attestation is a store-side comparison before materialisation**, and §31.47's sentence is
+narrowed from "any architecture of this shape" to "a marker-only gate of this shape, and a
+clock-augmented one of this family at K ≤ 64". Both outcomes are owned (leases, generation numbers,
+expected-version checks; MemStrata arXiv:2606.26511 for the thesis).
+
+**R4 — the pod is not a container over unseen entities.** On the retrained E-000020 seed-0 adapter,
+600-fact banks, trained medial templates t1 and t9 with and without the lone-space prefix, entity
+tables swapped by writing the `entity_token_ids` and `candidate_ids` buffers and nothing else: the
+in-vocabulary control reads 0.97–1.00 at routing 0.97–1.00. With a frequency-matched interleaved split
+(odd positions of the first 512 regex matches, so held-out and trained tokens are interleaved in BPE
+id order), a bank whose **subjects** are held out routes at **0.10–0.25** while reading 0.97–1.00 of
+what it does route, and a bank whose **objects** are held out routes at 0.96–0.99 and reads
+**0.10–0.16**. The frequency-confounded next-256 set reads 0.01–0.03 at routing 0.15–0.29. So both the
+key map `k_proj∘LN(W_in[s] + r)` and the payload map `v_proj(W_out[o])` are per-entity memorisation on
+this substrate, and "knowledge added like a container" does not extend to entities the reader was not
+trained on. *By construction:* the buffers are a lookup table, so the swap is a table change and not a
+retraining; the reading is single-seed and single-adapter. *Prior art:* KBLaM, E-BERT, TOME and LRE own
+the design and predict partial transfer; this is the number for this substrate, and it is the one
+result of the round that a product decision turns on.
+
+**R5 — the SET NULL row, attributed, and an option in the store.** BLANK is the only lifecycle row
+that fails on the real model (§31.45: 0.825 UNKNOWN against a 0.90 bar). On the retrained seed-0
+adapter, 100 pods with their targets EVICTED and both aliases BLANKed, 200 alias reads per arm,
+**arms differing only in the export of the blanked rows and no weight changed**:
+
+| export of a blanked link | t0 + space | t0 | t3 | t8 |
+| --- | --- | --- | --- | --- |
+| the row's own key (recorded) | 0.475 | 0.270 | 0.260 | 0.260 |
+| own subject, absent relation (64 of 200 aliases have one; paired) | 0.395 | 0.210 | 0.215 | 0.200 |
+| another subject, absent key (hand-built, lowest free index) | 0.070 | 0.020 | 0.020 | 0.030 |
+| the evicted target's key | 0.165 | 0.035 | 0.055 | 0.045 |
+| DANGLE, the real state, aliases untouched | 0.165 | 0.035 | 0.055 | 0.045 |
+
+(wrong-entity rate; UNKNOWN is the complement.) The target-key export and DANGLE agree on **every one
+of 200 reads at every template** — zero discordant pairs — so **the export alone decides this row**;
+the store state does not enter. The subject component of the exported pointer carries it: McNemar on
+the 64-alias paired subset gives 0.484 → 0.234 at t0 + space (b = 17, c = 1, p = 1.4e-4) for moving the
+relation alone, and 0.475 → 0.165 (b = 75, c = 13, p = 9.3e-12) for moving the whole key. The entity
+named under the recorded export is the alias's **own subject** (0.350 at t0 + space, 0.190 at t3),
+never a sibling and never the true object — so LMLM's near-neighbour reconstitution is not what this
+is. Two floors are recorded beside it: the frozen model with no adapter at all names that same subject
+in 0.220 / 0.070 / 0.145 / 0.055 of these prompts and answers UNKNOWN in 0.000 / 0.000 / 0.495 / 0.000,
+and masking the alias rows out of routing entirely leaves 0.72 / 0.26 / 0.24 / 0.28 wrong entities.
+Read as suppression rather than as a rate: bare 0.485 → recorded export 0.350 → DANGLE 0.100 at
+t0 + space.
+The fix is three lines in the store, and it is offered as an option, default off, because every
+recorded run used the self-reference export: `MVCCStore(blank_export="foreign")` exports a blanked
+link as an absent key under a subject other than its own, chosen by a fixed function of the row's key
+so that blanked rows do not all point at the same subject (the lowest-index rule reads 0.265 at
+t0 + space where the spread reads 0.110). End to end through the real store path, same 100 pods, same
+weights: **0.110 / 0.020 / 0.045 / 0.025** wrong entity, UNKNOWN 0.890 / 0.980 / 0.955 / 0.975 — the
+pre-registered E-000052 bars (UNKNOWN ≥ 0.90, wrong ≤ 0.05) are met at t0, t3 and t8 and missed at
+t0 + space. Six unit tests pin the store half (`so/tests/test_blank_export.py`): the default export is
+byte-identical to the recorded one, the foreign key is absent and under another subject, the target and
+tombstone exports are untouched, the derived marker follows the exported key under `content_markers`,
+the fallback when every seen subject holds the relation is the row's own key, and an unknown option
+value is refused. *What it is:* SQL-92's `ON DELETE SET NULL` given a target the reader cannot
+verbalise. *What it is not:* a mechanism, a certificate, or a claim. It is one measurement (the export
+decides the row, the subject component carries it) and one option.
+
+**Registered and running.** E-000054 seeds 1–2 (the worst-of-three rule; seed 1's product surface is
+in at 0.91 / 0.93 bare). E-000052's substrates (the BOS-trained symlink adapter and its link-free arm,
+three seeds each) and then its battery, which will read the BLANK row on a substrate trained with the
+prefix — where the option above can be measured against a retrain instead of an export. Not run:
+E-000055, E-000047, E-000048, and the identity-wire control that would decide whether the frozen blocks
+can carry a planted pointer to the layer-10 query (both outcomes owned, per R2).
+
+**Standing.** Twenty-one repetitions of the request, nine sweeps, eleven retractions, and now ten
+refutations in one round with the sources fetched in the session. The J-space half of the seam is
+closed on four readings (§31.39 write, §31.40 carrier, §31.42 addressing, and the parallel agent's
+E-000062 against J-signatures as an address bus); R2 closes the symlink half at the place §31.36 left
+open — the dereference is a 2015 memory-network hop inside the adapter, and the frozen model is not
+part of it; the pod half is closed by the external-memory literature and by IBM's US20260119893A1.
+What the round leaves is five rows, one store option, and the same sentence the ledger has been
+printing since §31.36: **the mechanism is re-invention, and the work is the audit.** The largest claim
+the record supports is methodological, and it is a workshop note, not a novelty: deletion-residue and
+paraphrase-generalisation numbers on a memory read by a frozen GPT-2-family model must be reported
+against floors the reader's own arithmetic supplies — the row count, the marker generator's position,
+the subject at position 0, and now the exported pointer's subject — because each of them has, in this
+repository, produced a number that looked like a property of the memory and was not.
+
 ### 31.8 Boundary
 
 CPU only, no GPU, no LLM above 124M parameters, synthetic worlds, single-token entities, two surface forms per relation, one session. Nothing here shows unlearning of facts already encoded in pretrained weights. Evidence levels recorded: E3–E4 for the synthetic system (F4 for SHRED with the verified gate, E-000010 — **on the value channel only**: E-000028 recovers the shredded object at 1.0000 through the ungated reverse key, where REVOKE and DELETE are at chance, so F4 for SHRED is a claim about answers, logits, hidden states and probes and not about routing); E5 as substrate for the frozen-GPT-2 experiment, with reading, composition, update and the copy bound supported and behavioural deletion not yet supported at the pre-registered thresholds.

@@ -38,7 +38,15 @@ Forschungsprojekt **SO — Modular Neural Operating System**: adressierbares, ve
 - [GPU-Protokoll E-000027](docs/so-e000027-gpu-protocol.md) — ein vorregistrierter, gestufter Plan für den
   Lauf von E5 nach E6; die erste Stufe kostet nichts, jede Stufe nennt das Ergebnis, das die Ausgaben stoppt.
 - [Fahrplan](docs/so-roadmap-2026-09-02.md) — was heute belegt ist, die Lücken zur Durchbruchsdefinition, Stufen 0–6 bis zur externen Reproduktion, Abbruchkriterien.
-- Experimentalcode: [`so/`](so/README.md).
+- Experimentalcode: [`so/`](so/README.md); Diagnosen, die keine Records sind: [`so/diagnostics/`](so/results/diagnostics/README.md).
+
+**Stand 05.09.2026 (Ledger §31.48).** Die einundzwanzigste Wiederholung der Neuheitsfrage: acht
+Blickwinkel mit Websuche, neunzehn Kandidaten, zehn gegnerisch widerlegt, keiner überlebt. Was bleibt,
+sind fünf Messzeilen und eine Option im Store. Die beiden, die etwas ändern: der Symlink dieses
+Adapters wird **im Adapter** dereferenziert, durch einen Hop der End-To-End Memory Networks (2015) —
+das eingefrorene Modell ist an der Auflösung nicht beteiligt; und die Adressierung ist
+**Pro-Entität-Memorisierung** (ungesehene Subjekte routen zu 0.10–0.25 statt 0.97–1.00), ein Pod lässt
+sich also nicht wie ein Container über neue Entitäten legen, ohne den Reader nachzutrainieren.
 
 ### Selbst nachvollziehen, auf einem Ubuntu-Server
 
