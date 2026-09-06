@@ -20,6 +20,7 @@ from so.paper_numbers import (
     _resolve,
     check,
     coverage,
+    occurrences,
 )
 
 _PAPER_TEXT = PAPER.read_text(encoding="utf-8")
@@ -45,7 +46,7 @@ def test_every_figure_can_fail_on_a_wrong_number(claim):
     of them: each registered figure is proven to be reading a live value from a live path.
     """
     broken = Claim(claim.label, claim.record, claim.path,
-                   _bump_last_digit(claim.printed), claim.rule, claim.reduce)
+                   _bump_last_digit(claim.printed), claim.rule, claim.reduce, claim.appears_as)
     assert broken.printed != claim.printed
     rows = check(_PAPER_TEXT, claims=(broken,), scope_claims=())["figures"]
     assert [r["status"] for r in rows] == ["MISMATCH"], rows
@@ -54,7 +55,7 @@ def test_every_figure_can_fail_on_a_wrong_number(claim):
 @pytest.mark.parametrize("claim", CLAIMS, ids=[c.label for c in CLAIMS])
 def test_every_figure_can_fail_on_a_paper_that_omits_it(claim):
     """Floor: the record still agrees, but the paper no longer prints the figure -> ABSENT."""
-    text = _PAPER_TEXT.replace(claim.printed, "<removed>")
+    text = re.sub(re.escape(claim.sought), "<removed>", _PAPER_TEXT, flags=re.IGNORECASE)
     rows = check(text, claims=(claim,), scope_claims=())["figures"]
     assert [r["status"] for r in rows] == ["ABSENT"], rows
 
@@ -133,6 +134,33 @@ def test_resolver_prefers_the_longest_key_but_falls_back_to_nesting():
     assert _resolve(doc, "aggregate/active/object_top1/mean") == (1.0, None)
 
 
+def test_resolver_selects_a_list_element_by_field_rather_than_by_position():
+    """PDX-001's five policies are a list; a positional path would survive a reordering."""
+    policies = [{"policy": "a", "top1": 1.0}, {"policy": "b", "top1": 0.0}]
+    assert _resolve({"policies": policies}, "policies/policy=b/top1") == (0.0, None)
+    # the same claim survives a reordering, which is the whole point
+    assert _resolve({"policies": policies[::-1]}, "policies/policy=b/top1") == (0.0, None)
+    # a positional path would not
+    assert _resolve({"policies": policies}, "policies/1/top1") == (0.0, None)
+    assert _resolve({"policies": policies[::-1]}, "policies/1/top1") == (1.0, None)
+
+
+def test_a_selector_that_is_not_unique_is_an_error_not_a_first_match():
+    doc = {"policies": [{"policy": "a"}, {"policy": "a"}]}
+    assert _resolve(doc, "policies/policy=a")[0] is None
+    assert "matched 2" in _resolve(doc, "policies/policy=a")[1]
+    assert "matched 0" in _resolve(doc, "policies/policy=z")[1]
+
+
+def test_every_pdx_claim_addresses_its_policy_by_name():
+    """A positional index here would keep passing if the policy order ever changed."""
+    pdx = [c for c in CLAIMS if c.record.startswith("pdx001/")]
+    assert len(pdx) >= 10
+    for c in pdx:
+        assert "*" not in c.path
+        assert not any(seg.isdigit() for seg in c.path.split("/")), c.path
+
+
 def test_resolver_indexes_a_list_and_iterates_with_a_star():
     doc = {"per_checkpoint": [{"band": [1, 2]}, {"band": [3, 4]}]}
     assert _resolve(doc, "per_checkpoint/1/band/0") == (3, None)
@@ -167,3 +195,39 @@ def test_rounding_rules_render_as_the_paper_prints():
 def test_an_unknown_rounding_rule_raises_rather_than_passing():
     with pytest.raises(ValueError):
         _fmt(1.0, "nearest-convenient")
+
+
+# --------------------------------------------------------------------------- the presence test
+
+def test_a_figure_is_not_found_inside_a_longer_number():
+    """The bug this closes: '0.0' passed its presence test on '0.0040', and '12' on '128.02'."""
+    assert occurrences("0.0", "the revoke arm reads 0.0040 here") == 0
+    assert occurrences("12", "a mean rank of 128.02") == 0
+    assert occurrences("1", "1,536 of 1,536 keys") == 0
+    assert occurrences("0.0", "the mean rank is 0.0 on both arms") == 1
+
+
+def test_a_trailing_full_stop_or_comma_is_punctuation_not_a_digit_group():
+    assert occurrences("0.35", "a declared radius of 0.35.") == 1
+    assert occurrences("0.0953", "(min 0.0953, max 0.4014)") == 1
+    assert occurrences("0.4014", "(min 0.0953, max 0.4014)") == 1
+
+
+def test_a_figure_the_paper_spells_in_words_is_sought_in_words():
+    """'11' and '12' appear nowhere as numerals; the paper writes eleven and twelve."""
+    spelled = {c.label: c for c in CLAIMS if c.appears_as}
+    assert spelled["E29 checkpoints"].sought == "eleven"
+    assert spelled["E25 templates"].sought == "twelve"
+    assert occurrences("eleven", "over Eleven checkpoints") == 1
+    assert occurrences("eleven", "elevenths") == 0
+
+
+def test_round_recurring_figures_are_reported_as_weak_not_counted_as_checks():
+    """1.0000 appears all over the paper; its presence test proves nothing and says so."""
+    weak = set(_REPORT["weak_presence_tests"])
+    assert weak, "some figures are round enough to recur; none were flagged"
+    assert "E28 active top-1" in weak
+    assert all(r["occurrences"] > 0 for r in _REPORT["figures"])
+    assert "no longer discriminates" in _REPORT["not_claimed"]
+    strong = [r for r in _REPORT["figures"] if r.get("presence_discriminating")]
+    assert len(strong) > len(weak)

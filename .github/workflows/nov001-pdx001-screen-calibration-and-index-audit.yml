@@ -35,10 +35,13 @@ on:
       - "so/results/e000019_fresh_seed_chance.json"
       - "so/results/e000021_gate_error_rates.json"
       - "so/results/e000024_weights_vs_cells-seed0.json"
+      - "so/results/e000025_template_rescoring.json"
       - "so/results/e000028_key_channel.json"
       - "so/results/e000029_marker_geometry.json"
       - "so/results/e000030_deletion_certificate.json"
+      - "so/results/e000032_deletion_closure.json"
       - "so/results/e000035_deletion_disclosure.json"
+      - "so/results/pdx001/pdx001_payload_derived_index_audit.json"
   workflow_dispatch:
 
 jobs:
@@ -135,10 +138,13 @@ jobs:
             so/results/e000019_fresh_seed_chance.json \
             so/results/e000021_gate_error_rates.json \
             so/results/e000024_weights_vs_cells-seed0.json \
+            so/results/e000025_template_rescoring.json \
             so/results/e000028_key_channel.json \
             so/results/e000029_marker_geometry.json \
             so/results/e000030_deletion_certificate.json \
+            so/results/e000032_deletion_closure.json \
             so/results/e000035_deletion_disclosure.json \
+            so/results/pdx001/pdx001_payload_derived_index_audit.json \
             > ci-nov001/source-sha256.txt
           find ci-nov001 ci-pdx001 ci-nov002 ci-nov003 ci-nov004 ci-paper -maxdepth 1 -name '*.json' -print0 | sort -z \
             | xargs -0 -r sha256sum > ci-nov001/result-sha256.txt

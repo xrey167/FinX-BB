@@ -25,6 +25,14 @@ check: a registry binding each printed figure to a JSON path, and a run that fai
 (how many seeds, how many cells) that the paper must state in words. A number can be perfectly
 accurate and still mislead if the reader is not told it rests on one seed.
 
+**The presence test needed its own calibration.** The first version asked whether the printed string
+occurred anywhere in the paper, which is nearly vacuous for a short token: `"0.0"` is inside
+`0.0040`, `"12"` is inside `128.02`. Requiring a standalone match immediately turned up two figures
+the registry had been passing on a coincidence -- the eleven checkpoints and the twelve templates,
+both of which the paper spells in words and never prints as numerals. `appears_as` binds those. And
+for a figure round enough to recur across the paper (`1.0000`, `256`) the presence test still does
+not discriminate; those are reported weak rather than counted as checks.
+
 This registry is **partial by construction** and says so: `coverage()` reports what it binds. A
 figure absent from the registry is unchecked, not verified.
 """
@@ -64,7 +72,12 @@ class Claim:
     path: str
     printed: str
     rule: str
-    reduce: str = ""   # set when the path uses '*' and the paper quotes an aggregate
+    reduce: str = ""       # set when the path uses '*' and the paper quotes an aggregate
+    appears_as: str = ""   # set when the paper spells the figure some other way ("eleven" for 11)
+
+    @property
+    def sought(self) -> str:
+        return self.appears_as or self.printed
 
 
 @dataclass(frozen=True)
@@ -84,14 +97,25 @@ def _resolve(doc: object, path: str):
     These records mix two shapes: genuine nesting (`aggregate` -> `operational_radius` -> `mean`)
     and flat keys that contain slashes (`aggregate` -> `'active/margin_mean'` -> `mean`, and
     `gpt2[0]` -> `'gpt2_soft/shred/residual'`). So at each level try the longest remaining path as
-    one key before falling back to a single segment. A numeric segment indexes a list, and `*`
-    iterates one.
+    one key before falling back to a single segment.
+
+    On a list a segment may be a numeric index, `*` to iterate, or `field=value` to select the one
+    element whose `field` equals `value`. The selector exists so that a claim about a named policy
+    does not silently follow the list's *order*: PDX-001 writes five policies as a list, and a
+    positional path would keep resolving, and keep passing, if that order ever changed.
     """
     segs = [s for s in path.split("/") if s != ""]
     cur, i = doc, 0
     while i < len(segs):
         if isinstance(cur, list):
             seg = segs[i]
+            if "=" in seg:
+                field, _, want = seg.partition("=")
+                hits = [it for it in cur if isinstance(it, dict) and str(it.get(field)) == want]
+                if len(hits) != 1:
+                    return None, f"selector {seg!r} matched {len(hits)} of {len(cur)}, need exactly 1"
+                cur, i = hits[0], i + 1
+                continue
             if seg == "*":
                 out = []
                 for item in cur:
@@ -138,12 +162,49 @@ CLAIMS: tuple[Claim, ...] = (
     Claim("E28 revoke mean rank", "e000028_key_channel.json", "aggregate/revoke/object_mean_rank/mean", "128.02", "dp2"),
     Claim("E28 revoke margin", "e000028_key_channel.json", "aggregate/revoke/margin_mean/mean", "0.0022", "dp4"),
 
+    Claim("E28 active mean rank", "e000028_key_channel.json", "aggregate/active/object_mean_rank/mean", "0.0", "dp1"),
+    Claim("E28 shred mean rank", "e000028_key_channel.json", "aggregate/shred/object_mean_rank/mean", "0.0", "dp1"),
+    Claim("E28 chance top-1", "e000028_key_channel.json", "pooled_vs_chance/chance", "0.0039", "dp4"),
+    Claim("E28 pooled targets", "e000028_key_channel.json", "pooled_vs_chance/n", "500", "int"),
+
+    # PDX-001 — the same attack over an abstract store, selected by policy name not by position
+    Claim("PDX value-gated top-1", "pdx001/pdx001_payload_derived_index_audit.json",
+          "policies/policy=value_gated_shred/top1_recovery", "1.0000", "dp4"),
+    Claim("PDX value-gated candidates", "pdx001/pdx001_payload_derived_index_audit.json",
+          "policies/policy=value_gated_shred/mean_candidates_remaining", "1.00", "dp2"),
+    Claim("PDX value-gated posterior", "pdx001/pdx001_payload_derived_index_audit.json",
+          "policies/policy=value_gated_shred/mean_posterior_on_true_payload", "1.000000", "dp6"),
+    Claim("PDX value-gated cut", "pdx001/pdx001_payload_derived_index_audit.json",
+          "policies/policy=value_gated_shred/search_space_reduction_factor", "256", "int"),
+
+    Claim("PDX tombstone top-1", "pdx001/pdx001_payload_derived_index_audit.json",
+          "policies/policy=hnsw_tombstone/top1_recovery", "0.0000", "dp4"),
+    Claim("PDX tombstone candidates", "pdx001/pdx001_payload_derived_index_audit.json",
+          "policies/policy=hnsw_tombstone/mean_candidates_remaining", "2.92", "dp2"),
+    Claim("PDX tombstone posterior", "pdx001/pdx001_payload_derived_index_audit.json",
+          "policies/policy=hnsw_tombstone/mean_posterior_on_true_payload", "0.391667", "dp6"),
+    Claim("PDX tombstone cut", "pdx001/pdx001_payload_derived_index_audit.json",
+          "policies/policy=hnsw_tombstone/search_space_reduction_factor", "88", "int"),
+
+    Claim("PDX codebook top-1", "pdx001/pdx001_payload_derived_index_audit.json",
+          "policies/policy=codebook_key/top1_recovery", "1.0000", "dp4"),
+    Claim("PDX unindexed candidates", "pdx001/pdx001_payload_derived_index_audit.json",
+          "policies/policy=revoke_unindex/mean_candidates_remaining", "256.00", "dp2"),
+    Claim("PDX unindexed posterior", "pdx001/pdx001_payload_derived_index_audit.json",
+          "policies/policy=revoke_unindex/mean_posterior_on_true_payload", "0.003906", "dp6"),
+    Claim("PDX gate-all candidates", "pdx001/pdx001_payload_derived_index_audit.json",
+          "policies/policy=gate_all_derived/mean_candidates_remaining", "256.00", "dp2"),
+    Claim("PDX payload domain", "pdx001/pdx001_payload_derived_index_audit.json",
+          "policies/policy=gate_all_derived/payload_domain", "256", "int"),
+    Claim("PDX validity floor", "pdx001/pdx001_payload_derived_index_audit.json",
+          "validity_control/top1_recovery", "1.0000", "dp4"),
+
     # E-000029 — the swept geometry
     Claim("E29 declared radius", "e000029_marker_geometry.json", "declared_radius", "0.35", "dp2"),
     Claim("E29 operational radius", "e000029_marker_geometry.json", "aggregate/operational_radius/mean", "0.90", "dp2"),
     Claim("E29 annulus accepted", "e000029_marker_geometry.json", "pooled/annulus/0", "2,199,996", "thousands"),
     Claim("E29 annulus n", "e000029_marker_geometry.json", "pooled_intervals/annulus/n", "2,200,000", "thousands"),
-    Claim("E29 checkpoints", "e000029_marker_geometry.json", "n_checkpoints", "11", "int"),
+    Claim("E29 checkpoints", "e000029_marker_geometry.json", "n_checkpoints", "11", "int", "", "eleven"),
     Claim("E29 per-band n", "e000029_marker_geometry.json", "n_per_band", "20,000", "thousands"),
     Claim("E29 band 0.60 mean", "e000029_marker_geometry.json", "per_checkpoint/*/band_accept/5", "1.0000", "dp4", "mean"),
     Claim("E29 band 0.70 mean", "e000029_marker_geometry.json", "per_checkpoint/*/band_accept/6", "0.9999", "dp4", "mean"),
@@ -166,6 +227,27 @@ CLAIMS: tuple[Claim, ...] = (
     # E-000019 — the attack validity floor
     Claim("E19 probe floor min", "e000019_fresh_seed_chance.json", "aggregate/verified_hard/probe_calibration_top1/min", "0.893", "dp3"),
     Claim("E19 probe floor max", "e000019_fresh_seed_chance.json", "aggregate/verified_hard/probe_calibration_top1/max", "0.927", "dp3"),
+    Claim("E19 forced-choice wins", "e000019_fresh_seed_chance.json", "equivalence/forced_choice_win/successes", "375", "int"),
+    Claim("E19 forced-choice n", "e000019_fresh_seed_chance.json", "equivalence/forced_choice_win/n", "750", "int"),
+    Claim("E19 probe hits", "e000019_fresh_seed_chance.json", "equivalence/probe_top1/successes", "4", "int"),
+    Claim("E19 derivable survival", "e000019_fresh_seed_chance.json",
+          "aggregate/verified_hard/dependency/derivable_recovery_after_revoke_K3/min", "1.0", "dp1"),
+
+    # E-000025 — the price of the indirection, worst of three seeds
+    Claim("E25 cost of sharing", "e000025_template_rescoring.json", "aggregate/all/cost_of_sharing/max", "0.0954", "dp4"),
+    Claim("E25 cost of link training", "e000025_template_rescoring.json", "aggregate/all/cost_of_link_training/max", "0.0688", "dp4"),
+    Claim("E25 templates", "e000025_template_rescoring.json", "n_templates", "12", "int", "", "twelve"),
+
+    # E-000032 — the store-side closure, proved rather than sampled
+    Claim("E32 canonical closure", "e000032_deletion_closure.json", "aggregate/canonical/fact_closure_mean/mean", "1.00", "dp2"),
+    Claim("E32 duplicated closure", "e000032_deletion_closure.json", "aggregate/duplicated/fact_closure_mean/mean", "3.00", "dp2"),
+
+    # E-000035 — the closure inverts, and the false-positive column
+    Claim("E35 canonical trace closure", "e000035_deletion_disclosure.json", "aggregate/canonical/trace_closure_mean/mean", "3.00", "dp2"),
+    Claim("E35 duplicated trace closure", "e000035_deletion_disclosure.json", "aggregate/duplicated/trace_closure_mean/mean", "1.00", "dp2"),
+    Claim("E35 canonical false positives", "e000035_deletion_disclosure.json", "aggregate/canonical/false_positive_keys/mean", "0.00", "dp2"),
+    Claim("E35 pods per seed", "e000035_deletion_disclosure.json", "aggregate/n_groups/mean", "100", "int"),
+    Claim("E35 blanking closes it", "e000035_deletion_disclosure.json", "aggregate/blanked/channel_closed/mean", "1.0000", "dp4"),
 
     # E-000024 — rows versus weights
     Claim("E24 cells forced choice", "e000024_weights_vs_cells-seed0.json", "aggregate/cells/after/forced_choice/mean", "0.44", "dp2"),
@@ -179,6 +261,26 @@ CLAIMS: tuple[Claim, ...] = (
 
 
 SCOPE_CLAIMS: tuple[ScopeClaim, ...] = (
+    ScopeClaim(
+        "E28's attack pooled five seeds",
+        "e000028_key_channel.json", "seeds", [0, 1, 2, 3, 4],
+        "Five seeds",
+    ),
+    ScopeClaim(
+        "E32, E35 and E25 are three seeds each",
+        "e000035_deletion_disclosure.json", "seeds", [0, 1, 2],
+        "Three seeds",
+    ),
+    ScopeClaim(
+        "PDX-001 ran its own validity floor before reporting at-chance readings",
+        "pdx001/pdx001_payload_derived_index_audit.json", "attack_validity_floor_met", True,
+        "Validity floor",
+    ),
+    ScopeClaim(
+        "PDX-001 runs no published system",
+        "pdx001/pdx001_payload_derived_index_audit.json", "instrument_self_consistent", True,
+        "No published system is run here",
+    ),
     ScopeClaim(
         "E24 is a single seed",
         "e000024_weights_vs_cells-seed0.json", "seeds", [0],
@@ -195,6 +297,25 @@ SCOPE_CLAIMS: tuple[ScopeClaim, ...] = (
         "400 cells",
     ),
 )
+
+
+def occurrences(printed: str, text: str) -> int:
+    """Count the printed figure in the paper as a *standalone* number.
+
+    A plain substring test is far too weak here: `"0.0"` is inside `0.0040`, `"12"` is inside
+    `128.02`, and `"4"` is inside almost everything. The match must not be *extended* into a longer
+    number on either side -- but a trailing full stop or comma is punctuation, not a digit group, so
+    only `.` or `,` followed by a digit disqualifies. Without this, ABSENT means nothing: a claim
+    could pass its presence test on a number it has no relation to.
+    """
+    if not any(ch.isdigit() for ch in printed):
+        return len(re.findall(rf"\b{re.escape(printed)}\b", text, flags=re.IGNORECASE))
+    return len(re.findall(rf"(?<![\d.,]){re.escape(printed)}(?!\d)(?![.,]\d)", text))
+
+
+# A figure that appears this often is being matched by coincidence somewhere, so its presence test
+# stops discriminating. We report those rather than dropping them: the record comparison still holds.
+_PRESENCE_NOISE_FLOOR = 8
 
 
 def _load(name: str):
@@ -245,11 +366,17 @@ def check(
             rows.append({"label": c.label, "status": "MISMATCH",
                          "detail": f"record {value!r} renders {rendered!r} under {c.rule}, paper prints {c.printed!r}"})
             continue
-        if c.printed not in text:
-            rows.append({"label": c.label, "status": "ABSENT",
-                         "detail": f"{c.printed!r} matches the record but does not appear in the paper"})
+        hits = occurrences(c.sought, text)
+        if hits == 0:
+            rows.append({"label": c.label, "status": "ABSENT", "occurrences": 0,
+                         "detail": f"{c.sought!r} matches the record but does not appear in the paper"})
             continue
-        rows.append({"label": c.label, "status": "OK", "detail": f"{c.printed} = {c.path}"})
+        weak = hits > _PRESENCE_NOISE_FLOOR
+        spelled = "" if not c.appears_as else f" (spelled {c.appears_as!r})"
+        rows.append({"label": c.label, "status": "OK", "occurrences": hits,
+                     "presence_discriminating": not weak,
+                     "detail": f"{c.printed}{spelled} = {c.path}"
+                               + (f"  [presence test weak: {hits} matches]" if weak else "")})
 
     scope_rows = []
     for s in scope_claims:
@@ -272,6 +399,7 @@ def check(
         scope_rows.append({"label": s.label, "status": "OK", "detail": s.must_appear})
 
     failures = [r for r in rows + scope_rows if r["status"] != "OK"]
+    weak = [r["label"] for r in rows if r.get("presence_discriminating") is False]
     return {
         "registered_figures": len(claims),
         "registered_scope_claims": len(scope_claims),
@@ -279,10 +407,14 @@ def check(
         "scope": scope_rows,
         "failures": failures,
         "clean": not failures,
+        "weak_presence_tests": weak,
         "not_claimed": (
             "Partial by construction. A figure absent from this registry is unchecked, not verified; "
             "`coverage()` reports what is bound. The registry checks that the paper agrees with the "
-            "records, never that the records are right."
+            "records, never that the records are right. And a round figure that recurs across the "
+            "paper (1.0000, 256) has a presence test that no longer discriminates: its record "
+            "comparison still holds, but its ABSENT half is reported weak rather than counted as a "
+            "check."
         ),
     }
 
@@ -303,6 +435,10 @@ def main() -> None:
     print()
     print(f"{report['registered_figures']} figures + {report['registered_scope_claims']} scope claims; "
           f"{len(report['failures'])} failing")
+    weak = report["weak_presence_tests"]
+    if weak:
+        print(f"{len(weak)} figures are round enough to recur; their presence test does not "
+              f"discriminate and only the record comparison counts for them.")
     if not report["clean"]:
         raise SystemExit(1)
 

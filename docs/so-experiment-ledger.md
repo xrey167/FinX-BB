@@ -3236,8 +3236,10 @@ Writing the paper produced three disagreements between what the draft printed an
 
 Three for three is not a run of bad luck, it is the absence of an instrument. Prose drifts from the
 record whenever either side is edited, and the repository had no check that would notice. `make
-papernums` is that check: 33 printed figures and 3 scope claims, each bound to a record path, each
+papernums` is that check: 65 printed figures and 7 scope claims, each bound to a record path, each
 re-read and re-rendered under the rounding rule the paper used. It exits non-zero when they part.
+Figures from a list are addressed by name (`policies/policy=hnsw_tombstone/top1_recovery`) rather
+than by position, so a claim cannot keep passing through a reordering.
 
 **The scope claims are the half that matters most**, and the half a number-checker would miss. A
 figure can be exactly right and still mislead if the reader is not told it rests on one seed. Three
@@ -3247,12 +3249,24 @@ paper. The paper now states each in words, and the check fails if that sentence 
 **The floor.** A checker that prints `0 failing` and has never been shown to fail is not evidence.
 `so/tests/test_paper_numbers.py` mutates each registered figure by one in its last place and requires
 a `MISMATCH`, and deletes each from the paper text and requires an `ABSENT` -- for **every** claim,
-not a sample, because a claim whose path silently failed to resolve would pass the clean run too. 84
-tests, of which 72 are that floor. The registry is also **partial by construction** and says so:
-`coverage()` reports what it binds, and a figure not in it is unchecked, not verified.
+not a sample, because a claim whose path silently failed to resolve would pass the clean run too.
+163 tests, of which 144 are that floor.
 
-What the check does not do: it compares the paper against the records, never the records against
-reality. A wrong number written identically in both passes.
+**And the check needed calibrating, exactly like every other instrument here.** Its presence test
+started as `printed in text`, which is close to vacuous for a short token: `"0.0"` is inside
+`0.0040`, `"12"` is inside `128.02`, `"1"` is inside `1,536`. Requiring a standalone match --
+nothing extends the number on either side, while a trailing full stop or comma is punctuation --
+immediately failed two claims that had been passing on a coincidence: the paper writes **eleven**
+checkpoints and **twelve** templates in words and never prints them as numerals, so `appears_as`
+now binds the spelled form. A third category cannot be fixed and is instead reported: 14 of the 65
+figures are round enough to recur across the paper (`1.0000`, `256`), so their presence test does
+not discriminate and only their record comparison counts. That is the §31.15 rule applied to the
+rule's own enforcement -- a passing check whose failure mode is unreachable was not evidence for
+those 14, and now says so.
+
+The registry is **partial by construction**: `coverage()` reports what it binds, and a figure not in
+it is unchecked, not verified. What the check does not do: it compares the paper against the
+records, never the records against reality. A wrong number written identically in both passes.
 
 ### 31.8 Boundary
 

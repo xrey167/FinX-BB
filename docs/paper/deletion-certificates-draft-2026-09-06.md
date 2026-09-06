@@ -379,14 +379,20 @@ is cheap.
 and `so/results/`, and each was caught by a person opening a JSON file: a mean rank written 128.0
 where the record says 128.02; an accept rate written 1.0000 where the sweep says 0.9999; and §7's
 table presented with no seed count where the record is one seed. Three for three is the absence of
-an instrument, so there is now a registry (`make papernums`) binding every figure printed here to
-the record path it came from, re-rendered under the rounding rule used, plus **scope claims** — a
+an instrument, so there is now a registry (`make papernums`) binding 65 figures printed here to the
+record paths they came from, re-rendered under the rounding rule used, plus 7 **scope claims** — a
 fact about a record's extent that this text must state in words, which is what caught §7. It fails
 when prose and record part. Its own floor mutates each registered figure and requires the check to
 notice, for all of them rather than a sample, since a claim whose path silently failed to resolve
-would pass a clean run too. The registry is partial by construction: a figure not in it is
-unchecked, not verified. And it compares this paper against the records, never the records against
-reality — a wrong number written identically in both would pass.
+would pass a clean run too.
+
+Calibrating it made the same point a third time. Its presence test began as a substring search,
+which is nearly vacuous for a short token — `0.0` is inside `0.0040` — and requiring a standalone
+match immediately found two figures it had been passing on a coincidence. For a figure round enough
+to recur (`1.0000`, `256`) the test still does not discriminate, and those are reported weak rather
+than counted. What remains unclaimed: the registry is partial by construction, so a figure not in it
+is unchecked rather than verified; and it compares this paper against the records, never the records
+against reality — a wrong number written identically in both would pass.
 
 ## 10. What this is not
 
@@ -481,4 +487,4 @@ are what a practitioner will act on.
 
 Every number above: `make keychannel certify closure retrieval disclosure compare pdxaudit`. Records
 in `so/results/`. Instrument audits: `make calibrate charged unread auditinstr`. To check this text
-against those records: `make papernums` (33 figures, 3 scope claims; non-zero exit when they part).
+against those records: `make papernums` (65 figures, 7 scope claims; non-zero exit when they part).
