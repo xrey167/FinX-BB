@@ -10,6 +10,14 @@ question that needs no training to answer:
 If it does not, arm E cannot hold its capability gate and the reason is transport, not optimisation.
 If it does, the remaining risk in arm E is the routing and the training, not the carrier.
 
+The experiment asks that question two ways, and the second is the one that decides the design.  Holding
+out PROMPTS asks whether the readout survives a new context for an identity it has already seen.  A
+mutable memory needs more: its identity set changes, so the readout must work for an identity it has
+NEVER seen.  The first version of this experiment ran only the prompt split, read 1.0000 and was taken
+as evidence that the carrier transports.  It was not: with the identity split the same readout scores
+1.0000 on identities it was fitted on and 0.0000 -- below chance -- on identities it was not, so the
+prompt-split number was memorisation of a fixed identity set.  Both are reported.
+
 This is a diagnostic on frozen weights with a closed-form readout.  No adapter is trained, no world is
 used, and nothing here is a capability result or a novelty claim.  The readout is deliberately the same
 shape as the one arm E learns: a linear map of the boundary residual scored against the handle table,
@@ -112,15 +120,30 @@ def transport(model_name: str, read_layers: List[int], n_ids: int, seed: int,
     te = torch.cat([torch.arange(i * P + P // 2, (i + 1) * P) for i in range(n_ids)])
 
     # Closed-form linear map from residual to handle direction (ridge), then score against the table.
-    A = X[tr]
-    B = handles[y[tr]]
-    lam = 1e-3 * float(A.pow(2).mean())
-    W = torch.linalg.solve(A.t() @ A + lam * torch.eye(A.shape[1]), A.t() @ B)   # (d, d)
+    def fit(idx):
+        A = X[idx]
+        B = handles[y[idx]]
+        lam = 1e-3 * float(A.pow(2).mean())
+        return torch.linalg.solve(A.t() @ A + lam * torch.eye(A.shape[1]), A.t() @ B)   # (d, d)
 
-    def top1(idx):
-        pred = X[idx] @ W                                   # (n, d)
+    W = fit(tr)
+
+    def top1(idx, w=None):
+        pred = X[idx] @ (W if w is None else w)             # (n, d)
         pred = pred / pred.norm(dim=-1, keepdim=True).clamp_min(1e-9)
         return float((pred @ handles.t()).argmax(-1).eq(y[idx]).float().mean())
+
+    # The split that matters, and that this experiment originally did not run. Holding out PROMPTS asks
+    # whether the readout survives a new context for an identity it already knows. A mutable memory needs
+    # more than that: its identities change, so the readout must work for an identity it has never seen.
+    # Fit on half the identities and score the other half against the full table.
+    id_tr = torch.arange(n_ids // 2)
+    id_te = torch.arange(n_ids // 2, n_ids)
+    rows_tr = torch.cat([torch.arange(int(i) * P, (int(i) + 1) * P) for i in id_tr])
+    rows_te = torch.cat([torch.arange(int(i) * P, (int(i) + 1) * P) for i in id_te])
+    W_id = fit(rows_tr)
+    seen_identity_top1 = top1(rows_tr, W_id)
+    unseen_identity_top1 = top1(rows_te, W_id)
 
     # Control: the same readout applied to the CLEAN residual, where no handle was injected. It must be
     # at chance, otherwise the readout is reading the prompt rather than the carrier.
@@ -139,6 +162,8 @@ def transport(model_name: str, read_layers: List[int], n_ids: int, seed: int,
         "seed": seed,
         "train_top1": top1(tr),
         "heldout_prompt_top1": top1(te),
+        "seen_identity_top1": seen_identity_top1,
+        "heldout_identity_top1": unseen_identity_top1,
         "clean_control_top1": clean_top1,
         "chance": 1.0 / n_ids,
     }

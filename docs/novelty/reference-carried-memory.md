@@ -42,16 +42,39 @@ identical recipe: held-out candidate correctness **0.0000** on all four template
 0.955/0.990 and arm C at 0.621/0.645/0.664. Record kept at
 `so/results/e000084_armE_s0_UNSUPERVISED_BIND_FAILED.json`.
 
-The cause was diagnosed, not excused. The carrier is not at fault: E-000085 shows an injected
-knowledge-free handle is linearly recoverable at the boundary of frozen GPT-2 at top-1 **1.0000** on
-held-out prompts over 1024 identities (clean control exactly at chance), and on Pythia-70m at 0.972
-once the injection amplitude reaches 4× the residual RMS. What failed was supervision: arm E has one
-addressing decision the other arms do not — which row the transported handle names — and it had no
-training target, while every addressing slot in arms A/C/D is supervised. The signature is in the
-failed record: updating every payload moved the logits by 0.23 while shredding moved them by 9.6,
-which is a boundary distribution that never concentrated. `bind_supervision` now trains it the way the
-other arms' addressing is trained, and that rerun is in flight. **A pass would not revive the novelty
-claim**; it would only decide whether the design reads at all.
+Supervising the boundary decode did not fix it. With `bind_supervision` on, arm E seed 0 again scored
+**0.0000** on all four held-out templates after 3000 steps, and the bind loss ended at 5.31 against a
+uniform 6.55 — it barely learned — while training-template accuracy reached 0.406. That gap is the
+tell, and chasing it produced the finding that closes the design.
+
+**The carrier does not transport in the sense the design needs, and my own diagnostic said otherwise
+because it asked the wrong question.** E-000085 first held out *prompts*: it fitted a readout on some
+contexts for a fixed set of identities and tested other contexts for those same identities, read
+1.0000, and I reported it as "the carrier transports". A mutable memory needs more than that — its
+identity set changes, so the readout must work for an identity it has never seen. With that split, on
+frozen GPT-2, the same readout scores:
+
+| Split | top-1 | chance |
+|---|---:|---:|
+| held-out prompts, identities seen | 1.0000 | 0.0039 |
+| identities seen (fit half) | 1.0000 | 0.0039 |
+| **held-out identities** | **0.0000** | 0.0039 |
+
+The prompt-split number was memorisation of a fixed identity set. Both splits are now part of
+E-000085 so the instrument can fail. Arm E's 0.0000 follows directly: it is evaluated on a fresh
+world, so every identity is new, and the boundary decode is at chance.
+
+**Why the payload works where a reference cannot, which is the general statement.** The payload arm
+does not depend on any learned association surviving to new identities: the injected value *is* the
+frozen model's own output-embedding row for the answer, so adding it to the residual raises that
+token's logit through the unchanged head. That mechanism is identity-independent by construction. An
+arbitrary handle has no such relationship to the head — it means nothing to a model that was never
+trained to dereference it — so recovering it requires a learned per-identity association, and that is
+exactly what does not generalise.
+
+So, on a frozen model, a carrier only works if it is already interpretable by the model's own output
+geometry. "Put the address in, not the value" fails for frozen models for that reason, and no amount
+of supervision repairs it.
 
 **4. The point was occupied, by granted patent art.** The claim asserted that every neighbour either
 puts knowledge into persisted state and repairs it, or keeps it out by not participating. That was
@@ -110,12 +133,14 @@ a placement that already gives total invariance and cannot read.
 
 ## What is still worth running, and why it is not a claim
 
-1. **Arm E with `bind_supervision`, three seeds.** Decides whether a mid-stack knowledge-free carrier
-   can read at all. Positive would make the design viable and still leave it inside Salesforce's
-   granted scope at the concept level; negative closes the design.
-2. **Confirm the arm E collapse on seeds 1 and 2 and audit the eval path.** Exactly 0.0 is below
-   candidate-restricted chance and warrants a sanity check independent of the supervision fix.
-3. **A real patent search.** Nothing above may be called cleared until USPTO, Espacenet, Patentscope
+1. ~~Arm E with `bind_supervision`~~ — done, and it did not read: 0.0000 on all four held-out
+   templates with the boundary decode supervised, explained by the identity split above. **The design
+   is closed**, not pending.
+2. **Confirm on seeds 1 and 2.** The CI matrix carries them. One seed plus a mechanism that explains
+   it is strong, but three seeds is the standing bar and the row stays provisional until they land.
+3. **Per-read write placement**, to separate the routing feedback from a depth threshold above one
+   block in the arm A/C/D comparison. That question is still open and is about placement, not carriers.
+4. **A real patent search.** Nothing above may be called cleared until USPTO, Espacenet, Patentscope
    and a CPC sweep have been run.
 
 ## Errors in this document's earlier version, listed so they are not repeated
@@ -126,4 +151,8 @@ a placement that already gives total invariance and cannot read.
   smoke run; the trained run's exposure is 6.50;
 - listed "a lifecycle status change" among the bit-identical operations — untested, and measured at
   7.1e-01 once a revoked row is made unroutable;
-- asserted the design point was unoccupied without having run the search that found it occupied.
+- asserted the design point was unoccupied without having run the search that found it occupied;
+- reported E-000085's held-out-PROMPT score of 1.0000 as evidence that the carrier transports, when the
+  split that the design actually needs — held-out IDENTITIES — reads 0.0000, below chance. The
+  diagnostic had a clean control for the prompt axis and none for the identity axis, which is the same
+  "an instrument that cannot fail" error as the reordering test, found the same day, in my own work.

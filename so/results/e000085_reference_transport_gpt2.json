@@ -9,30 +9,16 @@
         10
       ],
       "n_blocks": 12,
-      "n_ids": 1024,
-      "n_prompts": 16,
-      "rms_scale": 0.5,
-      "seed": 0,
-      "train_top1": 1.0,
-      "heldout_prompt_top1": 0.9962158203125,
-      "clean_control_top1": 0.0009765625,
-      "chance": 0.0009765625
-    },
-    {
-      "model": "gpt2",
-      "read_layers": [
-        8,
-        10
-      ],
-      "n_blocks": 12,
-      "n_ids": 1024,
+      "n_ids": 256,
       "n_prompts": 16,
       "rms_scale": 1.0,
       "seed": 0,
       "train_top1": 1.0,
       "heldout_prompt_top1": 1.0,
-      "clean_control_top1": 0.0009765625,
-      "chance": 0.0009765625
+      "seen_identity_top1": 1.0,
+      "heldout_identity_top1": 0.0,
+      "clean_control_top1": 0.00390625,
+      "chance": 0.00390625
     }
   ],
   "not_claimed": "no capability result, no novelty claim; a frozen-weights diagnostic with a closed-form readout"
