@@ -1268,7 +1268,9 @@ class HistoryIndependence:
     counted as ``residue_rows``. ``exported_hi`` holds when the content arrays are identical row for
     row; ``markers_equal`` is reported separately, because this implementation draws markers from a
     seeded generator whose POSITION encodes the number of prior writes, so a marker can differ for no
-    reason but history.
+    reason but history -- E-000051 read that difference through a frozen reader at AUC 0.948. Under
+    ``MVCCStore(content_markers=True)`` markers are derived from exported content and ``markers_equal``
+    is expected to follow ``exported_hi``; the column is the store-level check of E-000053.
 
     RAW: ``store.cells`` (which keeps evicted and deleted cells), the operation log, and the next cell
     id. An MVCC store keeps its history on purpose; ``raw_hi`` is therefore false for any store that
@@ -1315,8 +1317,13 @@ def check_history_independence(store: Any) -> HistoryIndependence:
     """
     from .mvcc import CellKind, MVCCStore, Status
 
+    # the same construction parameters INCLUDING the marker scheme: under ``content_markers`` the fresh
+    # store signs identical content identically, so ``markers_equal`` can hold; without it the fresh
+    # store's generator sits at a different position and ``markers_equal`` reports the history channel
     fresh = MVCCStore(marker_dim=store.marker_dim, seed=store.seed, valid_radius=store.valid_radius,
-                      marker_centre=store.marker_centre)
+                      marker_centre=store.marker_centre,
+                      content_markers=getattr(store, "content_markers", False),
+                      marker_key=getattr(store, "marker_key", None))
     fresh_kid: Dict[int, int] = {}
     residue = 0
     # facts first, then links, so a link's target already exists in the fresh store; within each

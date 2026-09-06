@@ -105,10 +105,14 @@ def sample_alias_world(rng: np.random.Generator, n_base: int, n_groups: int, n_a
     return World(n_entities, n_relations, n_synonyms, facts), AliasSpec(alias_of, groups)
 
 
-def load_arm(world: World, spec: AliasSpec, centre: np.ndarray, seed: int, symlink: bool
-             ) -> Tuple[MVCCStore, Dict[Tuple[int, int], int]]:
-    """Write the world into a store; ``symlink`` decides whether alias keys become LINK cells."""
-    store = MVCCStore(marker_dim=centre.shape[0], seed=seed, marker_centre=centre)
+def load_arm(world: World, spec: AliasSpec, centre: np.ndarray, seed: int, symlink: bool,
+             content_markers: bool = False) -> Tuple[MVCCStore, Dict[Tuple[int, int], int]]:
+    """Write the world into a store; ``symlink`` decides whether alias keys become LINK cells.
+
+    ``content_markers`` (E-000053, default off -- every recorded arm used the generator scheme) makes
+    the store derive each row's marker from its exported content instead of the generator's position.
+    """
+    store = MVCCStore(marker_dim=centre.shape[0], seed=seed, marker_centre=centre, content_markers=content_markers)
     kids: Dict[Tuple[int, int], int] = {}
     for f in world.facts:                                   # facts first: a link needs its target
         if f.key not in spec.alias_of:

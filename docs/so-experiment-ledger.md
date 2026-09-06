@@ -2616,13 +2616,13 @@ number re-read from the result files for this entry.
 
 | clause of the target | delivered? | the record |
 |---|---|---|
-| add like a container | **yes at synthetic scale; in GPT-2 at a strong template only** | E-000014: 10,000 cells, direct 1.0000, provenance 0.9998. E-000026 (GPT-2): direct 0.5633 and alias 0.5000 at template 0 — FAIL against 0.85 / 0.80 — and 0.9933 / 0.8600 at the strong template — PASS. §31.21: the gap is token position, removable by a prefix without training. |
+| add like a container | **yes at synthetic scale; in GPT-2 at a strong template only** | E-000014: 10,000 cells, direct 1.0000, provenance 0.9998. E-000026 (GPT-2): direct 0.5633 and alias 0.5000 at template 0 — FAIL against 0.85 / 0.80 — and 0.9933 / 0.8600 at the strong template — PASS. §31.21: the gap is token position, removable by a prefix without training. **[§31.46, measured on three seeds: with one token at position 0 at inference and no weight changed, E-000020's template-0 rows read direct 0.9933, alias 0.9050, UPDATE reach 0.9350, rollback 0.9050 — every FAIL in this cell was the sink, and this row is now "yes in GPT-2 at every subject-initial template, with the subject-medial ones paying the prefix's lexical price".]** |
 | behaves like the model's own knowledge | **no, by the editing field's own metrics** | E-000013: override 1.0000 on the trained template, `override_heldout_min` **0.0000** on held-out phrasings; natural held-out reading 0.66 with 88.6% of the gap in addressing (E-000039-A). Injection on generic text: `generic/kl_to_base` 2.27 nats (E-000013) and 3.27, worst 3.65 (E-000017-B), against a 0.05 bar — a locality failure. ROME reports ~96% paraphrase success; RippleEdits alias 86.8–100%. |
 | composes | **yes** | E-000016: two dereference slots resolve two-link chains at 1.0000, all five claim groups "yes"; GPT-2 hop2 0.9350 (E-000013). |
 | own delete, modify, version | **operations yes; certified for REVOKE (both gates) and SHRED (hard gate) in GPT-2; holed elsewhere** | Thirteen operations in `so/mvcc.py`. E-000030: interface-level certificate, invariant for every query. But SHRED in the synthetic model gives the object up at **1.0000** through the ungated reverse key (E-000028), and the gate's operational radius is 0.90 against the declared 0.35 (E-000029). |
 | delete reverts to the prior (the overlay) | **on the trained phrasing only, and by construction** | E-000013: `revoke/kl_to_base` 0.0004 (worst 0.0005) PASS; `revoke/heldout_kl_max` 3.70, worst **4.47**, against 0.1 FAIL; `revoke/top1_matches_base_pooled` 0.7617, worst 0.7300, against 0.95 FAIL; `fallback_after_revoke_by_construction` **no**. |
 | traceless | **no — referentially clean, not history independent** | E-000046 third run: BLANK raw disclosure 0.0000, exported-level history independence **0.0000** on cells with an alias (3.1 residue rows), raw-level 0.0000 everywhere (§31.35). |
-| the symlinks make external the same as internal | **half** | LINK cells share one object across alias *keys*: E-000015 update reach 1.0000 against 0.0000 in the copy arm, object recoverable by probe after one SHRED 0.7% against 87.3%; in GPT-2, update reach 0.8850 worst seed against the 0.90 bar (E-000026); rollback through an alias 0.5000 FAIL. *Phrasings* are not symlinked at all — they are learned addressing (§31.7, §31.21), and that is where the held-out failures live. |
+| the symlinks make external the same as internal | **half** | LINK cells share one object across alias *keys*: E-000015 update reach 1.0000 against 0.0000 in the copy arm, object recoverable by probe after one SHRED 0.7% against 87.3%; in GPT-2, update reach 0.8850 worst seed against the 0.90 bar (E-000026); rollback through an alias 0.5000 FAIL **[§31.46: 0.8850 → 0.9000 and 0.5000 → 0.9050 with a token at position 0, no weight changed; the duplication control stays at 0.0000, so the lift is the pointer's]**. *Phrasings* are not symlinked at all — they are learned addressing (§31.7, §31.21), and that is where the held-out failures live. |
 
 Read across: the row has the conjunction as *operations*, and fails its own bars on the three
 properties the target names as the point — behaves like own knowledge, reverts to the prior off the
@@ -2737,6 +2737,12 @@ exactly those that put the subject at token position 0, and GPT-2's tokenizer pr
 
 ### 31.38 The held-out paraphrase gap is the position-0 token, and a BOS at training time closes its subject-initial half for free (2026-09-05, E-000050)
 
+[Retracted in part, §31.44: the pre-registered rule's third branch fired (arm C failed the generic,
+medial-reading and addressing rows in every seed), so "for free", "at no price", "the honest held-out
+numbers are C's" and the re-scoping to C are withdrawn; the medial "residue" is C's regression on t9
+against an untrained control that has no medial gap; arm D's SHRED 1.0000 is a refusal floor; arm B's
+seed 0 was probed before registration. The subject-initial finding (arms A, B, D) stands.]
+
 The probe that opened this (§31.37's end): GPT-2's tokenizer prepends no BOS, so a template that begins
 with the subject makes the subject the position-0 token — the attention-sink position, whose residual
 is a fixed direction — and the adapter's routing query reads the sink instead of the subject. Four arms
@@ -2764,7 +2770,7 @@ trained with a BOS, held-out reading 0.9712 (bar 0.95, PASS), subject-initial he
 and two rows FAIL: subject-medial held-out reading 0.91 with addressing 0.83 (bars 0.95), and
 generic-text injection 4.22 nats against the control's 3.65.
 
-**The decision rule fires two of its branches, and the record keeps both.** The subject-initial half
+**The decision rule fires two of its branches, and the record keeps both.** [Wrong — the third branch fired; §31.44.] The subject-initial half
 of the held-out paraphrase failure — the half that fired E-000017's kill criterion, produced
 E-000025's bimodality, drove E-000026's template selection and defeated E-000039-B's tie — is the
 position-0 token and nothing else; a BOS at training time closes it at no price on the trained
@@ -2779,7 +2785,11 @@ adapter it has trained, and by this one by more.
 (ICLR 2025: the sink follows position 0, not the token), and the field's prepend-BOS convention
 (TransformerLens). The diagnosis-and-remedy chain — subject at token 0 on a GPT-2-family model breaks
 the key a locate-and-edit method reads, any prefix repairs it, Llama's `<s>` prevents it — is Yang et
-al., "The Fall of ROME" (Findings of EMNLP 2024), for a weight edit, and is cited first. What was not
+al., "The Fall of ROME" (Findings of EMNLP 2024), for a weight edit, and is cited first. [Correction, §31.43: this
+adapter's subjects are single BPE tokens by construction, so the failing templates here are exactly
+Yang et al.'s collapse condition — subject-initial *and* single-token — and not a new condition; what
+this section adds is the external-memory measurement of it and the bare-BOS control in both
+directions.] What was not
 published is the measurement on an external addressable memory's paraphrase generalisation and
 deletion propagation, with a bare BOS, both at inference (a trade) and at training (free on the
 initial half), with the reverse control; and two of its numbers correct the sweep's own refuters: the
@@ -2792,7 +2802,7 @@ template now carries this section: E-000017-B's kill criterion (fired on templat
 subject-initial), E-000025's twelve-template table (rows 0, 2, 6, 8, 11), E-000026's template rule,
 E-000039-A's "88.6% of the gap is addressing" (the addressing share *is* the position-0 share),
 E-000039-B, and the target table's second row in §31.36. None of those numbers is wrong; each was a
-measurement of an adapter reading a sink. The instrument switch (`SO_BOS=1` in `encode_texts`, read at
+measurement of an adapter reading a sink. [§31.44: the subject-initial rows of each are re-scoped; kill criterion 5 is not, since it still fires under a BOS on t9.] The instrument switch (`SO_BOS=1` in `encode_texts`, read at
 call time) is on for every run from here.
 
 ### 31.39 The J-space pod is by construction in this adapter, and the one measurement that survived is predicted by §31.38 (2026-09-05)
@@ -2989,8 +2999,1180 @@ Owned and cited: the adversary shape (Chen et al., arXiv:2506.14003), the cascad
 (Ramesh, arXiv:2607.27539 — at chance in his memory, which has no seeded markers; here it is the
 marker channel), the two-clause store/reader structure (Garg, Goldwasser and Vasudevan). The GPT-2
 half is queued behind E-000050 and decides whether a frozen language model's adapter, which routes
-with the same dense softmax, carries the same two channels.
+with the same dense softmax, carries the same two channels. [Measured: §31.45 — it carries both, an
+order of magnitude more logit movement, and it fails the SET NULL row.]
+
+**E-000053, measured (2026-09-05): content-derived markers close the marker channel at this reader, and
+the frozen reader accepts them.** `MVCCStore(content_markers=True)` draws every marker from an HMAC of
+the row's exported content instead of the seeded generator (§31.42 registered it; `so/experiments/e000053_hi_markers_reader.py`,
+three seeds, 100 pods, trains nothing). All 23 pre-registered rows pass at the worst seed.
+
+| arm (positive vs reference) | AUC, deleted keys | AUC, bystanders | AUC, generic | recorded, bystanders (E-000051) | max KL, bystanders |
+|---|---|---|---|---|---|
+| LIVE vs NEVER (validity) | 1.000 | — | — | — | — |
+| CASCADE vs NEVER (the marker channel) | 0.500 | **0.500** (every seed) | 0.500 | 0.948 | 0.000 |
+| BLANK vs CASCADE | 1.000 | 0.800 (worst 0.769) | 0.670 | 0.817 | 0.102 |
+| DANGLE vs CASCADE | 0.999 | 0.839 (worst 0.833) | 0.681 | 0.869 | 0.030 |
+| PERM vs PERM2 (float floor) | — | 0.487 | 0.571 | 0.499 | 0.000 |
+| ADD2 vs PERM (row-count floor) | — | 0.974 (worst 0.944) | 0.770 | 0.965 | 0.000 |
+| DUP vs DUPX (identical content, identical markers) | — | 0.499 | — | — | 0.000 |
+
+Read in the order the rule fixed. Store half: CASCADE exported-HI 1.000 and `markers_equal` 1.000 on
+every pod (the generator scheme gave 0.000 on the same pods), BLANK and DANGLE still 0.000 with two
+residue rows. R1, the row that could have failed: the E-000015 reader, trained on generator-drawn
+markers, accepts the re-signed live bank as its own — gate acceptance 1.000, max gate delta 0.002, top-1
+agreement 1.000, KL ≤ 0.0001 nats, reading accuracy unchanged — while the markers themselves moved by
+up to 0.281. So the option does not need retraining. R2: ADD2 moves by 0.020–0.032 per seed, within the
+±0.05 bar, and stays above 0.90. M1: CASCADE-versus-NEVER at exactly 0.500 on every class with
+interface residual 0.000 (E-000051: 0.0116) — the pipeline check it was declared to be, and no other
+channel (row order, a placeholder column) reaches the reader. M2: BLANK and DANGLE against CASCADE
+stay within 0.014–0.042 of E-000051's per-seed values and below the ADD2 floor on every seed: the
+two live rows are the whole residue, as §31.41 read them. S1, registered and not decided on: two rows
+with identical content now carry identical markers (pair distance 0.000; generator scheme 0.135–0.194)
+and the reader cannot tell them from two distinct-marker rows (AUC 0.499, KL 10⁻⁹). Nothing here is a
+claim: the composition is Hartline et al.'s canonical-representation argument with a deterministic
+reader, and the measured content is that this reader's learned gate is indifferent to which sample of
+the marker family signs the bank. The record: `so/results/e000053_hi_markers_reader.{json,md}`.
+
+### 31.42 After the artefact: what the seam still holds, and what closed with it (2026-09-05)
+
+With E-000050 (§31.38) and E-000051 (§31.41) in hand, an eleven-agent workflow constructed the three
+experiments those two results made possible, refuted each result sentence twice, and landed a run
+order. Two survive as measurements; one closes as a tautology, and it is the one that carried the
+J-space half of the idea.
+
+**J-space addressing closes — a tautology of the adapter's keying.** The design: is the subject of a
+query recoverable from the J-lens coordinates of the last-token residual at the read layers, and can a
+pointer memory be keyed on those coordinates with no training, inheriting their paraphrase invariance?
+Both refuters (0.8 each) read it against `so/llm_adapter.py` and found the learned address already is
+that object: the routing score is `q_proj(q_ln(h_l[last])) · k_proj(ln_key(W_in[s] + rel_emb[r]))`, and on
+GPT-2 `W_in` is `W_U`, so the trained query is a learned affine readout of the subject's unembedding
+row from the last-position residual plus a relation term; the "training-free J-space address"
+`⟨ln_f(h), J_lᵀ W_U[s]⟩` has the same bilinear form with the learned maps replaced by the identity or
+`J`, and `encode_bank` keys one cell per exact (subject, relation), so a one-hot address on the argmax
+subject and relation coordinates is a dictionary lookup on the decode. What would remain is a
+per-layer calibration of subject decodability at the answer position — Merullo et al.'s argument-
+formation stage under forced choice, with McDougall's L10H7 predicting the layer-10 drop — bounded by
+the recorded cos(v_u, w_u) = 0.858 at layer 8 and the identity at layer 10. Not run. With §31.39 (the
+J-space *write* is by construction) and §31.40 (the J-lens *carrier* is owned and nearly the
+unembedding row), this is the third and last reading of "J space" at the seam, and it closes the
+same way: what the adapter does is already a J-space object, and naming it does not make a result.
+
+**E-000053 — history-independent markers, a ledger row and not a claim.** The refuters flagged the
+positive sentence as by construction: with equal content (E-000046), equal markers (the option and its
+unit test) and the same row order, CASCADE(p) and NEVER(p) export bit-identical banks and a reader that
+never consumes `kid` returns identical outputs, so CASCADE-versus-NEVER at chance is Hartline et al.'s
+canonical-representation-implies-SHI composed with a deterministic reader. The implementation is kept
+and the by-construction clause is declared before the run (`so/experiments/e000053_hi_markers_reader.py`:
+M1 is a pipeline check). What can fail: whether the frozen reader's *learned* gate accepts a re-signed
+bank as its own (R1 — the gate was trained on generator-drawn markers; the derived ones are a
+different sample of the same family), whether the row-count floor and the residue AUCs stay where
+E-000051 put them (R2, M2), and the side effect that identical content now carries identical markers
+(S1). The option is on record (`MVCCStore(content_markers=True)`, default off, 269 tests). Measured; the row is at the end of §31.41 — every registered clause held, R1 included.
+
+**E-000052 — the pointer battery on the BOS-trained symlink adapter, narrowed.** One refuter left it
+standing ("what Raeesi and Roed name as future work and nobody runs"); the other found most of its
+positive sentence to be a predicted transport of rows the repository already holds. The residue both
+leave, and the only content the run will carry: (i) the reader's **price** for the pointer in the BOS
+regime — `cost_of_sharing` and `cost_of_link_training` over all twelve phrasings against the BOS-trained
+link-free adapter, the one number whose sign nobody here can predict (E-000025's 0.0954 sits 0.005 under
+its bar); (ii) the **SET NULL row** — a blanked alias is a self-referencing link the adapter never saw,
+and E-000051 read one of two as a wrong entity on GPT-2 — as the wrong-entity rate at every phrasing;
+(iii) the **subject-medial held-out residue** E-000050 left at 0.91 read / 0.83 route, at t9 and t10,
+in the lifecycle rows whose failure is an answered entity. The completeness critic then corrected the
+pre-registration in five places, carried into the script when it is written: the reproduction anchor
+is restricted to trained templates (t10 was both anchor and claim row); its tolerance is the recorded
+seed spread, not 0.05; "anchor fails" and "bar fails while the anchor holds" are separate outcomes, so
+a negative can fire at trained templates; the medial-template `≤` rows are scored only where
+`alias_direct ≥ 0.80`, since a routing miss passes every one of them for free; and only the
+wrong-entity rate is a claim row for BLANK, the UNKNOWN rate being validity. The substrate — the
+E-000020 trainer unchanged with a BOS on every prompt — is training behind E-000051's GPT-2 half. Disclosed before the substrate exists: the script's end-to-end smoke, run on the
+*recorded* no-BOS E-000020 checkpoint (seed 0, templates 3 and 8, the evaluation shrunk), printed the
+SET NULL row at 0.15 (t3) and 0.30 (t8) wrong-entity, and E-000051's GPT-2 seed 0 read a blanked alias
+as an entity in 0.175 of cases — so the row the battery is about is likely to fail on the BOS-trained
+substrate too, and the pre-registered bar (≤ 0.05) is left exactly where it was.
+Everything in it is a measurement; the mechanism is SQL-92's, the remedy is Yang et al.'s, and the
+design is Raeesi and Roed's future work.
+
+**Standing.** Twenty repetitions of the request, seven sweeps, ten retractions. What the seam holds
+after this entry is three measurements in flight (E-000051 on the GPT-2 reader, E-000052, E-000053),
+one instrument finding with a field-level question attached (E-000050 and its re-analysis), and no
+mechanism. The J-space half is closed on all three readings.
+
+### 31.43 The position-0 condition in the field: four fifths of the editing efficacy prompts, none of the paraphrase metric by design, and E-000050's failing case is the single-token collapse Yang et al. already own (2026-09-05)
+
+§31.38 left a question attached to its instrument finding: if a subject at token 0 with no BOS breaks
+this adapter's routing, how much of the published GPT-2-family editing and memory-adapter evidence was
+measured under that condition, and does any of it split by it? An eight-agent workflow (43 minutes,
+1.13 M tokens) took a census at the source — every prompt of every benchmark it could download, run
+through the HF `gpt2` tokenizer as the released code loads it (ByteLevel post-processor, one added
+token, no `add_bos_token`), with "subject at token 0" meaning the prompt begins with the subject string
+*and* token 0's offset span lies inside the subject span — read the BOS handling of each released
+evaluation at file and line (ROME, MEMIT, EasyEdit, the Fall of ROME fork, RippleEdits, MEMIT-CSK,
+GRACE/MELO, MEND, MEMOIR, Larimar, Memory Injections), looked for per-item results to re-split, and
+put the union of its candidate sentences to two refuters and a completeness critic. What follows is
+what survived, with the critic's labels: MEASURED where a tokenizer ran over the released file,
+INFERRED where a subject span or a code path was reconstructed, REPORTED where a paper's own table is
+the only source.
+
+| benchmark / system | prompt type | subject at GPT-2 token 0 | BOS in the released evaluation | label |
+|---|---|---|---|---|
+| CounterFact (Meng et al., 21,919 cases) | `requested_rewrite` (efficacy) | 17,575 / 21,919 = 80.18% (strict token-prefix 80.04%; single-token subject at 0: 80 = 0.36%) | none — `rome/experiments/evaluate.py:91-92`, `eval_utils_counterfact.py:114-123`; `memit` `:94-95`, `:136-147` | MEASURED |
+| CounterFact | `paraphrase_prompts` (generalisation) | 1 / 43,838, and that one spurious (a random-text prefix on every item; Hase et al. 2023 §3.4) | same path | MEASURED |
+| CounterFact | neighborhood / attribute / generation | 80.08% / 80.21% / 63.15% (subject span reconstructed from the relation's templates) | same path | INFERRED |
+| MCF (`multi_counterfact.json`, 20,877) | rewrite / paraphrase / neighborhood / attribute / generation | 82.35% / 0 of 41,754 / 82.30% / 82.40% / 63.33% | MEMIT path | MEASURED |
+| Fall of ROME released case files | rewrite prompt | GPT-2-XL collapse 77 / 77 at token 0 **and** single-token; GPT-J 85 / 85 at 0, 79 / 85 single-token; `normal_1k` 777 / 1000 at 0, 0 single-token-at-0 | fork of EasyEdit, no BOS (`editor.py:151-154`); the test-time random prefix is applied to the rewrite prompt only (`editor.py:359-362`) | MEASURED (files), REPORTED (Tables 4–5) |
+| Fall of ROME released case files | `rephrase_prompt` (EasyEdit counterfact-edit format) | 42 / 77 (GPT-2-XL collapse), 46 / 85 (GPT-J), 529 / 1000 (normal) subject-initial; locality = neighborhood, 100% | evaluated unprefixed, no BOS (`evaluate.py:56-66`); never split | MEASURED / REPORTED |
+| KnowEdit WikiData_counterfact (839 test) | prompt / rephrase | 59 / 839 = 7.0% / 597 / 839 = 71.2% | EasyEdit `editor.py:145-148`, no BOS; rewrite and rephrase scored as single strings, unpadded | MEASURED (recomputed by the critic; the census script for this row was not retained) |
+| zsRE (19,086 / 1,037 / 1,301) | src / rephrase / locality | ≈ 0% / 0.7–1.4% / 100% "nq question:"-prefixed | ROME `dsets/zsre.py`, `eval_utils_zsre.py:101-105`; EasyEdit path | MEASURED |
+| MQuAKE-CF-3k (6,015) | cloze edit prompts / question forms | 4,248 / 6,015 = 70.6% / 0–0.2% (27 of 44 cloze templates `[X]`-initial, 0 of 44 question templates) | README: edited models scored on the same cloze statement; the tokenisation path is external to the repo | MEASURED + REPORTED |
+| RippleEdits | edits / six test categories | 2.7–7.9% / 0–8.4% (string proxy on the relation templates; no subject label in the files) | `src/queryexecutor.py:65` bare encode for gpt2-xl / gpt-j | INFERRED |
+| PEP3k / 20Q (MEMIT-CSK) | edit set / 20Q | 51.7% (a further 47.8% with an article at 0, a string test) / 90.2% | `evaluate_csk.py:119-120`, `eval_utils_csk.py:98-104` bare, right-padded | MEASURED |
+| WISE / MEMOIR (GPT-J) | zsRE edit / hallucination / temporal | 0 / 1,037; 0 / 600 (fixed Wikipedia header); 75 / 75 = 100% | read from EasyEdit's copy, the WISE clone failed; EasyEdit forces `padding_side='left'` for these algorithms (`editor.py:181-183`) | MEASURED (copy) |
+| GRACE / MELO (GPT-2-XL) | all prompts | 0% (`This is a Wikipedia passage about {concept}.` header) | GPT2TokenizerFast, pad = eos, no BOS (`grace/models.py:98`) | MEASURED |
+| Larimar (GPT-2-large decoder) | CounterFact / zsRE | 0% at token 0 by construction: an explicit `<BOS>` string on every evaluated prompt (`counterfact_eval_rephrase.py:579-581, 644, 664-668`); 72.2% of its prefix-stripped paraphrases are subject-initial *after* that BOS (string proxy for its stripping) | never ran without a BOS | MEASURED / INFERRED |
+| Memory Injections (GPT-2 small / large) | multi-hop prompts | 6.8% / 0% — but TransformerLens `to_tokens` with `prepend_bos` at its default (`utils.py:31, 147`); the pinned `transformer-lens==1.4.0` source was not read | never ran without a BOS | MEASURED (default INFERRED for the pinned version) |
+| Left padding on HF `gpt2` (transformers 5.16.1, eager) | — | pads receive 0.0 attention, so a pad is **not** a quasi-BOS; `position_ids = arange` ignores the mask, so a left-padded shorter prompt's first real token *loses* the sink (layer-2 max abs 618 → 34–37 on 4 / 4 prompts, final-state cosine 0.83–0.94, argmax changes 4 / 4; mask-derived positions restore cosine 1.000) | — | MEASURED (GPT-J untested) |
+| Per-item re-split (third-party re-run of the MEMIT evaluate script on GPT-2-XL, 3,533 single edits per method; 3,119 subject-at-0 vs 414 not) | rewrite / neighborhood / paraphrase | ROME rewrite 1.000 vs 1.000, MEMIT 0.971 vs 0.971; neighborhood ROME 0.745 vs 0.669; paraphrase (every item subject-medial, split by the *edit* prompt's position) 0.986 vs 0.929 | MEMIT path | MEASURED, and discounted below |
+
+No official per-item results exist (the ROME/MEMIT result directory is gone from `baulab.info`; Fall
+of ROME releases case lists, not outputs), and no paper in the search reports a subject-position split
+for paraphrase generalisation or for a memory read.
+
+**What the refuters removed.** Three things, each from the census's own numbers. (1) The negation
+"the standard paraphrase metric never places the subject at token 0" is true for Meng et al.'s
+`paraphrase_prompts` and MCF (random-text-prefixed by design, a file property ROME's Appendix D does
+not state) and for zsRE, and false for the EasyEdit-format CounterFact rephrase (53% in Fall of ROME's
+thousand normal cases), KnowEdit WikiData_counterfact rephrase (71%) and MQuAKE cloze (70.6%) — so
+every EasyEdit-harness GPT-2-XL / GPT-J CounterFact generalisation number since 2024 is about half
+subject-initial and unsplit. (2) An axis confusion: the census condition is the subject's *first*
+token at position 0, but ROME and MEMIT read and write at `subject_last`, which is position 0 only for
+the 80 single-token subjects (0.36%), and the third-party re-split shows the condition carries no
+efficacy penalty (1.000 vs 1.000; Fall of ROME's normal row is 96.16% on cases that are 78%
+subject-initial). (3) Left padding, which the census had inferred to act as a quasi-BOS for the
+KnowEdit-ZsRE Relation_Specificity row, was measured to do the opposite: the shorter subject-initial
+prompt in a left-padded batch is evaluated with *no* token at position 0 and no sink. The re-split's
+paraphrase column (0.986 vs 0.929) splits by the edit prompt over all-medial paraphrases and contrasts
+templates within a relation; it is evidence about nothing here and is not quoted.
+
+**What the critic corrected, and it changes the landing.** E-000050's subjects are single BPE tokens
+by construction: `select_entities` in `so/experiments/e000008_gpt2_adapter.py` takes the first 256
+tokens matching `Ġ[A-Z][a-z]{3,}` and raises "not enough single-token entity names" otherwise, and
+every record carries the note "entities are the first 256 capitalised single BPE tokens of GPT-2". So
+the templates that fail in §31.38 are exactly Yang et al.'s collapse condition — subject-initial
+**and** single-token, 77 / 77 of their GPT-2-XL collapse cases — which is 80 of 21,919 CounterFact
+prompts, 3 of the 3,119 subject-at-0 cases in the re-split, 0 of the 777 in `normal_1k`, and 0 of 59
+prompts and 11 of 597 rephrases in KnowEdit WikiData_counterfact. The 80% census describes a different
+condition, a multi-token subject whose first token sits at the sink, on which ROME's `subject_last`
+key never sits at position 0, no penalty is visible, and this repository has no measurement. The
+workflow's landing sentence closed with "a learned routing query fails on the condition where ROME's
+efficacy key does not"; at the matched condition ROME's key *does* fail (Fall of ROME Table 4,
+efficacy 5.19%), and the sentence contrasted two conditions. Two smaller overstatements go with it:
+`normal_1k` is defined by the absence of collapse, so its 96% cannot show "no penalty"; and "any
+prefix repairs it" is broader than the paper, which tested random prefixes from its editing
+distribution — the bare-`<|endoftext|>` result, in both directions, is E-000050's own. §31.38 now
+carries this note in place.
+
+**The sentence that survives.** E-000050 reproduces the Fall of ROME collapse condition on an external
+addressable memory over frozen GPT-2 whose routing query is read at the last prompt token — a read
+*through* the sink into the last-token state, not a key extracted at it — and is the only
+BOS-versus-no-BOS control of that condition in either direction (recorded weights read with a BOS:
+a trade, initial 0.97 / 0.98, medial 0.95 → 0.70 / 0.64; BOS-trained weights read without one:
+initial 0.00 / 0.00, medial 0.95 / 0.97), on axes no editing paper reports: held-out paraphrase reading
+and addressing, and deletion propagation (0.865 → 0.990). What is unpublished as numbers is the
+census — CounterFact rewrite 80.2%, MCF 82.4%, the ROME-harness paraphrase metric 0% by design, the
+EasyEdit-format rephrase 53%, KnowEdit rephrase 71%, MQuAKE cloze 70.6% against 0% for every question
+form, zsRE ≈ 0%, the WISE / MEMOIR temporal set 100% — together with the file-and-line record that
+ROME, MEMIT, EasyEdit, RippleEdits, MEMIT-CSK and GRACE / MELO evaluate with no BOS while Larimar and
+Memory Injections carry one by construction and never ran without it, the left-padding measurement,
+and the negative that no paper splits by subject position. Everything mechanistic is owned: the sink
+(Xiao 2023, Sun 2024, Gu ICLR 2025, Ran-Milo 2026), the single-token subject-initial collapse and the
+`<s>` escape (Fall of ROME; Butterfly Effect), the prefixed / unprefixed key asymmetry (Rebuilding
+ROME), the library defaults (HF `add_bos_token=False`; TransformerLens `prepend_bos=True`, "heads
+often use the first position as a resting position").
+
+**Not claimed.** That any published ROME / MEMIT efficacy, locality or generation number is
+artefactual (the condition is present at ~80% and shows no penalty where it can be seen). That the
+EasyEdit-harness generalisation numbers *are* contaminated (they are half subject-initial and
+unsplit; that is a question, not a finding). That Larimar or Memory Injections would fail without
+their BOS (neither ran the control). That E-000050's failure is a property of GPT-2 reading
+subject-initial prompts in general rather than of this adapter's learned routing on single-token
+subjects. The literature search was two targeted queries plus the census's own list, and a
+2025–26 evaluation critique reporting a subject-position split could exist unseen; Fall of ROME's
+`rephrase_prompt` provenance as EasyEdit's `counterfact-edit.json` is inferred from field names; GPT-J
+padding is untested.
+
+**The cheapest decisive measurement, registered as E-000054 — since run, and its prediction refuted (§31.55).** The critic's, not the
+workflow's: the proposed thousand-edit EasyEdit run would again be 99% multi-token-subject cases, the
+condition E-000050 never tested. Inside this repository the question — is the adapter's failure the
+single-token collapse condition, or subject-at-0 in general — costs a change to the subject surface
+only: render each of the 256 entities as a two-token subject whose identity needs both tokens (a
+16 × 16 product code, so the sink eats half the identity), against a two-token surface identified by
+its second token alone (the sink eats nothing), on E-000050's harness, trained without a BOS and read
+at the initial and medial templates, then trained with one; three seeds. The prediction that could
+fail: the product-code surface fails at the initial templates without a BOS and recovers with one, the
+second-token surface does not fail, and the medial residue is unchanged by either. The field-side
+option, if the published harness must be touched, is about two hundred EasyEdit ROME edits on
+GPT-2-XL — the 77 collapse cases plus the normal cases whose rephrase is subject-initial — with and
+without an evaluation-time `<|endoftext|>`, split by the rephrase prompt's own subject position;
+it needs ROME's layer-covariance statistics and a GPU this box does not have.
+
+*Outcome, added 2026-09-05.* E-000054 ran on three seeds and the prediction's first clause is false:
+the product-code surface does **not** fail at the initial templates without a BOS. It reads 0.91 / 0.90
+held-out subject-initial bare, against 0.37 / 0.54 for the single-token record on the same trainer and
+templates, and the second-token surface reads 1.00 / 0.97. The residue on the product code is 0.03 to
+0.04 against its own subject-medial rows, one fifteenth of the single-token collapse, and a lone space
+removes it. So the 80% census condition — a multi-token subject whose first token sits at the sink —
+costs this adapter nothing, and the failing case is the 0.36% single-token case this section's critic
+had already isolated. The "Not claimed" line below that declined exactly this generalisation was
+right, and is now measured rather than merely withheld. §31.55.
+
+**Standing.** Twenty repetitions of the request, eight sweeps, ten retractions and one landing
+narrowed by its own critic. The field question attached to §31.38 is answered as far as a census can
+answer it: the condition is the majority condition of the efficacy numbers and absent from the
+paraphrase metric by design, and the case that breaks this adapter is the 0.36% case the literature
+already names. The instrument finding stands at its size; the claim that it contaminates published
+evaluations does not exist and was not made.
+
+### 31.44 Eleventh retraction: the BOS-trained arm fired the "costs capability" branch of its own rule, the medial residue is that arm's regression, and the training-free fix is a different token (2026-09-05, E-000050 audit)
+
+A fourteen-agent workflow (57 minutes, 2.27 M tokens) audited E-000050's code, records and controls
+with three independent auditors, drafted three candidate claims from three angles, attacked each twice,
+judged the survivors and put the judged sentence to a completeness critic. Two auditors said the record
+stands; one said it does not; the judge found every draft broken as written. Every number below was
+re-read from `so/results/e000050_bos_trained.json` in this session before it was written down. §31.38
+is retracted in the following parts and corrected in place.
+
+**1. The rule's third branch fired, and I wrote up the first two.** The decision rule fixed before the
+run reads: "C passes every row → the honest held-out numbers for the memory are C's … C passes the
+subject-initial rows and fails the medial ones → the artefact is the subject-initial half only and the
+remainder is semantic. C fails the trained-template or generic rows → a BOS at training time costs
+capability and the finding is B's alone." Arm C failed three registered rows in every seed — generic
+KL 4.170 / 4.158 / 4.224 against the 3.65 bar, held-out medial reading 0.91, held-out addressing 0.83
+— so the third branch fired. §31.38's title ("closes its subject-initial half for free"), "at no
+price", "the decision rule fires two of its branches, and the record keeps both", and the re-scoping of
+every prior held-out number to C's are withdrawn. `SO_BOS=1` as the default instrument was an
+engineering decision taken outside the rule; it stays only for runs already registered under it, whose
+rows compare BOS-trained to BOS-trained (E-000052's price arm).
+
+**2. The "residual medial gap" is C's regression, not a residue.** The untrained control has no medial
+gap. Per seed on the 200-target rows, t9 (the one genuinely unseen subject-medial template):
+
+| arm | t9 reading, seeds 0 / 1 / 2 | t9 refusal while active (`active_unknown`) | t10 |
+|---|---|---|---|
+| A — recorded, no BOS | 0.990 / 0.955 / 0.960 | 0.005 / 0.025 / 0.025 | 1.00 |
+| B — recorded, BOS at inference | 0.810 / 0.705 / 0.775 | 0.135 / 0.170 / 0.140 | 1.00 |
+| C — BOS-trained, BOS | 0.945 / 0.905 / 0.885 | 0.055 / 0.090 / 0.105 | 1.00 |
+| D — BOS-trained, no BOS | 0.995 / 0.995 / 0.990 | 0.005 / 0.005 / 0.010 | 1.00 |
+
+C is below A on t9 in every seed, and the loss is mostly refusal — the same direction as C's broken-key
+gain (0.63 → 0.935). t10 is "It is known that " followed by the trained t0 verbatim and reads 1.00 in
+every arm and seed, so "the two medial held-out forms" of §31.38 is one form. The sentence "that
+residue is where the paraphrase problem of this memory now lives" is withdrawn: the paraphrase problem
+of the *recorded* memory was the subject-initial half, and the BOS-trained memory's medial gap is a cost
+the training introduced.
+
+**3. The generic-KL bar compared a BOS-prefixed distribution against a bare one.** The GENERIC prompts
+go through `encode_texts` too, so arm C's 4.22 carries the BOS while the 3.65 bar is arm A's on bare
+text. Arm B — identical weights, BOS at inference only — already sits at 3.920 / 3.336 / 3.558 against
+A's 3.647 / 2.959 / 3.216, +0.27 to +0.38 nats with no weight changed. Like for like, C − B is +0.25 /
++0.82 / +0.67 and D − A is +0.15 / +0.70 / +0.57 per seed. The direction (the BOS-trained adapter
+injects more where no key matches) survives; the attribution of the whole 0.57 to training does not.
+An unlogged five-prompt check the auditor quoted was re-run here (BOS-trained seed 0, five prompts): the
+BOS alone moves the base by 0.25 nats, the adapter by 4.8. And the quantity is the *mean* generic KL
+per seed, worst seed, not a maximum, wherever this ledger wrote "max".
+
+**4. Three deletion rows were vacuous or doubled, and the one clause that carries was not written.**
+Arm D's "SHRED reaches the worst held-out phrasing 1.0000" is the refusal floor of an adapter that
+answers UNKNOWN before any deletion (D's t11 `active_unknown` is 1.0 in every seed); the column is an
+unconditional UNKNOWN rate, and arm A's 0.865 on t11 is inflated the same way (t11 read correctly at
+0.41–0.445 while active, `active_unknown` 0.47–0.49). `shred_heldout_min` and `revoke_heldout_min`
+are one measurement (identical in every arm and seed, §31.13's identity) counted as two PASS rows.
+`revoked_deleted_object ≤ 0.02` cannot fail under the status gate (0.0000 in every arm, seed and prior
+record). What carries the re-reading of the record's 0.865 is a row nobody quoted: on t11 the
+other-entity rate is 0.085 / 0.085 / 0.105 while the fact is active and 0.065 / 0.105 / 0.090 after
+it is revoked, with refusal conditional on a correct read at 1.000 / 0.988 / 0.976 — the non-UNKNOWN
+residue after deletion is the misrouting that exists before it. That is the sentence Raeesi and Roed
+(arXiv:2607.00605, §6.4) publish at twelve thousand deletions: prompt formulation moves the full
+baseline far more than the deletion residual.
+
+**5. The remedy makes the recorded deletion number worse on the medial template.** Under a BOS on the
+recorded weights, `shred_heldout_min` is 0.945 / 0.84 / 0.88 — now set by t9 (t9 `active_unknown`
+0.135–0.17). E-000017's kill criterion 5 (≥ 0.95) would still fire under `SO_BOS=1`, on a
+subject-medial phrasing. §31.38's "re-scoped to position 0" for that criterion is withdrawn.
+
+**6. Arm B was confirmatory, not predictive.** The pre-registration commit (`42818f4`) says the
+BOS-at-inference probe had been run on the E-000017-B checkpoint before B's two rows were written; only
+seeds 1–2 and arms C and D were blind. "Criteria fixed before the run" holds for C and D and for B's
+seeds 1–2, not for B's seed 0.
+
+**7. The price is the token's, not the prefix's — and E-000050-A seed 0 has all eight variants.** The
+recorded seed-0 weights, no training, 100 targets, all rows from `scratchpad/e50a/full.log` (the
+`none` and `bos` lines equal arms A and B seed 0 to printed precision):
+
+| prefix at position 0 | held-out subject-initial read / route | held-out medial (t9) read / route | held-out reading | trained reading | SHRED reaches worst held-out | broken-key UNKNOWN | mean generic KL |
+|---|---|---|---|---|---|---|---|
+| none (the record) | 0.39 / 0.54 | 0.96 / 0.97 | 0.7587 | 0.9312 | 0.920 | 0.630 | 3.647 |
+| `<\|endoftext\|>` | 0.99 / 1.00 | 0.79 / 0.64 | 0.9487 | 0.9719 | 0.945 | 0.520 | 3.920 |
+| `<\|endoftext\|>` + space | 0.98 / 0.97 | 0.80 / 0.62 | 0.9413 | 0.9650 | 0.935 | 0.615 | 3.826 |
+| newline | 0.99 / 1.00 | 0.86 / 0.69 | 0.9638 | 0.9925 | 0.945 | 0.540 | 3.800 |
+| "It is known that " (E-000039-A's text) | 0.99 / 0.99 | 0.69 / 0.45 | 0.9325 | 0.9906 | 0.980 | 0.680 | 3.527 |
+| the same text without its trailing space | 0.99 / 0.99 | 0.69 / 0.45 | 0.9338 | 0.9919 | 0.980 | 0.580 | 3.616 |
+| "Also" | 0.99 / 0.99 | 0.90 / 0.87 | 0.9700 | 0.9850 | 0.930 | 0.570 | 3.815 |
+| a lone space | 0.99 / 0.99 | **0.97 / 0.96** | **0.9938** | **0.9938** | **0.990** | 0.535 | 3.677 |
+
+Read by the rule E-000050-A registered for its three marker arms: BOS + space ≈ BOS (0.80 / 0.62 vs
+0.79 / 0.64), so the trained space-marker before the subject does not rescue t9 under a BOS; text
+without its space = text (0.69 / 0.45), so the marker is not what the text costs either; a lone space at
+position 0 costs nothing. The medial price therefore belongs to *which token* sits at position 0 — the
+BOS and the newline cost t9 most, a word less, a space not at all — and not to moving the subject off
+position 0 as such; §31.38's "a prefix is a trade for an adapter trained without one" is re-scoped to
+the BOS. On this seed the lone space reaches, with no training, held-out reading 0.9938 against C's
+0.9837, no t9 cost against C's regression, SHRED reach 0.990, and generic KL 3.677 against C's 4.170;
+C wins only broken-key refusal (0.97 vs 0.535). The space arm is confounded by construction — entity
+names carry a leading space, so every trained medial prompt contains the lone-space token immediately
+before the subject — and the BOS + space row says that bigram alone does not explain the ordering; it
+is one seed, and seeds 1–2 are running. An unrecorded 30-target probe from the audit (`scratchpad/audit50/probe.json`)
+adds that the BOS-trained seed-0 adapter, read *without* its BOS but with a space, "Also" or a newline
+at position 0, reads the subject-initial forms at 0.97–1.00: arm D's collapse is the empty position 0,
+not a dependence on the BOS token.
+
+**8. Citations §31.38 owed.** Youssef, Zhao, Schlötterer and Seifert (NAACL 2025, arXiv:2410.12586,
+§7): a bare `<BOS>` inserted at inference changes what GPT-2-XL and GPT-J read in an in-context editing
+setting (attention to the query 15% → 38%) and does nothing on Llama 3.1 — the bare-BOS form, at a
+different position. Barbero et al. (COLM 2025, arXiv:2504.02732, §5, Table 2): removing `<bos>` from a
+model trained with it collapses performance, and without it the sink forms at the first token
+regardless — arms D and A in kind, on their own pretrained models. Yang et al., Table 4: prefixed keys
+at edit time and an unprefixed prompt at test give efficacy 5.19% on GPT-2-XL — the nearer parent of
+arm D's shape than the `<s>` removal in A.2; and their A.4 sentence is "while position embedding plays a
+role, it is not the only determining factor", not the paraphrase §31.38 put in quotation marks. Ran-Milo,
+Ofek and Mendel (arXiv:2604.14722): the GPT-2 sink is built from the positional encoding through the
+first-layer MLP, a query bias and the key projection, and nullifying the BOS embedding leaves it at
+99.7% — consistent with, and not an explanation of, the space row above.
+
+**The sentence that survives, at the judge's size and the critic's trim.** On a frozen GPT-2 small
+reading an external status-gated addressable memory (the recorded E-000017-B adapter; three seeds,
+worst seed throughout; criteria committed before arms C and D were trained, B's rows after a seed-0
+probe), the held-out paraphrase failure lies almost entirely on the phrasings whose subject is token 0
+by the tokenizer — Yang et al.'s first-token diagnosis for a ROME weight edit, here on a memory's
+routing query with no weight edited — and is removed there by a token at inference, not by training: a
+bare `<|endoftext|>` prepended to weights trained without it raises held-out subject-initial reading
+and addressing from 0.37 / 0.54 to 0.97 / 0.98 with no weight changed; an adapter of the same design
+trained with the BOS and read without it reads those forms at ≤ 0.01 and routes them at ≤ 0.04 while
+its subject-medial forms stand at ≥ 0.95 / 0.97; the price of that BOS on the recorded weights is the
+one genuinely unseen subject-medial template, t9, 0.95 → 0.70 reading and 0.94 → 0.64 addressing, plus
++0.27 to +0.38 nats of mean generic-text KL to base on the same weights; and the record's held-out
+deletion number, 0.865, was an unconditional UNKNOWN rate on a subject-initial template the adapter
+read correctly at only 0.41–0.445 while active, with the other-entity rate the same before and after
+revocation and refusal conditional on a correct read at 0.976–1.000, so that number measured the
+adapter not reading the phrasing rather than knowledge surviving deletion — a re-reading of the
+E-000017-B row and §31.13, not a new deletion result.
+
+| row | worst seed (per seed) | the control that could have failed |
+|---|---|---|
+| A: held-out subject-initial read / route | 0.37 (0.39, 0.37, 0.45) / 0.54 (0.54, 0.56, 0.59), set by t11 | same weights, t9: 0.95 / 0.94; t10 1.00 |
+| A: record reproduced in-process | 0.72875 = E-000017-B's worst seed exactly; six checkpoint SHA-256 match | a reproduction check, not a control |
+| B: held-out subject-initial read / route | 0.97 (0.99, 0.97, 1.00) / 0.98 (1.00, 0.98, 0.99) | arm A on identical weights; seed 0 seen before registration |
+| D: held-out subject-initial read / route | ≤ 0.01 / ≤ 0.01 (t8 route up to 0.04) | arm C on identical weights 0.99 / 0.97; D's own t9 0.95–1.00 |
+| B: price on t9, read / route | 0.70 (0.79, 0.70, 0.74) / 0.64 (0.64, 0.72, 0.70) | t10 at 0.99–1.00 in every arm and seed |
+| B: price on generic text, mean KL, worst seed | 3.920 (B − A = +0.27, +0.38, +0.34) | base and adapter scored on the same BOS-prefixed ids |
+| A: the deletion number re-read | 0.865 unconditional on t11; other-entity 0.085–0.105 active, 0.065–0.105 revoked; conditional refusal 0.976–1.000 | `revoked_deleted_object` 0.0000 by construction and not counted |
+| C: reported, not headlined | held-out 0.9712; t9 below A in every seed; generic 4.224 FAIL; route 0.83 FAIL; medial 0.91 FAIL | the rule's third branch |
+| E-000050-A: prefix dependence, seed 0 only | the table in item 7 | seeds 1–2 pending; at risk, and named so |
+
+**Not claimed.** A mechanism ("sink" is Xiao, Sun, Gu and Ran-Milo's word, cited and not measured).
+That the fix is free, or that arm C is the memory's honest ceiling. That the price belongs to the BOS
+token as a property of prefixing (a text prefix costs t9 more, a lone space nothing, on one seed). That
+the failure is confined to position 0 (the control reads unseen t9 at 0.95 against trained 1.00, and
+its trained subject-initial forms at 0.75–0.83; "almost entirely" is the sentence). That the medial
+residue is semantic. Anything about E-000013 or E-000020 under a BOS (E-000050-A's smoke read
+E-000013's held-out override at 0.0000 with a BOS; the families are in the running job). Anything about
+pods.
+
+**Standing.** Eleven retractions. The recommendation reverts to §31.21's — normalise the prompt, do not
+train — with the token unnamed until E-000050-A's seeds 1–2 and its E-000013 / E-000020 families
+report; if the lone space holds across seeds, the training-free fix is a space and the BOS-trained
+substrate of E-000052 is the wrong instrument for a ceiling, though the right one for a like-for-like
+price.
+
+### 31.45 The residue against the GPT-2 reader: both floors rise, the residue rises with them, and the SET NULL row fails on the real model (2026-09-05, E-000051, GPT-2 half)
+
+§31.41 read the deletion residue through the synthetic E-000015 reader and found two calibrated
+floors — a row-count floor (two fresh live rows, AUC 0.965) and a marker floor (CASCADE against
+NEVER, 0.948) — under which every residue AUC sat. The GPT-2 half of the same experiment, same code,
+same adversary, same three seeds and 100 pods, ran on the frozen-GPT-2 symlink adapter (28,600
+forwards per seed, 55 minutes per seed). The reading is the same and every number is larger.
+
+| arm (positive vs reference) | AUC, deleted keys | AUC, bystanders | AUC, generic | max KL, bystanders | top-1 agreement |
+|---|---|---|---|---|---|
+| LIVE vs NEVER (validity) | 1.000 | — | — | — | — |
+| CASCADE vs NEVER (the marker channel) | 0.500 | **0.869** (worst 0.888) | 0.598 | 0.000 | 1.000 |
+| BLANK vs CASCADE | 0.998 | 0.791 (worst 0.829) | 0.668 | **4.486** | 0.999 |
+| DANGLE vs CASCADE | 0.975 | 0.876 (worst 0.911) | 0.742 | 3.962 | 0.999 |
+| PERM vs PERM2 (float floor) | — | 0.482 | 0.457 | 0.000 | 1.000 |
+| ADD2 vs PERM (row-count floor) | — | **0.977** (worst 1.000) | 0.827 | 0.310 | 0.999 |
+
+Validity held (live against none 1.000, the float floor at chance, the hard-gate pipeline check
+bit-identical at 0.000/0.000), so the rule's readings fire as they did on the synthetic reader:
+ROW-COUNT, because two fresh live rows are separable at 0.977–1.000, and MARKER, because the seeded
+generator's position is separable at 0.869. No POSITIVE: the rule requires a residue AUC at or above
+0.75 **with its ADD2 row at or below 0.60**, and ADD2 is at the ceiling. The residue is again read as
+a number below two floors the reader's own arithmetic supplies with no deletion at all.
+
+**What is new on the real model, and it is not the AUC.** The bystander KL. On the synthetic reader
+the two rows BLANK keeps moved a bystander's distribution by at most 0.23 nats on one seed and 0.03
+on the others; on frozen GPT-2 they move it by **4.49 nats** (DANGLE 3.96, and 1.11 / 0.90 on the
+generic class), while top-1 agreement stays at 0.999. So the residue of a deleted pod is, at this
+reader, a large change in the distribution over a bystander's answer that almost never changes the
+answer itself. The interface residual behind the marker channel is 0.169 (synthetic: 0.009–0.014).
+
+**The lifecycle row fails.** A blanked alias — `ON DELETE SET NULL` by hand, the self-referencing row
+the adapter never trained on — reads UNKNOWN in only **0.825** of cases on GPT-2 and names some entity
+in **0.175** (bars 0.90 and 0.05, both FAIL). The DANGLE reproduction of E-000026's
+`delete_target/alias_unknown` holds at 0.970. This is the row E-000052 is pre-registered to measure on
+the BOS-trained substrate at every phrasing, and §31.42 already disclosed the smoke's 0.15–0.30; the
+GPT-2 residue reader now puts a three-seed number on it at the recorded template. BLANK is not a safe
+deletion primitive on this reader: one alias in six answers with an entity.
+
+Record: `so/results/e000051_residue_reader-gpt2.{json,md}`. Nothing here is a claim about history: the
+same two floors, one order of magnitude more logit movement, and a failed SET NULL row.
+
+### 31.46 Occupying position 0 is what restores the subject-initial forms; which token occupies it is what costs the medial ones — and a single space is nearly free (2026-09-05, E-000050-A)
+
+E-000050-A evaluates the recorded checkpoints as they stand and changes one thing: a prefix on the
+prompt at inference. Eight prefixes, three seeds, three adapter families (E-000017-B's paraphrase
+adapter, E-000013's prior-conflict adapter, E-000020's symlink adapter), nothing trained, criteria and
+a decision rule fixed before the run. It is the run §31.44 named as at risk, and it settles the
+at-risk clause.
+
+| prefix at position 0 | held-out reading | held-out subject-initial read / route | held-out subject-medial (t9) read / route | trained reading | max medial change | SHRED reaches worst held-out | address collision | mean generic KL |
+|---|---|---|---|---|---|---|---|---|
+| none (the record) | 0.7288 | 0.37 / 0.54 | 0.95 / 0.94 | 0.9119 | — | 0.8650 | 0.1000 | 3.647 |
+| `<\|endoftext\|>` | 0.9175 | 0.97 / 0.98 | 0.70 / 0.64 | 0.9719 | 0.25 | 0.8400 | 0.0775 | 3.920 |
+| `<\|endoftext\|>` + space | 0.9100 | 0.97 / 0.95 | 0.67 / 0.62 | 0.9587 | 0.33 | 0.8200 | 0.0925 | 3.826 |
+| newline | 0.9313 | 0.98 / 0.98 | 0.70 / 0.69 | 0.9913 | 0.25 | 0.8650 | 0.0700 | 3.800 |
+| "It is known that " (E-000039-A's text) | 0.9187 | 0.99 / 0.99 | 0.69 / 0.45 | 0.9894 | 0.27 | 0.9400 | 0.1375 | 3.527 |
+| the same text without its trailing space | 0.9187 | 0.99 / 0.99 | 0.69 / 0.45 | 0.9875 | 0.27 | 0.9400 | 0.1375 | 3.616 |
+| "Also" | 0.9300 | 0.98 / 0.98 | 0.75 / 0.70 | 0.9850 | 0.20 | 0.8100 | 0.0475 | 3.815 |
+| **a lone space** | **0.9800** | 0.97 / 0.98 | **0.94 / 0.95** | **0.9938** | **0.02** | **0.9750** | **0.0075** | 3.677 |
+
+**The row that decides it.** The mean gain on the subject-initial held-out forms is the same for every
+prefix: 0.318, 0.320, 0.322, 0.324, 0.324, 0.326, 0.318, 0.324 at the worst seed — eight tokens, a
+spread of 0.008. Whatever occupies position 0, the subject-initial forms recover by the same amount.
+What differs is the bill on the subject-medial forms, and it is token-specific: 0.02 for a space, 0.20
+for a word, 0.25 for a newline or the BOS, 0.27 for a text prefix, 0.33 for the BOS followed by a
+space. §31.44 left this as one seed and named it at risk; it now holds on three, and §31.38's
+"a prefix is a trade for an adapter trained without one" is re-scoped for good: **the recovery is
+positional, the price is lexical.**
+
+The double-space confound registered in E-000050-A is answered by its own two arms. Entity names carry
+a leading space, so every trained subject-medial prompt already contains the lone-space token before
+the subject; if that trained bigram were the explanation, `bos_sp` (BOS + space, the marker restored
+under a BOS) would behave like the space and `text_nosp` (the text without its trailing space) would
+behave worse than the text. Neither happens: `bos_sp` is the worst arm in the table (medial change
+0.33) and `text_nosp` equals `text` to four decimals. The marker is not the mechanism; which token
+sits at position 0 is.
+
+**What a space buys on the recorded weights, with nothing trained.** Held-out reading 0.7288 → 0.9800;
+trained reading 0.9119 → 0.9938; address collision 0.1000 → 0.0075; and deletion propagation to the
+worst held-out phrasing 0.8650 → **0.9750**, over the 0.95 bar of roadmap kill criterion 5 — the
+criterion that fired in E-000017 and has stood fired since. It fires on the unconditional UNKNOWN
+rate, which §31.44 showed is inflated by non-reading; here the reading is 0.98 at the same time, so
+the 0.975 is not a refusal floor. The price is +0.03 nats of mean generic-text KL (3.647 → 3.677),
+which leaves the locality failure exactly where it was, two orders of magnitude over its 0.05 bar.
+
+**The pod half: the symlink battery was measured through the sink.** E-000020's lifecycle battery,
+same checkpoints, evaluated bare and with a BOS at inference (worst seed of three):
+
+| E-000020 row, at the recorded template t0 | bare | BOS at inference |
+|---|---|---|
+| direct reading | 0.5633 | **0.9933** |
+| alias reading | 0.5000 | **0.9050** |
+| duplicate reading | 0.5900 | 0.9950 |
+| one UPDATE reaches the alias | 0.5350 | **0.9350** |
+| one UPDATE reaches a duplicate (the control) | 0.0000 | **0.0000** |
+| ROLLBACK read through the alias | 0.5000 | 0.9050 |
+| one SHRED leaves the alias UNKNOWN | 0.9950 | 1.0000 |
+| DELETE leaves the alias UNKNOWN | 0.9650 | 0.8750 |
+| held-out alias reading, worst template | 0.3000 | 0.7400 |
+| t8: direct / alias / UPDATE reach | 0.3933 / 0.3550 / 0.3700 | 0.9733 / 0.8850 / 0.9000 |
+| t9 (subject-medial): direct / alias | 0.9300 / 0.8700 | 0.7433 / 0.7400 |
+
+So the numbers this programme has quoted for pods — "in GPT-2 only at a strong template (0.9933;
+0.5633 at template 0)", the alias reading at 0.50, the shared-UPDATE reach at 0.8850 against its 0.90
+bar, the rollback-through-an-alias FAIL at 0.5000 — were measurements of an adapter reading the
+attention sink, at every template whose subject is the first token. With one token at inference and no
+weight changed, direct reading, alias reading, UPDATE reach and rollback all rise by 0.35–0.44, and the
+duplication control stays at exactly 0.0000, so the lift is the pointer's and not a general one. The
+subject-medial template t9 pays the BOS's usual bill (0.93 → 0.74); the space arm was not run on this
+family and is the obvious next evaluation.
+
+**What did not move, and it is the target's second row.** E-000013's prior-conflict adapter overrides
+the pretrained capital on the trained phrasing (1.0000) and on no held-out phrasing (0.0000) under
+*every* prefix — bare, BOS, and text alike — with the post-REVOKE KL to base on the held-out template
+at 4.47 / 5.65 / 6.07 nats. The position-0 artefact is not what makes injected knowledge fail to
+behave like the model's own; that row of §31.36 stands exactly as recorded.
+
+The record's own reading, fixed before the run: **artefact, for reading but not for deletion** —
+`record_reproduced`, `bos_restores_heldout_addressing`, `any_token_does_it` and
+`e20_lifecycle_at_template0` supported; `controls_hold`, `deletion_follows`, `no_new_collateral` and
+`e13_override_and_revert_on_heldout` not supported. Record:
+`so/results/e000050a_bos_artefact.{json,md}`.
+
+### 31.47 A second agent audited this architecture; its two findings, checked against the code, and the premise the certificate ladder had never stated (2026-09-05)
+
+A parallel agent works the same seam on branches `research/*` of this repository (its experiments run
+in GitHub Actions; its claim documents are in `docs/novelty/` on `research/cavi-continuation-audit`).
+It calls its object **CAVI-N**, *neural-consumption continuity for causally attested versioned
+indirection*, and it has already excluded most of its own first framing against an IETF Internet-Draft
+(PAMSPEC, persistent memory in agentic systems, 19 July 2026), which specifies canonical memory
+objects, immutable versions, versioned relationship objects, an authoritative state plane,
+non-authoritative derived representations, expected-version concurrency and propagation of deletion to
+derived state. Its own documents say that canonical identity, versioned pointers, authoritative
+versus derived state, freshness metadata, cache invalidation, tombstones and provenance therefore
+cannot carry a claim. That is the same discipline this ledger runs, and it left two candidates. Both
+were checked here against this repository's code.
+
+**Candidate one — the stale export.** A bank exported before a SHRED, replayed afterwards, still
+answers with the deleted object, because the exported tensors carry no live generation the reader
+could check (their E-000066). This is true here and it is true by construction: `bank_from_store`
+materialises arrays, `forward` consumes them, and a copy handed out before a deletion is a copy. Their
+own docstring says as much ("this behavior is expected from snapshots in general"). What it is worth
+is not a finding but a **premise this ladder had stated only in prose**: `certify_encoding` says "the
+forward is therefore a deterministic function of (encoding, query)" and no test held it. It does now
+(`so/tests/test_snapshot_premise.py`, four tests): mutating the store after materialisation — SHRED,
+REVOKE, BLANK, EVICT — moves not one bit of a forward over the already-materialised bank; the same
+store re-exported does move it. So every certificate in `so/audit.py` is a statement about **one
+export**, for every query, and never about copies already in someone's hands. Nothing in §31.14,
+§31.30 or §31.32 is withdrawn; the certificates were always computed on a named bank. The sentence
+they license is "no query distinguishes the payload values in this export", not "the fact is gone from
+the world", and that qualifier is now pinned by a test rather than by prose.
+
+**Candidate two — the torn read, and why this substrate cannot have it.** Their E-000075 measures a
+mutation committing *between* two neural read sites of one forward, producing logits that match
+neither the all-old nor the all-rejected reference (10.67 and 0.0029 max-abs from the two), and closes
+it with a forward-wide authority snapshot that reproduces the all-old reference exactly. Read against
+this code, the hazard is a property of their remedy, not of the architecture it audits:
+`KnowledgeAdapterLM.forward` calls `encode_bank` **once** (`so/llm_adapter.py:333`) and stashes the
+result in `self._ctx`; both read-layer hooks consume only that stash and the bank never re-enters, so
+no mutation can linearise between the read sites of one inference. Counted, on the two-read-layer
+adapter and on the synthetic reader: one materialisation per forward
+(`test_the_two_read_site_adapter_also_reads_the_store_once_per_forward`). Their per-read-site
+revalidation is what made the forward non-atomic, and their forward-wide snapshot is what gave the
+atomicity back. The baseline had it already; what the baseline does not have is any revalidation at
+all.
+
+**What that leaves, stated plainly.** Put the two candidates together and they compose into a single
+engineering requirement: *materialise the bank fresh, once, per inference.* Revalidating a cached bank
+against the live store at the consumption site costs a store read per consumption, which is what
+materialising it costs, so the cache buys nothing it did not already spend — unless the validation is
+strictly cheaper than the fetch, which is the regime where leases, generation numbers and
+expected-version checks were invented (NFS file handles and `ESTALE`, Sandberg et al. 1985; leases,
+Gray and Cheriton 1989; optimistic validation, Kung and Robinson 1981; revocation by indirection,
+Redell 1974 — which *is* the versioned symlink). This ledger's own composition result says the same
+thing from the other side: the store-side and reader-side clauses are separate (Garg, Goldwasser and
+Vasudevan, Eurocrypt 2020; §31.35), and freshness belongs to the store clause, not to the learned
+reader.
+
+**The one question in it that is not owned, and that this substrate can answer.** Can the *learned*
+acceptance function host the freshness predicate at all? The reader's gate is a trained network with a
+measured acceptance boundary (E-000029: 0.90, not the declared 0.35), and E-000053 measured that a
+frozen gate accepts a bank re-signed under a different marker *scheme* as its own (acceptance 1.000,
+KL ≤ 0.0001) — so the marker family is negotiable without retraining. Whether an *epoch* is: a
+rotation of the marker centre large enough for the frozen gate to reject the previous epoch is, on the
+face of the geometry, also large enough for it to reject the current one, since the gate is one
+learned region and epochs are not a direction it was trained to resolve. If that holds, the version
+check cannot live in the learned reader on any architecture of this shape, and every design that
+promises attestation "at the point of neural consumption" reduces to a store-side check before
+materialisation. That is E-000056, and §31.48 records
+both its answer and the fact that the answer needed no run: the gate is a pure function of the row's
+own marker, so a retained row's verdict is constant in time.
+
+### 31.48 Where the freshness check can live: a gate that is a pure function of the row cannot revoke it (2026-09-05, E-000056)
+
+§31.47 left one question from the parallel branch's audit open, and it is the only part of "attested at
+the point of neural consumption" that is about a *learned* component rather than about a database: can
+the reader's own acceptance function be made to reject a bank signed under a previous epoch, without
+being retrained?
+
+**The proposition, which settles it before any measurement.** `gate_logits` takes one argument, the
+row's own marker (`so/model.py:176`, `so/llm_adapter.py:200`). A retained bank carries its markers
+with it, unchanged. So the gate's verdict on a retained row is constant in time, and no signing
+schedule — epochs, rotating keys, shrinking leases, a generation number written into the marker — can
+make a row the gate accepted at write time stop being accepted later: nothing about the row or the
+gate has changed. A freshness predicate needs an input that changes between the write and the read,
+and the gate has none. Therefore the version check cannot live in this learned reader at all, and a
+design that promises attestation at the point of neural consumption must either give the reader live
+state — an epoch nonce mixed into every row at materialisation, which is the store touching every row,
+which *is* materialising the bank — or put the check in the store before materialisation. This is a
+property of a function signature, not a finding, and it is recorded as such: it makes the freshness
+clause of §31.47 a store-side clause, exactly where the composition result (Garg, Goldwasser and
+Vasudevan, Eurocrypt 2020) already puts it.
+
+**What was measured anyway, and the two rows that could have failed.** E-000056 runs on eleven
+recorded checkpoints across three families, trains nothing, and describes the instrument the
+proposition talks about — including the one geometric escape somebody could propose, that a
+disconnected accepting set would let a store cycle epochs through its components.
+
+| row (worst of eleven checkpoints) | observed |
+|---|---|
+| radial accept bands | 1 (every checkpoint) |
+| operational radius, chord distance | 0.840 – 0.890 |
+| profile monotone (accept, then reject, never back) | yes, every checkpoint |
+| tangential accept bands on great circles inside the cap | 1 (every checkpoint), accept fraction 1.000 |
+| epoch capacity, equidistant and inward schedules | 0 |
+| acceptance under two HMAC keys of the same content | 1.000 / 1.000, gap 0.000 |
+
+The accepting set of every trained gate here is a single monotone cap, so the escape does not exist
+even in the weak form. The row that could have failed is the last one: E-000053 measured that the
+frozen gate accepts content-derived markers as its own under **one** key, and if the gate discriminated
+keys inside the family that acceptance would have been a coincidence of that key. It does not: two
+different keyed hashes of the same content are accepted alike to three decimals, which is E-000053's
+result from the other side and closes it. The measurement also sharpens E-000029: the operational
+radius is 0.84–0.89 rather than the single 0.90, on eleven checkpoints instead of one family.
+
+The epoch rows are reported and not scored, because the proposition says they cannot come out
+otherwise; recording them under a criterion that cannot fail is the mistake §31.33 and §31.44 both
+caught, and it is avoided here by declaring it in the file before the run
+(`so/experiments/e000056_epoch_capacity.py`). Record: `so/results/e000056_epoch_capacity.{json,md}`.
+
+### 31.49 The parallel branch audited: what CAVI-N really holds, why its differentiator does not survive, and the one question that does (2026-09-05)
+
+§31.47 checked two of the parallel branch's findings against this code. An eight-agent audit then read
+its claim documents, its experiments, its committed evidence and its prior art at source, and put the
+differentiator to two refuters. The verdict matters here for three reasons: the two records must
+eventually merge, the branch's locality failure reproduces this one independently, and its surviving
+question is the only unowned measurement either branch has left at the seam.
+
+**First, what the branch itself says.** Every committed result file on all eight `research/*` refs is
+stamped `breakthrough: false`; its evidence index says the same; its pre-registration hardcodes the
+string `novelty` into a `not_established` list emitted into every record
+(`so/experiments/e000079_joint_contract.py:169-170`); and each architecture document is headed "not a
+breakthrough or novelty claim". **The branch does not claim what it is being credited with.** Anyone
+reporting a research-level novelty from it is overstating its own record.
+
+**What is real there, with provenance.** A three-seed, three-thousand-step joint contract whose twelve
+numeric criteria are declared in code and which *failed* its own bars, recorded as failing. A
+KV-lineage race on two public backbones (`distilgpt2`, `pythia-70m-deduped`), three seeds each, where
+stale key-value cache against current differs by 14.2 and 21.0 max-abs and 1.26 / 1.60 nats — with the
+control that carries it, clean-current cache against full recompute at 9.2e-05 and 0.0, ruling out
+ordinary cache-versus-recompute drift; a first harness attempt is preserved as invalid because its
+trigger also fired in the no-memory control. Three provenance counterexamples on two qualified readers
+with before-and-after controls. A write-scope pilot with the reader's weights hashed before and after.
+And negatives kept: Pythia readers failing at 0.72 / 0.68, a seed failing a gradient-equivalence
+preflight at 0.0198 against a 0.0002 tolerance **with the tolerance not relaxed**, and a reader gate
+that refused to run attacks on unqualified checkpoints. That is the discipline this ledger runs.
+
+**Why the differentiator does not survive.** Its sentence is: *an authorized memory read does not
+permanently authorize the neural tensors derived from it; if those tensors survive into a later
+consumption event their originating reference-plus-referent authority must still be live, otherwise
+they are inert and execution reduces to the no-memory path.* Four independent failures:
+
+1. **The two criteria that carry it are arithmetic on four integers.** `alias_lineage_rejection` and
+   `pod_only_differentiation` both pass at 1.000 on all three seeds because `relink_alias` executes
+   `a.incarnation += 1`, `validate_witness` compares that counter, and `validate_pod_only` does not read
+   the alias table at all (`so/cavi.py:131`, `:159`, `:170`). No tensor enters either number. This is
+   §31.33's and §31.44's error, on the two rows that matter most.
+2. **The neural half was measured and failed.** `stale_updated_unknown` and `stale_relinked_unknown` —
+   the criteria that ask whether stale derived state actually goes inert — came in at 0.88 / 0.84,
+   0.84 / 0.80 and 0.77 / 0.80 against a 0.95 bar, failed on three of three seeds. The clause's second
+   half fails separately: `generic_locality` failed 3/3 at 3.65–5.23 nats against a 0.05 bar, so the
+   fallback is not the no-memory path either. **That is this repository's own locality failure,
+   reproduced by an independent implementation** (§31.36: 2.27 nats on E-000013, 3.65 on E-000017-B,
+   4.22 on the BOS-trained arm). Two codebases, one bar, the same failure: residual injection into a
+   frozen model is not local, and that now has two witnesses.
+3. **Their own counterexample refutes the mechanism.** A *live, genuine* alias witness authorizes
+   unrelated cached values and restores the original logits exactly (`replay_vs_original_maxabs 0.0`,
+   injected layers 0 → 2). Lineage liveness is not evidence that the tensor was derived under it. A
+   second counterexample shows "its originating authority" is not well defined for a dense routed
+   mixture at all: the queried witness stays valid while a different contributing pod is deleted.
+4. **The structure is owned, and precisely.** Redell (1974) revokes through an alias while the referent
+   stays live. CHERIvoke (2019) and Cornucopia (S&P 2020) invalidate stale *derived* references
+   including the reallocation case. **Cornucopia Reloaded (ASPLOS 2024) moves that check to the point
+   of use with a revocation-epoch load barrier** — "an authorized read does not permanently authorize
+   the derived reference; its authority must be live at the consumption event; otherwise it is inert"
+   is a load barrier, in print, two years old. In the agent-memory domain PAMSPEC
+   (`draft-infantado-agent-memory-architecture-00`, an individual Internet-Draft of 19 July 2026, no
+   IETF standing) owns authoritative-versus-derived separation and deletion propagation to derived
+   state, and Wu and Canedo (arXiv:2609.00243, 31 August 2026) own version-stamped invalidation of
+   cached agent memory — a citation the branch found itself. Its own sibling branch also records two
+   patent collisions, one of which recites deletion inside a key-value cache layer of a language model.
+
+**A caution about the evidence.** Roughly ten of the experiments the claim document lists as its
+breakthrough sequence — including the "20/20" and "5/5" figures and E-000075's 10.67 / 0.0029 / 19.22
+— have modules and CI workflows but **no committed result file anywhere in the repository**. They may
+well have run in Actions and had their artifacts expire; either way there is nothing to audit, and a
+number with no retained record cannot support anything. This ledger's own rule (a record is a file
+with seeds, criteria and a checkpoint hash) is what separates the four families above from the rest.
+
+**The numbering collision, which has to be fixed before anything merges.** The merge base is `a67eb37`
+(§31.38). Above E-000051 the two branches numbered independently: E-000052 is the pointer battery here
+and BOS locality there; E-000053 is history-independent markers here and a hard-match frontier there;
+E-000054 is two-token subjects here and a hard-gate frontier there; E-000056 is the epoch capacity here
+and a single read site there; and the other branch also collides with itself twice (E-000073 and
+E-000079 each name two different experiments). Recommendation, recorded so it is not silently
+resolved later: freeze E-000001–E-000051 as the common prefix, and let the other branch renumber above
+it into a disjoint range with a committed mapping table — this branch's numbers are cited across
+§§31.41–31.49 and in eleven retraction records whose whole value is that they are stable references,
+while that branch's real primary keys are its run identifiers and commit hashes.
+
+**The one question that survives, and it is not about the gate.** A pointer has one referent; a routed
+tensor has many. So the revocation unit for neural derived state may be the whole set of rows with
+non-zero routing coefficient rather than the queried witness. Their only two measurements of that
+effect are 0.2251 and 0.0151 max-abs logit change at coefficients 0.0118 and 0.0011, with top-1
+unchanged **and no null measured at all** — which, after §31.41 and §31.45, is exactly the mistake
+those two sections exist to prevent. Registered here as **E-000057**, trains nothing, on the E-000015
+synthetic reader first and the three GPT-2 symlink checkpoints second: per queried alias, holding
+prompt, authority and coefficients fixed, ablate one row's linear contribution from the cached
+mixture — **DEL** a row whose pod was SHREDded at coefficient c; **NULL-c** a *live* row matched on
+coefficient to within 10%, the calibrated null and the arm that can void the run; **PERM** the float
+floor (E-000051: 0.499); **ADD2** the row-count floor (E-000051: 0.965). Measured with E-000051's
+instrument unchanged. The residue counts as real only if, on the worst of three seeds,
+AUC(DEL) − AUC(NULL-c) ≥ 0.10 *and* AUC(DEL) > 0.965; behavioural only if the top-1 flip rate is at
+least 0.02 or the KL at least 0.05 nats. If DEL does not separate from NULL-c the dependency-closure
+requirement is unfounded on this substrate and the entry is a refutation; if it separates and the
+behavioural bar fails — the expected outcome — the residue is real, sub-behavioural, and the sentence
+is about logits and not answers. Two to four CPU-hours for the GPT-2 half, under one for the
+synthetic; it does not run while the box is training.
+
+### 31.50 The deleted row's contribution, with the null it was missing: it is smaller than a live row's, on 94 of 94 matched pairs (2026-09-05, E-000057)
+
+§31.49 registered the parallel branch's one surviving observation as E-000057: a pointer has one
+referent but a routed answer depends on the whole bank, so a bystander's answer also depends on rows
+of a pod that was deleted — their number, a deleted row at routing coefficient 0.0118 whose ablation
+moved the logits by 0.2251 max-abs, top-1 unchanged, with **no null measured**. This is that
+measurement with its null, on the E-000015 synthetic reader, three seeds, 100 pods, training nothing.
+
+**What the substrate does, probed before the design was fixed.** On the recorded `e000010_seed0`
+checkpoint, one row, three store states: a **REVOKED** row keeps its value vector *bit-identical* to
+the live row's (max-abs 0.000) and is removed from routing; a **SHREDDED** row keeps its payload in
+the exported bank (`obj` unchanged), stays **routable**, and has only its value gated — to 7e-06 of
+the payload, the rest the UNKNOWN direction (gate 0.998363 live, 0.000007 shredded). E-000028 recorded
+the key half of this asymmetry; the value half and the routability difference are now stated. It is
+why the arms are what they are: a shredded row is the only lifecycle state that still competes for
+routing mass, so it is the only one that can shape a bystander's answer at all.
+
+| arm (exactly one row silenced through the reader's own cell mask) | mean routing coefficient | max-abs logit change | mean KL | top-1 flip rate |
+|---|---|---|---|---|
+| DEL — a routable row whose pod was SHREDded | 0.00020 | **0.1073** | 0.0000 | 0.0000 |
+| LIVE — a live row matched on coefficient (the null) | 0.00020 | **0.5596** | 0.0192 | 0.0013 |
+| LIVE2 — a second matched live row (the floor) | 0.00020 | 0.5923 | 0.0209 | 0.0013 |
+| REV — a revoked row (the zero control) | 0.00000 | **0.0000** | 0.0000 | 0.0000 |
+| TOP — the highest-coefficient row (validity) | 0.01376 | 17.8188 | 1.0683 | 0.0842 |
+
+| paired comparison over pods | dominance, worst seed | median ratio | sign-test z |
+|---|---|---|---|
+| DEL against its matched LIVE null | **0.000** | 0.313 | −6.94 |
+| LIVE against LIVE2 (the floor) | 0.468 | 0.997 | −0.14 |
+
+**The reading, by the rule fixed before the run: NO-EFFECT, and past it.** The three validity rows
+hold — the revoked row moves the forward by exactly zero, silencing the top row moves it by 17.8, and
+the floor sits at chance (0.468, ratio 0.997, z = −0.14). Against that, silencing a deleted row moves
+the logits **less** than silencing a live row of the same routing mass, on every one of 94 matched
+pairs in the worst seed (dominance 0.000, median ratio 0.31, z = −6.94), with a KL of 0.0000 and a
+top-1 flip rate of exactly 0.0000 against the null's 0.0013. So a deleted-but-routable row is not a
+hidden dependency: it is a *weaker* contributor than an arbitrary live row of the same weight, because
+what it injects is the UNKNOWN direction the null column already carries. The dependency-closure
+requirement has no measurable basis on this substrate, and the other branch's 0.2251 is the magnitude
+an arbitrary row of that coefficient produces — the same order as this table's 0.107 to 0.560 — not
+the size of a deletion residue.
+
+**One instrument was thrown away in the making of this, and the control that threw it.** The first
+version scored E-000051's five-feature probe on the ablated logits, arm against arm; its floor — two
+coefficient-matched *live* rows — came back at 1.000, because a probe separates any two distinct rows
+whatever their status. A second version drew the null as "closest match" and the floor as "second
+closest", which makes the floor asymmetric by construction and duly returned 1.000 again. Both were
+caught by the floor row before anything was recorded, and the design became the paired magnitude
+comparison the question actually asks, with the two matched rows randomised into null and floor. That
+is the third time in this ledger (§31.33, §31.44) that a control written to catch the instrument caught
+it; it is the only reason the number above means anything.
+
+Record: `so/results/e000057_dependency_closure.{json,md}`. Owned, and cited so nothing here is
+claimed as a mechanism: dependency tracking and revoking a capability together with everything derived
+from it (Redell 1974; CHERIvoke 2019; Cornucopia, S&P 2020; Cornucopia Reloaded, ASPLOS 2024, which
+performs the check at the point of use), and PAMSPEC with Wu and Canedo (arXiv:2609.00243) for the
+agent-memory instantiation. The GPT-2 half is not run.
+
+### 31.51 The pointer battery, at every phrasing: what one write buys, what one delete leaves, and what the reader charges (2026-09-05, E-000052 and E-000050-A's symlink arm)
+
+E-000052 was pre-registered in §31.42 before its substrate existed, narrowed by a critic in five
+places, and its SET NULL row was disclosed as likely to fail. It ran on the BOS-trained symlink
+adapter (three seeds, three thousand steps each, twelve phrasings, the full lifecycle through every
+alias). Thirteen of fourteen pre-registered criteria pass, and the record's own verdict is `criteria.claim_supported = False`.
+
+| template | direct | alias | dup | one UPDATE reaches the alias | SHRED → UNKNOWN | DELETE → UNKNOWN | BLANK → some entity | RELINK **to the same target** reads | no BOS: alias |
+|---|---|---|---|---|---|---|---|---|---|
+| t0 initial, trained | 1.0000 | 0.9200 | 1.0000 | 0.9450 | 1.0000 | 1.0000 | 0.0000 | 0.9200 | 0.0150 |
+| t1 medial, trained | 0.9767 | 0.8150 | 0.9950 | 0.8250 | 1.0000 | 0.9950 | 0.0000 | 0.8400 | 0.9100 |
+| t2 initial, trained | 0.9967 | 0.9250 | 1.0000 | 0.9450 | 1.0000 | 1.0000 | 0.0000 | 0.9200 | 0.0300 |
+| t3 medial, trained | 0.9933 | 0.9000 | 1.0000 | 0.9050 | 1.0000 | 1.0000 | 0.0000 | 0.9200 | 0.9500 |
+| t4 medial, trained | 1.0000 | 0.9400 | 1.0000 | 0.9550 | 1.0000 | 1.0000 | 0.0000 | 0.9400 | 0.9700 |
+| t5 medial, trained | 0.9967 | 0.9250 | 1.0000 | 0.9450 | 1.0000 | 0.9950 | 0.0000 | 0.9200 | 0.9650 |
+| t6 initial, trained | 1.0000 | 0.9300 | 1.0000 | 0.9350 | 1.0000 | 1.0000 | 0.0000 | 0.9300 | 0.0200 |
+| t7 medial, trained | 0.9967 | 0.8850 | 1.0000 | 0.8950 | 1.0000 | 1.0000 | 0.0000 | 0.8900 | 0.9350 |
+| **t8 initial, held out** | 0.9967 | 0.9100 | 1.0000 | 0.9400 | 1.0000 | 1.0000 | 0.0000 | 0.9100 | 0.0100 |
+| **t9 medial, held out** | 0.8200 | 0.8300 | 0.8750 | 0.8200 | 0.9950 | 0.9950 | 0.0100 | 0.8200 | 0.9600 |
+| **t10 medial, held out** | 0.9967 | 0.9150 | 0.9950 | 0.9300 | 1.0000 | 1.0000 | 0.0000 | 0.9200 | 0.9550 |
+| **t11 initial, held out** | 0.9967 | 0.9250 | 0.9950 | 0.9400 | 1.0000 | 1.0000 | 0.0000 | 0.9300 | 0.0100 |
+
+[Corrected, §31.53: the record's own verdict is `criteria.claim_supported = False`; the SHRED, DELETE,
+deleted-object and BLANK-UNKNOWN rows below are demoted (forced by the exporter and the gate, or
+unfailable); the price is a within-reader contrast and not a link-free one; and the no-BOS column
+prints the most favourable seed at the seven subject-medial templates.] Worst seed for the C arm;
+n = 200 alias reads per template per seed, so the 0.8150 worst cell carries a
+95% Clopper-Pearson interval of 0.754 to 0.866, and eight of the twelve templates are trained forms
+while t10 is the trained t0 under a fixed prefix (verified: `TEMPLATES12[0][10] == E39.PREFIX +
+TEMPLATES12[0][0]`), leaving three genuinely novel phrasings. The **cost of sharing** is a
+within-reader contrast, `dup_mean − alias_mean` with **both arms scored by the link adapter**
+(`e000052_symlink_bos_battery.py:130-141`; E-000025's own comment says "same adapter"):
+**0.0879** against its 0.10 bar, a bar E-000025 discloses was set knowing the alias cells at templates
+1, 8 and 9. Only `cost_of_link_training` involves the link-free adapter, at **0.0054** against 0.25,
+and it cannot fail with 46x headroom. The 200 alias reads per cell are 100 target rows through two
+aliases each in one world per seed, so a binomial interval on the 0.8150 floor is anti-conservative
+and the independent replicates are three worlds. The **reverse control** fires on the half where it
+can: read without the BOS it was trained with, the same adapter answers a subject-initial alias at
+0.0050–0.0100, while its medial ones read 0.7450 to 0.9550 across seeds and do not collapse (the
+pre-registered criterion covers only the held-out medial pair, at 0.9150).
+
+**The row that was expected to fail, and did not.** §31.42 disclosed before the run that BLANK — `ON
+DELETE SET NULL` performed by hand, a self-referencing row the adapter never trained on — read as a
+wrong entity in 0.15–0.30 of cases in the script's smoke and in 0.175 on the GPT-2 residue reader
+(§31.45), and left its 0.05 bar where it was. On the corrected substrate a blanked alias answers with
+an entity in **0.0000** at eleven of twelve phrasings and 0.0100 at t9, answers UNKNOWN at 0.99–1.00, which is the
+arithmetic complement of the same row. But the rule fixed before the run gates this row on its
+neighbours, and `sibling_readable` came in at 0.7900 against its 0.80 bar, so **under this
+experiment's own pre-registration the SET NULL row is not readable**: it is reported, not claimed
+(§31.53). The deleted-object row at 0.0000 cannot fail, and the pre-registration excluded rows of that
+kind. The single FAIL is a validity row beside it: a blanked alias's sibling
+stays readable at 0.7900 against a 0.80 bar at t1, 0.83–0.97 elsewhere.
+
+**And it needs no retraining.** E-000050-A's symlink arm ran the same family on the *recorded*
+checkpoints, evaluation only, three seeds, under three prompts (worst seed):
+
+| E-000020 row | bare (the record) | a lone space at inference | `<\|endoftext\|>` |
+|---|---|---|---|
+| t0 direct / alias / UPDATE reach | 0.5633 / 0.5000 / 0.5350 | **0.9933 / 0.8850 / 0.9150** | 0.9933 / 0.9050 / 0.9350 |
+| t8 (held out, initial) | 0.3933 / 0.3550 / 0.3700 | **0.9667 / 0.8650 / 0.8900** | 0.9733 / 0.8850 / 0.9000 |
+| t9 (held out, medial) | 0.9300 / 0.8700 / 0.8700 | **0.9433 / 0.8600 / 0.8500** | 0.7433 / 0.7400 / 0.7300 |
+| t11 (held out, initial) | 0.2933 / 0.3000 / 0.2950 | **0.9867 / 0.8900 / 0.9100** | 0.9867 / 0.8950 / 0.9100 |
+
+So the whole battery is available on the recorded weights, with no training at all, by occupying
+position 0 with a single space — and unlike the BOS it costs the subject-medial phrasing nothing
+(§31.46). One SHRED leaves every alias UNKNOWN at 0.9950–1.0000 under every prompt, **including the bare column where the same alias reads 0.2933 to 0.5000**: the row passes where the reader cannot read, which is why §31.53 demotes it.
+
+Records: `so/results/e000052_symlink_bos_battery.{json,md}`,
+`so/results/e000050a_symlink_prefix.{json,md}`. What is *not* in these tables: locality.
+The adapter injects 3.4–4.2 nats on generic text against a 0.05 bar (§31.36, §31.46), and the parallel
+branch's independent implementation fails the same bar at 3.65–5.23 (§31.49). A pointer that reads,
+updates and deletes correctly at every phrasing still speaks when it is not asked.
+
+### 31.52 The ninth sweep, and the first claim this programme has made (2026-09-05)
+
+Eight sweeps of the symlink / J-space / pod seam returned "none". The ninth ran four generators
+against a corpus of the papers on disk, the record's own FAIL rows, a morphological box of
+store × reader × guarantee × adversary, and the artifact framing; sixteen candidates reached the
+refuters, seven were refuted on both lenses before the subagent budget ran out, and the judge never
+ran. What follows is the judging done by hand, against the record.
+
+**Refuted, with the reason, because these are the shapes that keep recurring.** *Certificate
+shelf-life* (does an issued certificate survive later admissions?) — refuted by this ledger's own
+§31.47: every certificate is a statement about one export, now pinned by four tests; and the
+bit-exact half is arithmetic, since a closed gate multiplies the payload by exactly zero.
+*Substitution-not-abstention*, *derivation-term-at-the-reader*, *group-deletion-visibility*,
+*dereference typing*, *null-address map*, *null-budget trade* — all refuted on ownership or on a
+control that cannot fail.
+
+**Three candidates the budget did not reach, kept as registered questions.** (i) *Two authorities at
+one address*: `bank()` exports every non-deleted cell with no precedence column, and two rows with the
+same key produce identical key vectors, so the routing softmax splits evenly and the injected value is
+the **arithmetic mean of two payloads** — an addressable memory over a routing softmax has no
+precedence operator. The knowledge-conflict literature puts conflict in the context or in the weights,
+never at one address inside a routed memory resolved by averaging. (ii) *A count-invariant read*: the
+dereference bias is literally `deref_pass_bias + log(n_cells)`, so the row-count floor §31.41 and
+§31.45 measured is the read's own normalisation, and a hard-addressed read would make an added or
+evicted off-pod row bit-identical — the sentence being "a membership-based deletion certificate is
+sound for a hard-addressed memory and unsound for a soft-attended one", whose only content is the
+price. (iii) *A vacuity checker for pre-registered criteria*, the model-checking notion (Beer et al.,
+CAV 1997) transplanted to empirical criteria: this programme has caught eleven retracted sentences and
+three instrument failures by hand, and the operators are enumerable — identical-code-path reference
+arms, interfaces that decline to export, routing misses that pass a bar for free, extrema by
+construction.
+
+**And one candidate that survived, once its own killers were checked.** The artifact generator
+proposed a *pointer-lifecycle battery* and named two things that would sink it. The first: the
+duplication arm at 0.0000 is store arithmetic, so it cannot be a claim row — correct, and the claim
+below demotes it to a baseline. The second: "exactly one operation fails the safety bar, SET NULL at
+0.175, and the paper is carried by that failure" — this was written from §31.45, before E-000052
+landed. On the corrected substrate the SET NULL row reads **0.0000** at eleven of twelve phrasings
+(§31.51). The failure was the attention sink, not the operation, so the paper is not carried by it;
+what carries it is the positive battery and its price.
+
+**The claim, made at last and at its size.** [WITHDRAWN the same day. The sentence that stood here
+claimed seven lifecycle rows; §31.53 is the retraction, lists twelve findings with their file and
+line, and holds the surviving sentence. It is not reprinted, so that nobody reads the withdrawn
+version as the record.] `docs/so-claim-pointer-lifecycle-2026-09-05.md`. On a
+frozen GPT-2 small reading an external multi-version store whose access keys are LINK rows pointing at
+one object, the pointer's semantics survive the neural read at every one of twelve phrasings — aliased
+read ≥ 0.82, one UPDATE reaching every alias ≥ 0.82, one SHRED or DELETE leaving every alias UNKNOWN
+≥ 0.995 and the deleted object at 0.0000, a blanked alias answering with an entity ≤ 0.01, RELINK
+≥ 0.82 — at a measured price of 0.088 reading accuracy against a link-free adapter trained on the same
+budget, with the reverse control firing and the same battery collapsing to 0.29–0.53 when position 0
+is left to the subject. It is a **measurement**, not a mechanism: symlinks, `ON DELETE SET NULL`,
+versioned pointers and overlays are owned by filesystems and databases; the architecture is owned by
+SERAC, GRACE, SILO and LMLM; the design is Raeesi and Roed's stated future work
+(arXiv:2607.00605 §9), executed. What no paper reports is the result sentence — that a *storage
+pointer's* read, update, delete, set-null and relink semantics hold across every phrasing of a query
+set through a frozen model's read, with the price of the indirection measured against a link-free
+control.
+
+**What the claim does not touch, stated in the same breath.** Locality: the adapter injects 3.4–4.2
+nats where no key matches, against a bar of 0.05 it has never met, and the parallel branch's
+independent implementation fails the same bar (§31.49) — two witnesses now, and the programme's
+largest open failure. Held-out override of a pretrained fact: 0.0000, under every prefix (§31.46).
+Traceless deletion: no (§31.35, §31.45). Scale: 124M parameters, a synthetic world, single-token
+entities, three seeds. And J space, closed on all three readings (§31.42).
+
+Eleven retractions preceded this one. It did not survive: a three-lens audit and a completeness
+critic, run against it the same day, produced twelve findings and cut it to a third of its size
+(§31.53). The programme's first claim became its twelfth retraction within hours, which is the rule
+working and not the rule failing.
+
+### 31.53 Twelfth retraction, and it is this morning's claim: five of its seven rows do not survive their own audit (2026-09-05)
+
+§31.52 made this programme's first claim. A three-lens audit was then run against it with the same
+rules everything else here gets, and two of the three lenses refuted it. Every finding below was
+re-verified by hand against the record or the code before being written down. The claim is withdrawn
+to the sentence that survives, and the claim document is rewritten rather than patched.
+
+**1. The price was described wrongly, and it is the headline number.** `cost_of_sharing` is
+`dup_mean − alias_mean` with **both arms scored by the same link adapter** on two stores
+(`e000052_symlink_bos_battery.py:130-141`), and E-000025's own docstring says so: *"`dup` minus
+`alias` on the same adapter is the cost of sharing."* The claim called 0.0879 a price "against a
+link-free adapter trained on the same budget". That is the other number, `cost_of_link_training` =
+0.0054, and it is a criterion that cannot fail: both arms read the link-free store at ceiling
+(0.9914 against 0.9938) with 46× headroom. The honest statement is a **within-reader contrast**:
+reading through a pointer costs this adapter 0.088 against reading the same keys as duplicated
+copies, and 0.046 and 0.056 on the other two seeds.
+
+**2. UPDATE-reach and RELINK measure the aliased read.** The alias row's exported bytes really are
+unchanged by an update to its target (§31.51's verification stands, `so/mvcc.py:522-525`). But the
+reader is stateless: `forward` recomputes `encode_bank` on every call (`so/llm_adapter.py:329-333`)
+and the battery rebuilds the bank from the store at every read
+(`e000020_symlink_gpt2.py:186-190`), so the post-UPDATE bank is structurally identical to a bank in
+which the target had always held the new object. There is no cache for an update to break. The
+paired numbers say it: over 36 cells, update minus alias has mean +0.012 and r = 0.910; relink minus
+alias has mean −0.0001, |Δ| ≤ 0.025 everywhere, r = 0.980. Both rows are the aliased read, measured
+again.
+
+**3. SHRED and DELETE are forced before the pointer is followed.** `shred` replaces the target row's
+marker only; `encode_bank` then computes `values = payload·g + unk·(1−g)` with the gate closed, so
+**the shredded row's exported value is already the UNKNOWN direction** when the dereference arrives.
+`bank()` does not export deleted cells at all. The decisive evidence is in this programme's own
+record: both rows sit at 0.95–0.995 on the bare recorded checkpoints, where the aliased read is
+0.30–0.50 — they pass while the reader cannot read.
+
+**4. "The deleted object returns at 0.0000" is a criterion that cannot fail**, and E-000052's own
+pre-registration says so: it excludes rows a routing miss would pass for free
+(`e000052_symlink_bos_battery.py:22-24`). The claim table re-imported exactly such a row. This is
+§31.33's and §31.44's error, committed a third time, by me, today. `BLANK → UNKNOWN` is likewise the
+arithmetic complement of `BLANK → some entity` and is one row, not two.
+
+**5. The SET NULL row is gated out by the rule fixed before the run.** That rule reads the wrong-entity
+rate only when its neighbour rows hold; `sibling_readable` came in at 0.7900 against its 0.80 bar, so
+under my own pre-registration the row is **not readable** and cannot appear in a claim. Its value,
+0.0100 at t9 with a 95% interval of 0.001 to 0.036, is reported.
+
+**6. Two presentation errors.** The record's own verdict is `criteria.claim_supported = False`, and
+§31.51 framed thirteen-of-fourteen as clean without quoting it. And the battery's no-BOS column
+applies one "lower is better" convention to a column whose desired direction flips: for the
+subject-initial templates the printed value is conservative, for the subject-medial ones it is the
+most favourable seed (t1 prints 0.9100 where the worst seed is 0.7450). The pre-registered criteria
+are unaffected — they take the max for the initial bar and the min for the medial one — but the
+display is corrected in the script and re-stated here.
+
+**7. The prior-art boundary was too generous to itself.** Raeesi and Roed (arXiv:2607.00605) already
+measure the delete half at far larger scale: 12,228 alias-closure deletions, 13 databases, four
+topologies including ALIAS, six prompt formulations, parametric leakage 0.11%. RippleEdits owns "one
+edit must reach every alias" as an evaluation axis, at the parametric tier. And §9's future-work
+sentence names a *test* — re-running their audit on the modified database and measuring whether the
+retrieval-artifact rate falls — which this battery does not perform. The claim executes their design,
+not their test.
+
+
+**Five more, found by the completeness critic after the three lenses finished, none of them raised
+before.**
+
+**8. The RELINK row does not relink to a new target.** `lifecycle_extra` blanks the first alias of
+every pod and then runs `st.relink(kids[a], kids[t])` over `zip(first, targets)`, where `targets` are
+those same pods' own targets, scoring against `truth_first`, the original target's object
+(`e000052_symlink_bos_battery.py:89-107`). The operation measured is **blank, then restore the same
+binding**. "RELINK reads the new target" is false in the claim table, in §31.51's column header and in
+the script's own header; all three are corrected.
+
+**9. The control is vacuous at the cell the claim floors on.** Seven of the twelve templates are
+subject-medial, so the subject is never at position 0 and the position-0 control cannot apply there.
+The floor, 0.8150, is at t1, a medial trained template, where arm D reads 0.745 to 0.910 without the
+BOS: no collapse. The control exercises the five subject-initial templates; the evidence cited for it
+exercises three of them, on a different checkpoint.
+
+**10. The interval was computed on clustered trials.** The 200 alias reads per cell are 100 target
+rows read through two aliases each, both dereferencing the same target row through the same gate, in
+one world per seed (`E20.EVAL`). Clopper–Pearson at n = 200 assumes 200 independent trials; there are
+at most 100 independent units per cell and three independent worlds in the battery. The quoted 0.754
+to 0.866 is anti-conservative and "n = 200" overstates the design.
+
+**11. The surviving bar is not blind at three of its own cells.** E-000025 discloses it
+(`e000025_template_rescoring.py:137-141`): *"three of the sixty cells of this table were already
+visible … (alias at templates 1, 8 and 9), and the thresholds below were chosen knowing them … a
+confirmation of a reading of existing numbers, not an independent prediction."* Template 1 is this
+claim's floor cell; templates 8 and 9 are two of its three genuinely novel phrasings. E-000052
+inherits that 0.10 bar and clears it by 0.012.
+
+**12. The component the sentence credits was never ablated.** The dereference slot is directly
+supervised (`e000020_symlink_gpt2.py:50-53`), as is the gate (`:117-120`), and no `n_deref = 0` arm
+was run on the same link store. Crediting "a trained depth-1 dereference slot" is architectural
+attribution, not measurement. What is measured is link-store against copy-store on one adapter, which
+is the price.
+
+**And one defence that had to go.** §31.51 argued the update row is a property of the read because it
+"failed at 0.8850 against a 0.90 bar in E-000026". Per seed there, alias reads 0.5000 / 0.8600 /
+0.8700 and update reads 0.5350 / 0.8650 / 0.8850: the update row is the alias row plus 0.005 to 0.035
+in every seed, and it "failed" only because its bar was 0.90 where the alias bar was 0.80. The same
+number against a different threshold is not evidence for a distinction.
+
+**What survives, and it is one sentence.** *On a frozen GPT-2 small reading an external store in
+which an access key is a LINK row carrying only another row's key rather than a copy of its object, a
+trained depth-1 dereference slot resolves the pointer at all twelve phrasings of the template set:
+0.8150 to 0.9400, worst of three seeds, n = 200 alias reads per phrasing per seed, so the worst cell's
+95% Clopper–Pearson interval is 0.754 to 0.866 — against 0.30 to 0.50 for the identical read on the
+recorded checkpoints when the subject occupies the prompt's position 0 — and reading through the
+pointer costs the same adapter 0.088 of accuracy against reading the same keys as duplicated copies
+(0.046 and 0.056 on the other two seeds).* Everything else in the morning's sentence is demoted to a
+reported row.
+
+That is smaller than what §31.52 announced, and it is what the measurements support. The programme's
+first claim lasted six hours before its own audit cut it to a third of its size; the claim document
+`docs/so-claim-pointer-lifecycle-2026-09-05.md` is rewritten to the surviving sentence, §31.51 and
+§31.52 carry correction notes at the site of every wrong number, and the pull request no longer leads
+with the withdrawn version.
+
+### 31.54 The control the claim should have carried: switching off the dereference slot takes aliased reading to exactly zero, at every phrasing (2026-09-05, E-000058)
+
+§31.53's twelfth finding was that the claim credited "a trained depth-1 dereference slot" with
+resolving the pointer while never ablating it. The slot is directly supervised
+(`e000020_symlink_gpt2.py:50-53`), so the credit was architectural attribution. This is the missing
+arm. It trains nothing: `cfg.n_deref = 0` at inference removes exactly the second query built from the
+value just read (`so/llm_adapter.py:270-285`) and touches no weight.
+
+| template | alias, slot on | alias, slot off | direct, slot on | direct, slot off |
+|---|---|---|---|---|
+| t0 | 0.9300 | **0.0000** | 0.9967 | 0.9967 |
+| t1 | 0.8400 | **0.0000** | 0.9700 | 0.9833 |
+| t2 | 0.9350 | **0.0000** | 1.0000 | 1.0000 |
+| t3 | 0.9100 | **0.0000** | 0.9967 | 0.9967 |
+| t4 | 0.9500 | **0.0000** | 1.0000 | 1.0000 |
+| t5 | 0.9300 | **0.0000** | 1.0000 | 1.0000 |
+| t6 | 0.9450 | **0.0000** | 1.0000 | 1.0000 |
+| t7 | 0.9050 | **0.0000** | 0.9967 | 0.9967 |
+| t8 | 0.9300 | **0.0000** | 0.9933 | 0.9933 |
+| t9 | 0.8500 | **0.0000** | 0.8200 | 0.8233 |
+| t10 | 0.9300 | **0.0000** | 0.9933 | 0.9933 |
+| t11 | 0.9250 | **0.0000** | 0.9933 | 0.9933 |
+
+Worst seed per cell, three seeds, 200 alias reads and 600 direct reads per template per seed: 7,200
+alias reads with the slot off, and not one of them returns the target's object. Direct reading moves by
+**0.0000** at every template, and is marginally *higher* without the slot at t1 and t9 (0.9700 →
+0.9833, 0.8200 → 0.8233), which is what one expects when a spurious second hop can no longer fire on a
+FACT row.
+
+**It could have come out otherwise, and that is the point.** `v_link` is a learned projection of the
+target's key (`so/llm_adapter.py:220-228`). Nothing forced the model to keep it an address: it could
+have learned to make `v_link(target_key)` approximate the target's object embedding, resolving the
+pointer inside the value projection and leaving the hop decorative. Then alias reading would have
+survived the ablation and the claim would have credited the wrong component. It did not survive, at
+any template, on any seed.
+
+**A bar of mine was mis-set, and it stays mis-set.** `DEREF/direct_min ≥ 0.90` fires at 0.8200. That is
+not a failure of the reproduction: E-000052's own worst direct cell is 0.8200, at t9, so the trained
+arm reproduces the battery exactly and the bar simply demanded more than the substrate delivers. The
+row that carries the ablation's validity is `direct_drop_max ≤ 0.05`, measured at 0.0000. Adjusting a
+bar after seeing the run is the move eleven of this ledger's retractions exist for; the bar is left as
+written, its firing is reported, and a note sits beside it in the module.
+
+**What this licenses, and what it does not.** The claim's attribution stops being architectural: the
+aliased read is the dereference hop, measured, with a control that could have failed and a surgical
+check that passed exactly. It is a **control, not a finding** — ablating a component to attribute a
+behaviour to it is the oldest move there is, and the slot is E-000015's own design. Record:
+`so/results/e000058_deref_ablation.{json,md}`.
 
 ### 31.8 Boundary
 
 CPU only, no GPU, no LLM above 124M parameters, synthetic worlds, single-token entities, two surface forms per relation, one session. Nothing here shows unlearning of facts already encoded in pretrained weights. Evidence levels recorded: E3–E4 for the synthetic system (F4 for SHRED with the verified gate, E-000010 — **on the value channel only**: E-000028 recovers the shredded object at 1.0000 through the ungated reverse key, where REVOKE and DELETE are at chance, so F4 for SHRED is a claim about answers, logits, hidden states and probes and not about routing); E5 as substrate for the frozen-GPT-2 experiment, with reading, composition, update and the copy bound supported and behavioural deletion not yet supported at the pre-registered thresholds.
+
+### 31.55 The registered prediction failed: a two-token subject at position 0 is read, so E-000050's collapse is the single-token case and the census's 80% condition costs this adapter nothing (2026-09-05, E-000054)
+
+§31.43 closed by registering the cheapest measurement that could separate two readings of §31.38's
+instrument finding — is the adapter's subject-initial failure *position 0*, or *a single-token subject
+at position 0* — and it wrote down the prediction that could fail: "the product-code surface fails at
+the initial templates without a BOS and recovers with one, the second-token surface does not fail, and
+the medial residue is unchanged by either." The run is E-000054. Three seeds, 3000 steps per surface
+and seed, E-000050-B's trainer and keys and objects untouched; the only thing that changes is the
+string a subject is rendered as. **The first clause is refuted.** The product-code surface does not
+fail. Record: `so/results/e000054_two_token_subjects.{json,md}`.
+
+| surface, held-out, worst seed | subject-initial read / route, bare | subject-medial read / route, bare | initial, `<\|endoftext\|>` at inference | initial, a lone space | medial, `<\|endoftext\|>` | medial, a lone space |
+|---|---|---|---|---|---|---|
+| single token (E-000050-A, the record) | **0.37 / 0.54** | 0.95 / 0.94 | 0.97 / 0.98 | 0.97 / 0.98 | 0.70 / 0.64 | 0.94 / 0.95 |
+| two tokens, 16 × 16 product code (identity needs both) | **0.91 / 0.90** | 0.94 / 0.90 | 0.99 / 0.99 | 0.99 / 0.99 | 0.74 / 0.69 | 0.93 / 0.90 |
+| two tokens, identity in the second alone | **1.00 / 0.97** | 0.97 / 0.96 | 0.99 / 0.97 | 1.00 / 0.98 | 0.90 / 0.85 | 0.97 / 0.97 |
+
+Both learnability rows pass (trained subject-medial read 0.98 on both surfaces), so the rule's VOID
+branch does not fire and the rows are read. The pre-registered criterion that carries the finding is
+`product/N/heldout_initial/read_min <= 0.5`, and it is **0.92** — the single row of the eight that
+FAILs, and it fails in the direction that answers the question. Per seed the product surface reads
+0.92 / 0.91 / 0.92 subject-initially against 0.95 / 0.96 / 0.94 medially: a residue of 0.03 to 0.04,
+in the same direction as the single-token collapse and about one fifteenth of its size (0.58). The
+second-token surface has no residue at all — 1.00 initial against 0.97 to 0.99 medial, the initial
+forms reading *higher*.
+
+**What this settles, and it narrows §31.38 for the third time.** The condition the census measured at
+80.18% of CounterFact's efficacy prompts, 82.35% of MCF's and 70.6% of MQuAKE's cloze forms is a
+*multi-token* subject whose first token sits at the sink. That is exactly the product surface, and this
+adapter reads it at 0.91 bare. The failing case is the one §31.43's critic had already isolated by
+reading `select_entities` — subject-initial **and** single-token, Yang et al.'s collapse condition,
+80 of 21,919 CounterFact prompts (0.36%). §31.43 answered the field question by census and declined
+the general claim in its "Not claimed" list ("that E-000050's failure is a property of GPT-2 reading
+subject-initial prompts in general rather than of this adapter's learned routing on single-token
+subjects"). That decline is now a measurement rather than a caution, and it was the right decline.
+
+**The dissociation §31.46 found, on a substrate it was not measured on.** §31.46 separated a
+*positional* recovery from a *lexical* price. E-000054 puts a second variable through it — how much of
+the subject's identity sits at position 0 — and the two halves come apart again, in opposite ways.
+The benefit of a `<|endoftext|>` collapses with the identity at stake: **+0.60** on the single-token
+surface, **+0.08** on the product code, **−0.01** on the second-token surface. The price on the
+subject-medial forms does not collapse with it: **−0.25**, **−0.20**, **−0.07**. So on a two-token
+subject the BOS is a *bad* trade, and on a subject whose first token is redundant it is a pure loss.
+A lone space stays what §31.46 measured it to be: it buys whatever there is to buy (product initial
+0.91 → 0.99) and costs 0.02 or less medially either way, on both surfaces and all three seeds.
+
+**Reported, not scored, as registered.** The trained subject-initial rows, the space arm's medial
+price, and every lifecycle row. For the record the lifecycle rows move with the reading and not against
+it: bare, the product surface's SHRED and REVOKE reach the worst held-out phrasing at 0.9600 and the
+second surface's at 0.9950, both over kill criterion 5's 0.95 bar, and under a lone space they are
+0.9600 and 1.0000. Address collision is 0.02 or below bare on the product surface and 0.00 to 0.0125
+on the second — against 0.1000 for the single-token record. The locality failure is untouched, as
+always: mean generic-text KL 3.73 to 3.92 nats against a 0.05 bar.
+
+**Not claimed.** That the pointer battery survives two-token subjects — E-000054 is the *reading*
+harness (E-000017-B's trainer, §31.38's substrate), not the symlink harness, and no alias, pod or
+lifecycle-through-a-LINK-row measurement in §§31.51–31.54 has ever been run on anything but
+single-token entities. That the product code is a hard case for a real subject: it is sixteen by
+sixteen over a synthetic vocabulary, and a real multi-token name distributes identity differently.
+That published editing numbers are or are not contaminated — that question closed in §31.43 with no
+finding, and this run only removes the one route by which this repository's own artefact could have
+reached them. That the 0.03 residue on the product code is nothing: it is small, it is consistent
+across three seeds, and a lone space removes it.
+
+**Standing.** A prediction registered in the ledger, run, and refuted in its own first clause, with
+nothing to retract because nothing had been claimed on it. Twelve retractions, and this is not the
+thirteenth.
