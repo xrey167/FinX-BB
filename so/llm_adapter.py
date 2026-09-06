@@ -259,37 +259,51 @@ class KnowledgeAdapterLM(nn.Module):
     # "the wrong directions" with "a smaller write". The ``_renorm`` modes restore the unprojected
     # read's norm, isolating direction; the bare modes are what an audit of the real write would see.
     # Both are reported rather than one being chosen.
-    def set_inject_projection(self, basis: Optional[torch.Tensor], mode: str = "keep") -> None:
+    MODES = ("keep", "drop", "keep_renorm", "drop_renorm", "zero")
+
+    def set_inject_projection(self, basis, mode: str = "keep", layers: Optional[Sequence[int]] = None) -> None:
         """``basis`` is (d, r) with ORTHONORMAL COLUMNS, or None to restore the trained behaviour.
 
         Modes: ``keep`` / ``drop`` -- inject the component inside / outside the span; ``keep_renorm``
         / ``drop_renorm`` -- the same direction at the unprojected read's norm; ``zero`` -- inject
         nothing (the no-memory floor, which needs no basis).
+
+        ``basis`` may also be a ``{layer: basis}`` mapping, and ``layers`` may name a subset of the
+        read layers. Both exist because the arms are PER READ SITE: a lens basis is a property of one
+        layer, and restricting an earlier write changes which cell a later read routes to, so an arm
+        applied at every site is a different object from one applied at a single site. Sites not named
+        keep the trained write.
         """
-        allowed = ("keep", "drop", "keep_renorm", "drop_renorm", "zero")
-        if mode not in allowed:
-            raise ValueError(f"mode must be one of {allowed}, got {mode!r}")
+        if mode not in self.MODES:
+            raise ValueError(f"mode must be one of {self.MODES}, got {mode!r}")
+        sites = tuple(self.cfg.read_layers if layers is None else layers)
+        unknown = [l for l in sites if l not in self.cfg.read_layers]
+        if unknown:
+            raise ValueError(f"layers {unknown} are not read layers {tuple(self.cfg.read_layers)}")
         if basis is None and mode != "zero":
             self._inject_projection = None
             return
-        if mode != "zero":
-            b = torch.as_tensor(basis, dtype=torch.float32)
-            if b.ndim != 2 or b.shape[0] != self.d:
-                raise ValueError(f"basis must be (d={self.d}, r), got {tuple(b.shape)}")
-            gram = b.t() @ b
-            off = (gram - torch.eye(b.shape[1], dtype=gram.dtype)).abs().max()
-            if float(off) > 1e-3:
-                raise ValueError(f"basis columns are not orthonormal (max |G - I| = {float(off):.2e}); "
-                                 "orthonormalise it, or the 'keep' and 'drop' arms do not partition the read")
-            self._inject_projection = (b, mode)
-        else:
-            self._inject_projection = (None, mode)
+        per_layer: Dict[int, Tuple[Optional[torch.Tensor], str]] = {}
+        for l in sites:
+            b = None
+            if mode != "zero":
+                raw = basis[l] if isinstance(basis, dict) else basis
+                b = torch.as_tensor(raw, dtype=torch.float32)
+                if b.ndim != 2 or b.shape[0] != self.d:
+                    raise ValueError(f"basis for layer {l} must be (d={self.d}, r), got {tuple(b.shape)}")
+                gram = b.t() @ b
+                off = (gram - torch.eye(b.shape[1], dtype=gram.dtype)).abs().max()
+                if float(off) > 1e-3:
+                    raise ValueError(f"basis columns are not orthonormal (max |G - I| = {float(off):.2e}); "
+                                     "orthonormalise it, or 'keep' and 'drop' do not partition the read")
+            per_layer[int(l)] = (b, mode)
+        self._inject_projection = per_layer
 
-    def _project_injection(self, read: torch.Tensor) -> torch.Tensor:
+    def _project_injection(self, read: torch.Tensor, layer: int) -> torch.Tensor:
         p = getattr(self, "_inject_projection", None)
-        if p is None:
+        if not p or layer not in p:
             return read
-        basis, mode = p
+        basis, mode = p[layer]
         if mode == "zero":
             return torch.zeros_like(read)
         inside = (read @ basis) @ basis.t()
@@ -374,7 +388,7 @@ class KnowledgeAdapterLM(nn.Module):
                 ref = self.o_proj[str(layer)](val)
                 rms_r = ref.pow(2).mean(-1, keepdim=True).sqrt().clamp_min(1e-3 * rms_h + 1e-6)
                 read = read * (rms_h / rms_r) * self.inject_gain[read_index]
-            read = self._project_injection(read)
+            read = self._project_injection(read, layer)
             ctx.setdefault("injected", []).append(read.detach())
             delta = torch.zeros_like(h)
             delta[ar, ctx["last_idx"]] = read

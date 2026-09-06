@@ -32,6 +32,7 @@ from __future__ import annotations
 import argparse
 import copy
 import json
+import os
 import time
 from pathlib import Path
 from typing import Dict, List, Sequence, Tuple
@@ -132,14 +133,27 @@ def kl_rows(a: torch.Tensor, b: torch.Tensor) -> torch.Tensor:
     return (la.exp() * (la-lb)).sum(-1)
 
 
-def run(seed: int, steps: int, threads: int, n_groups: int, results_dir: str) -> Dict[str,object]:
+def run(seed: int, steps: int, threads: int, n_groups: int, results_dir: str,
+        checkpoint: str = "") -> Dict[str,object]:
     if threads:
         torch.set_num_threads(threads)
     t0=time.time()
     cfg=AdapterConfig(status_gated=True, use_links=True, n_deref=1)
     gk=E8.GPT2Knowledge(cfg)
-    trained=E20.train_adapter_links(gk, seed, steps, n_groups=max(80,n_groups), verbose=True)
-    centre=np.asarray(trained["centre"])
+    if checkpoint:
+        # Read an already-trained symlink adapter instead of training a fresh one. Nothing about what
+        # this experiment MEASURES changes: it needs a trained symlink reader and its marker centre,
+        # and the criteria below are unchanged. What changes is which reader the record is about, so
+        # the checkpoint's path and hash go into the record. The BOS-trained adapter is the strongest
+        # recorded reader (alias 0.815-0.940 worst seed at twelve phrasings) and is the honest
+        # substrate for a certificate whose validity bar is that the memory can be read at all.
+        ck=torch.load(checkpoint, weights_only=False)
+        gk.model.load_state_dict(ck["adapter"], strict=False); gk.model.eval()
+        centre=np.asarray(ck["centre"])
+        trained={"train_seconds": float(ck.get("train_seconds", 0.0)), "reused_checkpoint": checkpoint}
+    else:
+        trained=E20.train_adapter_links(gk, seed, steps, n_groups=max(80,n_groups), verbose=True)
+        centre=np.asarray(trained["centre"])
 
     rng=np.random.default_rng(63000+seed)
     world,spec=E15.sample_alias_world(rng, 420, max(n_groups*2,48), 2,
@@ -268,6 +282,8 @@ def run(seed: int, steps: int, threads: int, n_groups: int, results_dir: str) ->
         checks[k]={"observed":v,"op":op,"bar":b,"pass":bool(ok)}
     screen=all(c["pass"] for c in checks.values())
     rec={"experiment":"E-000063","candidate_only":True,"seed":seed,"steps":steps,
+         "reused_checkpoint":checkpoint or None,
+         "bos": os.environ.get("SO_BOS","") == "1",
          "adapter":cfg.to_dict(),"templates":TEMPLATES,"capture_block":CAPTURE_BLOCK,
          "jl_source_hidden_state":JL_SOURCE,"jlens_prompts":jl.n_prompts,"metrics":metrics,
          "criteria":checks,"screening_pass":screen}
@@ -282,6 +298,7 @@ def main():
     ap.add_argument("--seed",type=int,default=0);ap.add_argument("--steps",type=int,default=2000)
     ap.add_argument("--threads",type=int,default=2);ap.add_argument("--n-groups",type=int,default=16)
     ap.add_argument("--results-dir",default="so/results")
-    a=ap.parse_args();run(a.seed,a.steps,a.threads,a.n_groups,a.results_dir)
+    ap.add_argument("--checkpoint",default="",help="reuse a trained symlink adapter instead of training one")
+    a=ap.parse_args();run(a.seed,a.steps,a.threads,a.n_groups,a.results_dir,a.checkpoint)
 
 if __name__=="__main__": main()

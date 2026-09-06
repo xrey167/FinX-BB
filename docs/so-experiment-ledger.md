@@ -4176,3 +4176,58 @@ across three seeds, and a lone space removes it.
 **Standing.** A prediction registered in the ledger, run, and refuted in its own first clause, with
 nothing to retract because nothing had been claimed on it. Twelve retractions, and this is not the
 thirteenth.
+
+### 31.56 Two instrument findings, before any claim: the J-lens could not run on a frozen core, and the two read sites are not independent (2026-09-06)
+
+Neither of these is a result about pods. Both are properties of the instruments this programme's next
+measurement needs, and both were found by running the code rather than by reading it.
+
+**The J-lens has never run on this repository's own reader, and the reason is one line.**
+`so/jlens.py` estimated `v_u = J_l^T W_U[u]` by a vector-Jacobian product taken with respect to
+`out.hidden_states[layer]` of a forward started from `input_ids`. `KnowledgeAdapterLM.__init__` calls
+`requires_grad_(False)` on every parameter of the core, so on the adapter's own frozen GPT-2 that
+forward builds no autograd graph at all and the VJP raises *element 0 of tensors does not require
+grad*. E-000063 — the composed workspace-pod deletion certificate, the one experiment that was to
+compose a store-side operation with a causal audit — died on exactly that line in CI (run
+33955376015), on both seeds, **after** training its adapter for 2000 steps: 31 minutes of compute per
+seed spent before the crash. That is why no E-000063 record exists anywhere in this repository, and
+why every "J-space" row in §§31.39–31.42 was argued from geometry and code reading rather than from a
+measurement on the adapter.
+
+The fix is one line and it is not a workaround: the lens is a derivative with respect to the hidden
+STATE, never with respect to the weights, so the forward now starts from the token embeddings as a
+leaf that requires grad. `so/tests/test_jlens.py` pins that the frozen and trainable paths return
+bit-identical vectors and norms, so nothing that did run before moves.
+
+**Recorded while fixing it, and it bounds what the lens can be used for here.** The J-lens vector at
+layer l and the unembedding row of the same token, on pretrained GPT-2 small over eight prompts, mean
+cosine over eight entity tokens: layer 1 **0.310**, 3 0.526, 5 0.593, 7 0.698, 8 **0.750**, 9 0.783,
+10 **0.783**, 11 **1.000**. §31.40 recorded 0.858 at layer 8 and 1.000 at layer 10 from a different
+token set; the ordering is the same and the conclusion is unchanged — *at this adapter's read layers
+the lens is a thin variant of the vocabulary basis*, and a design that wants the lens to be a
+different object from `W_U` has to read early, where it costs 0.31 of alignment.
+
+**The two read sites are not independent, and a subspace decomposition of "the write" is per-site.**
+`so/tests/test_inject_projection.py` was written to pin that restricting the injected read to a
+subspace and to its complement partitions the write. It does — at the FIRST read site only. With
+`read_layers=(8, 10)` the two arms diverge afterwards, because the block-8 write is in the residual
+that the block-10 hook reads its routing query from, so restricting the earlier write changes **which
+cell the later read routes to**, not merely how that read is projected. The single-read-site control
+is the other half of the test and there the partition is exact everywhere. Two consequences: any
+experiment that reports a keep/drop decomposition over this two-site reader is reporting two
+trajectories rather than one decomposition, and E-000084's arm A/C/D confound — routing feedback
+versus depth after the write — is a property of the architecture that a projection instrument
+reproduces exactly.
+
+**Instrument, on record, off by default.** `KnowledgeAdapterLM.set_inject_projection(basis, mode,
+layers)` injects the component of the read inside a subspace, outside it, either at the write's own
+magnitude or renormalised to it, or nothing at all; with nothing set the forward is bit-identical to
+the trained one. A basis whose Gram matrix is not the identity is refused, because overlapping arms
+are not a decomposition. `so.jlens.workspace_basis` returns the J-lens family's span with its
+spectrum — the family is far from orthogonal (mean |cos| between two of 256 entity atoms is 0.51 at
+layer 8), so 256 atoms hold **r99 = 210** directions at layer 8 and **216** at layer 10, and a
+matched-rank null must match that rank and not the token count. `so.jlens.random_basis` is that null:
+an r-dimensional subspace holds r/d of a random vector's mass, so a contrast that is really about rank
+reproduces itself there and the arm is void. Measured on the frozen model: the 256-atom span holds
+**0.333** of a random unit vector at layer 8 (0.334 at layer 10) and **0.721 / 0.816** of the entity
+unembedding rows.

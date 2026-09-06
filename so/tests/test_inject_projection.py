@@ -52,9 +52,12 @@ def _prompt(B=4, T=6):
             torch.full((B,), T - 1, dtype=torch.long))
 
 
-def _run(m, b, arm=None):
+def _run(m, b, arm=None, layers=None):
     ids, am, last = _prompt()
-    m.set_inject_projection(*(arm if arm is not None else (None, "keep")))
+    if arm is None:
+        m.set_inject_projection(None)
+    else:
+        m.set_inject_projection(arm[0], arm[1], layers=layers)
     with torch.no_grad():
         cand, full, _, _ = m(b, ids, am, last)
     inj = m.last_injected.clone()
@@ -130,6 +133,30 @@ def test_zero_mode_is_the_no_memory_forward():
     cand, full, inj = _run(m, b, (None, "zero"))
     assert float(inj.abs().max()) == 0.0
     assert torch.allclose(cand, none_cand, atol=1e-6) and torch.allclose(full, none_full, atol=1e-6)
+
+
+def test_a_single_site_arm_leaves_the_other_site_untouched():
+    """Per-site arms: restricting the write at the LAST read layer cannot change an earlier one."""
+    m, b = _adapter(status_gated=True, use_links=True, n_deref=1), _bank()
+    basis = random_basis(D, 8, seed=5)
+    _, _, full_inj = _run(m, b)
+    _, _, late = _run(m, b, (basis, "keep"), layers=(1,))
+    assert torch.equal(late[:, 0], full_inj[:, 0])          # site 0 is the trained write, bit for bit
+    assert not torch.allclose(late[:, 1], full_inj[:, 1])   # site 1 was restricted
+    with pytest.raises(ValueError, match="not read layers"):
+        m.set_inject_projection(basis, "keep", layers=(7,))
+
+
+def test_a_per_layer_basis_mapping_is_accepted():
+    m, b = _adapter(status_gated=True, use_links=True, n_deref=1), _bank()
+    per = {0: random_basis(D, 8, seed=6), 1: random_basis(D, 12, seed=7)}
+    m.set_inject_projection(per, "keep")
+    ids, am, last = _prompt()
+    with torch.no_grad():
+        m(b, ids, am, last)
+    inj = m.last_injected.clone()
+    m.set_inject_projection(None)
+    assert torch.isfinite(inj).all()
 
 
 def test_a_non_orthonormal_basis_is_refused():
