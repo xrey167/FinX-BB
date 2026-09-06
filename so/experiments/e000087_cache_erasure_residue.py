@@ -1,40 +1,30 @@
-"""E-000087 -- does a KV-cache erasure primitive actually erase?
+"""E-000087 -- RETRACTED. The headline result was a tensor compared with itself.
 
-Serving systems remove content from a KV cache by rewriting the removed span: replace its K/V with a
-stub or a neutral span, keep everything else, avoid a recompute. The span is gone, the system reports
-the chunk removed. But attention is causal: every token AFTER the chunk attended to it while it was
-still there, so the retained suffix K/V was computed FROM it. Rewriting the chunk's own span does not
-touch them.
+The experiment claimed that a span-replacement KV erasure primitive leaks the erased entity at 1.0000
+from the retained suffix. That number is VACUOUS. P_STUB rewrites only the chunk's own span; the
+retained suffix it then reads is BITWISE IDENTICAL to the suffix of the arm where no erasure happened
+at all (verified: max abs difference 0.000e+00). The attack therefore matched a tensor against itself,
+and 1.0000 was arithmetic, not evidence. The same holds for P_ZERO.
 
-This experiment asks whether that residue is recoverable, which is the same shape as this programme's
-E-000028 -- a deletion primitive that passed every attack aimed at the channel it gated, and gave the
-payload up through a derived quantity it never touched.
+The controls this file declared -- C1 through C4 -- all checked the IDEAL arm. Not one of them asked
+whether the TREATMENT arm differed from doing nothing, which is the only control that could have caught
+this. That check is now `C0` below and it fails on the original design, which is why the arms are gone.
 
-  prompt = [ prefix | D: a chunk naming entity e | S: a fixed bystander chunk | query ]
+What the design should have known before running: KVEraser (arXiv:2606.17034) states in its own method
+that its steering block is length-preserving and "leaves the suffix cache unchanged", and Leyline
+(arXiv:2606.01065) preserves suffix K_nope and V because "that attention is exactly what we want to
+keep". Any readout over retained suffix K/V returns the same value erased or not, BY THEIR OWN
+EQUATIONS. Pointing an instrument at a quantity the treatment provably does not touch is not a
+measurement.
 
-  P_IDEAL   recompute S and the query with a neutral chunk in D's place. Nothing retained depends
-            on e. This is what erasure is supposed to mean.
-  P_STUB    take the full cache computed WITH e, and replace only D's span with the neutral span's
-            K/V. S and the query keep the K/V they had. This is the span-replacement primitive.
-  P_ZERO    same, but D's span is zeroed rather than replaced.
+What survives, and it is a null result: decoding the query AGAINST the erased cache -- which does
+differ from the un-erased one, since the chunk's own span was replaced -- the erased entity is the
+top-1 answer in 0.0 of cases on both backbones, mean rank 2820 (GPT-2) and 916 (Pythia-70m), gain over
+the ideal arm +0.66 and +1.66 nats. The primitive works behaviourally on this harness.
 
-The attack is a storage-layer adversary who reads the retained tensors and knows the candidate set:
-for every candidate it builds the same prefill and matches. Top-1 against a chance of 1/N.
-
-CONTROLS, and they can fail. This session produced four measurement errors, every one of them a
-comparison that was not like-for-like or a control that could not fail, so they are stated first:
-
-  C1  P_IDEAL's retained tensors must be BIT-IDENTICAL across every candidate e, since e never entered
-      that forward. Asserted, not assumed. If it fails the harness is wrong and nothing else is read.
-  C2  The same attack run against P_IDEAL must land at chance. If a matcher can identify e from state
-      that provably does not depend on e, the matcher is reading the harness and every other number
-      in this file is void.
-  C3  Every arm is matched against references built the SAME way -- retained-suffix against
-      retained-suffix -- so no arm is compared against a differently-normalised quantity.
-  C4  The behavioural attack reports the answer distribution's mass on e MINUS its mass under P_IDEAL,
-      so a prompt that merely makes e likely cannot be read as leakage.
-
-Nothing here is a novelty claim. It is an audit of a primitive.
+Prior art that occupies the space anyway: MEMENTO (arXiv:2604.09852) §6.2.2 evicts a block holding a
+5-digit passcode and trains an MLP probe on the retained downstream KV, recovering 26.7% PER DIGIT
+against a 10% floor, with a causal control at chance. Note per digit: full recovery is ~0.267^5.
 """
 from __future__ import annotations
 
@@ -161,7 +151,12 @@ def run(model_name: str, n_entities: int, seed: int) -> Dict[str, object]:
             v[:, :, lo:hi, :] = 0.0
         zero.append(_slice(kv2, hi, tot))
 
+    # C0, the control this experiment was missing: the treatment must actually change what is retained.
+    # If the erasure arm's retained state equals the no-erasure arm's, any attack on it is comparing a
+    # tensor with itself and no number below means anything.
+    stub_t = torch.stack(stub)
     R = torch.stack(retained_with)          # attacker's reference set, built the same way as each arm
+    c0 = float((stub_t - R).abs().max())
     tgt = torch.arange(N)
 
     def top1(obs: torch.Tensor) -> float:
@@ -173,6 +168,9 @@ def run(model_name: str, n_entities: int, seed: int) -> Dict[str, object]:
     # C1: the ideal arm's retained state cannot depend on e
     c1 = bool((I - I[0:1]).abs().max() == 0.0)
     results = {
+        "C0_stub_retained_differs_from_no_erasure_maxabs": c0,
+        "C0_passes": bool(c0 > 0.0),
+        "tensor_attack_is_vacuous": bool(c0 == 0.0),
         "model": model_name,
         "n_entities": N,
         "chance": 1.0 / N,
@@ -192,7 +190,11 @@ def run(model_name: str, n_entities: int, seed: int) -> Dict[str, object]:
     results["behavioural_top1_is_e_after_stub"] = float(sa.argmax(-1).eq(ent).float().mean())
     results["behavioural_rank_of_e_after_stub"] = float(
         (sa > sa[idx, ent][:, None]).sum(-1).float().mean())
-    results["controls_ok"] = bool(c1 and results["C2_attack_on_ideal_top1"] <= 4.0 / N)
+    # the tensor-level arms are reported only if C0 passes; on the original design it does not
+    results["controls_ok"] = bool(c1 and results["C2_attack_on_ideal_top1"] <= 4.0 / N and c0 > 0.0)
+    if c0 == 0.0:
+        for k in ("P_STUB_top1", "P_ZERO_top1", "P_NOOP_top1", "P_IDEAL_top1"):
+            results[k] = f"VACUOUS ({results[k]}): retained state identical to the no-erasure arm"
     return results
 
 

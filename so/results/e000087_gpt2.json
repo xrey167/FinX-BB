@@ -2,19 +2,22 @@
   "experiment": "E-000087",
   "rows": [
     {
+      "C0_stub_retained_differs_from_no_erasure_maxabs": 0.0,
+      "C0_passes": false,
+      "tensor_attack_is_vacuous": true,
       "model": "gpt2",
-      "n_entities": 64,
-      "chance": 0.015625,
+      "n_entities": 32,
+      "chance": 0.03125,
       "C1_ideal_retained_bit_identical_across_entities": true,
-      "C2_attack_on_ideal_top1": 0.015625,
-      "P_IDEAL_top1": 0.015625,
-      "P_STUB_top1": 1.0,
-      "P_ZERO_top1": 1.0,
-      "P_NOOP_top1": 1.0,
-      "behavioural_logprob_gain_on_e_after_stub_vs_ideal": 0.6621778011322021,
+      "C2_attack_on_ideal_top1": 0.03125,
+      "P_IDEAL_top1": "VACUOUS (0.03125): retained state identical to the no-erasure arm",
+      "P_STUB_top1": "VACUOUS (1.0): retained state identical to the no-erasure arm",
+      "P_ZERO_top1": "VACUOUS (1.0): retained state identical to the no-erasure arm",
+      "P_NOOP_top1": "VACUOUS (1.0): retained state identical to the no-erasure arm",
+      "behavioural_logprob_gain_on_e_after_stub_vs_ideal": 0.8558400869369507,
       "behavioural_top1_is_e_after_stub": 0.0,
-      "behavioural_rank_of_e_after_stub": 2820.578125,
-      "controls_ok": true
+      "behavioural_rank_of_e_after_stub": 6502.71875,
+      "controls_ok": false
     }
   ],
   "not_claimed": "no novelty claim; an audit of a cache erasure primitive"
