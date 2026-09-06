@@ -86,7 +86,15 @@ def jlens_vectors(lm, layer: int, token_ids: Sequence[int], input_ids: torch.Ten
     for start in range(0, input_ids.shape[0], batch):
         chunk = input_ids[start: start + batch].to(dev)
         mask = attention_mask[start: start + batch].to(dev)
-        out = lm(input_ids=chunk, attention_mask=mask, output_hidden_states=True)
+        # The forward runs from the token EMBEDDINGS as a leaf that requires grad. On a frozen model --
+        # ``KnowledgeAdapterLM`` sets ``requires_grad_(False)`` on every core parameter -- a forward from
+        # ``input_ids`` builds no autograd graph at all, and the VJP below raises "element 0 of tensors
+        # does not require grad" (E-000063's CI run died on exactly that line at step 2000 of its
+        # training, both seeds). The lens is a derivative with respect to the hidden STATE, never the
+        # weights, so a leaf at the embeddings gives the identical quantity on a trainable model and the
+        # only working one on a frozen model.
+        emb = lm.get_input_embeddings()(chunk).detach().requires_grad_(True)
+        out = lm(inputs_embeds=emb, attention_mask=mask, output_hidden_states=True)
         h = out.hidden_states[layer]                       # (B, T, d), the state being differentiated
         z = out.hidden_states[target_layer]                # (B, T, d), the target the paper uses
         keep = mask.unsqueeze(-1).to(z.dtype)
