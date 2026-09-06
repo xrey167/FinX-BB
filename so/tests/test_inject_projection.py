@@ -176,3 +176,35 @@ def test_random_basis_keeps_the_expected_share_of_a_random_vector():
     g = g / g.norm(dim=1, keepdim=True)
     share = float((((g @ b) ** 2).sum(1)).mean())
     assert abs(share - r / d) < 0.02
+
+
+def test_a_capture_registered_after_the_adapter_sees_the_injected_write():
+    """A hook registered after the adapter's own must observe the state INCLUDING the write.
+
+    This is the premise E-000063 states in prose ("this hook is registered afterwards, so it observes
+    block-8 output AFTER the first symlink resolve/dereference injection") and never tested. It is
+    load-bearing: if a capture were to observe the PRE-injection state, then ACTIVE and NEVER banks
+    would give bit-identical states there and "the audit sees nothing at this site" would be an
+    artefact of the instrument rather than a fact about the model. On the trained adapter the two
+    facts have to be told apart by a mediator; here the mechanism itself is pinned.
+    """
+    from so.llm_adapter import transformer_blocks
+    m, b = _adapter(status_gated=True, use_links=True, n_deref=1), _bank()
+    seen = {}
+
+    def hook(module, inputs, output):
+        seen["h"] = (output[0] if isinstance(output, tuple) else output).detach().clone()
+        return None
+
+    handle = transformer_blocks(m.lm)[1].register_forward_hook(hook)   # after the adapter's own hooks
+    ids, am, last = _prompt()
+    with torch.no_grad():
+        m(b, ids, am, last)
+    with_memory = seen["h"][torch.arange(ids.shape[0]), last].clone()
+    with torch.no_grad():
+        m(None, ids, am, last)
+    no_memory = seen["h"][torch.arange(ids.shape[0]), last].clone()
+    handle.remove()
+    assert not torch.allclose(with_memory, no_memory, atol=1e-4), (
+        "the capture did not observe the injected write; every 'the audit sees nothing here' row read "
+        "through such a capture would be an artefact")
