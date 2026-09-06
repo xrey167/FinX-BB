@@ -234,10 +234,25 @@ def test_a_handle_is_a_function_of_the_identity_alone():
     ids = torch.tensor([0, 1, 2, 7, 31, 1_000_003, -1])
     h = m.handles_for(ids)
     assert h.shape == (ids.shape[0], m.d)
-    # well separated, not merely unequal: the closest pair is a large fraction of a handle's own norm
-    norm = float(h.norm(dim=-1).mean())
-    closest = min(float((h[i] - h[j]).norm()) for i in range(ids.shape[0]) for j in range(i + 1, ids.shape[0]))
-    assert closest > 0.1 * norm, f"identities crowd together: closest {closest:.4f} against norm {norm:.4f}"
+    # Separation must be asserted as COHERENCE, not as a distance. The first version of this test
+    # checked that the closest pair was at least a tenth of a handle's norm; that passed while the
+    # family was 87.8% collinear with rank 8, because a distance between near-parallel unit-ish
+    # vectors is still nonzero. It is the angle that decides whether a lossy transport can tell two
+    # handles apart, and the crowded family measured 0.0859 identification where this one measures
+    # 0.9941 (E-000085). An instrument that cannot fail is not evidence.
+    # The bar scales with the width: for random unit vectors in d dimensions the mean |cos| is
+    # sqrt(2 / (pi * d)), which is 0.14 for this test model's d=32 and 0.029 at GPT-2's 768. A fixed
+    # threshold would either pass everything here or fail everything there, so the assertion is
+    # against twice the random baseline. The family this replaced measured 0.878 at d=768 — thirty
+    # times its baseline — and rank 8 for 128 identities.
+    u = h / h.norm(dim=-1, keepdim=True)
+    c = (u @ u.t()).abs()
+    c.fill_diagonal_(0.0)
+    baseline = (2.0 / (3.141592653589793 * m.d)) ** 0.5
+    assert float(c.mean()) < 2 * baseline, (
+        f"handle family is crowded: mean |cos| {float(c.mean()):.4f} against a random baseline of {baseline:.4f}")
+    assert float(c.max()) < 0.75, f"two identities nearly collinear: max |cos| {float(c.max()):.4f}"
+    assert torch.linalg.matrix_rank(h).item() == min(ids.shape[0], m.d), "handles do not span"
     # order- and position-independent. Equality here is numerical, not bit-exact: the handle is a matmul,
     # and a different batch shape reduces the same sum in a different order, which is float32 rounding
     # (measured at 7e-09) and not a dependence on position.

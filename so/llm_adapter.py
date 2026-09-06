@@ -125,7 +125,6 @@ class AdapterConfig:
 
 
 class KnowledgeAdapterLM(nn.Module):
-    ID_BITS = 64      # width of the identity a cfg.reference_carrier handle is derived from
 
     def __init__(self, lm, cfg: AdapterConfig, entity_token_ids: Sequence[int], unknown_token_id: int):
         super().__init__()
@@ -196,7 +195,7 @@ class KnowledgeAdapterLM(nn.Module):
             # enter it. The basis is a buffer, never trained, so a checkpoint carries the handles it learned to
             # transport. See `handles_for`.
             g = torch.Generator().manual_seed(20260905)
-            self.register_buffer("handle_basis", torch.randn(d, self.ID_BITS, generator=g) * 0.02)
+            self.register_buffer("handle_basis", torch.randn(d, d, generator=g) * 0.02)
             # The only learned part of the boundary: how to read a handle back out of the residual.
             self.bind_q = nn.Sequential(nn.LayerNorm(d), nn.Linear(d, d))
             self.bind_gain = nn.Parameter(torch.tensor(1.0))
@@ -458,18 +457,39 @@ class KnowledgeAdapterLM(nn.Module):
             return (h2,) + tuple(output[1:]) if isinstance(output, tuple) else h2
         return hook
 
+    @staticmethod
+    def _mix(z: torch.Tensor) -> torch.Tensor:
+        """splitmix64 finaliser: consecutive integers must give UNRELATED bit patterns.
+
+        Without this the handles were a catastrophe measured at mean pairwise |cos| 0.878 and rank 8
+        for 128 identities, because the raw two's-complement bits of 0..127 agree in every high bit,
+        so the handles were very nearly the same vector and no readout could tell them apart. That,
+        and not the frozen model, is what produced arm E's 0.0000.
+        """
+        z = z + (-7046029254386353131)                       # 0x9E3779B97F4A7C15 as int64
+        z = (z ^ (z >> 30)) * (-4658895280553007687)         # 0xBF58476D1CE4E5B9
+        z = (z ^ (z >> 27)) * (-7723592293110705685)         # 0x94D049BB133111EB
+        return z ^ (z >> 31)
+
     def handles_for(self, ids: torch.Tensor) -> torch.Tensor:
         """The knowledge-free carrier for each identity in ``ids``.
 
-        A handle is ``basis @ bits(id)``: a fixed linear image of the identity's bit pattern, scaled so its
-        norm does not grow with the width. The map is a function of the integer alone, so it is stable across
-        banks, stores, reorderings and processes; distinct identities give distinct handles because the basis
-        is random and the bit patterns differ. ``-1`` is the null identity: in two's complement its bits are
-        all ones, which no non-negative identity produces.
+        A handle is a deterministic, hashed, FULL-DIMENSIONAL pseudo-random unit direction: the
+        identity is hashed under `self.d` distinct counters, one bit is taken from each hash, and the
+        resulting sign vector is rotated by a fixed random basis. The map is a function of the integer
+        alone, so it is stable across banks, stores, reorderings and processes, and it needs no table,
+        so any identity is addressable.
+
+        Full-dimensional and hashed is the point. Distinct identities must give near-orthogonal
+        handles, or the frozen stack's lossy transport cannot tell them apart at the boundary:
+        measured on frozen GPT-2, identification from the boundary with no learning at all is 0.9941
+        for near-orthogonal handles and 0.0859 for the crowded family this replaces.
         """
-        shifts = torch.arange(self.ID_BITS, device=ids.device)
-        bits = ((ids[:, None] >> shifts) & 1).to(self.handle_basis.dtype) * 2.0 - 1.0
-        return (bits @ self.handle_basis.t()) / (self.ID_BITS ** 0.5)
+        ids = ids.to(torch.int64)
+        counters = torch.arange(self.d, device=ids.device, dtype=torch.int64)
+        bits = (self._mix(ids[:, None] * 0x100000000 + counters[None, :]) >> 17) & 1
+        signs = bits.to(self.handle_basis.dtype) * 2.0 - 1.0          # (n, d) in {-1, +1}
+        return (signs @ self.handle_basis.t()) / (self.d ** 0.5)
 
     def make_ctx(self, bank: Dict[str, torch.Tensor], last_idx: torch.Tensor,
                  cell_mask: Optional[torch.Tensor] = None) -> Dict:
