@@ -12,6 +12,9 @@ on:
       - "docs/novelty/nov002-charged-rerun-e104-e105-result.md"
       - "docs/novelty/screen-v2-2026-09-06.md"
       - "so/screen.py"
+      - "docs/novelty/nov003-unread-coordinates-e103-result.md"
+      - "so/experiments/nov003_unread_coordinates_e103.py"
+      - "so/tests/test_nov003_unread_coordinates_e103.py"
       - "so/tests/test_screen.py"
       - "so/experiments/nov001_screen_calibration.py"
       - "so/experiments/nov002_charged_rerun_e104_e105.py"
@@ -39,13 +42,15 @@ jobs:
           python -m py_compile so/experiments/pdx001_payload_derived_index_audit.py
           python -m py_compile so/experiments/nov002_charged_rerun_e104_e105.py
           python -m py_compile so/screen.py
+          python -m py_compile so/experiments/nov003_unread_coordinates_e103.py
       - name: Focused regressions
         run: |
           python -m pytest -q \
             so/tests/test_nov001_screen_calibration.py \
             so/tests/test_pdx001_payload_derived_index_audit.py \
             so/tests/test_nov002_charged_rerun_e104_e105.py \
-            so/tests/test_screen.py
+            so/tests/test_screen.py \
+            so/tests/test_nov003_unread_coordinates_e103.py
       - name: NOV001 registered screen calibration
         run: |
           mkdir -p ci-nov001
@@ -61,6 +66,11 @@ jobs:
           mkdir -p ci-nov002
           python -m so.experiments.nov002_charged_rerun_e104_e105 \
             --results-dir ci-nov002 | tee ci-nov002/stdout.txt
+      - name: NOV003 unread-coordinate re-screen of E-000103
+        run: |
+          mkdir -p ci-nov003
+          python -m so.experiments.nov003_unread_coordinates_e103 \
+            --results-dir ci-nov003 | tee ci-nov003/stdout.txt
       - name: Hash evidence
         run: |
           sha256sum docs/novelty/nov001-screen-calibration.md \
@@ -77,8 +87,11 @@ jobs:
             docs/novelty/screen-v2-2026-09-06.md \
             so/screen.py \
             so/tests/test_screen.py \
+            docs/novelty/nov003-unread-coordinates-e103-result.md \
+            so/experiments/nov003_unread_coordinates_e103.py \
+            so/tests/test_nov003_unread_coordinates_e103.py \
             > ci-nov001/source-sha256.txt
-          find ci-nov001 ci-pdx001 ci-nov002 -maxdepth 1 -name '*.json' -print0 | sort -z \
+          find ci-nov001 ci-pdx001 ci-nov002 ci-nov003 -maxdepth 1 -name '*.json' -print0 | sort -z \
             | xargs -0 -r sha256sum > ci-nov001/result-sha256.txt
       - uses: actions/upload-artifact@v4
         with:
@@ -87,4 +100,5 @@ jobs:
             ci-nov001/
             ci-pdx001/
             ci-nov002/
+            ci-nov003/
           if-no-files-found: error

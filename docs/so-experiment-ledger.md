@@ -3111,6 +3111,43 @@ could not test the M1 and M2 defects against E-000104 or E-000105 because neithe
 instruments memory traffic or sequential depth, and under the old predicate that absence had nowhere
 to appear. It now appears in every verdict.
 
+### 31.46 E-000103's verdict was underdetermined, and a screen can be unfair in the other direction (2026-09-06, NOV-003)
+
+§31.44 left one gap: M1 and M2 could not be tested on E-000104 or E-000105 because neither
+instruments memory traffic or sequential depth. E-000103 was picked to close it -- two sequential
+rank-1 Sherman-Morrison updates against one rank-2 Woodbury block, with the candidate carrying
+`z_del`, `z_add` and two denominators between events.
+
+**The baseline as written is not a baseline.** `woodbury_rankk_solution` rebuilds `inv_u` and
+`middle_inv` on every one of the 24 sessions though neither depends on that session's right-hand
+side, so the candidate beats it 3.5x-4.2x without the mechanism doing anything. This is the mirror of
+the representation subsidy: there the baseline is handed the candidate's representation for free,
+here it is denied an optimisation the candidate is already using -- caching z and denom is exactly
+what the candidate does. A screen can be unfair in both directions and this programme had only looked
+for one. Hoisting costs no arithmetic at all: `woodbury_rankk_inverse` already builds both quantities
+internally (lines 121-125), so a hoisted implementation retains rather than rebuilds.
+
+**Against a fair baseline there is no single verdict.** Candidate `8n^2 + 98n + 48` against hoisted
+`6n^2 + 104n + 104`: a worse quadratic bought against a better linear term. PROMOTE at n=4 and n=6
+(568 vs 616, 924 vs 944), KILL at n=8 and n=10 (1,344 vs 1,320, 1,828 vs 1,744). **The crossover sits
+inside E-000103's own registered domain of (4,6,8,10).** The aggregate returns KILL and that number
+is not the answer -- a domain weighted toward small n returns PROMOTE with equal authority.
+E-000103's kill was not wrong so much as underdetermined: one verdict for a comparison that does not
+have one.
+
+**And a defect this experiment found in itself.** Its first run screened `slow_memory_words` and
+promoted at every dimension, including where the candidate spends more arithmetic: every arm's
+resident state is `n^2 + 2n + O(1)` and the two differ by a constant 2 words, so a 2-word gap
+outranked a 484-multiply regression. A coordinate a model cannot resolve must be declared unread, not
+scored -- otherwise the screen manufactures an advantage out of its own rounding, which is §31.42's
+defect committed by the file auditing it. First use of `so/screen.py`'s `unread_coordinates`, and
+what it was added for. The general lesson §31.45 does not yet enforce: **a strict improvement is not
+the same as a material one.** The screen has no notion of margin, so "improved on at least one
+coordinate" can still be satisfied by noise.
+
+No mechanism promoted. A candidate that wins small, loses large, and pays roughly twice the
+sequential depth throughout is not an invention.
+
 ### 31.8 Boundary
 
 CPU only, no GPU, no LLM above 124M parameters, synthetic worlds, single-token entities, two surface forms per relation, one session. Nothing here shows unlearning of facts already encoded in pretrained weights. Evidence levels recorded: E3–E4 for the synthetic system (F4 for SHRED with the verified gate, E-000010 — **on the value channel only**: E-000028 recovers the shredded object at 1.0000 through the ungated reverse key, where REVOKE and DELETE are at chance, so F4 for SHRED is a claim about answers, logits, hidden states and probes and not about routing); E5 as substrate for the frozen-GPT-2 experiment, with reading, composition, update and the copy bound supported and behavioural deletion not yet supported at the pre-registered thresholds.
