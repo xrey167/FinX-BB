@@ -62,6 +62,12 @@ jobs:
           SO_THREADS: '2'
         run: |
           python -m so.experiments.e000052_symlink_bos_train --seeds '${{ matrix.seed }}' --steps 3000 --threads 2
+      # --require-validity makes this job able to FAIL on the science, not only on an exception.
+      # It gates on the four VALIDITY rows only -- the memory was read, some readout saw it, the
+      # zero-dose arm is a floor, and the chord ladder moves the gate. A finding row never gates a
+      # build: a job that goes red because a measurement came out one way rather than the other pays
+      # its author to adjust the measurement, and this ledger has retracted eleven sentences over
+      # exactly that. A green job here means the run is INTERPRETABLE, not that it agrees with anyone.
       - name: LOD-001 both ladders
         env:
           SO_BOS: '1'
@@ -69,7 +75,8 @@ jobs:
         run: |
           mkdir -p ci-lod001
           python -m so.experiments.lod001_detection_limit \
-            --seeds '${{ matrix.seed }}' --threads 2 --n-groups 16 --results-dir ci-lod001
+            --seeds '${{ matrix.seed }}' --threads 2 --n-groups 16 --results-dir ci-lod001 \
+            --require-validity
       - uses: actions/upload-artifact@v4
         with:
           name: lod001-seed${{ matrix.seed }}

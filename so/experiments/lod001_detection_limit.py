@@ -396,6 +396,35 @@ def _worst_lod(per_seed: List[Dict[str, Any]], key: str, top: float, increasing:
             "n_seeds": len(vals)}
 
 
+def validity(rec: Dict[str, Any]) -> Dict[str, Dict[str, Any]]:
+    """The pre-registered validity rows, worst seed, as a machine-checkable dict.
+
+    ONLY the validity rows. A finding row must never gate a build: a job that goes red because a
+    measurement came out one way rather than another is a job that pays its author to adjust the
+    measurement, which is the failure mode this ledger has retracted eleven sentences over. These four
+    rows say whether the run is INTERPRETABLE AT ALL -- the memory was read, some readout saw it, the
+    zero-dose anchor is a floor, and the store-side ladder actually moves the gate. If one fails the
+    corresponding part is VOID by the pre-registration, and a void run should be loud.
+    """
+    per = rec["per_seed"]
+    g = lambda k, d=float("nan"): [s.get(k, d) for s in per]
+    rows = {
+        "V1_alias_answer_a1": (min(g("alias/answer/a1")), ">=", 0.80),
+        "V2_alias_final_raw_a1_minus_never": (min(g("alias/final/raw/a1_minus_never")), ">=", 0.30),
+        "V3a_alias_answer_a0_minus_never": (
+            max(s.get("alias/answer/a0", 0.0) - s.get("alias/answer/never", 0.0) for s in per), "<=", 0.05),
+        "V3b_abs_alias_final_raw_a0_minus_never": (
+            max(abs(s.get("alias/final/raw/a0_minus_never", 0.0)) for s in per), "<=", 0.10),
+        "V4a_gate_at_chord_0": (min(s["gate_by_chord"].get("c0", float("nan")) for s in per), ">=", 0.90),
+        "V4b_gate_at_chord_1": (max(s["gate_by_chord"].get("c1", float("nan")) for s in per), "<=", 0.10),
+    }
+    out: Dict[str, Dict[str, Any]] = {}
+    for k, (obs, op, bar) in rows.items():
+        ok = (obs >= bar) if op == ">=" else (obs <= bar)
+        out[k] = {"observed": float(obs), "op": op, "bar": bar, "pass": bool(ok)}
+    return out
+
+
 def summarise(rec: Dict[str, Any]) -> str:
     """The record as the tables a reader checks the pre-registered rows against."""
     per = rec["per_seed"]
@@ -511,6 +540,9 @@ def main(argv: Optional[List[str]] = None) -> Dict[str, Any]:
     ap.add_argument("--modes", nargs="*", default=["alias", "direct"])
     ap.add_argument("--results-dir", default="so/results/lod001")
     ap.add_argument("--suffix", default="_bos")
+    ap.add_argument("--require-validity", action="store_true",
+                    help="exit non-zero if any pre-registered VALIDITY row fails. Findings never gate: "
+                         "only the rows that decide whether the run is interpretable at all.")
     a = ap.parse_args(argv)
     if a.threads:
         torch.set_num_threads(a.threads)
@@ -529,7 +561,17 @@ def main(argv: Optional[List[str]] = None) -> Dict[str, Any]:
     p = Path(a.results_dir); p.mkdir(parents=True, exist_ok=True)
     (p / "lod001_detection_limit.json").write_text(json.dumps(rec, indent=2), encoding="utf-8")
     (p / "lod001_detection_limit.md").write_text(summarise(rec), encoding="utf-8")
+    v = validity(rec)
+    rec["validity"] = v
+    (p / "lod001_detection_limit.json").write_text(json.dumps(rec, indent=2), encoding="utf-8")
+    print("validity rows (worst seed):", flush=True)
+    for k, c in v.items():
+        print(f"  {'PASS' if c['pass'] else 'FAIL'}  {k:42s} {c['observed']:+.4f} {c['op']} {c['bar']}", flush=True)
     print(f"wrote {p / 'lod001_detection_limit.json'} in {rec['seconds']:.0f}s", flush=True)
+    bad = [k for k, c in v.items() if not c["pass"]]
+    if bad and getattr(a, "require_validity", False):
+        raise SystemExit(f"VOID: validity rows failed: {bad}. The pre-registration voids the "
+                         f"corresponding part; the record is written and this exit is the alarm.")
     return rec
 
 
