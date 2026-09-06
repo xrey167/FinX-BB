@@ -1,0 +1,504 @@
+{
+  "arms": {
+    "early": {
+      "read_layers": [
+        4,
+        6
+      ],
+      "suffix": "_bos_early"
+    },
+    "recorded": {
+      "read_layers": [
+        8,
+        10
+      ],
+      "suffix": "_bos"
+    }
+  },
+  "bos": true,
+  "candidate_only": true,
+  "environment": {
+    "device": "cpu",
+    "numpy": "2.4.6",
+    "platform": "Linux-6.18.44-fc-v24-x86_64-with-glibc2.39",
+    "python": "3.11.15",
+    "threads": "2",
+    "torch": "2.14.0+cpu"
+  },
+  "experiment": "SIT-001",
+  "preregistration": "docs/novelty/sit001-preregister.md",
+  "recorded_at": "2026-09-06T05:17:26+00:00",
+  "records": [
+    {
+      "arm": "recorded",
+      "audit": {
+        "final": {
+          "jprobe_active": 0.9776785714285714,
+          "jprobe_active_minus_never": 0.9285714285714285,
+          "jprobe_never": 0.049107142857142856,
+          "jprobe_shred": 0.12946428571428573,
+          "jprobe_shred_minus_never": 0.08035714285714288
+        },
+        "site10": {
+          "jprobe_active": 0.9821428571428571,
+          "jprobe_active_minus_never": 0.9330357142857142,
+          "jprobe_never": 0.049107142857142856,
+          "jprobe_shred": 0.125,
+          "jprobe_shred_minus_never": 0.07589285714285715
+        },
+        "site8": {
+          "jprobe_active": 0.1875,
+          "jprobe_active_minus_never": -0.008928571428571425,
+          "jprobe_never": 0.19642857142857142,
+          "jprobe_shred": 0.18303571428571427,
+          "jprobe_shred_minus_never": -0.01339285714285715
+        },
+        "site9": {
+          "jprobe_active": 0.6339285714285714,
+          "jprobe_active_minus_never": -0.022321428571428603,
+          "jprobe_never": 0.65625,
+          "jprobe_shred": 0.6339285714285714,
+          "jprobe_shred_minus_never": -0.022321428571428603
+        }
+      },
+      "capability": {
+        "active_alias_correct": 0.8794642686843872,
+        "bystander_top1_agree": 1.0,
+        "never_alias_true_object": 0.0,
+        "shred_alias_true_object": 0.0,
+        "shred_alias_unknown": 1.0
+      },
+      "chance": 0.0625,
+      "checkpoint": "so/results/checkpoints/e000020_gpt2_bos_seed0.pt",
+      "e000063_certificate": {
+        "admissible": false,
+        "reasons": [
+          "arrival 0.055 < 0.50: the content has not reached this site, so a null readout here is not evidence of absence"
+        ],
+        "site": "site8",
+        "siting": {
+          "arrival": 4.389632865786552,
+          "arrival_ratio": 0.05460113083293515,
+          "in_window": false,
+          "lens_cos": 0.7771443128585815,
+          "reasons": [
+            "arrival 0.055 < 0.50: the content has not reached this site, so a null readout here is not evidence of absence"
+          ],
+          "site": "site8"
+        },
+        "status": "VACUOUS",
+        "verdict": {
+          "jprobe_active": 0.1875,
+          "jprobe_active_minus_never": -0.008928571428571425,
+          "jprobe_never": 0.19642857142857142,
+          "jprobe_shred": 0.18303571428571427,
+          "jprobe_shred_minus_never": -0.01339285714285715
+        },
+        "window": []
+      },
+      "e000063_site": "site8",
+      "lens_cos": {
+        "final": 1.0,
+        "site10": 1.0,
+        "site8": 0.7771443128585815,
+        "site9": 0.8093673586845398
+      },
+      "mediators": {
+        "final": 18.7259042263031,
+        "site10": 80.39454126358032,
+        "site8": 4.389632865786552,
+        "site9": 7.324888110160828
+      },
+      "n_pods": 16,
+      "never_mediators": {
+        "final": 24.927393436431885,
+        "site10": 65.46323704719543,
+        "site8": 6.95873749256134,
+        "site9": 8.297096371650696
+      },
+      "read_layers": [
+        8,
+        10
+      ],
+      "seed": 0,
+      "sites": [
+        "site8",
+        "site9",
+        "site10",
+        "final"
+      ],
+      "siting": [
+        {
+          "arrival": 4.389632865786552,
+          "arrival_ratio": 0.05460113083293515,
+          "in_window": false,
+          "lens_cos": 0.7771443128585815,
+          "reasons": [
+            "arrival 0.055 < 0.50: the content has not reached this site, so a null readout here is not evidence of absence"
+          ],
+          "site": "site8"
+        },
+        {
+          "arrival": 7.324888110160828,
+          "arrival_ratio": 0.09111175951792001,
+          "in_window": false,
+          "lens_cos": 0.8093673586845398,
+          "reasons": [
+            "arrival 0.091 < 0.50: the content has not reached this site, so a null readout here is not evidence of absence"
+          ],
+          "site": "site9"
+        },
+        {
+          "arrival": 80.39454126358032,
+          "arrival_ratio": 1.0,
+          "in_window": false,
+          "lens_cos": 1.0,
+          "reasons": [
+            "lens |cos| to the unembedding 1.000 > 0.90: the audit at this site is the logit lens, not an independent instrument"
+          ],
+          "site": "site10"
+        },
+        {
+          "arrival": 18.7259042263031,
+          "arrival_ratio": 0.23292507093122947,
+          "in_window": false,
+          "lens_cos": 1.0,
+          "reasons": [
+            "arrival 0.233 < 0.50: the content has not reached this site, so a null readout here is not evidence of absence",
+            "lens |cos| to the unembedding 1.000 > 0.90: the audit at this site is the logit lens, not an independent instrument"
+          ],
+          "site": "final"
+        }
+      ],
+      "window": [],
+      "write_mediators": {
+        "write10": 82.10693740844727,
+        "write8": 4.389633379876614
+      }
+    },
+    {
+      "arm": "recorded",
+      "audit": {
+        "final": {
+          "jprobe_active": 0.9955357142857143,
+          "jprobe_active_minus_never": 0.9151785714285714,
+          "jprobe_never": 0.08035714285714286,
+          "jprobe_shred": 0.06696428571428571,
+          "jprobe_shred_minus_never": -0.01339285714285715
+        },
+        "site10": {
+          "jprobe_active": 0.9866071428571429,
+          "jprobe_active_minus_never": 0.9285714285714286,
+          "jprobe_never": 0.05803571428571429,
+          "jprobe_shred": 0.0625,
+          "jprobe_shred_minus_never": 0.004464285714285712
+        },
+        "site8": {
+          "jprobe_active": 0.23214285714285715,
+          "jprobe_active_minus_never": -0.013392857142857123,
+          "jprobe_never": 0.24553571428571427,
+          "jprobe_shred": 0.23660714285714285,
+          "jprobe_shred_minus_never": -0.008928571428571425
+        },
+        "site9": {
+          "jprobe_active": 0.8125,
+          "jprobe_active_minus_never": -0.008928571428571397,
+          "jprobe_never": 0.8214285714285714,
+          "jprobe_shred": 0.8080357142857143,
+          "jprobe_shred_minus_never": -0.013392857142857095
+        }
+      },
+      "capability": {
+        "active_alias_correct": 0.9732142686843872,
+        "bystander_top1_agree": 1.0,
+        "never_alias_true_object": 0.0,
+        "shred_alias_true_object": 0.0,
+        "shred_alias_unknown": 0.9955357313156128
+      },
+      "chance": 0.0625,
+      "checkpoint": "so/results/checkpoints/e000020_gpt2_bos_seed1.pt",
+      "e000063_certificate": {
+        "admissible": false,
+        "reasons": [
+          "arrival 0.016 < 0.50: the content has not reached this site, so a null readout here is not evidence of absence"
+        ],
+        "site": "site8",
+        "siting": {
+          "arrival": 1.5425908640027046,
+          "arrival_ratio": 0.016469021452481705,
+          "in_window": false,
+          "lens_cos": 0.7847729921340942,
+          "reasons": [
+            "arrival 0.016 < 0.50: the content has not reached this site, so a null readout here is not evidence of absence"
+          ],
+          "site": "site8"
+        },
+        "status": "VACUOUS",
+        "verdict": {
+          "jprobe_active": 0.23214285714285715,
+          "jprobe_active_minus_never": -0.013392857142857123,
+          "jprobe_never": 0.24553571428571427,
+          "jprobe_shred": 0.23660714285714285,
+          "jprobe_shred_minus_never": -0.008928571428571425
+        },
+        "window": []
+      },
+      "e000063_site": "site8",
+      "lens_cos": {
+        "final": 1.0,
+        "site10": 1.0,
+        "site8": 0.7847729921340942,
+        "site9": 0.825556218624115
+      },
+      "mediators": {
+        "final": 31.14799475669861,
+        "site10": 93.66621255874634,
+        "site8": 1.5425908640027046,
+        "site9": 1.4219844937324524
+      },
+      "n_pods": 16,
+      "never_mediators": {
+        "final": 31.625391006469727,
+        "site10": 64.4160840511322,
+        "site8": 2.430972471833229,
+        "site9": 3.8452685475349426
+      },
+      "read_layers": [
+        8,
+        10
+      ],
+      "seed": 1,
+      "sites": [
+        "site8",
+        "site9",
+        "site10",
+        "final"
+      ],
+      "siting": [
+        {
+          "arrival": 1.5425908640027046,
+          "arrival_ratio": 0.016469021452481705,
+          "in_window": false,
+          "lens_cos": 0.7847729921340942,
+          "reasons": [
+            "arrival 0.016 < 0.50: the content has not reached this site, so a null readout here is not evidence of absence"
+          ],
+          "site": "site8"
+        },
+        {
+          "arrival": 1.4219844937324524,
+          "arrival_ratio": 0.015181402715953744,
+          "in_window": false,
+          "lens_cos": 0.825556218624115,
+          "reasons": [
+            "arrival 0.015 < 0.50: the content has not reached this site, so a null readout here is not evidence of absence"
+          ],
+          "site": "site9"
+        },
+        {
+          "arrival": 93.66621255874634,
+          "arrival_ratio": 1.0,
+          "in_window": false,
+          "lens_cos": 1.0,
+          "reasons": [
+            "lens |cos| to the unembedding 1.000 > 0.90: the audit at this site is the logit lens, not an independent instrument"
+          ],
+          "site": "site10"
+        },
+        {
+          "arrival": 31.14799475669861,
+          "arrival_ratio": 0.332542481496868,
+          "in_window": false,
+          "lens_cos": 1.0,
+          "reasons": [
+            "arrival 0.333 < 0.50: the content has not reached this site, so a null readout here is not evidence of absence",
+            "lens |cos| to the unembedding 1.000 > 0.90: the audit at this site is the logit lens, not an independent instrument"
+          ],
+          "site": "final"
+        }
+      ],
+      "window": [],
+      "write_mediators": {
+        "write10": 93.74936103820801,
+        "write8": 1.5425899541005492
+      }
+    },
+    {
+      "arm": "recorded",
+      "audit": {
+        "final": {
+          "jprobe_active": 0.9776785714285714,
+          "jprobe_active_minus_never": 0.9285714285714285,
+          "jprobe_never": 0.049107142857142856,
+          "jprobe_shred": 0.09821428571428571,
+          "jprobe_shred_minus_never": 0.049107142857142856
+        },
+        "site10": {
+          "jprobe_active": 0.9955357142857143,
+          "jprobe_active_minus_never": 0.9151785714285714,
+          "jprobe_never": 0.08035714285714286,
+          "jprobe_shred": 0.05803571428571429,
+          "jprobe_shred_minus_never": -0.022321428571428575
+        },
+        "site8": {
+          "jprobe_active": 0.23660714285714285,
+          "jprobe_active_minus_never": -0.01339285714285715,
+          "jprobe_never": 0.25,
+          "jprobe_shred": 0.23214285714285715,
+          "jprobe_shred_minus_never": -0.01785714285714285
+        },
+        "site9": {
+          "jprobe_active": 0.8035714285714286,
+          "jprobe_active_minus_never": -0.004464285714285698,
+          "jprobe_never": 0.8080357142857143,
+          "jprobe_shred": 0.7991071428571429,
+          "jprobe_shred_minus_never": -0.008928571428571397
+        }
+      },
+      "capability": {
+        "active_alias_correct": 0.9821428656578064,
+        "bystander_top1_agree": 1.0,
+        "never_alias_true_object": 0.0,
+        "shred_alias_true_object": 0.0,
+        "shred_alias_unknown": 1.0
+      },
+      "chance": 0.0625,
+      "checkpoint": "so/results/checkpoints/e000020_gpt2_bos_seed2.pt",
+      "e000063_certificate": {
+        "admissible": false,
+        "reasons": [
+          "arrival 0.032 < 0.50: the content has not reached this site, so a null readout here is not evidence of absence"
+        ],
+        "site": "site8",
+        "siting": {
+          "arrival": 2.479924976825714,
+          "arrival_ratio": 0.03241100592657333,
+          "in_window": false,
+          "lens_cos": 0.7909474968910217,
+          "reasons": [
+            "arrival 0.032 < 0.50: the content has not reached this site, so a null readout here is not evidence of absence"
+          ],
+          "site": "site8"
+        },
+        "status": "VACUOUS",
+        "verdict": {
+          "jprobe_active": 0.23660714285714285,
+          "jprobe_active_minus_never": -0.01339285714285715,
+          "jprobe_never": 0.25,
+          "jprobe_shred": 0.23214285714285715,
+          "jprobe_shred_minus_never": -0.01785714285714285
+        },
+        "window": []
+      },
+      "e000063_site": "site8",
+      "lens_cos": {
+        "final": 1.0,
+        "site10": 1.0,
+        "site8": 0.7909474968910217,
+        "site9": 0.8307117819786072
+      },
+      "mediators": {
+        "final": 31.277414321899414,
+        "site10": 76.51490306854248,
+        "site8": 2.479924976825714,
+        "site9": 3.8066871911287308
+      },
+      "n_pods": 16,
+      "never_mediators": {
+        "final": 31.638150215148926,
+        "site10": 64.49685978889465,
+        "site8": 3.6059033274650574,
+        "site9": 5.054779291152954
+      },
+      "read_layers": [
+        8,
+        10
+      ],
+      "seed": 2,
+      "sites": [
+        "site8",
+        "site9",
+        "site10",
+        "final"
+      ],
+      "siting": [
+        {
+          "arrival": 2.479924976825714,
+          "arrival_ratio": 0.03241100592657333,
+          "in_window": false,
+          "lens_cos": 0.7909474968910217,
+          "reasons": [
+            "arrival 0.032 < 0.50: the content has not reached this site, so a null readout here is not evidence of absence"
+          ],
+          "site": "site8"
+        },
+        {
+          "arrival": 3.8066871911287308,
+          "arrival_ratio": 0.04975092483249543,
+          "in_window": false,
+          "lens_cos": 0.8307117819786072,
+          "reasons": [
+            "arrival 0.050 < 0.50: the content has not reached this site, so a null readout here is not evidence of absence"
+          ],
+          "site": "site9"
+        },
+        {
+          "arrival": 76.51490306854248,
+          "arrival_ratio": 1.0,
+          "in_window": false,
+          "lens_cos": 1.0,
+          "reasons": [
+            "lens |cos| to the unembedding 1.000 > 0.90: the audit at this site is the logit lens, not an independent instrument"
+          ],
+          "site": "site10"
+        },
+        {
+          "arrival": 31.277414321899414,
+          "arrival_ratio": 0.40877545507547636,
+          "in_window": false,
+          "lens_cos": 1.0,
+          "reasons": [
+            "arrival 0.409 < 0.50: the content has not reached this site, so a null readout here is not evidence of absence",
+            "lens |cos| to the unembedding 1.000 > 0.90: the audit at this site is the logit lens, not an independent instrument"
+          ],
+          "site": "final"
+        }
+      ],
+      "window": [],
+      "write_mediators": {
+        "write10": 76.86288166046143,
+        "write8": 2.479923963546753
+      }
+    }
+  ],
+  "seconds": 78.79562592506409,
+  "verdict": {
+    "arrival_floor": 0.5,
+    "degeneracy_ceiling": 0.9,
+    "recorded": {
+      "P0_first_read_site_fails_arrival": true,
+      "P1_window_non_empty": false,
+      "P2_jprobe_active_minus_never_ge_030": null,
+      "P3_jprobe_shred_minus_never_le_005": null,
+      "VE1_active_alias_correct_ge_080": true,
+      "VE2_shred_alias_true_object_le_005": true,
+      "VE2_shred_alias_unknown_ge_090": true,
+      "VE3_bystander_top1_agree_ge_098": true,
+      "capability_worst_seed": {
+        "active_alias_correct": 0.8794642686843872,
+        "bystander_top1_agree": 1.0,
+        "never_alias_true_object": 0.0,
+        "shred_alias_true_object": 0.0,
+        "shred_alias_unknown": 0.9955357313156128
+      },
+      "kill1_never_floor_le_005": true,
+      "registered_site": null,
+      "seeds": [
+        0,
+        1,
+        2
+      ],
+      "window_all_seeds": []
+    }
+  }
+}
