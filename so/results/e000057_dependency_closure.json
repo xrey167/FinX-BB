@@ -1,0 +1,481 @@
+{
+  "aggregate": {
+    "DEL/coef": {
+      "max": 0.00022166493531984842,
+      "mean": 0.00019728049955681064,
+      "min": 0.00014930088987976558,
+      "n": 3
+    },
+    "DEL/flip": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 3
+    },
+    "DEL/kl": {
+      "max": 4.260302499590999e-06,
+      "mean": 2.6671866799951914e-06,
+      "min": 8.111252457199125e-07,
+      "n": 3
+    },
+    "DEL/kl_max": {
+      "max": 0.00014569218910764903,
+      "mean": 9.646737332028958e-05,
+      "min": 3.799754995270632e-05,
+      "n": 3
+    },
+    "DEL/maxabs": {
+      "max": 0.10733375333725138,
+      "mean": 0.07739372181554212,
+      "min": 0.050855743124129923,
+      "n": 3
+    },
+    "DEL/maxabs_max": {
+      "max": 3.4210925102233887,
+      "mean": 2.7606024742126465,
+      "min": 2.364320755004883,
+      "n": 3
+    },
+    "LIVE/coef": {
+      "max": 0.00022170228067683968,
+      "mean": 0.00019731203333255885,
+      "min": 0.00014936112455885413,
+      "n": 3
+    },
+    "LIVE/flip": {
+      "max": 0.0013297872340425532,
+      "mean": 0.001182033096926714,
+      "min": 0.0008865248226950354,
+      "n": 3
+    },
+    "LIVE/kl": {
+      "max": 0.019172504903082522,
+      "mean": 0.016632214950408394,
+      "min": 0.01232468843914658,
+      "n": 3
+    },
+    "LIVE/kl_max": {
+      "max": 0.7063471674919128,
+      "mean": 0.6255156993865967,
+      "min": 0.5842884182929993,
+      "n": 3
+    },
+    "LIVE/maxabs": {
+      "max": 0.559579588036905,
+      "mean": 0.4853621736195282,
+      "min": 0.3623651480896676,
+      "n": 3
+    },
+    "LIVE/maxabs_max": {
+      "max": 18.83195686340332,
+      "mean": 17.813317616780598,
+      "min": 17.17295265197754,
+      "n": 3
+    },
+    "LIVE2/coef": {
+      "max": 0.0002217801728859479,
+      "mean": 0.00019730983601585987,
+      "min": 0.00014934849637368043,
+      "n": 3
+    },
+    "LIVE2/flip": {
+      "max": 0.0013297872340425532,
+      "mean": 0.001182033096926714,
+      "min": 0.0008865248226950354,
+      "n": 3
+    },
+    "LIVE2/kl": {
+      "max": 0.020924110800390985,
+      "mean": 0.017772615170822324,
+      "min": 0.012691137327965387,
+      "n": 3
+    },
+    "LIVE2/kl_max": {
+      "max": 0.7063471674919128,
+      "mean": 0.6524158716201782,
+      "min": 0.6070557236671448,
+      "n": 3
+    },
+    "LIVE2/maxabs": {
+      "max": 0.5923400072262008,
+      "mean": 0.5101375668474758,
+      "min": 0.37006008514064426,
+      "n": 3
+    },
+    "LIVE2/maxabs_max": {
+      "max": 19.78824806213379,
+      "mean": 18.557671229044598,
+      "min": 17.435043334960938,
+      "n": 3
+    },
+    "REV/coef": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 3
+    },
+    "REV/flip": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 3
+    },
+    "REV/kl": {
+      "max": 4.675957363625812e-09,
+      "mean": 2.102290895543552e-09,
+      "min": -3.733812365379311e-11,
+      "n": 3
+    },
+    "REV/kl_max": {
+      "max": 8.599514877971615e-09,
+      "mean": 5.442888288224405e-09,
+      "min": 2.9430309300693125e-09,
+      "n": 3
+    },
+    "REV/maxabs": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 3
+    },
+    "REV/maxabs_max": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 3
+    },
+    "TOP/coef": {
+      "max": 0.013856655224523645,
+      "mean": 0.013756317231830552,
+      "min": 0.01356660608360742,
+      "n": 3
+    },
+    "TOP/flip": {
+      "max": 0.08421985815602837,
+      "mean": 0.08377659574468084,
+      "min": 0.08333333333333331,
+      "n": 3
+    },
+    "TOP/kl": {
+      "max": 1.0682647570650627,
+      "mean": 0.9646348042268279,
+      "min": 0.8404851251460136,
+      "n": 3
+    },
+    "TOP/kl_max": {
+      "max": 1.63399076461792,
+      "mean": 1.4468656778335571,
+      "min": 1.2649329900741577,
+      "n": 3
+    },
+    "TOP/maxabs": {
+      "max": 17.818805532252536,
+      "mean": 17.163019589498532,
+      "min": 15.971614675318941,
+      "n": 3
+    },
+    "TOP/maxabs_max": {
+      "max": 19.400121688842773,
+      "mean": 18.799795150756836,
+      "min": 17.805360794067383,
+      "n": 3
+    },
+    "bank_size": {
+      "max": 1050.0,
+      "mean": 1050.0,
+      "min": 1050.0,
+      "n": 3
+    },
+    "del_rows_routable": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "del_vs_live/dominance": {
+      "max": 0.4148936170212766,
+      "mean": 0.14184397163120568,
+      "min": 0.0,
+      "n": 3
+    },
+    "del_vs_live/median_ratio": {
+      "max": 0.5849605317823017,
+      "mean": 0.3127312868360952,
+      "min": 0.14657004980836966,
+      "n": 3
+    },
+    "del_vs_live/sign_z": {
+      "max": -1.6502739940140698,
+      "mean": -6.944903058142543,
+      "min": -9.695359714832659,
+      "n": 3
+    },
+    "floor/dominance": {
+      "max": 0.5212765957446809,
+      "mean": 0.49290780141843976,
+      "min": 0.46808510638297873,
+      "n": 3
+    },
+    "floor/median_ratio": {
+      "max": 1.0890971052976886,
+      "mean": 0.9969704681564465,
+      "min": 0.9059688484030589,
+      "n": 3
+    },
+    "floor/sign_z": {
+      "max": 0.412568498503518,
+      "mean": -0.13752283283450562,
+      "min": -0.6188527477552759,
+      "n": 3
+    },
+    "n_del_rows": {
+      "max": 6.0,
+      "mean": 6.0,
+      "min": 6.0,
+      "n": 3
+    },
+    "n_pods": {
+      "max": 100.0,
+      "mean": 100.0,
+      "min": 100.0,
+      "n": 3
+    },
+    "n_rev_rows": {
+      "max": 6.0,
+      "mean": 6.0,
+      "min": 6.0,
+      "n": 3
+    },
+    "n_skipped_unmatched": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 3
+    },
+    "n_units": {
+      "max": 94.0,
+      "mean": 94.0,
+      "min": 94.0,
+      "n": 3
+    },
+    "rev_rows_routable": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "seconds": {
+      "max": 11.435431957244873,
+      "mean": 10.959096113840738,
+      "min": 10.446085214614868,
+      "n": 3
+    }
+  },
+  "control": "E-000051's setting, reader, probe and AUC unchanged; the null is a live row matched on routing coefficient to within 10%",
+  "criteria": {
+    "claim_supported": false,
+    "criteria": {
+      "DEL/flip": {
+        "observed": 0.0,
+        "op": ">=",
+        "pass": false,
+        "threshold": 0.02
+      },
+      "REV/maxabs_max": {
+        "observed": 0.0,
+        "op": "<=",
+        "pass": true,
+        "threshold": 1e-06
+      },
+      "TOP/maxabs": {
+        "observed": 15.971614675318941,
+        "op": ">=",
+        "pass": true,
+        "threshold": 1.0
+      },
+      "del_vs_live/dominance": {
+        "observed": 0.0,
+        "op": ">=",
+        "pass": false,
+        "threshold": 0.75
+      },
+      "floor/dominance": {
+        "observed": 0.5212765957446809,
+        "op": "<=",
+        "pass": true,
+        "threshold": 0.6
+      }
+    }
+  },
+  "decision_rule": "Worst seed. Every row is a PAIRED comparison over pods: the effect of silencing one row against the effect of silencing another of the same routing mass, on the same queries. VOID if the REV zero control moves the forward at all (the mask or the routability flag is wrong and nothing else is readable), if silencing the top-coefficient row does not move the forward (a one-row ablation is invisible, so no row below it can be read), or if the FLOOR dominance exceeds 0.60 (two coefficient-matched live rows already dominate one another and the pairing is not matched). With all three holding: NO-EFFECT if DEL vs LIVE dominance is at or below 0.60 -- a deleted row that is still routable shapes a bystander's answer exactly as a live row of the same routing mass does, the other branch's dependency-closure requirement has no measurable basis on this substrate, and the entry is a refutation of it. SUB-BEHAVIOURAL if DEL vs LIVE is at least 0.75 while the flip rate stays under 0.02 and the KL under 0.05 nats: the deleted row's contribution is distinguishable in the logits and does not reach answers, which is the same shape as \u00a731.45's residue and is reported with the magnitudes beside it. BEHAVIOURAL if both fire: a deleted row changes what the model answers about other pods, at a measured rate, and the revocation unit for this reader is the routable set and not the queried pod. Anything in (0.60, 0.75) is inconclusive at this n. The magnitudes (max-abs, KL, flip rate, mean coefficient) are recorded for every arm whatever the reading, because the number the other branch published has no null beside it. Fixed before the run.",
+  "environment": {
+    "device": "cpu",
+    "numpy": "2.2.6",
+    "platform": "Linux-6.18.44-fc-v24-x86_64-with-glibc2.39",
+    "python": "3.11.15",
+    "threads": "1",
+    "torch": "2.14.0+cpu"
+  },
+  "evidence_level": "E4",
+  "evidence_level_meaning": "Controlled neural-network evidence",
+  "experiment": "E-000057",
+  "n_pods": 100,
+  "per_seed": [
+    {
+      "DEL/coef": 0.00022166493531984842,
+      "DEL/flip": 0.0,
+      "DEL/kl": 2.9301322946746628e-06,
+      "DEL/kl_max": 0.00010571238090051338,
+      "DEL/maxabs": 0.10733375333725138,
+      "DEL/maxabs_max": 3.4210925102233887,
+      "LIVE/coef": 0.00022170228067683968,
+      "LIVE/flip": 0.0013297872340425532,
+      "LIVE/kl": 0.019172504903082522,
+      "LIVE/kl_max": 0.7063471674919128,
+      "LIVE/maxabs": 0.559579588036905,
+      "LIVE/maxabs_max": 18.83195686340332,
+      "LIVE2/coef": 0.0002217801728859479,
+      "LIVE2/flip": 0.0013297872340425532,
+      "LIVE2/kl": 0.020924110800390985,
+      "LIVE2/kl_max": 0.7063471674919128,
+      "LIVE2/maxabs": 0.5923400072262008,
+      "LIVE2/maxabs_max": 19.78824806213379,
+      "REV/coef": 0.0,
+      "REV/flip": 0.0,
+      "REV/kl": 4.675957363625812e-09,
+      "REV/kl_max": 8.599514877971615e-09,
+      "REV/maxabs": 0.0,
+      "REV/maxabs_max": 0.0,
+      "TOP/coef": 0.013856655224523645,
+      "TOP/flip": 0.08377659574468084,
+      "TOP/kl": 1.0682647570650627,
+      "TOP/kl_max": 1.63399076461792,
+      "TOP/maxabs": 17.698638560924124,
+      "TOP/maxabs_max": 17.805360794067383,
+      "bank_size": 1050,
+      "checkpoint_sha256": "104f5c4549a0a57ea7e31fd0dad4c83324478e8cc330419329ac927018d9b456",
+      "del_rows_routable": 1.0,
+      "del_vs_live/dominance": 0.0,
+      "del_vs_live/median_ratio": 0.20666327891761418,
+      "del_vs_live/sign_z": -9.695359714832659,
+      "floor/dominance": 0.5212765957446809,
+      "floor/median_ratio": 1.0890971052976886,
+      "floor/sign_z": 0.412568498503518,
+      "n_del_rows": 6,
+      "n_pods": 100,
+      "n_rev_rows": 6,
+      "n_skipped_unmatched": 0,
+      "n_units": 94,
+      "rev_rows_routable": 1.0,
+      "seconds": 10.995771169662476,
+      "seed": 0
+    },
+    {
+      "DEL/coef": 0.00014930088987976558,
+      "DEL/flip": 0.0,
+      "DEL/kl": 8.111252457199125e-07,
+      "DEL/kl_max": 3.799754995270632e-05,
+      "DEL/maxabs": 0.050855743124129923,
+      "DEL/maxabs_max": 2.364320755004883,
+      "LIVE/coef": 0.00014936112455885413,
+      "LIVE/flip": 0.0008865248226950354,
+      "LIVE/kl": 0.01232468843914658,
+      "LIVE/kl_max": 0.5859115123748779,
+      "LIVE/maxabs": 0.3623651480896676,
+      "LIVE/maxabs_max": 17.435043334960938,
+      "LIVE2/coef": 0.00014934849637368043,
+      "LIVE2/flip": 0.0008865248226950354,
+      "LIVE2/kl": 0.012691137327965387,
+      "LIVE2/kl_max": 0.6070557236671448,
+      "LIVE2/maxabs": 0.37006008514064426,
+      "LIVE2/maxabs_max": 17.435043334960938,
+      "REV/coef": 0.0,
+      "REV/flip": 0.0,
+      "REV/kl": 1.668253446658637e-09,
+      "REV/kl_max": 4.7861190566322875e-09,
+      "REV/maxabs": 0.0,
+      "REV/maxabs_max": 0.0,
+      "TOP/coef": 0.013845690387360592,
+      "TOP/flip": 0.08421985815602837,
+      "TOP/kl": 0.8404851251460136,
+      "TOP/kl_max": 1.4416732788085938,
+      "TOP/maxabs": 15.971614675318941,
+      "TOP/maxabs_max": 19.19390296936035,
+      "bank_size": 1050,
+      "checkpoint_sha256": "a680a8772571d78de57257308e5ea3ff07f20469858007c827f638f766e8267e",
+      "del_rows_routable": 1.0,
+      "del_vs_live/dominance": 0.4148936170212766,
+      "del_vs_live/median_ratio": 0.14657004980836966,
+      "del_vs_live/sign_z": -1.6502739940140698,
+      "floor/dominance": 0.46808510638297873,
+      "floor/median_ratio": 0.9059688484030589,
+      "floor/sign_z": -0.6188527477552759,
+      "n_del_rows": 6,
+      "n_pods": 100,
+      "n_rev_rows": 6,
+      "n_skipped_unmatched": 0,
+      "n_units": 94,
+      "rev_rows_routable": 1.0,
+      "seconds": 11.435431957244873,
+      "seed": 1
+    },
+    {
+      "DEL/coef": 0.00022087567347081792,
+      "DEL/flip": 0.0,
+      "DEL/kl": 4.260302499590999e-06,
+      "DEL/kl_max": 0.00014569218910764903,
+      "DEL/maxabs": 0.07399166898524508,
+      "DEL/maxabs_max": 2.496394157409668,
+      "LIVE/coef": 0.00022087269476198278,
+      "LIVE/flip": 0.0013297872340425532,
+      "LIVE/kl": 0.018399451508996086,
+      "LIVE/kl_max": 0.5842884182929993,
+      "LIVE/maxabs": 0.534141784732012,
+      "LIVE/maxabs_max": 17.17295265197754,
+      "LIVE2/coef": 0.00022080083878795134,
+      "LIVE2/flip": 0.0013297872340425532,
+      "LIVE2/kl": 0.019702597384110596,
+      "LIVE2/kl_max": 0.643844723701477,
+      "LIVE2/maxabs": 0.5680126081755821,
+      "LIVE2/maxabs_max": 18.449722290039062,
+      "REV/coef": 0.0,
+      "REV/flip": 0.0,
+      "REV/kl": -3.733812365379311e-11,
+      "REV/kl_max": 2.9430309300693125e-09,
+      "REV/maxabs": 0.0,
+      "REV/maxabs_max": 0.0,
+      "TOP/coef": 0.01356660608360742,
+      "TOP/flip": 0.08333333333333331,
+      "TOP/kl": 0.9851545304694074,
+      "TOP/kl_max": 1.2649329900741577,
+      "TOP/maxabs": 17.818805532252536,
+      "TOP/maxabs_max": 19.400121688842773,
+      "bank_size": 1050,
+      "checkpoint_sha256": "07b0a97f4681dc8718beed086b7956090e4ec10dc86b6f4ef6f8dcc058e74240",
+      "del_rows_routable": 1.0,
+      "del_vs_live/dominance": 0.010638297872340425,
+      "del_vs_live/median_ratio": 0.5849605317823017,
+      "del_vs_live/sign_z": -9.4890754655809,
+      "floor/dominance": 0.48936170212765956,
+      "floor/median_ratio": 0.9958454507685917,
+      "floor/sign_z": -0.206284249251759,
+      "n_del_rows": 6,
+      "n_pods": 100,
+      "n_rev_rows": 6,
+      "n_skipped_unmatched": 0,
+      "n_units": 94,
+      "rev_rows_routable": 1.0,
+      "seconds": 10.446085214614868,
+      "seed": 2
+    }
+  ],
+  "quick": false,
+  "recorded_at": "2026-09-05T14:16:59+00:00",
+  "seeds": [
+    0,
+    1,
+    2
+  ],
+  "title": "what a deleted row still contributes to a bystander's answer",
+  "trains_nothing": true
+}

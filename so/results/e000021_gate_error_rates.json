@@ -1,0 +1,263 @@
+{
+  "answers": "The standing audit's objection that the deletion certificate is a learned classifier whose false-accept rate is reported only as a worst-seed maximum.",
+  "claim_supported": true,
+  "criteria": {
+    "false_accept_ci_upper": {
+      "observed": 0.0008880068251619355,
+      "op": "<=",
+      "pass": true,
+      "threshold": 0.01
+    },
+    "false_accept_rate": {
+      "observed": 0.0008486363636363636,
+      "op": "<=",
+      "pass": true,
+      "threshold": 0.001
+    },
+    "false_reject_rate": {
+      "observed": 0.0,
+      "op": "<=",
+      "pass": true,
+      "threshold": 0.001
+    }
+  },
+  "deletion_level": null,
+  "environment": {
+    "device": "cpu",
+    "numpy": "2.2.6",
+    "platform": "Linux-6.18.44-fc-v24-x86_64-with-glibc2.39",
+    "python": "3.11.15",
+    "threads": "1",
+    "torch": "2.14.0+cpu"
+  },
+  "evidence_level": "E4",
+  "evidence_level_meaning": "Controlled neural-network evidence",
+  "experiment": "E-000021",
+  "interpretation_limit": "This is the gate's error rate on markers drawn from the same two distributions the programme uses. It is not a security claim: an adversary who can choose the marker is not modelled here, and a gate that separates two fixed distributions says nothing about one that must resist a search for a passing vector.",
+  "no_training": "Nothing was trained. Every recorded checkpoint of the verified-gate family is loaded and its gate scored on freshly drawn markers; the rest of the model is not involved, because the gate is a function of the marker alone.",
+  "per_checkpoint": [
+    {
+      "checkpoint_sha256": "f0b181bc52152f26b419f2d096a7419bbbe507307a1c4e6984a4e61c441c864d",
+      "false_accepts": 132,
+      "false_rejects": 0,
+      "family": "e000010",
+      "n_per_class": 200000,
+      "seed": 0,
+      "signed_mean": 0.9980823397636414,
+      "signed_min": 0.9928663969039917,
+      "signed_p001": 0.9960169196128845,
+      "unsigned_max": 0.8552359938621521,
+      "unsigned_mean": 0.0028606264386326075,
+      "unsigned_p999": 0.43020328879356384
+    },
+    {
+      "checkpoint_sha256": "e5ebb907e9e4f8a17978d43c0fe1e8f1935fd74377e6768a2424c67f56f67033",
+      "false_accepts": 172,
+      "false_rejects": 0,
+      "family": "e000010",
+      "n_per_class": 200000,
+      "seed": 1,
+      "signed_mean": 0.998071014881134,
+      "signed_min": 0.9926024079322815,
+      "signed_p001": 0.9955443739891052,
+      "unsigned_max": 0.8610167503356934,
+      "unsigned_mean": 0.002767068101093173,
+      "unsigned_p999": 0.46397578716278076
+    },
+    {
+      "checkpoint_sha256": "18a064916cb19bf84fd32bfc9dc8b47d9cf28e68434c88a3f4dd6a7f7663f6c5",
+      "false_accepts": 164,
+      "false_rejects": 0,
+      "family": "e000010",
+      "n_per_class": 200000,
+      "seed": 2,
+      "signed_mean": 0.9982849359512329,
+      "signed_min": 0.9934725761413574,
+      "signed_p001": 0.9962761402130127,
+      "unsigned_max": 0.8353922367095947,
+      "unsigned_mean": 0.0030765726696699858,
+      "unsigned_p999": 0.4567963778972626
+    },
+    {
+      "checkpoint_sha256": "c5649b6c31c19a4fc041a3d1da6fa0376256e046808711691435efe77a777a28",
+      "false_accepts": 180,
+      "false_rejects": 0,
+      "family": "e000010",
+      "n_per_class": 200000,
+      "seed": 3,
+      "signed_mean": 0.9982962608337402,
+      "signed_min": 0.993782103061676,
+      "signed_p001": 0.9963670969009399,
+      "unsigned_max": 0.8126808404922485,
+      "unsigned_mean": 0.0030321821104735136,
+      "unsigned_p999": 0.4753356873989105
+    },
+    {
+      "checkpoint_sha256": "bd56e78905824b59a3e2236944db25ff6fcbe988ecde2de5aef0a5ad45937bcb",
+      "false_accepts": 163,
+      "false_rejects": 0,
+      "family": "e000010",
+      "n_per_class": 200000,
+      "seed": 4,
+      "signed_mean": 0.9981542825698853,
+      "signed_min": 0.9927563071250916,
+      "signed_p001": 0.9960070252418518,
+      "unsigned_max": 0.8058797121047974,
+      "unsigned_mean": 0.0028876166325062513,
+      "unsigned_p999": 0.4658867120742798
+    },
+    {
+      "checkpoint_sha256": "aa4f74732fbef59283102ce8b4c4c103aac85f76753e18a504f66a2ec70afdbe",
+      "false_accepts": 165,
+      "false_rejects": 0,
+      "family": "e000014",
+      "n_per_class": 200000,
+      "seed": 0,
+      "signed_mean": 0.9976251721382141,
+      "signed_min": 0.9926578402519226,
+      "signed_p001": 0.9950904846191406,
+      "unsigned_max": 0.8614013195037842,
+      "unsigned_mean": 0.0035292343236505985,
+      "unsigned_p999": 0.4676535129547119
+    },
+    {
+      "checkpoint_sha256": "bdbc4a47b7b74d39cb765827f8772592d10bb12b352c6266d34e2b5d811e0632",
+      "false_accepts": 199,
+      "false_rejects": 0,
+      "family": "e000014",
+      "n_per_class": 200000,
+      "seed": 1,
+      "signed_mean": 0.9976568222045898,
+      "signed_min": 0.9915720224380493,
+      "signed_p001": 0.9947565793991089,
+      "unsigned_max": 0.8732275366783142,
+      "unsigned_mean": 0.0034919886384159327,
+      "unsigned_p999": 0.4962497055530548
+    },
+    {
+      "checkpoint_sha256": "e9b81b88e3222f9df875349cc701f8d9c86ec014cb4935e7e189bf432af9062e",
+      "false_accepts": 212,
+      "false_rejects": 0,
+      "family": "e000014",
+      "n_per_class": 200000,
+      "seed": 2,
+      "signed_mean": 0.9970863461494446,
+      "signed_min": 0.9901521801948547,
+      "signed_p001": 0.9935619831085205,
+      "unsigned_max": 0.8773707151412964,
+      "unsigned_mean": 0.004192505497485399,
+      "unsigned_p999": 0.5141825079917908
+    },
+    {
+      "checkpoint_sha256": "d8ea4efa201a16a3a3302420b84bd85d0c88081147976c3898f651eef3d0134e",
+      "false_accepts": 159,
+      "false_rejects": 0,
+      "family": "e000019",
+      "n_per_class": 200000,
+      "seed": 5,
+      "signed_mean": 0.9977677464485168,
+      "signed_min": 0.9923918843269348,
+      "signed_p001": 0.9955933690071106,
+      "unsigned_max": 0.8396009802818298,
+      "unsigned_mean": 0.003010005224496126,
+      "unsigned_p999": 0.45136964321136475
+    },
+    {
+      "checkpoint_sha256": "55f61ee245eed422299d22b96fbf3e5396a17b991f3b66039d662a646e95c0c9",
+      "false_accepts": 122,
+      "false_rejects": 0,
+      "family": "e000019",
+      "n_per_class": 200000,
+      "seed": 6,
+      "signed_mean": 0.9981734156608582,
+      "signed_min": 0.9914199113845825,
+      "signed_p001": 0.9958847165107727,
+      "unsigned_max": 0.855737030506134,
+      "unsigned_mean": 0.0027322147507220507,
+      "unsigned_p999": 0.40416353940963745
+    },
+    {
+      "checkpoint_sha256": "2908431288567329044977d5fd82be98a5f1e1a07840732ee326e9d217a1661c",
+      "false_accepts": 199,
+      "false_rejects": 0,
+      "family": "e000019",
+      "n_per_class": 200000,
+      "seed": 7,
+      "signed_mean": 0.9974843859672546,
+      "signed_min": 0.9877628087997437,
+      "signed_p001": 0.9942374229431152,
+      "unsigned_max": 0.8928999304771423,
+      "unsigned_mean": 0.0032065308187156916,
+      "unsigned_p999": 0.4994122087955475
+    }
+  ],
+  "per_family": {
+    "e000010": {
+      "ci_false_accept": {
+        "lower": 0.000756157498896791,
+        "n": 1000000,
+        "rate": 0.000811,
+        "upper": 0.0008687663034958049
+      },
+      "false_accept_rate": 0.000811,
+      "false_accepts": 811,
+      "false_reject_rate": 0.0,
+      "false_rejects": 0,
+      "n_per_class_total": 1000000,
+      "signed_min": 0.9926024079322815,
+      "unsigned_max": 0.8610167503356934
+    },
+    "e000014": {
+      "ci_false_accept": {
+        "lower": 0.0008832249604229154,
+        "n": 600000,
+        "rate": 0.00096,
+        "upper": 0.0010416571527601115
+      },
+      "false_accept_rate": 0.00096,
+      "false_accepts": 576,
+      "false_reject_rate": 0.0,
+      "false_rejects": 0,
+      "n_per_class_total": 600000,
+      "signed_min": 0.9901521801948547,
+      "unsigned_max": 0.8773707151412964
+    },
+    "e000019": {
+      "ci_false_accept": {
+        "lower": 0.0007300486014278995,
+        "n": 600000,
+        "rate": 0.0008,
+        "upper": 0.0008748414745552435
+      },
+      "false_accept_rate": 0.0008,
+      "false_accepts": 480,
+      "false_reject_rate": 0.0,
+      "false_rejects": 0,
+      "n_per_class_total": 600000,
+      "signed_min": 0.9877628087997437,
+      "unsigned_max": 0.8928999304771423
+    }
+  },
+  "recorded_at": "2026-09-03T17:58:30+00:00",
+  "title": "The verification gate as a classifier: false accepts and false rejects over fresh markers",
+  "totals": {
+    "checkpoints": 11,
+    "ci_false_accept": {
+      "lower": 0.0008105895239403137,
+      "n": 2200000,
+      "rate": 0.0008486363636363636,
+      "upper": 0.0008880068251619355
+    },
+    "ci_false_reject": {
+      "lower": 0.0,
+      "n": 2200000,
+      "rate": 0.0,
+      "upper": 1.676761981539432e-06
+    },
+    "false_accept_rate": 0.0008486363636363636,
+    "false_accepts": 1867,
+    "false_reject_rate": 0.0,
+    "false_rejects": 0,
+    "markers_per_class": 2200000
+  }
+}
