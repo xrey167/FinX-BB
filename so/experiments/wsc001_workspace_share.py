@@ -125,17 +125,72 @@ def probe_families(states: Dict[str, torch.Tensor], atoms: torch.Tensor, unembed
     }
 
 
+# Block outputs, plus "final" (the last hidden state, after ln_f). Block 11 is not a site: its output
+# IS hidden_states[12], and the lens's target hidden_states[-2] is upstream of it, so the Jacobian is
+# not defined there (the vector-Jacobian product raises "not used in the graph"). At the final state
+# the lens degenerates to the unembedding row by construction -- ledger 31.56 measures cos = 1.000 at
+# layer 11 -- so the family used there is W_U itself, which is the same object and is labelled as such.
+SITES: Tuple[int, ...] = (8, 9, 10)
+
+
+class MultiCapture:
+    """The output of every named block at the last token, plus the final state.
+
+    E-000063 captures ONE block, chosen as "the first adapter read site" (`CAPTURE_BLOCK = 8`). That
+    choice is the reason its audit could not see the pod: measured on the BOS-trained adapter, the
+    write at the first read site is BIT-IDENTICAL between a live pod and a shredded one (0.0000 over
+    eight pods), while the write at the second read site differs by 68.84 and the block-10 and block-11
+    states differ by 68.84 and 288.87. The first read site injects nothing pod-specific for these
+    prompts; the content enters at the second. An audit sited at block 8 is therefore upstream of the
+    write it audits, and this class exists so the siting question is measured rather than assumed.
+    """
+
+    def __init__(self, gk: E8.GPT2Knowledge, sites: Sequence[int] = SITES):
+        self.sites = tuple(sites)
+        self.buf: Dict[int, torch.Tensor] = {}
+        blocks = transformer_blocks(gk.model.lm)
+        self.handles = [blocks[l].register_forward_hook(self._mk(l)) for l in self.sites]
+
+    def _mk(self, l: int):
+        def hook(module, inputs, output):
+            self.buf[l] = (output[0] if isinstance(output, tuple) else output).detach()
+            return None
+        return hook
+
+    def close(self) -> None:
+        for h in self.handles:
+            h.remove()
+        self.handles.clear()
+
+
+def eval_states(gk: E8.GPT2Knowledge, cap: MultiCapture, store, texts: Sequence[str], batch: int = 64):
+    """Per-site states at the last token, the final state, the answers, and the injected writes."""
+    tensors = bank_from_store(store).tensors()
+    per: Dict[str, List[torch.Tensor]] = {}
+    answers, injected = [], []
+    for i in range(0, len(texts), batch):
+        ids, am, last = E8.encode_texts(gk.tok, texts[i:i + batch])
+        with torch.no_grad():
+            cand, _, _, final = gk.model(tensors, ids, am, last)
+        ar = torch.arange(ids.shape[0])
+        for l in cap.sites:
+            per.setdefault(f"site{l}", []).append(cap.buf[l][ar, last].cpu())
+        per.setdefault("final", []).append(final.detach().cpu())
+        answers.append(cand.argmax(-1).cpu())
+        if gk.model.last_injected is not None:
+            injected.append(gk.model.last_injected.cpu())
+    return ({k: torch.cat(v) for k, v in per.items()}, torch.cat(answers),
+            torch.cat(injected) if injected else None)
+
+
 def part_a(gk: E8.GPT2Knowledge, centre: np.ndarray, seed: int, n_groups: int,
            verbose: bool = True) -> Dict[str, float]:
-    """E-000063's states and transfer probe, over five feature families, two sites and two ADDRESS MODES.
+    """Where can an accessibility audit of this memory be read, and where does the memory enter?
 
-    The address mode is what makes the pointer load-bearing rather than decorative. The pod, its
-    payload, the frozen weights and the template set are identical in both modes; only the way the
-    prompt reaches the pod differs -- its own canonical key, or a LINK alias that the model must
-    dereference. An audit calibrated on one access path and applied to the other is the deployment
-    situation a canonicalised store creates, and whether it survives that is not settled by anything
-    the code fixes: the alias path routes through a second learned hop (E-000058) whose output is the
-    same object vector, so a difference is about what the audit can see, not about what was injected.
+    Two address modes (the pod's own canonical key; a LINK alias the model must dereference), five
+    feature families, and every candidate site from the first read layer to the final state. Each site
+    carries its own MEDIATOR -- how far the state moves when the pod is shredded, and when it was never
+    written -- so "the audit sees nothing here" can be separated from "nothing is here".
     """
     rng = np.random.default_rng(63000 + seed)
     world, spec = E15.sample_alias_world(rng, 420, max(n_groups * 2, 48), 2, gk.n_entities, 4,
@@ -152,14 +207,19 @@ def part_a(gk: E8.GPT2Knowledge, centre: np.ndarray, seed: int, n_groups: int,
     obj_ids = [int(gk.model.entity_token_ids[o]) for _, _, o in selected]
     enc = gk.tok(LENS_CORPUS, return_tensors="pt", padding=True)
     w_out = gk.model.w_out
-    jl = jlens_vectors(gk.model.lm, E63.JL_SOURCE, obj_ids, enc["input_ids"], enc["attention_mask"],
-                       w_out, batch=4)
-    cap = E63.Capture(gk)
+    # One lens family per site, each at the index whose state it is used to read.
+    jl = {f"site{l}": jlens_vectors(gk.model.lm, l + 1, obj_ids, enc["input_ids"], enc["attention_mask"],
+                                    w_out, batch=4) for l in SITES}
+    class _Identity:                      # the lens at the final state: J = I, so v_u = W_U[u]
+        vectors = F.normalize(w_out[torch.as_tensor(obj_ids)].float(), dim=-1)
+    jl["final"] = _Identity()
+    cap = MultiCapture(gk)
     acc: Dict[Tuple[str, str, str], List[torch.Tensor]] = {}
     ys: Dict[str, List[int]] = {"alias": [], "direct": []}
     gs: Dict[str, List[int]] = {"alias": [], "direct": []}
-    answers: Dict[str, List[torch.Tensor]] = {"alias": [], "direct": []}
+    ans: Dict[str, List[torch.Tensor]] = {"alias": [], "direct": []}
     truths: Dict[str, List[int]] = {"alias": [], "direct": []}
+    med: Dict[Tuple[str, str, str], List[float]] = {}
     for label, (target, aliases, obj) in enumerate(selected):
         never = copy.deepcopy(store)
         for ak in aliases:
@@ -169,36 +229,47 @@ def part_a(gk: E8.GPT2Knowledge, centre: np.ndarray, seed: int, n_groups: int,
             never.delete(kids[target])
         for mode, keys in (("alias", aliases), ("direct", [target])):
             texts, tg = E63.texts_for(keys, gk.names, E63.TEMPLATES)
-            sa, fa, _, aa = E63.eval_texts(gk, cap, store, texts)
-            sn, fn, _, _ = E63.eval_texts(gk, cap, never, texts)
+            sa, aa, inj_a = eval_states(gk, cap, store, texts)
+            sn, _, _ = eval_states(gk, cap, never, texts)
             store.shred(kids[target])
-            ss, fs, _, _ = E63.eval_texts(gk, cap, store, texts)
+            ss, _, inj_s = eval_states(gk, cap, store, texts)
             store.resign(kids[target])
-            for site, (a_, s_, n_) in (("mid", (sa, ss, sn)), ("final", (fa, fs, fn))):
-                acc.setdefault((mode, site, "active"), []).append(a_)
-                acc.setdefault((mode, site, "shred"), []).append(s_)
-                acc.setdefault((mode, site, "never"), []).append(n_)
+            for site in sa:
+                acc.setdefault((mode, site, "active"), []).append(sa[site])
+                acc.setdefault((mode, site, "shred"), []).append(ss[site])
+                acc.setdefault((mode, site, "never"), []).append(sn[site])
+                med.setdefault((mode, site, "shred_moves"), []).append(
+                    float((sa[site] - ss[site]).abs().max()))
+                med.setdefault((mode, site, "never_moves"), []).append(
+                    float((sa[site] - sn[site]).abs().max()))
+            if inj_a is not None and inj_s is not None:
+                for j, l in enumerate(gk.model.cfg.read_layers):
+                    med.setdefault((mode, f"write{l}", "shred_moves"), []).append(
+                        float((inj_a[:, j] - inj_s[:, j]).abs().max()))
             ys[mode].extend([label] * len(texts)); gs[mode].extend(tg)
-            answers[mode].append(aa); truths[mode].extend([obj] * len(texts))
+            ans[mode].append(aa); truths[mode].extend([obj] * len(texts))
     cap.close()
     out: Dict[str, float] = {"partA/n_pods": float(n), "partA/chance": 1.0 / n}
+    for (mode, site, what), v in med.items():
+        out[f"partA/{mode}/{site}/{what}"] = float(np.mean(v))
     for mode in ("alias", "direct"):
         y = torch.tensor(ys[mode], dtype=torch.long); g = torch.tensor(gs[mode], dtype=torch.long)
         truth = torch.tensor(truths[mode], dtype=torch.long)
-        out[f"partA/{mode}/answer_correct"] = float((torch.cat(answers[mode]) == truth).float().mean())
-        for site in ("mid", "final"):
+        out[f"partA/{mode}/answer_correct"] = float((torch.cat(ans[mode]) == truth).float().mean())
+        for site in list(f"site{l}" for l in SITES) + ["final"]:
             states = {st: torch.cat(acc[(mode, site, st)]) for st in ("active", "shred", "never")}
-            fams = probe_families(states, jl.vectors, w_out[torch.as_tensor(obj_ids)], n, seed)
+            fams = probe_families(states, jl[site].vectors, w_out[torch.as_tensor(obj_ids)], n, seed)
             for fam, feats in fams.items():
                 p = E63.transfer_probe(feats["active"], feats["shred"], feats["never"], y, g, n)
                 for s_, v_ in p.items():
                     out[f"partA/{mode}/{site}/{fam}/{s_}"] = v_
                 out[f"partA/{mode}/{site}/{fam}/active_minus_never"] = p["active"] - p["never"]
                 out[f"partA/{mode}/{site}/{fam}/shred_minus_never"] = p["shred"] - p["never"]
-                if verbose:
-                    print(f"  seed {seed} partA {mode:6s} {site:5s} {fam:8s}: "
-                          f"active {p['active']:.4f} shred {p['shred']:.4f} never {p['never']:.4f}  "
-                          f"A-N {p['active'] - p['never']:+.4f}", flush=True)
+            if verbose:
+                print(f"  seed {seed} partA {mode:6s} {site:6s} "
+                      f"moves(shred) {out.get(f'partA/{mode}/{site}/shred_moves', float('nan')):8.3f}  "
+                      + "  ".join(f"{f}={out[f'partA/{mode}/{site}/{f}/active_minus_never']:+.3f}"
+                                  for f in ("jspace", "pca", "raw")), flush=True)
     return out
 
 
@@ -339,12 +410,11 @@ def load_bos_adapter(seed: int, suffix: str = "_bos") -> Tuple[E8.GPT2Knowledge,
 SUMMARY_KEYS = ("B/full_alias_min", "B/full_direct_min", "B/dropW_alias_max", "B/dropW_n_alias_max",
                 "B/dropT_n_deficit_min", "B/perm_alias_max", "B/none_alias_max",
                 "B/n_templates_dropWn_ge_50", "B/share_W_mean", "B/atom_dropW_alias_max",
-                "A/mid_max_active_minus_never", "A/mid_jspace_amn", "A/mid_pca_amn", "A/mid_raw_amn",
-                "A/final_raw_amn",
-                "A/alias/final_jspace_amn", "A/direct/final_jspace_amn", "A/indirection/jspace",
-                "A/alias/final_raw_amn", "A/direct/final_raw_amn", "A/indirection/raw",
-                "A/alias/final_pca_amn", "A/direct/final_pca_amn", "A/indirection/pca",
-                "A/alias/final_raw_shred_minus_never", "A/direct/final_raw_shred_minus_never",
+                "A/write8_shred_moves", "A/write10_shred_moves",
+                "A/site8_max_amn", "A/site10_max_amn", "A/final_raw_amn",
+                "A/alias/site8/shred_moves", "A/alias/site10/shred_moves", "A/alias/final/shred_moves",
+                "A/alias/final/jspace", "A/direct/final/jspace", "A/indirection/jspace",
+                "A/alias/final/raw", "A/direct/final/raw", "A/indirection/raw",
                 "A/shred_residual_direct", "A/shred_residual_alias", "A/shred_residual_asymmetry")
 
 
@@ -366,28 +436,32 @@ def summarise(m: Dict[str, Any], templates: Sequence[int]) -> Dict[str, float]:
         out["B/n_templates_dropWn_ge_50"] = float(sum(g(f"partB/t{t}/dropW_n/alias") >= 0.50 for t in ts))
         out["B/share_W_mean"] = float(np.mean([g(f"partB/t{t}/share_W_site0") for t in ts]))
     fams = ("jspace", "random", "pca", "unembed", "raw")
-    if any(f"partA/alias/mid/{f}/active_minus_never" in m for f in fams):
+    sites = [f"site{l}" for l in SITES] + ["final"]
+    if any(f"partA/alias/{sites[0]}/{f}/active_minus_never" in m for f in fams):
         for mode in ("alias", "direct"):
-            for f in fams:
-                out[f"A/{mode}/mid_{f}_amn"] = g(f"partA/{mode}/mid/{f}/active_minus_never")
-                out[f"A/{mode}/final_{f}_amn"] = g(f"partA/{mode}/final/{f}/active_minus_never")
-            out[f"A/{mode}/mid_max_active_minus_never"] = max(out[f"A/{mode}/mid_{f}_amn"] for f in fams)
-            out[f"A/{mode}/final_max_active_minus_never"] = max(out[f"A/{mode}/final_{f}_amn"] for f in fams)
-            out[f"A/{mode}/final_raw_shred_minus_never"] = g(f"partA/{mode}/final/raw/shred_minus_never")
-        # INDIRECTION (A6): the audit calibrated on the canonical key, applied through the pointer.
+            for site in sites:
+                for f in fams:
+                    out[f"A/{mode}/{site}/{f}"] = g(f"partA/{mode}/{site}/{f}/active_minus_never")
+                out[f"A/{mode}/{site}/max_amn"] = max(out[f"A/{mode}/{site}/{f}"] for f in fams)
+                out[f"A/{mode}/{site}/shred_moves"] = g(f"partA/{mode}/{site}/shred_moves")
+                out[f"A/{mode}/{site}/raw_shred_minus_never"] = g(
+                    f"partA/{mode}/{site}/raw/shred_minus_never")
+            out[f"A/{mode}/answer_correct"] = g(f"partA/{mode}/answer_correct")
+        # The write mediator: how far the INJECTED vector moves when the pod is shredded, per read site.
+        for l in (8, 10):
+            out[f"A/write{l}_shred_moves"] = max(g(f"partA/alias/write{l}/shred_moves", 0.0),
+                                                 g(f"partA/direct/write{l}/shred_moves", 0.0))
+        # A6 indirection, at the site where the audit is valid (the final state).
         for f in fams:
-            out[f"A/indirection/{f}"] = out[f"A/direct/final_{f}_amn"] - out[f"A/alias/final_{f}_amn"]
-        # A7, a DISCLOSED POST-HOC ROW: what a deletion leaves in the final state, by address mode.
-        out["A/shred_residual_direct"] = g("partA/direct/final/raw/shred_minus_never")
-        out["A/shred_residual_alias"] = g("partA/alias/final/raw/shred_minus_never")
+            out[f"A/indirection/{f}"] = out[f"A/direct/final/{f}"] - out[f"A/alias/final/{f}"]
+        # A7, the disclosed post-hoc row.
+        out["A/shred_residual_direct"] = out["A/direct/final/raw_shred_minus_never"]
+        out["A/shred_residual_alias"] = out["A/alias/final/raw_shred_minus_never"]
         out["A/shred_residual_asymmetry"] = (out["A/shred_residual_direct"]
                                              - out["A/shred_residual_alias"])
-        out["A/mid_max_active_minus_never"] = max(out["A/alias/mid_max_active_minus_never"],
-                                                  out["A/direct/mid_max_active_minus_never"])
-        out["A/final_raw_amn"] = min(out["A/alias/final_raw_amn"], out["A/direct/final_raw_amn"])
-        out["A/mid_jspace_amn"] = max(out["A/alias/mid_jspace_amn"], out["A/direct/mid_jspace_amn"])
-        out["A/mid_pca_amn"] = max(out["A/alias/mid_pca_amn"], out["A/direct/mid_pca_amn"])
-        out["A/mid_raw_amn"] = max(out["A/alias/mid_raw_amn"], out["A/direct/mid_raw_amn"])
+        out["A/final_raw_amn"] = min(out["A/alias/final/raw"], out["A/direct/final/raw"])
+        out["A/site8_max_amn"] = max(out["A/alias/site8/max_amn"], out["A/direct/site8/max_amn"])
+        out["A/site10_max_amn"] = max(out["A/alias/site10/max_amn"], out["A/direct/site10/max_amn"])
     return out
 
 
@@ -398,6 +472,8 @@ def criteria() -> Dict[str, Tuple[str, float]]:
         "B/perm_alias_max": ("<=", 0.05),                                          # V2
         "B/none_alias_max": ("<=", 0.05),                                          # V3
         "A/final_raw_amn": (">=", 0.30),                                           # V4
+        "A/write8_shred_moves": (">=", 0.0),          # reported: the first read site's write mediator
+        "A/site10_max_amn": (">=", 0.0),              # reported: the second read site's readability
         "B/dropW_n_alias_max": ("<=", 0.20),                                       # B1a
         "B/dropT_n_deficit_min": (">=", -0.20),                                    # B1b
     }
@@ -425,13 +501,14 @@ def decide(agg: Dict[str, Dict[str, float]]) -> Dict[str, str]:
     else:
         out["partB"] = "VOID (validity)"
     if v["V4"]:
-        mid_max = w("A/mid_max_active_minus_never", True)
-        out["partA"] = ("A1 DEPTH: no linear readout at the write site attributes the memory beyond the "
-                        "prompt, at any dimension up to the full residual" if mid_max <= 0.05 else
-                        "A2 DIRECTION: k coordinates suffice at the write site and the audit has the wrong k"
-                        if w("A/mid_pca_amn", False) >= 0.30 and w("A/mid_jspace_amn", True) <= 0.05 else
-                        "A3 DIMENSION: only the full residual attributes the memory at the write site"
-                        if w("A/mid_raw_amn", False) >= 0.30 and w("A/mid_pca_amn", True) <= 0.05 else
+        site8 = w("A/site8_max_amn", True)
+        write8 = w("A/write8_shred_moves", True)
+        out["partA"] = ("A0 SITING: E-000063's capture block is upstream of the write that carries the "
+                        "pod -- the first read site's injected vector does not move when the pod is "
+                        "shredded -- so no readout there can attribute the memory, and the certificate "
+                        "audits a state the pod never reached" if (site8 <= 0.05 and write8 <= 1e-3) else
+                        "A1 DEPTH: the write reaches the first read site but no linear readout there "
+                        "attributes it, at any dimension up to the full residual" if site8 <= 0.05 else
                         "A4 mixed: no siting sentence is licensed")
     else:
         out["partA"] = "VOID (V4: no readout anywhere sees the memory)"
@@ -461,10 +538,14 @@ def record(per_seed: List[Dict[str, Any]], args) -> Dict[str, Any]:
     # 'full' and the null are capability rows (worst = min); every other arm is a leak row (worst = max)
     arm_rows = [[f"t{t}"] + [f"{ledger.worst(agg[f'partB/t{t}/{a}/alias'], a not in ('full', 'dropT_n')):.4f}"
                              for a in PART_B_ARMS] for t in ts]
+    site_names = [f"site{l}" for l in SITES] + ["final"]
     fam_rows = [[f] + [f"{ledger.worst(agg[f'partA/{mode}/{site}/{f}/active_minus_never'], False):.4f}"
-                       for mode in ("direct", "alias") for site in ("mid", "final")]
+                       for mode in ("direct", "alias") for site in site_names]
                 for f in ("jspace", "random", "pca", "unembed", "raw")
-                if f"partA/alias/mid/{f}/active_minus_never" in agg]
+                if f"partA/alias/{site_names[0]}/{f}/active_minus_never" in agg]
+    med_rows = [[site] + [f"{ledger.worst(agg[f'partA/{mode}/{site}/{w_}'], False):.4f}"
+                          for mode in ("direct", "alias") for w_ in ("shred_moves", "never_moves")]
+                for site in site_names if f"partA/alias/{site}/shred_moves" in agg]
     rec = {
         "experiment": "WSC-001",
         "title": "Where an accessibility audit of an external memory must read",
@@ -490,8 +571,11 @@ def record(per_seed: List[Dict[str, Any]], args) -> Dict[str, Any]:
         "## Part B — the causal side (alias reads, worst seed)", "",
         ledger.table(["template"] + list(PART_B_ARMS), arm_rows), "",
         "## Part A — the readout side (probe trained on ACTIVE only, worst seed)", "",
-        ledger.table(["family", "direct mid A−N", "direct final A−N", "alias mid A−N", "alias final A−N"],
+        ledger.table(["family"] + [f"{m} {s_}" for m in ("direct", "alias") for s_ in site_names],
                      fam_rows), "",
+        "### The mediator: how far the state moves at each site when the pod is shredded, and when it "
+        "was never written", "",
+        ledger.table(["site", "direct SHRED", "direct NEVER", "alias SHRED", "alias NEVER"], med_rows), "",
         "## Summary rows", "", ledger.table(["measure", "mean over seeds", "worst seed"], rows), "",
         "## Pre-registered criteria (worst seed)", "", ledger.criteria_table(check), "",
         "By construction: " + "; ".join(rec["by_construction"]) + ".", "",

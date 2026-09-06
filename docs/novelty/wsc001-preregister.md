@@ -32,10 +32,23 @@ WSC-001 asks the two questions that leaves, and nothing wider.
 
 ## The two questions, and the three answers that are distinguishable
 
-**A — the readout side.** Is the blindness DIMENSION (k coordinates are too few), DIRECTION (k
-coordinates suffice but not those k), or DEPTH (the memory is not in linearly decodable form at the
-site the audit reads)? Five feature families over the *same* states, probes trained on ACTIVE only and
-applied unchanged to SHRED and NEVER (E-000063's transfer probe, five-fold by template):
+**A — the readout side.** Four explanations are distinguishable, and the first was found by
+measurement after this file's first draft was written (disclosed below):
+
+    SITING     the audit reads a state the memory has not reached yet
+    DEPTH      the write reaches that state but is not linearly decodable there
+    DIRECTION  k coordinates suffice there, but not those k
+    DIMENSION  k coordinates are too few, whatever they are
+
+Separating SITING from the rest needs a **mediator**, and the mediator is what the first draft lacked:
+at every candidate site, how far does the state move when the pod is shredded, and when it was never
+written? A readout that sees nothing at a site where the state does not move is not a blind readout,
+it is a correctly sited one looking at the wrong block. The mediator is recorded beside every probe
+number, for the states AND for the injected write at each read layer.
+
+Sites: the outputs of blocks 8, 9, 10 and 11, and the final hidden state. Five feature families over
+the *same* states, probes trained on ACTIVE only and applied unchanged to SHRED and NEVER (E-000063's
+transfer probe, five-fold by template):
 
 | family | what it is | why it is here |
 |---|---|---|
@@ -45,8 +58,8 @@ applied unchanged to SHRED and NEVER (E-000063's transfer probe, five-fold by te
 | `unembed` | cosine with the objects' unembedding rows | the vocabulary-basis analogue |
 | `raw` | the residual itself, 768 dimensions | the capacity ceiling |
 
-at two sites: `mid` = the output of block 8, the adapter's first write site and where E-000063's audit
-reads; `final` = the last hidden state.
+E-000063 reads one site, the output of block 8, chosen in its source as "the first adapter read
+site".
 
 **B — the causal side.** A probe says what is readable, not what the model uses. The write is a tensor
 this harness holds, so it can be re-injected with its entire first-order channel removed. Projecting
@@ -105,13 +118,18 @@ Part B, read only with V1–V3 and V5 passing:
   in the atom span against the random floor r/d = 0.3346. This row is descriptive and carries no bar.
 
 Part A, read only with V4 passing:
-- `A1` **DEPTH**: every family at `mid` has ACTIVE − NEVER ≤ 0.05 while `final/raw` ≥ 0.30 → the
-  memory is not linearly attributable at the write site at any dimension, and an audit that reads
-  there is blind for reasons that have nothing to do with which basis it uses.
-- `A2` **DIRECTION**: `mid/pca` ≥ 0.30 while `mid/jspace` ≤ 0.05 → k coordinates suffice at that site
-  and the audit has the wrong k.
-- `A3` **DIMENSION**: `mid/raw` ≥ 0.30 while `mid/pca` ≤ 0.05.
+- `A0` **SITING**: every family at `site8` has ACTIVE − NEVER ≤ 0.05 **and** the injected write at the
+  first read layer does not move when the pod is shredded (`write8_shred_moves` ≤ 1e-3) → E-000063's
+  capture block is upstream of the write that carries the pod, so no readout there can attribute the
+  memory and its certificate audits a state the pod never reached. The mediator is what licenses this
+  rather than A1.
+- `A1` **DEPTH**: `site8` families ≤ 0.05 while the write there DOES move → the write reaches that
+  state and is not linearly attributable at any dimension up to the full residual.
+- `A2` **DIRECTION**: at a site whose write moves, `pca` ≥ 0.30 while `jspace` ≤ 0.05.
+- `A3` **DIMENSION**: at such a site, `raw` ≥ 0.30 while `pca` ≤ 0.05.
 - `A4` none of these → recorded as mixed with the table and no sentence.
+- `A8` reported at every site with no bar: the first site at which each family reaches ACTIVE − NEVER
+  ≥ 0.30, which is the answer to "where can this audit be read".
 - `A5` reported beside every row, no bar: `final/jspace`, so that "the audit works downstream" is a
   number and not an inference.
 
@@ -155,6 +173,16 @@ ROWS WITH BARS SET KNOWING THEM, labelled so wherever they are reported:
   from E-000063 as the validity floor that the OUTPUT is closed in both modes. Otherwise it is
   reported as a table and no sentence is drawn. This row is a DISCLOSED POST-HOC ADDITION: it was not
   in the design, it was found by a plumbing run, and it is the row a reader should discount most.
+
+**The mediator measurement, made after the bars above and before the recorded run.** On seed 0 over
+eight pods at template 3, comparing a live pod against a shredded one and against a never-written one,
+max-abs at the last token: block 8 **0.0000** / 0.0038, block 9 **0.0000** / 0.0079, block 10 **68.84**
+/ 50.57, block 11 **288.87** / 263.64; and the injected write itself, first read site (block 8)
+**0.0000**, second read site (block 10) **68.84**. The first read site injects nothing pod-specific
+for these prompts. This is why `A0` exists and why the first draft's DIMENSION/DIRECTION/DEPTH triple
+was insufficient: it assumed the audit's site was a write site. The `A0` branch is therefore expected,
+and it is reported as a CORRECTED INSTRUMENT SITING rather than as a discovery about linear
+decodability.
 
 **What is still blind:** seeds 1 and 2 entirely (their checkpoints did not exist when this was
 written), ten of the twelve templates, the direct-read rows, part A at full size, and every
