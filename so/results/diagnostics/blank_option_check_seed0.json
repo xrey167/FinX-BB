@@ -1,0 +1,38 @@
+{
+ "self": {
+  "t0_space": {
+   "unknown": 0.525,
+   "wrong_entity": 0.475
+  },
+  "t0": {
+   "unknown": 0.73,
+   "wrong_entity": 0.27
+  },
+  "t3": {
+   "unknown": 0.74,
+   "wrong_entity": 0.26
+  },
+  "t8": {
+   "unknown": 0.74,
+   "wrong_entity": 0.26
+  }
+ },
+ "foreign": {
+  "t0_space": {
+   "unknown": 0.89,
+   "wrong_entity": 0.11
+  },
+  "t0": {
+   "unknown": 0.98,
+   "wrong_entity": 0.02
+  },
+  "t3": {
+   "unknown": 0.955,
+   "wrong_entity": 0.045
+  },
+  "t8": {
+   "unknown": 0.975,
+   "wrong_entity": 0.025
+  }
+ }
+}

@@ -1,0 +1,1302 @@
+{
+  "aggregate": {
+    "one/alias_direct": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "one/alias_direct_minus_dup": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 3
+    },
+    "one/alias_provenance_len2": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "one/alias_provenance_pair": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "one/broken1_unknown": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "one/chain2/answer_acc": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 3
+    },
+    "one/chain2/depth1_acc": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "one/chain2/n": {
+      "max": 100.0,
+      "mean": 100.0,
+      "min": 100.0,
+      "n": 3
+    },
+    "one/chain2/unknown": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "one/delete_target/alias_true_object": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 3
+    },
+    "one/delete_target/alias_unknown": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "one/delete_target/pointer_still_in_bank": {
+      "max": 0.21052631578947367,
+      "mean": 0.21052631578947367,
+      "min": 0.21052631578947367,
+      "n": 3
+    },
+    "one/deref_disabled/alias_direct": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 3
+    },
+    "one/deref_disabled/direct": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "one/direct": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "one/dup_direct": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "one/dup_shred/copy_direct_acc": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "one/dup_shred/copy_forced_choice": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "one/dup_shred/copy_probe_top1": {
+      "max": 0.93,
+      "mean": 0.8866666666666667,
+      "min": 0.84,
+      "n": 3
+    },
+    "one/dup_shred/ops_to_delete": {
+      "max": 3.0,
+      "mean": 3.0,
+      "min": 3.0,
+      "n": 3
+    },
+    "one/duplicate_update/alias_new_object": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 3
+    },
+    "one/duplicate_update/ops_to_propagate": {
+      "max": 3.0,
+      "mean": 3.0,
+      "min": 3.0,
+      "n": 3
+    },
+    "one/hop2": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "one/probe_calibration_top1": {
+      "max": 0.9066666666666666,
+      "mean": 0.8866666666666667,
+      "min": 0.8666666666666667,
+      "n": 3
+    },
+    "one/provenance_direct": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "one/refcount_before_delete": {
+      "max": 2.0,
+      "mean": 2.0,
+      "min": 2.0,
+      "n": 3
+    },
+    "one/regression/broken2_unknown": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "one/regression/direct": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "one/regression/hop2": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "one/regression/hop3": {
+      "max": 1.0,
+      "mean": 0.9988888888888888,
+      "min": 0.9966666666666667,
+      "n": 3
+    },
+    "one/regression/provenance": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "one/regression/reverse": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "one/relink/alias_new_object": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "one/relink/sibling_unchanged": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "one/relink_rollback/alias_direct": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "one/resign_target/alias_direct": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "one/revoke_alias/alias_unknown": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "one/revoke_alias/sibling_readable": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "one/revoke_alias/target_readable": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "one/rollback/alias_direct": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "one/shared_update/alias_new_object": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "one/shared_update/ops_to_propagate": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "one/shared_update/target_new_object": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "one/shred_alias/alias_unknown": {
+      "max": 1.0,
+      "mean": 0.9833333333333334,
+      "min": 0.97,
+      "n": 3
+    },
+    "one/shred_alias/sibling_readable": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "one/shred_alias/target_readable": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "one/shred_target/alias_forced_choice": {
+      "max": 0.535,
+      "mean": 0.52,
+      "min": 0.505,
+      "n": 3
+    },
+    "one/shred_target/alias_mean_rank": {
+      "max": 129.08,
+      "mean": 125.72333333333334,
+      "min": 122.425,
+      "n": 3
+    },
+    "one/shred_target/alias_probe_top1": {
+      "max": 0.01,
+      "mean": 0.0033333333333333335,
+      "min": 0.0,
+      "n": 3
+    },
+    "one/shred_target/alias_top1_among_entities": {
+      "max": 0.01,
+      "mean": 0.008333333333333333,
+      "min": 0.005,
+      "n": 3
+    },
+    "one/shred_target/alias_true_object": {
+      "max": 0.01,
+      "mean": 0.0033333333333333335,
+      "min": 0.0,
+      "n": 3
+    },
+    "one/shred_target/alias_unknown": {
+      "max": 1.0,
+      "mean": 0.9966666666666667,
+      "min": 0.99,
+      "n": 3
+    },
+    "one/shred_target/chance_mean_rank": {
+      "max": 127.5,
+      "mean": 127.5,
+      "min": 127.5,
+      "n": 3
+    },
+    "one/shred_target/ops_to_delete": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "one/shred_target/target_unknown": {
+      "max": 1.0,
+      "mean": 0.9966666666666667,
+      "min": 0.99,
+      "n": 3
+    },
+    "one/train_seconds": {
+      "max": 457.02873611450195,
+      "mean": 455.9488296508789,
+      "min": 453.9935643672943,
+      "n": 3
+    },
+    "two/alias_direct": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "two/alias_direct_minus_dup": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 3
+    },
+    "two/alias_provenance_len2": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "two/alias_provenance_pair": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "two/broken1_unknown": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "two/chain2/answer_acc": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "two/chain2/depth1_acc": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "two/chain2/n": {
+      "max": 100.0,
+      "mean": 100.0,
+      "min": 100.0,
+      "n": 3
+    },
+    "two/chain2/unknown": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 3
+    },
+    "two/delete_target/alias_true_object": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 3
+    },
+    "two/delete_target/alias_unknown": {
+      "max": 1.0,
+      "mean": 0.9966666666666667,
+      "min": 0.99,
+      "n": 3
+    },
+    "two/delete_target/pointer_still_in_bank": {
+      "max": 0.21052631578947367,
+      "mean": 0.21052631578947367,
+      "min": 0.21052631578947367,
+      "n": 3
+    },
+    "two/deref_disabled/alias_direct": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 3
+    },
+    "two/deref_disabled/direct": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "two/direct": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "two/dup_direct": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "two/dup_shred/copy_direct_acc": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "two/dup_shred/copy_forced_choice": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "two/dup_shred/copy_probe_top1": {
+      "max": 0.93,
+      "mean": 0.8866666666666667,
+      "min": 0.84,
+      "n": 3
+    },
+    "two/dup_shred/ops_to_delete": {
+      "max": 3.0,
+      "mean": 3.0,
+      "min": 3.0,
+      "n": 3
+    },
+    "two/duplicate_update/alias_new_object": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 3
+    },
+    "two/duplicate_update/ops_to_propagate": {
+      "max": 3.0,
+      "mean": 3.0,
+      "min": 3.0,
+      "n": 3
+    },
+    "two/hop2": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "two/probe_calibration_top1": {
+      "max": 0.9066666666666666,
+      "mean": 0.8866666666666667,
+      "min": 0.8666666666666667,
+      "n": 3
+    },
+    "two/provenance_direct": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "two/refcount_before_delete": {
+      "max": 2.0,
+      "mean": 2.0,
+      "min": 2.0,
+      "n": 3
+    },
+    "two/regression/broken2_unknown": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "two/regression/direct": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "two/regression/hop2": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "two/regression/hop3": {
+      "max": 1.0,
+      "mean": 0.9955555555555556,
+      "min": 0.99,
+      "n": 3
+    },
+    "two/regression/provenance": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "two/regression/reverse": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "two/relink/alias_new_object": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "two/relink/sibling_unchanged": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "two/relink_rollback/alias_direct": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "two/resign_target/alias_direct": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "two/revoke_alias/alias_unknown": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "two/revoke_alias/sibling_readable": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "two/revoke_alias/target_readable": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "two/rollback/alias_direct": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "two/shared_update/alias_new_object": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "two/shared_update/ops_to_propagate": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "two/shared_update/target_new_object": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "two/shred_alias/alias_unknown": {
+      "max": 1.0,
+      "mean": 0.9866666666666667,
+      "min": 0.97,
+      "n": 3
+    },
+    "two/shred_alias/sibling_readable": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "two/shred_alias/target_readable": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "two/shred_target/alias_forced_choice": {
+      "max": 0.54,
+      "mean": 0.5266666666666667,
+      "min": 0.505,
+      "n": 3
+    },
+    "two/shred_target/alias_mean_rank": {
+      "max": 129.37,
+      "mean": 121.49000000000001,
+      "min": 116.72,
+      "n": 3
+    },
+    "two/shred_target/alias_probe_top1": {
+      "max": 0.01,
+      "mean": 0.01,
+      "min": 0.01,
+      "n": 3
+    },
+    "two/shred_target/alias_top1_among_entities": {
+      "max": 0.015,
+      "mean": 0.006666666666666667,
+      "min": 0.0,
+      "n": 3
+    },
+    "two/shred_target/alias_true_object": {
+      "max": 0.01,
+      "mean": 0.0033333333333333335,
+      "min": 0.0,
+      "n": 3
+    },
+    "two/shred_target/alias_unknown": {
+      "max": 1.0,
+      "mean": 0.9966666666666667,
+      "min": 0.99,
+      "n": 3
+    },
+    "two/shred_target/chance_mean_rank": {
+      "max": 127.5,
+      "mean": 127.5,
+      "min": 127.5,
+      "n": 3
+    },
+    "two/shred_target/ops_to_delete": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "two/shred_target/target_unknown": {
+      "max": 1.0,
+      "mean": 0.9966666666666667,
+      "min": 0.99,
+      "n": 3
+    },
+    "two/train_seconds": {
+      "max": 584.4519770145416,
+      "mean": 545.0430707931519,
+      "min": 521.5778970718384,
+      "n": 3
+    }
+  },
+  "by_construction": [
+    "the store resolves a chain by following kids with a depth limit and a cycle check; what is measured is whether the trained model reproduces it from the pointers alone",
+    "the one-slot arm CANNOT represent a two-link chain: it has one dereference slot. Its criterion is that it answers unknown rather than inventing an entity."
+  ],
+  "claim_groups_met": {
+    "no_price_paid_elsewhere": true,
+    "one_slot_refuses_a_chain": true,
+    "sharing_still_holds": true,
+    "shredding_a_pointer": true,
+    "two_slots_resolve_a_chain": true
+  },
+  "claim_parts": [
+    {
+      "claim": "two_slots_resolve_a_chain",
+      "criteria": [
+        "two/chain2/answer_acc"
+      ],
+      "supported": true
+    },
+    {
+      "claim": "one_slot_refuses_a_chain",
+      "criteria": [
+        "one/chain2/answer_acc",
+        "one/chain2/unknown"
+      ],
+      "supported": true
+    },
+    {
+      "claim": "no_price_paid_elsewhere",
+      "criteria": [
+        "two/direct",
+        "two/alias_direct",
+        "two/hop2",
+        "two/regression/direct",
+        "two/regression/hop2",
+        "two/regression/reverse",
+        "two/alias_provenance_pair"
+      ],
+      "supported": true
+    },
+    {
+      "claim": "sharing_still_holds",
+      "criteria": [
+        "two/shared_update/alias_new_object",
+        "two/duplicate_update/alias_new_object",
+        "two/shred_target/alias_unknown",
+        "two/shred_target/alias_probe_top1",
+        "two/dup_shred/copy_direct_acc"
+      ],
+      "supported": true
+    },
+    {
+      "claim": "shredding_a_pointer",
+      "criteria": [
+        "two/shred_alias/alias_unknown",
+        "one/shred_alias/alias_unknown"
+      ],
+      "supported": true
+    }
+  ],
+  "claim_supported": true,
+  "config": {
+    "eval": {
+      "n_alias_per_group": 2,
+      "n_base": 850,
+      "n_broken": 200,
+      "n_chain": 100,
+      "n_direct": 600,
+      "n_groups": 100,
+      "n_hop2": 300,
+      "n_targets": 100
+    },
+    "model_one": {
+      "d_ff": 256,
+      "d_model": 128,
+      "deref_query_from_state": false,
+      "disable_deref": false,
+      "hard_gate": false,
+      "marker_dim": 16,
+      "max_hops": 3,
+      "n_core_layers": 2,
+      "n_deref": 1,
+      "n_entities": 256,
+      "n_heads": 4,
+      "n_relations": 6,
+      "n_surface": 12,
+      "use_deref_passthrough": true,
+      "use_links": true,
+      "use_marker_gate": true,
+      "use_null_cell": true,
+      "use_routing": true
+    },
+    "model_two": {
+      "d_ff": 256,
+      "d_model": 128,
+      "deref_query_from_state": false,
+      "disable_deref": false,
+      "hard_gate": false,
+      "marker_dim": 16,
+      "max_hops": 3,
+      "n_core_layers": 2,
+      "n_deref": 2,
+      "n_entities": 256,
+      "n_heads": 4,
+      "n_relations": 6,
+      "n_surface": 12,
+      "use_deref_passthrough": true,
+      "use_links": true,
+      "use_marker_gate": true,
+      "use_null_cell": true,
+      "use_routing": true
+    },
+    "p_chain": 0.3,
+    "seeds": [
+      0,
+      1,
+      2
+    ],
+    "steps": 4000,
+    "train": {
+      "batch_size": 128,
+      "fixed_world": false,
+      "gate_balanced": true,
+      "gate_weight": 5.0,
+      "log_every": 250,
+      "lr": 0.001,
+      "mix": {
+        "fwd1": 0.4,
+        "fwd2": 0.25,
+        "fwd3": 0.2,
+        "rev1": 0.15
+      },
+      "n_cells_max": 850,
+      "n_cells_min": 600,
+      "n_entities": 256,
+      "n_relations": 6,
+      "n_steps": 4000,
+      "n_synonyms": 2,
+      "p_revoked": 0.1,
+      "p_shred": 0.05,
+      "p_stale": 0.05,
+      "route_weight": 0.5,
+      "seed": 0,
+      "train_noise": 0.03,
+      "warmup": 200,
+      "weight_decay": 0.01
+    }
+  },
+  "criteria": {
+    "one/chain2/answer_acc": {
+      "observed": 0.0,
+      "op": "<=",
+      "pass": true,
+      "threshold": 0.2
+    },
+    "one/chain2/unknown": {
+      "observed": 1.0,
+      "op": ">=",
+      "pass": true,
+      "threshold": 0.9
+    },
+    "one/shred_alias/alias_unknown": {
+      "observed": 0.97,
+      "op": ">=",
+      "pass": true,
+      "threshold": 0.95
+    },
+    "two/alias_direct": {
+      "observed": 1.0,
+      "op": ">=",
+      "pass": true,
+      "threshold": 0.95
+    },
+    "two/alias_provenance_pair": {
+      "observed": 1.0,
+      "op": ">=",
+      "pass": true,
+      "threshold": 0.9
+    },
+    "two/chain2/answer_acc": {
+      "observed": 1.0,
+      "op": ">=",
+      "pass": true,
+      "threshold": 0.9
+    },
+    "two/direct": {
+      "observed": 1.0,
+      "op": ">=",
+      "pass": true,
+      "threshold": 0.98
+    },
+    "two/dup_shred/copy_direct_acc": {
+      "observed": 1.0,
+      "op": ">=",
+      "pass": true,
+      "threshold": 0.95
+    },
+    "two/duplicate_update/alias_new_object": {
+      "observed": 0.0,
+      "op": "<=",
+      "pass": true,
+      "threshold": 0.05
+    },
+    "two/hop2": {
+      "observed": 1.0,
+      "op": ">=",
+      "pass": true,
+      "threshold": 0.95
+    },
+    "two/regression/direct": {
+      "observed": 1.0,
+      "op": ">=",
+      "pass": true,
+      "threshold": 0.98
+    },
+    "two/regression/hop2": {
+      "observed": 1.0,
+      "op": ">=",
+      "pass": true,
+      "threshold": 0.95
+    },
+    "two/regression/reverse": {
+      "observed": 1.0,
+      "op": ">=",
+      "pass": true,
+      "threshold": 0.95
+    },
+    "two/shared_update/alias_new_object": {
+      "observed": 1.0,
+      "op": ">=",
+      "pass": true,
+      "threshold": 0.95
+    },
+    "two/shred_alias/alias_unknown": {
+      "observed": 0.97,
+      "op": ">=",
+      "pass": true,
+      "threshold": 0.95
+    },
+    "two/shred_target/alias_probe_top1": {
+      "observed": 0.01,
+      "op": "<=",
+      "pass": true,
+      "threshold": 0.05
+    },
+    "two/shred_target/alias_unknown": {
+      "observed": 0.99,
+      "op": ">=",
+      "pass": true,
+      "threshold": 0.95
+    }
+  },
+  "deletion_level": "F3",
+  "deletion_level_meaning": "Functional forgetting",
+  "environment": {
+    "device": "cpu",
+    "numpy": "2.2.6",
+    "platform": "Linux-6.18.44-fc-v24-x86_64-with-glibc2.39",
+    "python": "3.11.15",
+    "threads": "2",
+    "torch": "2.14.0+cpu"
+  },
+  "evidence_level": "E4",
+  "evidence_level_meaning": "Controlled neural-network evidence",
+  "experiment": "E-000016",
+  "follows_from": "E-000015 recorded that its two-slot control did not resolve chains. The cause proposed there was the training distribution, not the architecture; this experiment tests that explanation by putting 30% chains into training and changing nothing else.",
+  "learned": [
+    "following a pointer whose target is itself a pointer, with the query for each dereference coming from the value just read",
+    "refusing a chain that does not fit the available slots instead of naming another entity"
+  ],
+  "not_claimed": "chains deeper than the number of slots; LLM scale.",
+  "per_seed": [
+    {
+      "one/alias_direct": 1.0,
+      "one/alias_direct_minus_dup": 0.0,
+      "one/alias_provenance_len2": 1.0,
+      "one/alias_provenance_pair": 1.0,
+      "one/broken1_unknown": 1.0,
+      "one/chain2/answer_acc": 0.0,
+      "one/chain2/depth1_acc": 1.0,
+      "one/chain2/n": 100.0,
+      "one/chain2/unknown": 1.0,
+      "one/checkpoint_sha256": "3340f879ad0046c8f0630227b98ae0f243312508c19dab32d3012f4f6b914fbc",
+      "one/delete_target/alias_true_object": 0.0,
+      "one/delete_target/alias_unknown": 1.0,
+      "one/delete_target/pointer_still_in_bank": 0.21052631578947367,
+      "one/deref_disabled/alias_direct": 0.0,
+      "one/deref_disabled/direct": 1.0,
+      "one/direct": 1.0,
+      "one/dup_direct": 1.0,
+      "one/dup_shred/copy_direct_acc": 1.0,
+      "one/dup_shred/copy_forced_choice": 1.0,
+      "one/dup_shred/copy_probe_top1": 0.84,
+      "one/dup_shred/ops_to_delete": 3,
+      "one/duplicate_update/alias_new_object": 0.0,
+      "one/duplicate_update/ops_to_propagate": 3,
+      "one/hop2": 1.0,
+      "one/probe_calibration_top1": 0.8666666666666667,
+      "one/provenance_direct": 1.0,
+      "one/refcount_before_delete": 2.0,
+      "one/regression/broken2_unknown": 1.0,
+      "one/regression/direct": 1.0,
+      "one/regression/hop2": 1.0,
+      "one/regression/hop3": 1.0,
+      "one/regression/provenance": 1.0,
+      "one/regression/reverse": 1.0,
+      "one/relink/alias_new_object": 1.0,
+      "one/relink/sibling_unchanged": 1.0,
+      "one/relink_rollback/alias_direct": 1.0,
+      "one/resign_target/alias_direct": 1.0,
+      "one/revoke_alias/alias_unknown": 1.0,
+      "one/revoke_alias/sibling_readable": 1.0,
+      "one/revoke_alias/target_readable": 1.0,
+      "one/rollback/alias_direct": 1.0,
+      "one/shared_update/alias_new_object": 1.0,
+      "one/shared_update/ops_to_propagate": 1,
+      "one/shared_update/target_new_object": 1.0,
+      "one/shred_alias/alias_unknown": 0.97,
+      "one/shred_alias/sibling_readable": 1.0,
+      "one/shred_alias/target_readable": 1.0,
+      "one/shred_target/alias_forced_choice": 0.535,
+      "one/shred_target/alias_mean_rank": 122.425,
+      "one/shred_target/alias_probe_top1": 0.0,
+      "one/shred_target/alias_top1_among_entities": 0.005,
+      "one/shred_target/alias_true_object": 0.0,
+      "one/shred_target/alias_unknown": 1.0,
+      "one/shred_target/chance_mean_rank": 127.5,
+      "one/shred_target/ops_to_delete": 1,
+      "one/shred_target/target_unknown": 1.0,
+      "one/train_seconds": 453.9935643672943,
+      "seed": 0,
+      "two/alias_direct": 1.0,
+      "two/alias_direct_minus_dup": 0.0,
+      "two/alias_provenance_len2": 1.0,
+      "two/alias_provenance_pair": 1.0,
+      "two/broken1_unknown": 1.0,
+      "two/chain2/answer_acc": 1.0,
+      "two/chain2/depth1_acc": 1.0,
+      "two/chain2/n": 100.0,
+      "two/chain2/unknown": 0.0,
+      "two/checkpoint_sha256": "533ff309e0fa8bd86c5d8f5034c2101d9a34f02175f69da10490fe8fb9c7fdd8",
+      "two/delete_target/alias_true_object": 0.0,
+      "two/delete_target/alias_unknown": 0.99,
+      "two/delete_target/pointer_still_in_bank": 0.21052631578947367,
+      "two/deref_disabled/alias_direct": 0.0,
+      "two/deref_disabled/direct": 1.0,
+      "two/direct": 1.0,
+      "two/dup_direct": 1.0,
+      "two/dup_shred/copy_direct_acc": 1.0,
+      "two/dup_shred/copy_forced_choice": 1.0,
+      "two/dup_shred/copy_probe_top1": 0.84,
+      "two/dup_shred/ops_to_delete": 3,
+      "two/duplicate_update/alias_new_object": 0.0,
+      "two/duplicate_update/ops_to_propagate": 3,
+      "two/hop2": 1.0,
+      "two/probe_calibration_top1": 0.8666666666666667,
+      "two/provenance_direct": 1.0,
+      "two/refcount_before_delete": 2.0,
+      "two/regression/broken2_unknown": 1.0,
+      "two/regression/direct": 1.0,
+      "two/regression/hop2": 1.0,
+      "two/regression/hop3": 0.99,
+      "two/regression/provenance": 1.0,
+      "two/regression/reverse": 1.0,
+      "two/relink/alias_new_object": 1.0,
+      "two/relink/sibling_unchanged": 1.0,
+      "two/relink_rollback/alias_direct": 1.0,
+      "two/resign_target/alias_direct": 1.0,
+      "two/revoke_alias/alias_unknown": 1.0,
+      "two/revoke_alias/sibling_readable": 1.0,
+      "two/revoke_alias/target_readable": 1.0,
+      "two/rollback/alias_direct": 1.0,
+      "two/shared_update/alias_new_object": 1.0,
+      "two/shared_update/ops_to_propagate": 1,
+      "two/shared_update/target_new_object": 1.0,
+      "two/shred_alias/alias_unknown": 0.97,
+      "two/shred_alias/sibling_readable": 1.0,
+      "two/shred_alias/target_readable": 1.0,
+      "two/shred_target/alias_forced_choice": 0.535,
+      "two/shred_target/alias_mean_rank": 116.72,
+      "two/shred_target/alias_probe_top1": 0.01,
+      "two/shred_target/alias_top1_among_entities": 0.0,
+      "two/shred_target/alias_true_object": 0.0,
+      "two/shred_target/alias_unknown": 1.0,
+      "two/shred_target/chance_mean_rank": 127.5,
+      "two/shred_target/ops_to_delete": 1,
+      "two/shred_target/target_unknown": 1.0,
+      "two/train_seconds": 584.4519770145416
+    },
+    {
+      "one/alias_direct": 1.0,
+      "one/alias_direct_minus_dup": 0.0,
+      "one/alias_provenance_len2": 1.0,
+      "one/alias_provenance_pair": 1.0,
+      "one/broken1_unknown": 1.0,
+      "one/chain2/answer_acc": 0.0,
+      "one/chain2/depth1_acc": 1.0,
+      "one/chain2/n": 100.0,
+      "one/chain2/unknown": 1.0,
+      "one/checkpoint_sha256": "84dd9a63fae18be0616200229345695f15d6f4088c3a64feb344b556874ba024",
+      "one/delete_target/alias_true_object": 0.0,
+      "one/delete_target/alias_unknown": 1.0,
+      "one/delete_target/pointer_still_in_bank": 0.21052631578947367,
+      "one/deref_disabled/alias_direct": 0.0,
+      "one/deref_disabled/direct": 1.0,
+      "one/direct": 1.0,
+      "one/dup_direct": 1.0,
+      "one/dup_shred/copy_direct_acc": 1.0,
+      "one/dup_shred/copy_forced_choice": 1.0,
+      "one/dup_shred/copy_probe_top1": 0.89,
+      "one/dup_shred/ops_to_delete": 3,
+      "one/duplicate_update/alias_new_object": 0.0,
+      "one/duplicate_update/ops_to_propagate": 3,
+      "one/hop2": 1.0,
+      "one/probe_calibration_top1": 0.8866666666666667,
+      "one/provenance_direct": 1.0,
+      "one/refcount_before_delete": 2.0,
+      "one/regression/broken2_unknown": 1.0,
+      "one/regression/direct": 1.0,
+      "one/regression/hop2": 1.0,
+      "one/regression/hop3": 1.0,
+      "one/regression/provenance": 1.0,
+      "one/regression/reverse": 1.0,
+      "one/relink/alias_new_object": 1.0,
+      "one/relink/sibling_unchanged": 1.0,
+      "one/relink_rollback/alias_direct": 1.0,
+      "one/resign_target/alias_direct": 1.0,
+      "one/revoke_alias/alias_unknown": 1.0,
+      "one/revoke_alias/sibling_readable": 1.0,
+      "one/revoke_alias/target_readable": 1.0,
+      "one/rollback/alias_direct": 1.0,
+      "one/shared_update/alias_new_object": 1.0,
+      "one/shared_update/ops_to_propagate": 1,
+      "one/shared_update/target_new_object": 1.0,
+      "one/shred_alias/alias_unknown": 0.98,
+      "one/shred_alias/sibling_readable": 1.0,
+      "one/shred_alias/target_readable": 1.0,
+      "one/shred_target/alias_forced_choice": 0.505,
+      "one/shred_target/alias_mean_rank": 129.08,
+      "one/shred_target/alias_probe_top1": 0.01,
+      "one/shred_target/alias_top1_among_entities": 0.01,
+      "one/shred_target/alias_true_object": 0.01,
+      "one/shred_target/alias_unknown": 0.99,
+      "one/shred_target/chance_mean_rank": 127.5,
+      "one/shred_target/ops_to_delete": 1,
+      "one/shred_target/target_unknown": 0.99,
+      "one/train_seconds": 456.82418847084045,
+      "seed": 1,
+      "two/alias_direct": 1.0,
+      "two/alias_direct_minus_dup": 0.0,
+      "two/alias_provenance_len2": 1.0,
+      "two/alias_provenance_pair": 1.0,
+      "two/broken1_unknown": 1.0,
+      "two/chain2/answer_acc": 1.0,
+      "two/chain2/depth1_acc": 1.0,
+      "two/chain2/n": 100.0,
+      "two/chain2/unknown": 0.0,
+      "two/checkpoint_sha256": "02a9c37faad5516f45ec14fc33f2741556770c6dfae45fbb18359ac74e1923b4",
+      "two/delete_target/alias_true_object": 0.0,
+      "two/delete_target/alias_unknown": 1.0,
+      "two/delete_target/pointer_still_in_bank": 0.21052631578947367,
+      "two/deref_disabled/alias_direct": 0.0,
+      "two/deref_disabled/direct": 1.0,
+      "two/direct": 1.0,
+      "two/dup_direct": 1.0,
+      "two/dup_shred/copy_direct_acc": 1.0,
+      "two/dup_shred/copy_forced_choice": 1.0,
+      "two/dup_shred/copy_probe_top1": 0.89,
+      "two/dup_shred/ops_to_delete": 3,
+      "two/duplicate_update/alias_new_object": 0.0,
+      "two/duplicate_update/ops_to_propagate": 3,
+      "two/hop2": 1.0,
+      "two/probe_calibration_top1": 0.8866666666666667,
+      "two/provenance_direct": 1.0,
+      "two/refcount_before_delete": 2.0,
+      "two/regression/broken2_unknown": 1.0,
+      "two/regression/direct": 1.0,
+      "two/regression/hop2": 1.0,
+      "two/regression/hop3": 0.9966666666666667,
+      "two/regression/provenance": 1.0,
+      "two/regression/reverse": 1.0,
+      "two/relink/alias_new_object": 1.0,
+      "two/relink/sibling_unchanged": 1.0,
+      "two/relink_rollback/alias_direct": 1.0,
+      "two/resign_target/alias_direct": 1.0,
+      "two/revoke_alias/alias_unknown": 1.0,
+      "two/revoke_alias/sibling_readable": 1.0,
+      "two/revoke_alias/target_readable": 1.0,
+      "two/rollback/alias_direct": 1.0,
+      "two/shared_update/alias_new_object": 1.0,
+      "two/shared_update/ops_to_propagate": 1,
+      "two/shared_update/target_new_object": 1.0,
+      "two/shred_alias/alias_unknown": 0.99,
+      "two/shred_alias/sibling_readable": 1.0,
+      "two/shred_alias/target_readable": 1.0,
+      "two/shred_target/alias_forced_choice": 0.54,
+      "two/shred_target/alias_mean_rank": 118.38,
+      "two/shred_target/alias_probe_top1": 0.01,
+      "two/shred_target/alias_top1_among_entities": 0.015,
+      "two/shred_target/alias_true_object": 0.01,
+      "two/shred_target/alias_unknown": 0.99,
+      "two/shred_target/chance_mean_rank": 127.5,
+      "two/shred_target/ops_to_delete": 1,
+      "two/shred_target/target_unknown": 0.99,
+      "two/train_seconds": 529.0993382930756
+    },
+    {
+      "one/alias_direct": 1.0,
+      "one/alias_direct_minus_dup": 0.0,
+      "one/alias_provenance_len2": 1.0,
+      "one/alias_provenance_pair": 1.0,
+      "one/broken1_unknown": 1.0,
+      "one/chain2/answer_acc": 0.0,
+      "one/chain2/depth1_acc": 1.0,
+      "one/chain2/n": 100.0,
+      "one/chain2/unknown": 1.0,
+      "one/checkpoint_sha256": "b6a8cfe3f34bd4d0a3afaf4dc2fba63e28f3c20fd65f278f4a5c65970d48bf65",
+      "one/delete_target/alias_true_object": 0.0,
+      "one/delete_target/alias_unknown": 1.0,
+      "one/delete_target/pointer_still_in_bank": 0.21052631578947367,
+      "one/deref_disabled/alias_direct": 0.0,
+      "one/deref_disabled/direct": 1.0,
+      "one/direct": 1.0,
+      "one/dup_direct": 1.0,
+      "one/dup_shred/copy_direct_acc": 1.0,
+      "one/dup_shred/copy_forced_choice": 1.0,
+      "one/dup_shred/copy_probe_top1": 0.93,
+      "one/dup_shred/ops_to_delete": 3,
+      "one/duplicate_update/alias_new_object": 0.0,
+      "one/duplicate_update/ops_to_propagate": 3,
+      "one/hop2": 1.0,
+      "one/probe_calibration_top1": 0.9066666666666666,
+      "one/provenance_direct": 1.0,
+      "one/refcount_before_delete": 2.0,
+      "one/regression/broken2_unknown": 1.0,
+      "one/regression/direct": 1.0,
+      "one/regression/hop2": 1.0,
+      "one/regression/hop3": 0.9966666666666667,
+      "one/regression/provenance": 1.0,
+      "one/regression/reverse": 1.0,
+      "one/relink/alias_new_object": 1.0,
+      "one/relink/sibling_unchanged": 1.0,
+      "one/relink_rollback/alias_direct": 1.0,
+      "one/resign_target/alias_direct": 1.0,
+      "one/revoke_alias/alias_unknown": 1.0,
+      "one/revoke_alias/sibling_readable": 1.0,
+      "one/revoke_alias/target_readable": 1.0,
+      "one/rollback/alias_direct": 1.0,
+      "one/shared_update/alias_new_object": 1.0,
+      "one/shared_update/ops_to_propagate": 1,
+      "one/shared_update/target_new_object": 1.0,
+      "one/shred_alias/alias_unknown": 1.0,
+      "one/shred_alias/sibling_readable": 1.0,
+      "one/shred_alias/target_readable": 1.0,
+      "one/shred_target/alias_forced_choice": 0.52,
+      "one/shred_target/alias_mean_rank": 125.665,
+      "one/shred_target/alias_probe_top1": 0.0,
+      "one/shred_target/alias_top1_among_entities": 0.01,
+      "one/shred_target/alias_true_object": 0.0,
+      "one/shred_target/alias_unknown": 1.0,
+      "one/shred_target/chance_mean_rank": 127.5,
+      "one/shred_target/ops_to_delete": 1,
+      "one/shred_target/target_unknown": 1.0,
+      "one/train_seconds": 457.02873611450195,
+      "seed": 2,
+      "two/alias_direct": 1.0,
+      "two/alias_direct_minus_dup": 0.0,
+      "two/alias_provenance_len2": 1.0,
+      "two/alias_provenance_pair": 1.0,
+      "two/broken1_unknown": 1.0,
+      "two/chain2/answer_acc": 1.0,
+      "two/chain2/depth1_acc": 1.0,
+      "two/chain2/n": 100.0,
+      "two/chain2/unknown": 0.0,
+      "two/checkpoint_sha256": "c222d3c5b8dc82b89a5be6f0dc7c782c7e1d3e8cc6a89c786c65fbb93bdfb46b",
+      "two/delete_target/alias_true_object": 0.0,
+      "two/delete_target/alias_unknown": 1.0,
+      "two/delete_target/pointer_still_in_bank": 0.21052631578947367,
+      "two/deref_disabled/alias_direct": 0.0,
+      "two/deref_disabled/direct": 1.0,
+      "two/direct": 1.0,
+      "two/dup_direct": 1.0,
+      "two/dup_shred/copy_direct_acc": 1.0,
+      "two/dup_shred/copy_forced_choice": 1.0,
+      "two/dup_shred/copy_probe_top1": 0.93,
+      "two/dup_shred/ops_to_delete": 3,
+      "two/duplicate_update/alias_new_object": 0.0,
+      "two/duplicate_update/ops_to_propagate": 3,
+      "two/hop2": 1.0,
+      "two/probe_calibration_top1": 0.9066666666666666,
+      "two/provenance_direct": 1.0,
+      "two/refcount_before_delete": 2.0,
+      "two/regression/broken2_unknown": 1.0,
+      "two/regression/direct": 1.0,
+      "two/regression/hop2": 1.0,
+      "two/regression/hop3": 1.0,
+      "two/regression/provenance": 1.0,
+      "two/regression/reverse": 1.0,
+      "two/relink/alias_new_object": 1.0,
+      "two/relink/sibling_unchanged": 1.0,
+      "two/relink_rollback/alias_direct": 1.0,
+      "two/resign_target/alias_direct": 1.0,
+      "two/revoke_alias/alias_unknown": 1.0,
+      "two/revoke_alias/sibling_readable": 1.0,
+      "two/revoke_alias/target_readable": 1.0,
+      "two/rollback/alias_direct": 1.0,
+      "two/shared_update/alias_new_object": 1.0,
+      "two/shared_update/ops_to_propagate": 1,
+      "two/shared_update/target_new_object": 1.0,
+      "two/shred_alias/alias_unknown": 1.0,
+      "two/shred_alias/sibling_readable": 1.0,
+      "two/shred_alias/target_readable": 1.0,
+      "two/shred_target/alias_forced_choice": 0.505,
+      "two/shred_target/alias_mean_rank": 129.37,
+      "two/shred_target/alias_probe_top1": 0.01,
+      "two/shred_target/alias_top1_among_entities": 0.005,
+      "two/shred_target/alias_true_object": 0.0,
+      "two/shred_target/alias_unknown": 1.0,
+      "two/shred_target/chance_mean_rank": 127.5,
+      "two/shred_target/ops_to_delete": 1,
+      "two/shred_target/target_unknown": 1.0,
+      "two/train_seconds": 521.5778970718384
+    }
+  ],
+  "recorded_at": "2026-09-03T09:41:57+00:00",
+  "title": "Alias chains: two dereference slots resolve a two-link chain, one slot must refuse it"
+}

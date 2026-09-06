@@ -1,0 +1,118 @@
+{
+ "t0_bare": {
+  "normal": {
+   "acc": 0.685,
+   "top1": {
+    "alias": 0.86,
+    "target": 0.0,
+    "other": 0.13,
+    "null": 0.01
+   },
+   "mass_alias": 0.6306402683258057,
+   "mass_target": 0.0013028616085648537,
+   "cos_alias": 0.08869847655296326,
+   "cos_target": -0.3505721390247345
+  },
+  "passthrough8": {
+   "acc": 0.685,
+   "top1": {
+    "alias": 0.86,
+    "target": 0.0,
+    "other": 0.13,
+    "null": 0.01
+   },
+   "mass_alias": 0.6306402683258057,
+   "mass_target": 0.001302860677242279,
+   "cos_alias": 0.08869847655296326,
+   "cos_target": -0.3505721390247345
+  },
+  "delta_q10_norm_rel": 3.715371974521986e-07
+ },
+ "t0_space": {
+  "normal": {
+   "acc": 0.99,
+   "top1": {
+    "alias": 0.995,
+    "target": 0.0,
+    "other": 0.0,
+    "null": 0.005
+   },
+   "mass_alias": 0.99251389503479,
+   "mass_target": 4.285244722268544e-05,
+   "cos_alias": 0.179946631193161,
+   "cos_target": -0.33760061860084534
+  },
+  "passthrough8": {
+   "acc": 0.99,
+   "top1": {
+    "alias": 0.995,
+    "target": 0.0,
+    "other": 0.0,
+    "null": 0.005
+   },
+   "mass_alias": 0.9925204515457153,
+   "mass_target": 4.285272370907478e-05,
+   "cos_alias": 0.17995022237300873,
+   "cos_target": -0.337599515914917
+  },
+  "delta_q10_norm_rel": 2.1007308532716706e-05
+ },
+ "t9_bare": {
+  "normal": {
+   "acc": 0.945,
+   "top1": {
+    "alias": 0.97,
+    "target": 0.0,
+    "other": 0.005,
+    "null": 0.025
+   },
+   "mass_alias": 0.9286798238754272,
+   "mass_target": 6.3621660046919715e-06,
+   "cos_alias": 0.09300142526626587,
+   "cos_target": -0.37260884046554565
+  },
+  "passthrough8": {
+   "acc": 0.945,
+   "top1": {
+    "alias": 0.97,
+    "target": 0.0,
+    "other": 0.005,
+    "null": 0.025
+   },
+   "mass_alias": 0.9286798238754272,
+   "mass_target": 6.362150998029392e-06,
+   "cos_alias": 0.09300140291452408,
+   "cos_target": -0.37260887026786804
+  },
+  "delta_q10_norm_rel": 9.005234460346401e-07
+ },
+ "t9_space": {
+  "normal": {
+   "acc": 0.96,
+   "top1": {
+    "alias": 0.965,
+    "target": 0.0,
+    "other": 0.005,
+    "null": 0.03
+   },
+   "mass_alias": 0.9202567934989929,
+   "mass_target": 9.986587429011706e-06,
+   "cos_alias": 0.09137008339166641,
+   "cos_target": -0.373068630695343
+  },
+  "passthrough8": {
+   "acc": 0.96,
+   "top1": {
+    "alias": 0.965,
+    "target": 0.0,
+    "other": 0.005,
+    "null": 0.03
+   },
+   "mass_alias": 0.9208295345306396,
+   "mass_target": 9.984702046494931e-06,
+   "cos_alias": 0.09147043526172638,
+   "cos_target": -0.3731480836868286
+  },
+  "delta_q10_norm_rel": 0.0002657971053849906
+ }
+}

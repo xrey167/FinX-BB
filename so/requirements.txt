@@ -1,0 +1,5 @@
+numpy>=1.26,<3
+torch>=2.2          # CPU build is enough: pip install torch --index-url https://download.pytorch.org/whl/cpu
+pytest>=8
+transformers>=4.40  # only the frozen-GPT-2 experiments need this
+safetensors>=0.4
