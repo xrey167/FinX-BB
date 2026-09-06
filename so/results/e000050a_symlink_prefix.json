@@ -1,0 +1,2741 @@
+{
+  "aggregate": {
+    "e20/bos/heldout/alias_direct_min": {
+      "max": 0.775,
+      "mean": 0.7583333333333334,
+      "min": 0.74,
+      "n": 3
+    },
+    "e20/bos/heldout/direct_min": {
+      "max": 0.8466666666666667,
+      "mean": 0.8022222222222221,
+      "min": 0.7433333333333333,
+      "n": 3
+    },
+    "e20/bos/heldout/shared_update/alias_new_object_min": {
+      "max": 0.78,
+      "mean": 0.75,
+      "min": 0.73,
+      "n": 3
+    },
+    "e20/bos/heldout/shred_target/alias_unknown_min": {
+      "max": 0.985,
+      "mean": 0.98,
+      "min": 0.975,
+      "n": 3
+    },
+    "e20/bos/t0/active/alias_probe_top1": {
+      "max": 0.83,
+      "mean": 0.7983333333333333,
+      "min": 0.78,
+      "n": 3
+    },
+    "e20/bos/t0/alias_direct": {
+      "max": 1.0,
+      "mean": 0.9466666666666667,
+      "min": 0.905,
+      "n": 3
+    },
+    "e20/bos/t0/alias_heldout_min": {
+      "max": 0.775,
+      "mean": 0.7583333333333334,
+      "min": 0.74,
+      "n": 3
+    },
+    "e20/bos/t0/delete_target/alias_true_object": {
+      "max": 0.005,
+      "mean": 0.0016666666666666668,
+      "min": 0.0,
+      "n": 3
+    },
+    "e20/bos/t0/delete_target/alias_unknown": {
+      "max": 0.975,
+      "mean": 0.9116666666666666,
+      "min": 0.875,
+      "n": 3
+    },
+    "e20/bos/t0/direct": {
+      "max": 1.0,
+      "mean": 0.9955555555555554,
+      "min": 0.9933333333333333,
+      "n": 3
+    },
+    "e20/bos/t0/dup_direct": {
+      "max": 1.0,
+      "mean": 0.9983333333333334,
+      "min": 0.995,
+      "n": 3
+    },
+    "e20/bos/t0/dup_shred/copy_direct_acc": {
+      "max": 1.0,
+      "mean": 0.9983333333333334,
+      "min": 0.995,
+      "n": 3
+    },
+    "e20/bos/t0/duplicate_update/alias_new_object": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 3
+    },
+    "e20/bos/t0/resign_target/alias_direct": {
+      "max": 1.0,
+      "mean": 0.9466666666666667,
+      "min": 0.905,
+      "n": 3
+    },
+    "e20/bos/t0/revoke_alias/alias_unknown": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "e20/bos/t0/revoke_alias/sibling_readable": {
+      "max": 1.0,
+      "mean": 0.9500000000000001,
+      "min": 0.91,
+      "n": 3
+    },
+    "e20/bos/t0/revoke_alias/target_readable": {
+      "max": 1.0,
+      "mean": 0.9966666666666667,
+      "min": 0.99,
+      "n": 3
+    },
+    "e20/bos/t0/rollback/alias_direct": {
+      "max": 1.0,
+      "mean": 0.9466666666666667,
+      "min": 0.905,
+      "n": 3
+    },
+    "e20/bos/t0/shared_update/alias_new_object": {
+      "max": 0.985,
+      "mean": 0.9533333333333333,
+      "min": 0.935,
+      "n": 3
+    },
+    "e20/bos/t0/shred_target/alias_probe_top1": {
+      "max": 0.005,
+      "mean": 0.0016666666666666668,
+      "min": 0.0,
+      "n": 3
+    },
+    "e20/bos/t0/shred_target/alias_true_object": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 3
+    },
+    "e20/bos/t0/shred_target/alias_unknown": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "e20/bos/t10/active/alias_probe_top1": {
+      "max": 0.845,
+      "mean": 0.8066666666666666,
+      "min": 0.785,
+      "n": 3
+    },
+    "e20/bos/t10/alias_direct": {
+      "max": 0.99,
+      "mean": 0.9266666666666667,
+      "min": 0.87,
+      "n": 3
+    },
+    "e20/bos/t10/alias_heldout_min": {
+      "max": 0.775,
+      "mean": 0.7583333333333334,
+      "min": 0.74,
+      "n": 3
+    },
+    "e20/bos/t10/delete_target/alias_true_object": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 3
+    },
+    "e20/bos/t10/delete_target/alias_unknown": {
+      "max": 0.985,
+      "mean": 0.935,
+      "min": 0.895,
+      "n": 3
+    },
+    "e20/bos/t10/direct": {
+      "max": 1.0,
+      "mean": 0.9977777777777778,
+      "min": 0.9966666666666667,
+      "n": 3
+    },
+    "e20/bos/t10/dup_direct": {
+      "max": 1.0,
+      "mean": 0.9983333333333334,
+      "min": 0.995,
+      "n": 3
+    },
+    "e20/bos/t10/dup_shred/copy_direct_acc": {
+      "max": 1.0,
+      "mean": 0.9983333333333334,
+      "min": 0.995,
+      "n": 3
+    },
+    "e20/bos/t10/duplicate_update/alias_new_object": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 3
+    },
+    "e20/bos/t10/resign_target/alias_direct": {
+      "max": 0.99,
+      "mean": 0.9266666666666667,
+      "min": 0.87,
+      "n": 3
+    },
+    "e20/bos/t10/revoke_alias/alias_unknown": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "e20/bos/t10/revoke_alias/sibling_readable": {
+      "max": 1.0,
+      "mean": 0.9333333333333335,
+      "min": 0.87,
+      "n": 3
+    },
+    "e20/bos/t10/revoke_alias/target_readable": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "e20/bos/t10/rollback/alias_direct": {
+      "max": 0.99,
+      "mean": 0.9266666666666667,
+      "min": 0.87,
+      "n": 3
+    },
+    "e20/bos/t10/shared_update/alias_new_object": {
+      "max": 0.94,
+      "mean": 0.9233333333333333,
+      "min": 0.89,
+      "n": 3
+    },
+    "e20/bos/t10/shred_target/alias_probe_top1": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 3
+    },
+    "e20/bos/t10/shred_target/alias_true_object": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 3
+    },
+    "e20/bos/t10/shred_target/alias_unknown": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "e20/bos/t11/active/alias_probe_top1": {
+      "max": 0.855,
+      "mean": 0.8066666666666666,
+      "min": 0.775,
+      "n": 3
+    },
+    "e20/bos/t11/alias_direct": {
+      "max": 1.0,
+      "mean": 0.9416666666666668,
+      "min": 0.895,
+      "n": 3
+    },
+    "e20/bos/t11/alias_heldout_min": {
+      "max": 0.775,
+      "mean": 0.7583333333333334,
+      "min": 0.74,
+      "n": 3
+    },
+    "e20/bos/t11/delete_target/alias_true_object": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 3
+    },
+    "e20/bos/t11/delete_target/alias_unknown": {
+      "max": 0.98,
+      "mean": 0.935,
+      "min": 0.905,
+      "n": 3
+    },
+    "e20/bos/t11/direct": {
+      "max": 1.0,
+      "mean": 0.9944444444444445,
+      "min": 0.9866666666666667,
+      "n": 3
+    },
+    "e20/bos/t11/dup_direct": {
+      "max": 1.0,
+      "mean": 0.9966666666666667,
+      "min": 0.995,
+      "n": 3
+    },
+    "e20/bos/t11/dup_shred/copy_direct_acc": {
+      "max": 1.0,
+      "mean": 0.9966666666666667,
+      "min": 0.995,
+      "n": 3
+    },
+    "e20/bos/t11/duplicate_update/alias_new_object": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 3
+    },
+    "e20/bos/t11/resign_target/alias_direct": {
+      "max": 1.0,
+      "mean": 0.9416666666666668,
+      "min": 0.895,
+      "n": 3
+    },
+    "e20/bos/t11/revoke_alias/alias_unknown": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "e20/bos/t11/revoke_alias/sibling_readable": {
+      "max": 1.0,
+      "mean": 0.9433333333333334,
+      "min": 0.9,
+      "n": 3
+    },
+    "e20/bos/t11/revoke_alias/target_readable": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "e20/bos/t11/rollback/alias_direct": {
+      "max": 1.0,
+      "mean": 0.9416666666666668,
+      "min": 0.895,
+      "n": 3
+    },
+    "e20/bos/t11/shared_update/alias_new_object": {
+      "max": 0.975,
+      "mean": 0.9433333333333334,
+      "min": 0.91,
+      "n": 3
+    },
+    "e20/bos/t11/shred_target/alias_probe_top1": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 3
+    },
+    "e20/bos/t11/shred_target/alias_true_object": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 3
+    },
+    "e20/bos/t11/shred_target/alias_unknown": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "e20/bos/t8/active/alias_probe_top1": {
+      "max": 0.845,
+      "mean": 0.7949999999999999,
+      "min": 0.77,
+      "n": 3
+    },
+    "e20/bos/t8/alias_direct": {
+      "max": 0.99,
+      "mean": 0.9316666666666666,
+      "min": 0.885,
+      "n": 3
+    },
+    "e20/bos/t8/alias_heldout_min": {
+      "max": 0.775,
+      "mean": 0.7583333333333334,
+      "min": 0.74,
+      "n": 3
+    },
+    "e20/bos/t8/delete_target/alias_true_object": {
+      "max": 0.005,
+      "mean": 0.0016666666666666668,
+      "min": 0.0,
+      "n": 3
+    },
+    "e20/bos/t8/delete_target/alias_unknown": {
+      "max": 0.985,
+      "mean": 0.9316666666666666,
+      "min": 0.9,
+      "n": 3
+    },
+    "e20/bos/t8/direct": {
+      "max": 0.9966666666666667,
+      "mean": 0.9822222222222222,
+      "min": 0.9733333333333334,
+      "n": 3
+    },
+    "e20/bos/t8/dup_direct": {
+      "max": 0.99,
+      "mean": 0.9866666666666667,
+      "min": 0.98,
+      "n": 3
+    },
+    "e20/bos/t8/dup_shred/copy_direct_acc": {
+      "max": 0.99,
+      "mean": 0.9866666666666667,
+      "min": 0.98,
+      "n": 3
+    },
+    "e20/bos/t8/duplicate_update/alias_new_object": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 3
+    },
+    "e20/bos/t8/resign_target/alias_direct": {
+      "max": 0.99,
+      "mean": 0.9316666666666666,
+      "min": 0.885,
+      "n": 3
+    },
+    "e20/bos/t8/revoke_alias/alias_unknown": {
+      "max": 1.0,
+      "mean": 0.9966666666666667,
+      "min": 0.99,
+      "n": 3
+    },
+    "e20/bos/t8/revoke_alias/sibling_readable": {
+      "max": 0.99,
+      "mean": 0.9400000000000001,
+      "min": 0.91,
+      "n": 3
+    },
+    "e20/bos/t8/revoke_alias/target_readable": {
+      "max": 1.0,
+      "mean": 0.9933333333333333,
+      "min": 0.99,
+      "n": 3
+    },
+    "e20/bos/t8/rollback/alias_direct": {
+      "max": 0.99,
+      "mean": 0.9316666666666666,
+      "min": 0.885,
+      "n": 3
+    },
+    "e20/bos/t8/shared_update/alias_new_object": {
+      "max": 0.96,
+      "mean": 0.9266666666666666,
+      "min": 0.9,
+      "n": 3
+    },
+    "e20/bos/t8/shred_target/alias_probe_top1": {
+      "max": 0.005,
+      "mean": 0.0016666666666666668,
+      "min": 0.0,
+      "n": 3
+    },
+    "e20/bos/t8/shred_target/alias_true_object": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 3
+    },
+    "e20/bos/t8/shred_target/alias_unknown": {
+      "max": 1.0,
+      "mean": 0.9983333333333334,
+      "min": 0.995,
+      "n": 3
+    },
+    "e20/bos/t9/active/alias_probe_top1": {
+      "max": 0.685,
+      "mean": 0.5716666666666667,
+      "min": 0.49,
+      "n": 3
+    },
+    "e20/bos/t9/alias_direct": {
+      "max": 0.775,
+      "mean": 0.7583333333333334,
+      "min": 0.74,
+      "n": 3
+    },
+    "e20/bos/t9/alias_heldout_min": {
+      "max": 0.775,
+      "mean": 0.7583333333333334,
+      "min": 0.74,
+      "n": 3
+    },
+    "e20/bos/t9/delete_target/alias_true_object": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 3
+    },
+    "e20/bos/t9/delete_target/alias_unknown": {
+      "max": 0.975,
+      "mean": 0.9583333333333334,
+      "min": 0.945,
+      "n": 3
+    },
+    "e20/bos/t9/direct": {
+      "max": 0.8466666666666667,
+      "mean": 0.8022222222222221,
+      "min": 0.7433333333333333,
+      "n": 3
+    },
+    "e20/bos/t9/dup_direct": {
+      "max": 0.835,
+      "mean": 0.8133333333333334,
+      "min": 0.79,
+      "n": 3
+    },
+    "e20/bos/t9/dup_shred/copy_direct_acc": {
+      "max": 0.835,
+      "mean": 0.8183333333333334,
+      "min": 0.8,
+      "n": 3
+    },
+    "e20/bos/t9/duplicate_update/alias_new_object": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 3
+    },
+    "e20/bos/t9/resign_target/alias_direct": {
+      "max": 0.775,
+      "mean": 0.7583333333333334,
+      "min": 0.74,
+      "n": 3
+    },
+    "e20/bos/t9/revoke_alias/alias_unknown": {
+      "max": 0.97,
+      "mean": 0.9366666666666665,
+      "min": 0.87,
+      "n": 3
+    },
+    "e20/bos/t9/revoke_alias/sibling_readable": {
+      "max": 0.8,
+      "mean": 0.7733333333333334,
+      "min": 0.76,
+      "n": 3
+    },
+    "e20/bos/t9/revoke_alias/target_readable": {
+      "max": 0.88,
+      "mean": 0.8233333333333333,
+      "min": 0.77,
+      "n": 3
+    },
+    "e20/bos/t9/rollback/alias_direct": {
+      "max": 0.775,
+      "mean": 0.7583333333333334,
+      "min": 0.74,
+      "n": 3
+    },
+    "e20/bos/t9/shared_update/alias_new_object": {
+      "max": 0.78,
+      "mean": 0.75,
+      "min": 0.73,
+      "n": 3
+    },
+    "e20/bos/t9/shred_target/alias_probe_top1": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 3
+    },
+    "e20/bos/t9/shred_target/alias_true_object": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 3
+    },
+    "e20/bos/t9/shred_target/alias_unknown": {
+      "max": 0.985,
+      "mean": 0.98,
+      "min": 0.975,
+      "n": 3
+    },
+    "e20/none/heldout/alias_direct_min": {
+      "max": 0.42,
+      "mean": 0.3433333333333333,
+      "min": 0.3,
+      "n": 3
+    },
+    "e20/none/heldout/direct_min": {
+      "max": 0.3233333333333333,
+      "mean": 0.30777777777777776,
+      "min": 0.29333333333333333,
+      "n": 3
+    },
+    "e20/none/heldout/shared_update/alias_new_object_min": {
+      "max": 0.405,
+      "mean": 0.3433333333333333,
+      "min": 0.295,
+      "n": 3
+    },
+    "e20/none/heldout/shred_target/alias_unknown_min": {
+      "max": 0.995,
+      "mean": 0.9766666666666667,
+      "min": 0.95,
+      "n": 3
+    },
+    "e20/none/t0/active/alias_probe_top1": {
+      "max": 0.435,
+      "mean": 0.4283333333333333,
+      "min": 0.42,
+      "n": 3
+    },
+    "e20/none/t0/alias_direct": {
+      "max": 0.73,
+      "mean": 0.6166666666666667,
+      "min": 0.5,
+      "n": 3
+    },
+    "e20/none/t0/alias_heldout_min": {
+      "max": 0.42,
+      "mean": 0.3433333333333333,
+      "min": 0.3,
+      "n": 3
+    },
+    "e20/none/t0/delete_target/alias_true_object": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 3
+    },
+    "e20/none/t0/delete_target/alias_unknown": {
+      "max": 0.995,
+      "mean": 0.9816666666666666,
+      "min": 0.965,
+      "n": 3
+    },
+    "e20/none/t0/direct": {
+      "max": 0.65,
+      "mean": 0.6122222222222223,
+      "min": 0.5633333333333334,
+      "n": 3
+    },
+    "e20/none/t0/dup_direct": {
+      "max": 0.685,
+      "mean": 0.6233333333333334,
+      "min": 0.59,
+      "n": 3
+    },
+    "e20/none/t0/dup_shred/copy_direct_acc": {
+      "max": 0.7,
+      "mean": 0.6366666666666666,
+      "min": 0.59,
+      "n": 3
+    },
+    "e20/none/t0/duplicate_update/alias_new_object": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 3
+    },
+    "e20/none/t0/resign_target/alias_direct": {
+      "max": 0.73,
+      "mean": 0.6166666666666667,
+      "min": 0.5,
+      "n": 3
+    },
+    "e20/none/t0/revoke_alias/alias_unknown": {
+      "max": 1.0,
+      "mean": 0.98,
+      "min": 0.96,
+      "n": 3
+    },
+    "e20/none/t0/revoke_alias/sibling_readable": {
+      "max": 0.78,
+      "mean": 0.6733333333333333,
+      "min": 0.58,
+      "n": 3
+    },
+    "e20/none/t0/revoke_alias/target_readable": {
+      "max": 0.71,
+      "mean": 0.63,
+      "min": 0.56,
+      "n": 3
+    },
+    "e20/none/t0/rollback/alias_direct": {
+      "max": 0.73,
+      "mean": 0.6166666666666667,
+      "min": 0.5,
+      "n": 3
+    },
+    "e20/none/t0/shared_update/alias_new_object": {
+      "max": 0.71,
+      "mean": 0.6216666666666667,
+      "min": 0.535,
+      "n": 3
+    },
+    "e20/none/t0/shred_target/alias_probe_top1": {
+      "max": 0.01,
+      "mean": 0.0033333333333333335,
+      "min": 0.0,
+      "n": 3
+    },
+    "e20/none/t0/shred_target/alias_true_object": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 3
+    },
+    "e20/none/t0/shred_target/alias_unknown": {
+      "max": 1.0,
+      "mean": 0.9966666666666667,
+      "min": 0.995,
+      "n": 3
+    },
+    "e20/none/t10/active/alias_probe_top1": {
+      "max": 0.85,
+      "mean": 0.82,
+      "min": 0.8,
+      "n": 3
+    },
+    "e20/none/t10/alias_direct": {
+      "max": 0.99,
+      "mean": 0.9249999999999999,
+      "min": 0.87,
+      "n": 3
+    },
+    "e20/none/t10/alias_heldout_min": {
+      "max": 0.42,
+      "mean": 0.3433333333333333,
+      "min": 0.3,
+      "n": 3
+    },
+    "e20/none/t10/delete_target/alias_true_object": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 3
+    },
+    "e20/none/t10/delete_target/alias_unknown": {
+      "max": 0.985,
+      "mean": 0.94,
+      "min": 0.91,
+      "n": 3
+    },
+    "e20/none/t10/direct": {
+      "max": 1.0,
+      "mean": 0.9988888888888888,
+      "min": 0.9966666666666667,
+      "n": 3
+    },
+    "e20/none/t10/dup_direct": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "e20/none/t10/dup_shred/copy_direct_acc": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "e20/none/t10/duplicate_update/alias_new_object": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 3
+    },
+    "e20/none/t10/resign_target/alias_direct": {
+      "max": 0.99,
+      "mean": 0.9249999999999999,
+      "min": 0.87,
+      "n": 3
+    },
+    "e20/none/t10/revoke_alias/alias_unknown": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "e20/none/t10/revoke_alias/sibling_readable": {
+      "max": 1.0,
+      "mean": 0.9366666666666666,
+      "min": 0.88,
+      "n": 3
+    },
+    "e20/none/t10/revoke_alias/target_readable": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "e20/none/t10/rollback/alias_direct": {
+      "max": 0.99,
+      "mean": 0.9249999999999999,
+      "min": 0.87,
+      "n": 3
+    },
+    "e20/none/t10/shared_update/alias_new_object": {
+      "max": 0.935,
+      "mean": 0.9166666666666666,
+      "min": 0.885,
+      "n": 3
+    },
+    "e20/none/t10/shred_target/alias_probe_top1": {
+      "max": 0.01,
+      "mean": 0.005,
+      "min": 0.0,
+      "n": 3
+    },
+    "e20/none/t10/shred_target/alias_true_object": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 3
+    },
+    "e20/none/t10/shred_target/alias_unknown": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "e20/none/t11/active/alias_probe_top1": {
+      "max": 0.17,
+      "mean": 0.14500000000000002,
+      "min": 0.125,
+      "n": 3
+    },
+    "e20/none/t11/alias_direct": {
+      "max": 0.42,
+      "mean": 0.3433333333333333,
+      "min": 0.3,
+      "n": 3
+    },
+    "e20/none/t11/alias_heldout_min": {
+      "max": 0.42,
+      "mean": 0.3433333333333333,
+      "min": 0.3,
+      "n": 3
+    },
+    "e20/none/t11/delete_target/alias_true_object": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 3
+    },
+    "e20/none/t11/delete_target/alias_unknown": {
+      "max": 0.985,
+      "mean": 0.9666666666666667,
+      "min": 0.945,
+      "n": 3
+    },
+    "e20/none/t11/direct": {
+      "max": 0.3233333333333333,
+      "mean": 0.30777777777777776,
+      "min": 0.29333333333333333,
+      "n": 3
+    },
+    "e20/none/t11/dup_direct": {
+      "max": 0.32,
+      "mean": 0.28833333333333333,
+      "min": 0.235,
+      "n": 3
+    },
+    "e20/none/t11/dup_shred/copy_direct_acc": {
+      "max": 0.335,
+      "mean": 0.305,
+      "min": 0.25,
+      "n": 3
+    },
+    "e20/none/t11/duplicate_update/alias_new_object": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 3
+    },
+    "e20/none/t11/resign_target/alias_direct": {
+      "max": 0.42,
+      "mean": 0.3433333333333333,
+      "min": 0.3,
+      "n": 3
+    },
+    "e20/none/t11/revoke_alias/alias_unknown": {
+      "max": 0.95,
+      "mean": 0.9199999999999999,
+      "min": 0.89,
+      "n": 3
+    },
+    "e20/none/t11/revoke_alias/sibling_readable": {
+      "max": 0.42,
+      "mean": 0.36999999999999994,
+      "min": 0.31,
+      "n": 3
+    },
+    "e20/none/t11/revoke_alias/target_readable": {
+      "max": 0.35,
+      "mean": 0.3,
+      "min": 0.25,
+      "n": 3
+    },
+    "e20/none/t11/rollback/alias_direct": {
+      "max": 0.42,
+      "mean": 0.3433333333333333,
+      "min": 0.3,
+      "n": 3
+    },
+    "e20/none/t11/shared_update/alias_new_object": {
+      "max": 0.405,
+      "mean": 0.3433333333333333,
+      "min": 0.295,
+      "n": 3
+    },
+    "e20/none/t11/shred_target/alias_probe_top1": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 3
+    },
+    "e20/none/t11/shred_target/alias_true_object": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 3
+    },
+    "e20/none/t11/shred_target/alias_unknown": {
+      "max": 0.995,
+      "mean": 0.9766666666666667,
+      "min": 0.95,
+      "n": 3
+    },
+    "e20/none/t8/active/alias_probe_top1": {
+      "max": 0.255,
+      "mean": 0.24166666666666667,
+      "min": 0.22,
+      "n": 3
+    },
+    "e20/none/t8/alias_direct": {
+      "max": 0.525,
+      "mean": 0.4283333333333334,
+      "min": 0.355,
+      "n": 3
+    },
+    "e20/none/t8/alias_heldout_min": {
+      "max": 0.42,
+      "mean": 0.3433333333333333,
+      "min": 0.3,
+      "n": 3
+    },
+    "e20/none/t8/delete_target/alias_true_object": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 3
+    },
+    "e20/none/t8/delete_target/alias_unknown": {
+      "max": 0.995,
+      "mean": 0.9783333333333332,
+      "min": 0.95,
+      "n": 3
+    },
+    "e20/none/t8/direct": {
+      "max": 0.48333333333333334,
+      "mean": 0.45,
+      "min": 0.3933333333333333,
+      "n": 3
+    },
+    "e20/none/t8/dup_direct": {
+      "max": 0.455,
+      "mean": 0.4133333333333334,
+      "min": 0.385,
+      "n": 3
+    },
+    "e20/none/t8/dup_shred/copy_direct_acc": {
+      "max": 0.465,
+      "mean": 0.425,
+      "min": 0.4,
+      "n": 3
+    },
+    "e20/none/t8/duplicate_update/alias_new_object": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 3
+    },
+    "e20/none/t8/resign_target/alias_direct": {
+      "max": 0.525,
+      "mean": 0.4283333333333334,
+      "min": 0.355,
+      "n": 3
+    },
+    "e20/none/t8/revoke_alias/alias_unknown": {
+      "max": 0.99,
+      "mean": 0.9533333333333335,
+      "min": 0.93,
+      "n": 3
+    },
+    "e20/none/t8/revoke_alias/sibling_readable": {
+      "max": 0.56,
+      "mean": 0.4566666666666667,
+      "min": 0.39,
+      "n": 3
+    },
+    "e20/none/t8/revoke_alias/target_readable": {
+      "max": 0.5,
+      "mean": 0.4666666666666666,
+      "min": 0.43,
+      "n": 3
+    },
+    "e20/none/t8/rollback/alias_direct": {
+      "max": 0.525,
+      "mean": 0.4283333333333334,
+      "min": 0.355,
+      "n": 3
+    },
+    "e20/none/t8/shared_update/alias_new_object": {
+      "max": 0.505,
+      "mean": 0.43,
+      "min": 0.37,
+      "n": 3
+    },
+    "e20/none/t8/shred_target/alias_probe_top1": {
+      "max": 0.005,
+      "mean": 0.0016666666666666668,
+      "min": 0.0,
+      "n": 3
+    },
+    "e20/none/t8/shred_target/alias_true_object": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 3
+    },
+    "e20/none/t8/shred_target/alias_unknown": {
+      "max": 0.995,
+      "mean": 0.9833333333333334,
+      "min": 0.96,
+      "n": 3
+    },
+    "e20/none/t9/active/alias_probe_top1": {
+      "max": 0.84,
+      "mean": 0.7933333333333333,
+      "min": 0.77,
+      "n": 3
+    },
+    "e20/none/t9/alias_direct": {
+      "max": 0.95,
+      "mean": 0.9033333333333333,
+      "min": 0.87,
+      "n": 3
+    },
+    "e20/none/t9/alias_heldout_min": {
+      "max": 0.42,
+      "mean": 0.3433333333333333,
+      "min": 0.3,
+      "n": 3
+    },
+    "e20/none/t9/delete_target/alias_true_object": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 3
+    },
+    "e20/none/t9/delete_target/alias_unknown": {
+      "max": 0.99,
+      "mean": 0.9566666666666667,
+      "min": 0.93,
+      "n": 3
+    },
+    "e20/none/t9/direct": {
+      "max": 0.98,
+      "mean": 0.9566666666666667,
+      "min": 0.93,
+      "n": 3
+    },
+    "e20/none/t9/dup_direct": {
+      "max": 0.985,
+      "mean": 0.9816666666666666,
+      "min": 0.98,
+      "n": 3
+    },
+    "e20/none/t9/dup_shred/copy_direct_acc": {
+      "max": 0.985,
+      "mean": 0.9816666666666666,
+      "min": 0.98,
+      "n": 3
+    },
+    "e20/none/t9/duplicate_update/alias_new_object": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 3
+    },
+    "e20/none/t9/resign_target/alias_direct": {
+      "max": 0.95,
+      "mean": 0.9033333333333333,
+      "min": 0.87,
+      "n": 3
+    },
+    "e20/none/t9/revoke_alias/alias_unknown": {
+      "max": 1.0,
+      "mean": 0.9966666666666667,
+      "min": 0.99,
+      "n": 3
+    },
+    "e20/none/t9/revoke_alias/sibling_readable": {
+      "max": 0.95,
+      "mean": 0.91,
+      "min": 0.88,
+      "n": 3
+    },
+    "e20/none/t9/revoke_alias/target_readable": {
+      "max": 0.99,
+      "mean": 0.9700000000000001,
+      "min": 0.93,
+      "n": 3
+    },
+    "e20/none/t9/rollback/alias_direct": {
+      "max": 0.95,
+      "mean": 0.9033333333333333,
+      "min": 0.87,
+      "n": 3
+    },
+    "e20/none/t9/shared_update/alias_new_object": {
+      "max": 0.93,
+      "mean": 0.9,
+      "min": 0.87,
+      "n": 3
+    },
+    "e20/none/t9/shred_target/alias_probe_top1": {
+      "max": 0.01,
+      "mean": 0.0033333333333333335,
+      "min": 0.0,
+      "n": 3
+    },
+    "e20/none/t9/shred_target/alias_true_object": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 3
+    },
+    "e20/none/t9/shred_target/alias_unknown": {
+      "max": 1.0,
+      "mean": 0.9983333333333334,
+      "min": 0.995,
+      "n": 3
+    },
+    "e20/space/heldout/alias_direct_min": {
+      "max": 0.95,
+      "mean": 0.8999999999999999,
+      "min": 0.86,
+      "n": 3
+    },
+    "e20/space/heldout/direct_min": {
+      "max": 0.9833333333333333,
+      "mean": 0.9611111111111111,
+      "min": 0.9433333333333334,
+      "n": 3
+    },
+    "e20/space/heldout/shared_update/alias_new_object_min": {
+      "max": 0.925,
+      "mean": 0.8933333333333334,
+      "min": 0.85,
+      "n": 3
+    },
+    "e20/space/heldout/shred_target/alias_unknown_min": {
+      "max": 1.0,
+      "mean": 0.9983333333333334,
+      "min": 0.995,
+      "n": 3
+    },
+    "e20/space/t0/active/alias_probe_top1": {
+      "max": 0.845,
+      "mean": 0.8099999999999999,
+      "min": 0.79,
+      "n": 3
+    },
+    "e20/space/t0/alias_direct": {
+      "max": 1.0,
+      "mean": 0.9416666666666668,
+      "min": 0.885,
+      "n": 3
+    },
+    "e20/space/t0/alias_heldout_min": {
+      "max": 0.95,
+      "mean": 0.8999999999999999,
+      "min": 0.86,
+      "n": 3
+    },
+    "e20/space/t0/delete_target/alias_true_object": {
+      "max": 0.005,
+      "mean": 0.0016666666666666668,
+      "min": 0.0,
+      "n": 3
+    },
+    "e20/space/t0/delete_target/alias_unknown": {
+      "max": 0.98,
+      "mean": 0.9166666666666666,
+      "min": 0.87,
+      "n": 3
+    },
+    "e20/space/t0/direct": {
+      "max": 1.0,
+      "mean": 0.9966666666666666,
+      "min": 0.9933333333333333,
+      "n": 3
+    },
+    "e20/space/t0/dup_direct": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "e20/space/t0/dup_shred/copy_direct_acc": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "e20/space/t0/duplicate_update/alias_new_object": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 3
+    },
+    "e20/space/t0/resign_target/alias_direct": {
+      "max": 1.0,
+      "mean": 0.9416666666666668,
+      "min": 0.885,
+      "n": 3
+    },
+    "e20/space/t0/revoke_alias/alias_unknown": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "e20/space/t0/revoke_alias/sibling_readable": {
+      "max": 1.0,
+      "mean": 0.9500000000000001,
+      "min": 0.91,
+      "n": 3
+    },
+    "e20/space/t0/revoke_alias/target_readable": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "e20/space/t0/rollback/alias_direct": {
+      "max": 1.0,
+      "mean": 0.9416666666666668,
+      "min": 0.885,
+      "n": 3
+    },
+    "e20/space/t0/shared_update/alias_new_object": {
+      "max": 0.985,
+      "mean": 0.9483333333333333,
+      "min": 0.915,
+      "n": 3
+    },
+    "e20/space/t0/shred_target/alias_probe_top1": {
+      "max": 0.005,
+      "mean": 0.0016666666666666668,
+      "min": 0.0,
+      "n": 3
+    },
+    "e20/space/t0/shred_target/alias_true_object": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 3
+    },
+    "e20/space/t0/shred_target/alias_unknown": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "e20/space/t10/active/alias_probe_top1": {
+      "max": 0.85,
+      "mean": 0.8183333333333334,
+      "min": 0.8,
+      "n": 3
+    },
+    "e20/space/t10/alias_direct": {
+      "max": 0.99,
+      "mean": 0.9249999999999999,
+      "min": 0.87,
+      "n": 3
+    },
+    "e20/space/t10/alias_heldout_min": {
+      "max": 0.95,
+      "mean": 0.8999999999999999,
+      "min": 0.86,
+      "n": 3
+    },
+    "e20/space/t10/delete_target/alias_true_object": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 3
+    },
+    "e20/space/t10/delete_target/alias_unknown": {
+      "max": 0.99,
+      "mean": 0.9433333333333334,
+      "min": 0.915,
+      "n": 3
+    },
+    "e20/space/t10/direct": {
+      "max": 1.0,
+      "mean": 0.9988888888888888,
+      "min": 0.9966666666666667,
+      "n": 3
+    },
+    "e20/space/t10/dup_direct": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "e20/space/t10/dup_shred/copy_direct_acc": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "e20/space/t10/duplicate_update/alias_new_object": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 3
+    },
+    "e20/space/t10/resign_target/alias_direct": {
+      "max": 0.99,
+      "mean": 0.9249999999999999,
+      "min": 0.87,
+      "n": 3
+    },
+    "e20/space/t10/revoke_alias/alias_unknown": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "e20/space/t10/revoke_alias/sibling_readable": {
+      "max": 1.0,
+      "mean": 0.9333333333333332,
+      "min": 0.88,
+      "n": 3
+    },
+    "e20/space/t10/revoke_alias/target_readable": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "e20/space/t10/rollback/alias_direct": {
+      "max": 0.99,
+      "mean": 0.9249999999999999,
+      "min": 0.87,
+      "n": 3
+    },
+    "e20/space/t10/shared_update/alias_new_object": {
+      "max": 0.935,
+      "mean": 0.9166666666666666,
+      "min": 0.885,
+      "n": 3
+    },
+    "e20/space/t10/shred_target/alias_probe_top1": {
+      "max": 0.005,
+      "mean": 0.0016666666666666668,
+      "min": 0.0,
+      "n": 3
+    },
+    "e20/space/t10/shred_target/alias_true_object": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 3
+    },
+    "e20/space/t10/shred_target/alias_unknown": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "e20/space/t11/active/alias_probe_top1": {
+      "max": 0.845,
+      "mean": 0.805,
+      "min": 0.78,
+      "n": 3
+    },
+    "e20/space/t11/alias_direct": {
+      "max": 0.99,
+      "mean": 0.9333333333333335,
+      "min": 0.89,
+      "n": 3
+    },
+    "e20/space/t11/alias_heldout_min": {
+      "max": 0.95,
+      "mean": 0.8999999999999999,
+      "min": 0.86,
+      "n": 3
+    },
+    "e20/space/t11/delete_target/alias_true_object": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 3
+    },
+    "e20/space/t11/delete_target/alias_unknown": {
+      "max": 0.98,
+      "mean": 0.945,
+      "min": 0.915,
+      "n": 3
+    },
+    "e20/space/t11/direct": {
+      "max": 1.0,
+      "mean": 0.9933333333333333,
+      "min": 0.9866666666666667,
+      "n": 3
+    },
+    "e20/space/t11/dup_direct": {
+      "max": 1.0,
+      "mean": 0.9933333333333333,
+      "min": 0.985,
+      "n": 3
+    },
+    "e20/space/t11/dup_shred/copy_direct_acc": {
+      "max": 1.0,
+      "mean": 0.9933333333333333,
+      "min": 0.985,
+      "n": 3
+    },
+    "e20/space/t11/duplicate_update/alias_new_object": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 3
+    },
+    "e20/space/t11/resign_target/alias_direct": {
+      "max": 0.99,
+      "mean": 0.9333333333333335,
+      "min": 0.89,
+      "n": 3
+    },
+    "e20/space/t11/revoke_alias/alias_unknown": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "e20/space/t11/revoke_alias/sibling_readable": {
+      "max": 0.99,
+      "mean": 0.9366666666666666,
+      "min": 0.89,
+      "n": 3
+    },
+    "e20/space/t11/revoke_alias/target_readable": {
+      "max": 1.0,
+      "mean": 0.9899999999999999,
+      "min": 0.98,
+      "n": 3
+    },
+    "e20/space/t11/rollback/alias_direct": {
+      "max": 0.99,
+      "mean": 0.9333333333333335,
+      "min": 0.89,
+      "n": 3
+    },
+    "e20/space/t11/shared_update/alias_new_object": {
+      "max": 0.96,
+      "mean": 0.9383333333333334,
+      "min": 0.91,
+      "n": 3
+    },
+    "e20/space/t11/shred_target/alias_probe_top1": {
+      "max": 0.005,
+      "mean": 0.0016666666666666668,
+      "min": 0.0,
+      "n": 3
+    },
+    "e20/space/t11/shred_target/alias_true_object": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 3
+    },
+    "e20/space/t11/shred_target/alias_unknown": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "e20/space/t8/active/alias_probe_top1": {
+      "max": 0.845,
+      "mean": 0.7949999999999999,
+      "min": 0.765,
+      "n": 3
+    },
+    "e20/space/t8/alias_direct": {
+      "max": 0.985,
+      "mean": 0.9199999999999999,
+      "min": 0.865,
+      "n": 3
+    },
+    "e20/space/t8/alias_heldout_min": {
+      "max": 0.95,
+      "mean": 0.8999999999999999,
+      "min": 0.86,
+      "n": 3
+    },
+    "e20/space/t8/delete_target/alias_true_object": {
+      "max": 0.005,
+      "mean": 0.0016666666666666668,
+      "min": 0.0,
+      "n": 3
+    },
+    "e20/space/t8/delete_target/alias_unknown": {
+      "max": 0.985,
+      "mean": 0.9366666666666666,
+      "min": 0.9,
+      "n": 3
+    },
+    "e20/space/t8/direct": {
+      "max": 0.9933333333333333,
+      "mean": 0.9811111111111112,
+      "min": 0.9666666666666667,
+      "n": 3
+    },
+    "e20/space/t8/dup_direct": {
+      "max": 0.995,
+      "mean": 0.9833333333333334,
+      "min": 0.975,
+      "n": 3
+    },
+    "e20/space/t8/dup_shred/copy_direct_acc": {
+      "max": 0.995,
+      "mean": 0.9833333333333334,
+      "min": 0.975,
+      "n": 3
+    },
+    "e20/space/t8/duplicate_update/alias_new_object": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 3
+    },
+    "e20/space/t8/resign_target/alias_direct": {
+      "max": 0.985,
+      "mean": 0.9199999999999999,
+      "min": 0.865,
+      "n": 3
+    },
+    "e20/space/t8/revoke_alias/alias_unknown": {
+      "max": 1.0,
+      "mean": 0.9966666666666667,
+      "min": 0.99,
+      "n": 3
+    },
+    "e20/space/t8/revoke_alias/sibling_readable": {
+      "max": 0.99,
+      "mean": 0.93,
+      "min": 0.88,
+      "n": 3
+    },
+    "e20/space/t8/revoke_alias/target_readable": {
+      "max": 1.0,
+      "mean": 0.9899999999999999,
+      "min": 0.98,
+      "n": 3
+    },
+    "e20/space/t8/rollback/alias_direct": {
+      "max": 0.985,
+      "mean": 0.9199999999999999,
+      "min": 0.865,
+      "n": 3
+    },
+    "e20/space/t8/shared_update/alias_new_object": {
+      "max": 0.95,
+      "mean": 0.92,
+      "min": 0.89,
+      "n": 3
+    },
+    "e20/space/t8/shred_target/alias_probe_top1": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 3
+    },
+    "e20/space/t8/shred_target/alias_true_object": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 3
+    },
+    "e20/space/t8/shred_target/alias_unknown": {
+      "max": 1.0,
+      "mean": 0.9983333333333334,
+      "min": 0.995,
+      "n": 3
+    },
+    "e20/space/t9/active/alias_probe_top1": {
+      "max": 0.845,
+      "mean": 0.805,
+      "min": 0.77,
+      "n": 3
+    },
+    "e20/space/t9/alias_direct": {
+      "max": 0.95,
+      "mean": 0.8999999999999999,
+      "min": 0.86,
+      "n": 3
+    },
+    "e20/space/t9/alias_heldout_min": {
+      "max": 0.95,
+      "mean": 0.8999999999999999,
+      "min": 0.86,
+      "n": 3
+    },
+    "e20/space/t9/delete_target/alias_true_object": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 3
+    },
+    "e20/space/t9/delete_target/alias_unknown": {
+      "max": 0.99,
+      "mean": 0.96,
+      "min": 0.94,
+      "n": 3
+    },
+    "e20/space/t9/direct": {
+      "max": 0.9866666666666667,
+      "mean": 0.9622222222222222,
+      "min": 0.9433333333333334,
+      "n": 3
+    },
+    "e20/space/t9/dup_direct": {
+      "max": 0.985,
+      "mean": 0.9766666666666666,
+      "min": 0.965,
+      "n": 3
+    },
+    "e20/space/t9/dup_shred/copy_direct_acc": {
+      "max": 0.985,
+      "mean": 0.9783333333333334,
+      "min": 0.97,
+      "n": 3
+    },
+    "e20/space/t9/duplicate_update/alias_new_object": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 3
+    },
+    "e20/space/t9/resign_target/alias_direct": {
+      "max": 0.95,
+      "mean": 0.8999999999999999,
+      "min": 0.86,
+      "n": 3
+    },
+    "e20/space/t9/revoke_alias/alias_unknown": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "e20/space/t9/revoke_alias/sibling_readable": {
+      "max": 0.95,
+      "mean": 0.9066666666666666,
+      "min": 0.88,
+      "n": 3
+    },
+    "e20/space/t9/revoke_alias/target_readable": {
+      "max": 1.0,
+      "mean": 0.9700000000000001,
+      "min": 0.93,
+      "n": 3
+    },
+    "e20/space/t9/rollback/alias_direct": {
+      "max": 0.95,
+      "mean": 0.8999999999999999,
+      "min": 0.86,
+      "n": 3
+    },
+    "e20/space/t9/shared_update/alias_new_object": {
+      "max": 0.925,
+      "mean": 0.8933333333333334,
+      "min": 0.85,
+      "n": 3
+    },
+    "e20/space/t9/shred_target/alias_probe_top1": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 3
+    },
+    "e20/space/t9/shred_target/alias_true_object": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 3
+    },
+    "e20/space/t9/shred_target/alias_unknown": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    }
+  },
+  "battery": true,
+  "claim": "NOT SUPPORTED BY THE MEASUREMENTS (see criteria): ",
+  "claim_groups_met": {
+    "any_token_does_it": null,
+    "bos_restores_heldout_addressing": null,
+    "controls_hold": null,
+    "deletion_follows": null,
+    "e13_override_and_revert_on_heldout": null,
+    "e20_lifecycle_at_template0": true,
+    "no_new_collateral": null,
+    "record_reproduced": null
+  },
+  "claim_supported": false,
+  "criteria": {
+    "e20/bos/t0/alias_direct": {
+      "observed": 0.905,
+      "op": ">=",
+      "pass": true,
+      "threshold": 0.8
+    },
+    "e20/bos/t0/direct": {
+      "observed": 0.9933333333333333,
+      "op": ">=",
+      "pass": true,
+      "threshold": 0.85
+    },
+    "e20/bos/t0/shared_update/alias_new_object": {
+      "observed": 0.935,
+      "op": ">=",
+      "pass": true,
+      "threshold": 0.9
+    }
+  },
+  "criteria_not_measured": [
+    "e13/bos/override/direct",
+    "e13/bos/override_heldout_min",
+    "e13/bos/revoke/heldout_kl_max",
+    "e17/bos/broken1_unknown",
+    "e17/bos/generic/kl_to_base",
+    "e17/bos/heldout/active_correct",
+    "e17/bos/heldout/revoked_deleted_object",
+    "e17/bos/heldout_initial/read_min",
+    "e17/bos/heldout_initial/route_hit_min",
+    "e17/bos/medial_abs_change_max",
+    "e17/bos/revoke_heldout_min",
+    "e17/bos/shred_heldout_min",
+    "e17/bos/train/active_correct",
+    "e17/bos/train_read_change_min",
+    "e17/newline/heldout_initial/read_min",
+    "e17/newline/heldout_initial/route_hit_min",
+    "e17/none/heldout/active_correct",
+    "e17/none/heldout_initial/read_min",
+    "e17/none/heldout_initial/route_hit_min",
+    "e17/text/heldout_initial/read_min",
+    "e17/text/heldout_initial/route_hit_min",
+    "e17/word/heldout_initial/read_min",
+    "e17/word/heldout_initial/route_hit_min"
+  ],
+  "decision_rule": "Worst seed on every row. READING 1 (artefact): record_reproduced, bos_restores_heldout_addressing, any_token_does_it and deletion_follows all pass -> the held-out paraphrase gap of this addressable memory on a frozen GPT-2 is the missing-BOS position-0 artefact; the honest held-out numbers for the memory are the BOS-prefixed ones, measured here with no training; kill criterion 5 (E-000017), the bimodality of E-000025, the template selection of E-000026, E-000039-B's negative and the 'behaves like own knowledge: no' row of section 31.36 are re-scoped as measured with the subject at position 0. If controls_hold also passes the fix is free; if controls_hold fails because subject-medial or trained templates MOVE under a BOS, the artefact reading survives (the subject-initial rows are its evidence) but the fix is not free: the adapter learned features of whichever token sat at position 0, and the BOS has to be applied consistently at training time (E-000050-B) before any number is quoted as a ceiling. READING 2 (semantic): the BOS fails its rows where the text prefix passes its own -> the gain is in what the prefix says and not where the subject sits; E-000039-A's prefix finding stands as it is, the position-0 diagnosis is withdrawn, and nothing is re-scoped. If the BOS passes and the newline or the word fails, the effect is BOS-specific (sink-token-specific) rather than position-0-specific and is recorded as such. The E-000013 and E-000020 groups are reported, not decided on: they say how far the switch reaches into the records the target was scored on (section 31.36). Prior art: the diagnosis and the remedy are Yang et al. 2024 (Fall of ROME) for ROME on GPT-2-family models; the mechanism is attention sinks / massive activations; only the memory-adapter measurement, the BOS-specific test, the deletion / override outcome and the controls are this record's. Fixed before the run.",
+  "deletion_level": null,
+  "e20_templates": [
+    0,
+    8,
+    9,
+    10,
+    11
+  ],
+  "environment": {
+    "device": "cpu",
+    "numpy": "2.2.6",
+    "platform": "Linux-6.18.44-fc-v24-x86_64-with-glibc2.39",
+    "python": "3.11.15",
+    "threads": "1",
+    "torch": "2.14.0+cpu"
+  },
+  "evidence_level": "E5",
+  "evidence_level_meaning": "Transformer evidence",
+  "experiment": "E-000050-A",
+  "families": [
+    "e20"
+  ],
+  "meta": {
+    "e20/seed0": {
+      "checkpoint_sha256": "3feb276b3498912759e1ef5819fe8dfbddb3c773f41653c693287047e6bbca9c",
+      "seconds/bos/t0": 78.86446905136108,
+      "seconds/bos/t10": 122.19420194625854,
+      "seconds/bos/t11": 94.66805577278137,
+      "seconds/bos/t8": 87.30884957313538,
+      "seconds/bos/t9": 101.14719271659851,
+      "seconds/none/t0": 67.69952869415283,
+      "seconds/none/t10": 109.3829755783081,
+      "seconds/none/t11": 83.68331694602966,
+      "seconds/none/t8": 75.33287167549133,
+      "seconds/none/t9": 83.82367539405823,
+      "seconds/space/t0": 76.32148957252502,
+      "seconds/space/t10": 109.33068132400513,
+      "seconds/space/t11": 90.55030584335327,
+      "seconds/space/t8": 87.05281496047974,
+      "seconds/space/t9": 86.4163179397583,
+      "templates": [
+        0,
+        8,
+        9,
+        10,
+        11
+      ]
+    },
+    "e20/seed1": {
+      "checkpoint_sha256": "d3e7d7c21b720f696204944b66194efb9676c5ed750bac3f98f506be2ccd7d33",
+      "seconds/bos/t0": 76.16856455802917,
+      "seconds/bos/t10": 119.15910816192627,
+      "seconds/bos/t11": 99.47084450721741,
+      "seconds/bos/t8": 87.34254670143127,
+      "seconds/bos/t9": 94.57116413116455,
+      "seconds/none/t0": 65.62712931632996,
+      "seconds/none/t10": 108.16050457954407,
+      "seconds/none/t11": 80.75627827644348,
+      "seconds/none/t8": 76.19724464416504,
+      "seconds/none/t9": 82.45671939849854,
+      "seconds/space/t0": 76.13383173942566,
+      "seconds/space/t10": 111.26134490966797,
+      "seconds/space/t11": 93.46495628356934,
+      "seconds/space/t8": 86.51723504066467,
+      "seconds/space/t9": 84.97984290122986,
+      "templates": [
+        0,
+        8,
+        9,
+        10,
+        11
+      ]
+    },
+    "e20/seed2": {
+      "checkpoint_sha256": "1706456c4c014eb571ea2e782167cdbeaae2088e7a380c1876b3dad464e338ce",
+      "seconds/bos/t0": 82.15017032623291,
+      "seconds/bos/t10": 118.90037727355957,
+      "seconds/bos/t11": 96.98709893226624,
+      "seconds/bos/t8": 87.8922004699707,
+      "seconds/bos/t9": 97.07084822654724,
+      "seconds/none/t0": 66.83640575408936,
+      "seconds/none/t10": 109.7818500995636,
+      "seconds/none/t11": 86.58680748939514,
+      "seconds/none/t8": 78.07407975196838,
+      "seconds/none/t9": 83.37805223464966,
+      "seconds/space/t0": 78.86464810371399,
+      "seconds/space/t10": 109.4679217338562,
+      "seconds/space/t11": 94.99777126312256,
+      "seconds/space/t8": 84.4611439704895,
+      "seconds/space/t9": 83.2304356098175,
+      "templates": [
+        0,
+        8,
+        9,
+        10,
+        11
+      ]
+    }
+  },
+  "n_targets": 100,
+  "not_claimed": "that prepending a BOS is a general law (sink formation is data-dependent; this is GPT-2 124M); that the positional EMBEDDING is the cause (Yang et al. A.4: the first token's self-only attention is the other cause -- this record says position 0, not position embedding); anything about a trained-with-BOS adapter (E-000050-B); LLM scale; multi-token entities.",
+  "oracle": true,
+  "per_seed": [
+    {
+      "e20/bos/heldout/alias_direct_min": 0.775,
+      "e20/bos/heldout/direct_min": 0.7433333333333333,
+      "e20/bos/heldout/shared_update/alias_new_object_min": 0.74,
+      "e20/bos/heldout/shred_target/alias_unknown_min": 0.975,
+      "e20/bos/t0/active/alias_probe_top1": 0.78,
+      "e20/bos/t0/alias_direct": 1.0,
+      "e20/bos/t0/alias_heldout_min": 0.775,
+      "e20/bos/t0/delete_target/alias_true_object": 0.005,
+      "e20/bos/t0/delete_target/alias_unknown": 0.875,
+      "e20/bos/t0/direct": 0.9933333333333333,
+      "e20/bos/t0/dup_direct": 1.0,
+      "e20/bos/t0/dup_shred/copy_direct_acc": 1.0,
+      "e20/bos/t0/duplicate_update/alias_new_object": 0.0,
+      "e20/bos/t0/resign_target/alias_direct": 1.0,
+      "e20/bos/t0/revoke_alias/alias_unknown": 1.0,
+      "e20/bos/t0/revoke_alias/sibling_readable": 1.0,
+      "e20/bos/t0/revoke_alias/target_readable": 1.0,
+      "e20/bos/t0/rollback/alias_direct": 1.0,
+      "e20/bos/t0/shared_update/alias_new_object": 0.985,
+      "e20/bos/t0/shred_target/alias_probe_top1": 0.0,
+      "e20/bos/t0/shred_target/alias_true_object": 0.0,
+      "e20/bos/t0/shred_target/alias_unknown": 1.0,
+      "e20/bos/t10/active/alias_probe_top1": 0.79,
+      "e20/bos/t10/alias_direct": 0.99,
+      "e20/bos/t10/alias_heldout_min": 0.775,
+      "e20/bos/t10/delete_target/alias_true_object": 0.0,
+      "e20/bos/t10/delete_target/alias_unknown": 0.895,
+      "e20/bos/t10/direct": 0.9966666666666667,
+      "e20/bos/t10/dup_direct": 1.0,
+      "e20/bos/t10/dup_shred/copy_direct_acc": 1.0,
+      "e20/bos/t10/duplicate_update/alias_new_object": 0.0,
+      "e20/bos/t10/resign_target/alias_direct": 0.99,
+      "e20/bos/t10/revoke_alias/alias_unknown": 1.0,
+      "e20/bos/t10/revoke_alias/sibling_readable": 1.0,
+      "e20/bos/t10/revoke_alias/target_readable": 1.0,
+      "e20/bos/t10/rollback/alias_direct": 0.99,
+      "e20/bos/t10/shared_update/alias_new_object": 0.94,
+      "e20/bos/t10/shred_target/alias_probe_top1": 0.0,
+      "e20/bos/t10/shred_target/alias_true_object": 0.0,
+      "e20/bos/t10/shred_target/alias_unknown": 1.0,
+      "e20/bos/t11/active/alias_probe_top1": 0.775,
+      "e20/bos/t11/alias_direct": 1.0,
+      "e20/bos/t11/alias_heldout_min": 0.775,
+      "e20/bos/t11/delete_target/alias_true_object": 0.0,
+      "e20/bos/t11/delete_target/alias_unknown": 0.905,
+      "e20/bos/t11/direct": 0.9866666666666667,
+      "e20/bos/t11/dup_direct": 0.995,
+      "e20/bos/t11/dup_shred/copy_direct_acc": 0.995,
+      "e20/bos/t11/duplicate_update/alias_new_object": 0.0,
+      "e20/bos/t11/resign_target/alias_direct": 1.0,
+      "e20/bos/t11/revoke_alias/alias_unknown": 1.0,
+      "e20/bos/t11/revoke_alias/sibling_readable": 1.0,
+      "e20/bos/t11/revoke_alias/target_readable": 1.0,
+      "e20/bos/t11/rollback/alias_direct": 1.0,
+      "e20/bos/t11/shared_update/alias_new_object": 0.975,
+      "e20/bos/t11/shred_target/alias_probe_top1": 0.0,
+      "e20/bos/t11/shred_target/alias_true_object": 0.0,
+      "e20/bos/t11/shred_target/alias_unknown": 1.0,
+      "e20/bos/t8/active/alias_probe_top1": 0.77,
+      "e20/bos/t8/alias_direct": 0.99,
+      "e20/bos/t8/alias_heldout_min": 0.775,
+      "e20/bos/t8/delete_target/alias_true_object": 0.005,
+      "e20/bos/t8/delete_target/alias_unknown": 0.91,
+      "e20/bos/t8/direct": 0.9733333333333334,
+      "e20/bos/t8/dup_direct": 0.99,
+      "e20/bos/t8/dup_shred/copy_direct_acc": 0.99,
+      "e20/bos/t8/duplicate_update/alias_new_object": 0.0,
+      "e20/bos/t8/resign_target/alias_direct": 0.99,
+      "e20/bos/t8/revoke_alias/alias_unknown": 1.0,
+      "e20/bos/t8/revoke_alias/sibling_readable": 0.99,
+      "e20/bos/t8/revoke_alias/target_readable": 0.99,
+      "e20/bos/t8/rollback/alias_direct": 0.99,
+      "e20/bos/t8/shared_update/alias_new_object": 0.96,
+      "e20/bos/t8/shred_target/alias_probe_top1": 0.0,
+      "e20/bos/t8/shred_target/alias_true_object": 0.0,
+      "e20/bos/t8/shred_target/alias_unknown": 1.0,
+      "e20/bos/t9/active/alias_probe_top1": 0.49,
+      "e20/bos/t9/alias_direct": 0.775,
+      "e20/bos/t9/alias_heldout_min": 0.775,
+      "e20/bos/t9/delete_target/alias_true_object": 0.0,
+      "e20/bos/t9/delete_target/alias_unknown": 0.945,
+      "e20/bos/t9/direct": 0.7433333333333333,
+      "e20/bos/t9/dup_direct": 0.79,
+      "e20/bos/t9/dup_shred/copy_direct_acc": 0.8,
+      "e20/bos/t9/duplicate_update/alias_new_object": 0.0,
+      "e20/bos/t9/resign_target/alias_direct": 0.775,
+      "e20/bos/t9/revoke_alias/alias_unknown": 0.87,
+      "e20/bos/t9/revoke_alias/sibling_readable": 0.8,
+      "e20/bos/t9/revoke_alias/target_readable": 0.77,
+      "e20/bos/t9/rollback/alias_direct": 0.775,
+      "e20/bos/t9/shared_update/alias_new_object": 0.74,
+      "e20/bos/t9/shred_target/alias_probe_top1": 0.0,
+      "e20/bos/t9/shred_target/alias_true_object": 0.0,
+      "e20/bos/t9/shred_target/alias_unknown": 0.975,
+      "e20/none/heldout/alias_direct_min": 0.42,
+      "e20/none/heldout/direct_min": 0.30666666666666664,
+      "e20/none/heldout/shared_update/alias_new_object_min": 0.405,
+      "e20/none/heldout/shred_target/alias_unknown_min": 0.985,
+      "e20/none/t0/active/alias_probe_top1": 0.43,
+      "e20/none/t0/alias_direct": 0.73,
+      "e20/none/t0/alias_heldout_min": 0.42,
+      "e20/none/t0/delete_target/alias_true_object": 0.0,
+      "e20/none/t0/delete_target/alias_unknown": 0.985,
+      "e20/none/t0/direct": 0.6233333333333333,
+      "e20/none/t0/dup_direct": 0.685,
+      "e20/none/t0/dup_shred/copy_direct_acc": 0.7,
+      "e20/none/t0/duplicate_update/alias_new_object": 0.0,
+      "e20/none/t0/resign_target/alias_direct": 0.73,
+      "e20/none/t0/revoke_alias/alias_unknown": 0.96,
+      "e20/none/t0/revoke_alias/sibling_readable": 0.78,
+      "e20/none/t0/revoke_alias/target_readable": 0.62,
+      "e20/none/t0/rollback/alias_direct": 0.73,
+      "e20/none/t0/shared_update/alias_new_object": 0.71,
+      "e20/none/t0/shred_target/alias_probe_top1": 0.0,
+      "e20/none/t0/shred_target/alias_true_object": 0.0,
+      "e20/none/t0/shred_target/alias_unknown": 0.995,
+      "e20/none/t10/active/alias_probe_top1": 0.8,
+      "e20/none/t10/alias_direct": 0.99,
+      "e20/none/t10/alias_heldout_min": 0.42,
+      "e20/none/t10/delete_target/alias_true_object": 0.0,
+      "e20/none/t10/delete_target/alias_unknown": 0.91,
+      "e20/none/t10/direct": 0.9966666666666667,
+      "e20/none/t10/dup_direct": 1.0,
+      "e20/none/t10/dup_shred/copy_direct_acc": 1.0,
+      "e20/none/t10/duplicate_update/alias_new_object": 0.0,
+      "e20/none/t10/resign_target/alias_direct": 0.99,
+      "e20/none/t10/revoke_alias/alias_unknown": 1.0,
+      "e20/none/t10/revoke_alias/sibling_readable": 1.0,
+      "e20/none/t10/revoke_alias/target_readable": 1.0,
+      "e20/none/t10/rollback/alias_direct": 0.99,
+      "e20/none/t10/shared_update/alias_new_object": 0.93,
+      "e20/none/t10/shred_target/alias_probe_top1": 0.01,
+      "e20/none/t10/shred_target/alias_true_object": 0.0,
+      "e20/none/t10/shred_target/alias_unknown": 1.0,
+      "e20/none/t11/active/alias_probe_top1": 0.14,
+      "e20/none/t11/alias_direct": 0.42,
+      "e20/none/t11/alias_heldout_min": 0.42,
+      "e20/none/t11/delete_target/alias_true_object": 0.0,
+      "e20/none/t11/delete_target/alias_unknown": 0.97,
+      "e20/none/t11/direct": 0.30666666666666664,
+      "e20/none/t11/dup_direct": 0.31,
+      "e20/none/t11/dup_shred/copy_direct_acc": 0.335,
+      "e20/none/t11/duplicate_update/alias_new_object": 0.0,
+      "e20/none/t11/resign_target/alias_direct": 0.42,
+      "e20/none/t11/revoke_alias/alias_unknown": 0.92,
+      "e20/none/t11/revoke_alias/sibling_readable": 0.42,
+      "e20/none/t11/revoke_alias/target_readable": 0.35,
+      "e20/none/t11/rollback/alias_direct": 0.42,
+      "e20/none/t11/shared_update/alias_new_object": 0.405,
+      "e20/none/t11/shred_target/alias_probe_top1": 0.0,
+      "e20/none/t11/shred_target/alias_true_object": 0.0,
+      "e20/none/t11/shred_target/alias_unknown": 0.985,
+      "e20/none/t8/active/alias_probe_top1": 0.255,
+      "e20/none/t8/alias_direct": 0.525,
+      "e20/none/t8/alias_heldout_min": 0.42,
+      "e20/none/t8/delete_target/alias_true_object": 0.0,
+      "e20/none/t8/delete_target/alias_unknown": 0.995,
+      "e20/none/t8/direct": 0.47333333333333333,
+      "e20/none/t8/dup_direct": 0.455,
+      "e20/none/t8/dup_shred/copy_direct_acc": 0.465,
+      "e20/none/t8/duplicate_update/alias_new_object": 0.0,
+      "e20/none/t8/resign_target/alias_direct": 0.525,
+      "e20/none/t8/revoke_alias/alias_unknown": 0.94,
+      "e20/none/t8/revoke_alias/sibling_readable": 0.56,
+      "e20/none/t8/revoke_alias/target_readable": 0.43,
+      "e20/none/t8/rollback/alias_direct": 0.525,
+      "e20/none/t8/shared_update/alias_new_object": 0.505,
+      "e20/none/t8/shred_target/alias_probe_top1": 0.0,
+      "e20/none/t8/shred_target/alias_true_object": 0.0,
+      "e20/none/t8/shred_target/alias_unknown": 0.995,
+      "e20/none/t9/active/alias_probe_top1": 0.77,
+      "e20/none/t9/alias_direct": 0.95,
+      "e20/none/t9/alias_heldout_min": 0.42,
+      "e20/none/t9/delete_target/alias_true_object": 0.0,
+      "e20/none/t9/delete_target/alias_unknown": 0.93,
+      "e20/none/t9/direct": 0.93,
+      "e20/none/t9/dup_direct": 0.985,
+      "e20/none/t9/dup_shred/copy_direct_acc": 0.985,
+      "e20/none/t9/duplicate_update/alias_new_object": 0.0,
+      "e20/none/t9/resign_target/alias_direct": 0.95,
+      "e20/none/t9/revoke_alias/alias_unknown": 1.0,
+      "e20/none/t9/revoke_alias/sibling_readable": 0.95,
+      "e20/none/t9/revoke_alias/target_readable": 0.93,
+      "e20/none/t9/rollback/alias_direct": 0.95,
+      "e20/none/t9/shared_update/alias_new_object": 0.93,
+      "e20/none/t9/shred_target/alias_probe_top1": 0.0,
+      "e20/none/t9/shred_target/alias_true_object": 0.0,
+      "e20/none/t9/shred_target/alias_unknown": 1.0,
+      "e20/space/heldout/alias_direct_min": 0.95,
+      "e20/space/heldout/direct_min": 0.9433333333333334,
+      "e20/space/heldout/shared_update/alias_new_object_min": 0.925,
+      "e20/space/heldout/shred_target/alias_unknown_min": 1.0,
+      "e20/space/t0/active/alias_probe_top1": 0.795,
+      "e20/space/t0/alias_direct": 1.0,
+      "e20/space/t0/alias_heldout_min": 0.95,
+      "e20/space/t0/delete_target/alias_true_object": 0.005,
+      "e20/space/t0/delete_target/alias_unknown": 0.87,
+      "e20/space/t0/direct": 0.9933333333333333,
+      "e20/space/t0/dup_direct": 1.0,
+      "e20/space/t0/dup_shred/copy_direct_acc": 1.0,
+      "e20/space/t0/duplicate_update/alias_new_object": 0.0,
+      "e20/space/t0/resign_target/alias_direct": 1.0,
+      "e20/space/t0/revoke_alias/alias_unknown": 1.0,
+      "e20/space/t0/revoke_alias/sibling_readable": 1.0,
+      "e20/space/t0/revoke_alias/target_readable": 1.0,
+      "e20/space/t0/rollback/alias_direct": 1.0,
+      "e20/space/t0/shared_update/alias_new_object": 0.985,
+      "e20/space/t0/shred_target/alias_probe_top1": 0.005,
+      "e20/space/t0/shred_target/alias_true_object": 0.0,
+      "e20/space/t0/shred_target/alias_unknown": 1.0,
+      "e20/space/t10/active/alias_probe_top1": 0.8,
+      "e20/space/t10/alias_direct": 0.99,
+      "e20/space/t10/alias_heldout_min": 0.95,
+      "e20/space/t10/delete_target/alias_true_object": 0.0,
+      "e20/space/t10/delete_target/alias_unknown": 0.915,
+      "e20/space/t10/direct": 0.9966666666666667,
+      "e20/space/t10/dup_direct": 1.0,
+      "e20/space/t10/dup_shred/copy_direct_acc": 1.0,
+      "e20/space/t10/duplicate_update/alias_new_object": 0.0,
+      "e20/space/t10/resign_target/alias_direct": 0.99,
+      "e20/space/t10/revoke_alias/alias_unknown": 1.0,
+      "e20/space/t10/revoke_alias/sibling_readable": 1.0,
+      "e20/space/t10/revoke_alias/target_readable": 1.0,
+      "e20/space/t10/rollback/alias_direct": 0.99,
+      "e20/space/t10/shared_update/alias_new_object": 0.93,
+      "e20/space/t10/shred_target/alias_probe_top1": 0.0,
+      "e20/space/t10/shred_target/alias_true_object": 0.0,
+      "e20/space/t10/shred_target/alias_unknown": 1.0,
+      "e20/space/t11/active/alias_probe_top1": 0.78,
+      "e20/space/t11/alias_direct": 0.99,
+      "e20/space/t11/alias_heldout_min": 0.95,
+      "e20/space/t11/delete_target/alias_true_object": 0.0,
+      "e20/space/t11/delete_target/alias_unknown": 0.915,
+      "e20/space/t11/direct": 0.9933333333333333,
+      "e20/space/t11/dup_direct": 0.995,
+      "e20/space/t11/dup_shred/copy_direct_acc": 0.995,
+      "e20/space/t11/duplicate_update/alias_new_object": 0.0,
+      "e20/space/t11/resign_target/alias_direct": 0.99,
+      "e20/space/t11/revoke_alias/alias_unknown": 1.0,
+      "e20/space/t11/revoke_alias/sibling_readable": 0.99,
+      "e20/space/t11/revoke_alias/target_readable": 0.99,
+      "e20/space/t11/rollback/alias_direct": 0.99,
+      "e20/space/t11/shared_update/alias_new_object": 0.96,
+      "e20/space/t11/shred_target/alias_probe_top1": 0.005,
+      "e20/space/t11/shred_target/alias_true_object": 0.0,
+      "e20/space/t11/shred_target/alias_unknown": 1.0,
+      "e20/space/t8/active/alias_probe_top1": 0.765,
+      "e20/space/t8/alias_direct": 0.985,
+      "e20/space/t8/alias_heldout_min": 0.95,
+      "e20/space/t8/delete_target/alias_true_object": 0.005,
+      "e20/space/t8/delete_target/alias_unknown": 0.9,
+      "e20/space/t8/direct": 0.9666666666666667,
+      "e20/space/t8/dup_direct": 0.995,
+      "e20/space/t8/dup_shred/copy_direct_acc": 0.995,
+      "e20/space/t8/duplicate_update/alias_new_object": 0.0,
+      "e20/space/t8/resign_target/alias_direct": 0.985,
+      "e20/space/t8/revoke_alias/alias_unknown": 1.0,
+      "e20/space/t8/revoke_alias/sibling_readable": 0.99,
+      "e20/space/t8/revoke_alias/target_readable": 0.98,
+      "e20/space/t8/rollback/alias_direct": 0.985,
+      "e20/space/t8/shared_update/alias_new_object": 0.95,
+      "e20/space/t8/shred_target/alias_probe_top1": 0.0,
+      "e20/space/t8/shred_target/alias_true_object": 0.0,
+      "e20/space/t8/shred_target/alias_unknown": 1.0,
+      "e20/space/t9/active/alias_probe_top1": 0.77,
+      "e20/space/t9/alias_direct": 0.95,
+      "e20/space/t9/alias_heldout_min": 0.95,
+      "e20/space/t9/delete_target/alias_true_object": 0.0,
+      "e20/space/t9/delete_target/alias_unknown": 0.94,
+      "e20/space/t9/direct": 0.9433333333333334,
+      "e20/space/t9/dup_direct": 0.965,
+      "e20/space/t9/dup_shred/copy_direct_acc": 0.97,
+      "e20/space/t9/duplicate_update/alias_new_object": 0.0,
+      "e20/space/t9/resign_target/alias_direct": 0.95,
+      "e20/space/t9/revoke_alias/alias_unknown": 1.0,
+      "e20/space/t9/revoke_alias/sibling_readable": 0.95,
+      "e20/space/t9/revoke_alias/target_readable": 0.93,
+      "e20/space/t9/rollback/alias_direct": 0.95,
+      "e20/space/t9/shared_update/alias_new_object": 0.925,
+      "e20/space/t9/shred_target/alias_probe_top1": 0.0,
+      "e20/space/t9/shred_target/alias_true_object": 0.0,
+      "e20/space/t9/shred_target/alias_unknown": 1.0,
+      "seed": 0
+    },
+    {
+      "e20/bos/heldout/alias_direct_min": 0.76,
+      "e20/bos/heldout/direct_min": 0.8466666666666667,
+      "e20/bos/heldout/shared_update/alias_new_object_min": 0.78,
+      "e20/bos/heldout/shred_target/alias_unknown_min": 0.98,
+      "e20/bos/t0/active/alias_probe_top1": 0.785,
+      "e20/bos/t0/alias_direct": 0.935,
+      "e20/bos/t0/alias_heldout_min": 0.76,
+      "e20/bos/t0/delete_target/alias_true_object": 0.0,
+      "e20/bos/t0/delete_target/alias_unknown": 0.885,
+      "e20/bos/t0/direct": 1.0,
+      "e20/bos/t0/dup_direct": 0.995,
+      "e20/bos/t0/dup_shred/copy_direct_acc": 0.995,
+      "e20/bos/t0/duplicate_update/alias_new_object": 0.0,
+      "e20/bos/t0/resign_target/alias_direct": 0.935,
+      "e20/bos/t0/revoke_alias/alias_unknown": 1.0,
+      "e20/bos/t0/revoke_alias/sibling_readable": 0.94,
+      "e20/bos/t0/revoke_alias/target_readable": 1.0,
+      "e20/bos/t0/rollback/alias_direct": 0.935,
+      "e20/bos/t0/shared_update/alias_new_object": 0.94,
+      "e20/bos/t0/shred_target/alias_probe_top1": 0.005,
+      "e20/bos/t0/shred_target/alias_true_object": 0.0,
+      "e20/bos/t0/shred_target/alias_unknown": 1.0,
+      "e20/bos/t10/active/alias_probe_top1": 0.785,
+      "e20/bos/t10/alias_direct": 0.92,
+      "e20/bos/t10/alias_heldout_min": 0.76,
+      "e20/bos/t10/delete_target/alias_true_object": 0.0,
+      "e20/bos/t10/delete_target/alias_unknown": 0.925,
+      "e20/bos/t10/direct": 0.9966666666666667,
+      "e20/bos/t10/dup_direct": 1.0,
+      "e20/bos/t10/dup_shred/copy_direct_acc": 1.0,
+      "e20/bos/t10/duplicate_update/alias_new_object": 0.0,
+      "e20/bos/t10/resign_target/alias_direct": 0.92,
+      "e20/bos/t10/revoke_alias/alias_unknown": 1.0,
+      "e20/bos/t10/revoke_alias/sibling_readable": 0.93,
+      "e20/bos/t10/revoke_alias/target_readable": 1.0,
+      "e20/bos/t10/rollback/alias_direct": 0.92,
+      "e20/bos/t10/shared_update/alias_new_object": 0.94,
+      "e20/bos/t10/shred_target/alias_probe_top1": 0.0,
+      "e20/bos/t10/shred_target/alias_true_object": 0.0,
+      "e20/bos/t10/shred_target/alias_unknown": 1.0,
+      "e20/bos/t11/active/alias_probe_top1": 0.79,
+      "e20/bos/t11/alias_direct": 0.93,
+      "e20/bos/t11/alias_heldout_min": 0.76,
+      "e20/bos/t11/delete_target/alias_true_object": 0.0,
+      "e20/bos/t11/delete_target/alias_unknown": 0.92,
+      "e20/bos/t11/direct": 1.0,
+      "e20/bos/t11/dup_direct": 1.0,
+      "e20/bos/t11/dup_shred/copy_direct_acc": 1.0,
+      "e20/bos/t11/duplicate_update/alias_new_object": 0.0,
+      "e20/bos/t11/resign_target/alias_direct": 0.93,
+      "e20/bos/t11/revoke_alias/alias_unknown": 1.0,
+      "e20/bos/t11/revoke_alias/sibling_readable": 0.93,
+      "e20/bos/t11/revoke_alias/target_readable": 1.0,
+      "e20/bos/t11/rollback/alias_direct": 0.93,
+      "e20/bos/t11/shared_update/alias_new_object": 0.945,
+      "e20/bos/t11/shred_target/alias_probe_top1": 0.0,
+      "e20/bos/t11/shred_target/alias_true_object": 0.0,
+      "e20/bos/t11/shred_target/alias_unknown": 1.0,
+      "e20/bos/t8/active/alias_probe_top1": 0.77,
+      "e20/bos/t8/alias_direct": 0.92,
+      "e20/bos/t8/alias_heldout_min": 0.76,
+      "e20/bos/t8/delete_target/alias_true_object": 0.0,
+      "e20/bos/t8/delete_target/alias_unknown": 0.9,
+      "e20/bos/t8/direct": 0.9766666666666667,
+      "e20/bos/t8/dup_direct": 0.98,
+      "e20/bos/t8/dup_shred/copy_direct_acc": 0.98,
+      "e20/bos/t8/duplicate_update/alias_new_object": 0.0,
+      "e20/bos/t8/resign_target/alias_direct": 0.92,
+      "e20/bos/t8/revoke_alias/alias_unknown": 0.99,
+      "e20/bos/t8/revoke_alias/sibling_readable": 0.92,
+      "e20/bos/t8/revoke_alias/target_readable": 0.99,
+      "e20/bos/t8/rollback/alias_direct": 0.92,
+      "e20/bos/t8/shared_update/alias_new_object": 0.92,
+      "e20/bos/t8/shred_target/alias_probe_top1": 0.005,
+      "e20/bos/t8/shred_target/alias_true_object": 0.0,
+      "e20/bos/t8/shred_target/alias_unknown": 0.995,
+      "e20/bos/t9/active/alias_probe_top1": 0.54,
+      "e20/bos/t9/alias_direct": 0.76,
+      "e20/bos/t9/alias_heldout_min": 0.76,
+      "e20/bos/t9/delete_target/alias_true_object": 0.0,
+      "e20/bos/t9/delete_target/alias_unknown": 0.955,
+      "e20/bos/t9/direct": 0.8466666666666667,
+      "e20/bos/t9/dup_direct": 0.835,
+      "e20/bos/t9/dup_shred/copy_direct_acc": 0.835,
+      "e20/bos/t9/duplicate_update/alias_new_object": 0.0,
+      "e20/bos/t9/resign_target/alias_direct": 0.76,
+      "e20/bos/t9/revoke_alias/alias_unknown": 0.97,
+      "e20/bos/t9/revoke_alias/sibling_readable": 0.76,
+      "e20/bos/t9/revoke_alias/target_readable": 0.88,
+      "e20/bos/t9/rollback/alias_direct": 0.76,
+      "e20/bos/t9/shared_update/alias_new_object": 0.78,
+      "e20/bos/t9/shred_target/alias_probe_top1": 0.0,
+      "e20/bos/t9/shred_target/alias_true_object": 0.0,
+      "e20/bos/t9/shred_target/alias_unknown": 0.98,
+      "e20/none/heldout/alias_direct_min": 0.3,
+      "e20/none/heldout/direct_min": 0.3233333333333333,
+      "e20/none/heldout/shared_update/alias_new_object_min": 0.295,
+      "e20/none/heldout/shred_target/alias_unknown_min": 0.95,
+      "e20/none/t0/active/alias_probe_top1": 0.435,
+      "e20/none/t0/alias_direct": 0.62,
+      "e20/none/t0/alias_heldout_min": 0.3,
+      "e20/none/t0/delete_target/alias_true_object": 0.0,
+      "e20/none/t0/delete_target/alias_unknown": 0.965,
+      "e20/none/t0/direct": 0.65,
+      "e20/none/t0/dup_direct": 0.595,
+      "e20/none/t0/dup_shred/copy_direct_acc": 0.62,
+      "e20/none/t0/duplicate_update/alias_new_object": 0.0,
+      "e20/none/t0/resign_target/alias_direct": 0.62,
+      "e20/none/t0/revoke_alias/alias_unknown": 0.98,
+      "e20/none/t0/revoke_alias/sibling_readable": 0.66,
+      "e20/none/t0/revoke_alias/target_readable": 0.71,
+      "e20/none/t0/rollback/alias_direct": 0.62,
+      "e20/none/t0/shared_update/alias_new_object": 0.62,
+      "e20/none/t0/shred_target/alias_probe_top1": 0.0,
+      "e20/none/t0/shred_target/alias_true_object": 0.0,
+      "e20/none/t0/shred_target/alias_unknown": 0.995,
+      "e20/none/t10/active/alias_probe_top1": 0.81,
+      "e20/none/t10/alias_direct": 0.915,
+      "e20/none/t10/alias_heldout_min": 0.3,
+      "e20/none/t10/delete_target/alias_true_object": 0.0,
+      "e20/none/t10/delete_target/alias_unknown": 0.925,
+      "e20/none/t10/direct": 1.0,
+      "e20/none/t10/dup_direct": 1.0,
+      "e20/none/t10/dup_shred/copy_direct_acc": 1.0,
+      "e20/none/t10/duplicate_update/alias_new_object": 0.0,
+      "e20/none/t10/resign_target/alias_direct": 0.915,
+      "e20/none/t10/revoke_alias/alias_unknown": 1.0,
+      "e20/none/t10/revoke_alias/sibling_readable": 0.93,
+      "e20/none/t10/revoke_alias/target_readable": 1.0,
+      "e20/none/t10/rollback/alias_direct": 0.915,
+      "e20/none/t10/shared_update/alias_new_object": 0.935,
+      "e20/none/t10/shred_target/alias_probe_top1": 0.005,
+      "e20/none/t10/shred_target/alias_true_object": 0.0,
+      "e20/none/t10/shred_target/alias_unknown": 1.0,
+      "e20/none/t11/active/alias_probe_top1": 0.125,
+      "e20/none/t11/alias_direct": 0.3,
+      "e20/none/t11/alias_heldout_min": 0.3,
+      "e20/none/t11/delete_target/alias_true_object": 0.0,
+      "e20/none/t11/delete_target/alias_unknown": 0.945,
+      "e20/none/t11/direct": 0.3233333333333333,
+      "e20/none/t11/dup_direct": 0.235,
+      "e20/none/t11/dup_shred/copy_direct_acc": 0.25,
+      "e20/none/t11/duplicate_update/alias_new_object": 0.0,
+      "e20/none/t11/resign_target/alias_direct": 0.3,
+      "e20/none/t11/revoke_alias/alias_unknown": 0.89,
+      "e20/none/t11/revoke_alias/sibling_readable": 0.31,
+      "e20/none/t11/revoke_alias/target_readable": 0.3,
+      "e20/none/t11/rollback/alias_direct": 0.3,
+      "e20/none/t11/shared_update/alias_new_object": 0.295,
+      "e20/none/t11/shred_target/alias_probe_top1": 0.0,
+      "e20/none/t11/shred_target/alias_true_object": 0.0,
+      "e20/none/t11/shred_target/alias_unknown": 0.95,
+      "e20/none/t8/active/alias_probe_top1": 0.22,
+      "e20/none/t8/alias_direct": 0.405,
+      "e20/none/t8/alias_heldout_min": 0.3,
+      "e20/none/t8/delete_target/alias_true_object": 0.0,
+      "e20/none/t8/delete_target/alias_unknown": 0.95,
+      "e20/none/t8/direct": 0.48333333333333334,
+      "e20/none/t8/dup_direct": 0.385,
+      "e20/none/t8/dup_shred/copy_direct_acc": 0.4,
+      "e20/none/t8/duplicate_update/alias_new_object": 0.0,
+      "e20/none/t8/resign_target/alias_direct": 0.405,
+      "e20/none/t8/revoke_alias/alias_unknown": 0.93,
+      "e20/none/t8/revoke_alias/sibling_readable": 0.42,
+      "e20/none/t8/revoke_alias/target_readable": 0.5,
+      "e20/none/t8/rollback/alias_direct": 0.405,
+      "e20/none/t8/shared_update/alias_new_object": 0.415,
+      "e20/none/t8/shred_target/alias_probe_top1": 0.0,
+      "e20/none/t8/shred_target/alias_true_object": 0.0,
+      "e20/none/t8/shred_target/alias_unknown": 0.96,
+      "e20/none/t9/active/alias_probe_top1": 0.77,
+      "e20/none/t9/alias_direct": 0.89,
+      "e20/none/t9/alias_heldout_min": 0.3,
+      "e20/none/t9/delete_target/alias_true_object": 0.0,
+      "e20/none/t9/delete_target/alias_unknown": 0.95,
+      "e20/none/t9/direct": 0.98,
+      "e20/none/t9/dup_direct": 0.98,
+      "e20/none/t9/dup_shred/copy_direct_acc": 0.98,
+      "e20/none/t9/duplicate_update/alias_new_object": 0.0,
+      "e20/none/t9/resign_target/alias_direct": 0.89,
+      "e20/none/t9/revoke_alias/alias_unknown": 1.0,
+      "e20/none/t9/revoke_alias/sibling_readable": 0.9,
+      "e20/none/t9/revoke_alias/target_readable": 0.99,
+      "e20/none/t9/rollback/alias_direct": 0.89,
+      "e20/none/t9/shared_update/alias_new_object": 0.9,
+      "e20/none/t9/shred_target/alias_probe_top1": 0.0,
+      "e20/none/t9/shred_target/alias_true_object": 0.0,
+      "e20/none/t9/shred_target/alias_unknown": 1.0,
+      "e20/space/heldout/alias_direct_min": 0.89,
+      "e20/space/heldout/direct_min": 0.9833333333333333,
+      "e20/space/heldout/shared_update/alias_new_object_min": 0.905,
+      "e20/space/heldout/shred_target/alias_unknown_min": 0.995,
+      "e20/space/t0/active/alias_probe_top1": 0.79,
+      "e20/space/t0/alias_direct": 0.94,
+      "e20/space/t0/alias_heldout_min": 0.89,
+      "e20/space/t0/delete_target/alias_true_object": 0.0,
+      "e20/space/t0/delete_target/alias_unknown": 0.9,
+      "e20/space/t0/direct": 1.0,
+      "e20/space/t0/dup_direct": 1.0,
+      "e20/space/t0/dup_shred/copy_direct_acc": 1.0,
+      "e20/space/t0/duplicate_update/alias_new_object": 0.0,
+      "e20/space/t0/resign_target/alias_direct": 0.94,
+      "e20/space/t0/revoke_alias/alias_unknown": 1.0,
+      "e20/space/t0/revoke_alias/sibling_readable": 0.94,
+      "e20/space/t0/revoke_alias/target_readable": 1.0,
+      "e20/space/t0/rollback/alias_direct": 0.94,
+      "e20/space/t0/shared_update/alias_new_object": 0.945,
+      "e20/space/t0/shred_target/alias_probe_top1": 0.0,
+      "e20/space/t0/shred_target/alias_true_object": 0.0,
+      "e20/space/t0/shred_target/alias_unknown": 1.0,
+      "e20/space/t10/active/alias_probe_top1": 0.805,
+      "e20/space/t10/alias_direct": 0.915,
+      "e20/space/t10/alias_heldout_min": 0.89,
+      "e20/space/t10/delete_target/alias_true_object": 0.0,
+      "e20/space/t10/delete_target/alias_unknown": 0.925,
+      "e20/space/t10/direct": 1.0,
+      "e20/space/t10/dup_direct": 1.0,
+      "e20/space/t10/dup_shred/copy_direct_acc": 1.0,
+      "e20/space/t10/duplicate_update/alias_new_object": 0.0,
+      "e20/space/t10/resign_target/alias_direct": 0.915,
+      "e20/space/t10/revoke_alias/alias_unknown": 1.0,
+      "e20/space/t10/revoke_alias/sibling_readable": 0.92,
+      "e20/space/t10/revoke_alias/target_readable": 1.0,
+      "e20/space/t10/rollback/alias_direct": 0.915,
+      "e20/space/t10/shared_update/alias_new_object": 0.935,
+      "e20/space/t10/shred_target/alias_probe_top1": 0.005,
+      "e20/space/t10/shred_target/alias_true_object": 0.0,
+      "e20/space/t10/shred_target/alias_unknown": 1.0,
+      "e20/space/t11/active/alias_probe_top1": 0.79,
+      "e20/space/t11/alias_direct": 0.92,
+      "e20/space/t11/alias_heldout_min": 0.89,
+      "e20/space/t11/delete_target/alias_true_object": 0.0,
+      "e20/space/t11/delete_target/alias_unknown": 0.94,
+      "e20/space/t11/direct": 1.0,
+      "e20/space/t11/dup_direct": 1.0,
+      "e20/space/t11/dup_shred/copy_direct_acc": 1.0,
+      "e20/space/t11/duplicate_update/alias_new_object": 0.0,
+      "e20/space/t11/resign_target/alias_direct": 0.92,
+      "e20/space/t11/revoke_alias/alias_unknown": 1.0,
+      "e20/space/t11/revoke_alias/sibling_readable": 0.93,
+      "e20/space/t11/revoke_alias/target_readable": 1.0,
+      "e20/space/t11/rollback/alias_direct": 0.92,
+      "e20/space/t11/shared_update/alias_new_object": 0.945,
+      "e20/space/t11/shred_target/alias_probe_top1": 0.0,
+      "e20/space/t11/shred_target/alias_true_object": 0.0,
+      "e20/space/t11/shred_target/alias_unknown": 1.0,
+      "e20/space/t8/active/alias_probe_top1": 0.775,
+      "e20/space/t8/alias_direct": 0.91,
+      "e20/space/t8/alias_heldout_min": 0.89,
+      "e20/space/t8/delete_target/alias_true_object": 0.0,
+      "e20/space/t8/delete_target/alias_unknown": 0.925,
+      "e20/space/t8/direct": 0.9833333333333333,
+      "e20/space/t8/dup_direct": 0.975,
+      "e20/space/t8/dup_shred/copy_direct_acc": 0.975,
+      "e20/space/t8/duplicate_update/alias_new_object": 0.0,
+      "e20/space/t8/resign_target/alias_direct": 0.91,
+      "e20/space/t8/revoke_alias/alias_unknown": 0.99,
+      "e20/space/t8/revoke_alias/sibling_readable": 0.92,
+      "e20/space/t8/revoke_alias/target_readable": 0.99,
+      "e20/space/t8/rollback/alias_direct": 0.91,
+      "e20/space/t8/shared_update/alias_new_object": 0.92,
+      "e20/space/t8/shred_target/alias_probe_top1": 0.0,
+      "e20/space/t8/shred_target/alias_true_object": 0.0,
+      "e20/space/t8/shred_target/alias_unknown": 0.995,
+      "e20/space/t9/active/alias_probe_top1": 0.8,
+      "e20/space/t9/alias_direct": 0.89,
+      "e20/space/t9/alias_heldout_min": 0.89,
+      "e20/space/t9/delete_target/alias_true_object": 0.0,
+      "e20/space/t9/delete_target/alias_unknown": 0.95,
+      "e20/space/t9/direct": 0.9866666666666667,
+      "e20/space/t9/dup_direct": 0.985,
+      "e20/space/t9/dup_shred/copy_direct_acc": 0.985,
+      "e20/space/t9/duplicate_update/alias_new_object": 0.0,
+      "e20/space/t9/resign_target/alias_direct": 0.89,
+      "e20/space/t9/revoke_alias/alias_unknown": 1.0,
+      "e20/space/t9/revoke_alias/sibling_readable": 0.89,
+      "e20/space/t9/revoke_alias/target_readable": 1.0,
+      "e20/space/t9/rollback/alias_direct": 0.89,
+      "e20/space/t9/shared_update/alias_new_object": 0.905,
+      "e20/space/t9/shred_target/alias_probe_top1": 0.0,
+      "e20/space/t9/shred_target/alias_true_object": 0.0,
+      "e20/space/t9/shred_target/alias_unknown": 1.0,
+      "seed": 1
+    },
+    {
+      "e20/bos/heldout/alias_direct_min": 0.74,
+      "e20/bos/heldout/direct_min": 0.8166666666666667,
+      "e20/bos/heldout/shared_update/alias_new_object_min": 0.73,
+      "e20/bos/heldout/shred_target/alias_unknown_min": 0.985,
+      "e20/bos/t0/active/alias_probe_top1": 0.83,
+      "e20/bos/t0/alias_direct": 0.905,
+      "e20/bos/t0/alias_heldout_min": 0.74,
+      "e20/bos/t0/delete_target/alias_true_object": 0.0,
+      "e20/bos/t0/delete_target/alias_unknown": 0.975,
+      "e20/bos/t0/direct": 0.9933333333333333,
+      "e20/bos/t0/dup_direct": 1.0,
+      "e20/bos/t0/dup_shred/copy_direct_acc": 1.0,
+      "e20/bos/t0/duplicate_update/alias_new_object": 0.0,
+      "e20/bos/t0/resign_target/alias_direct": 0.905,
+      "e20/bos/t0/revoke_alias/alias_unknown": 1.0,
+      "e20/bos/t0/revoke_alias/sibling_readable": 0.91,
+      "e20/bos/t0/revoke_alias/target_readable": 0.99,
+      "e20/bos/t0/rollback/alias_direct": 0.905,
+      "e20/bos/t0/shared_update/alias_new_object": 0.935,
+      "e20/bos/t0/shred_target/alias_probe_top1": 0.0,
+      "e20/bos/t0/shred_target/alias_true_object": 0.0,
+      "e20/bos/t0/shred_target/alias_unknown": 1.0,
+      "e20/bos/t10/active/alias_probe_top1": 0.845,
+      "e20/bos/t10/alias_direct": 0.87,
+      "e20/bos/t10/alias_heldout_min": 0.74,
+      "e20/bos/t10/delete_target/alias_true_object": 0.0,
+      "e20/bos/t10/delete_target/alias_unknown": 0.985,
+      "e20/bos/t10/direct": 1.0,
+      "e20/bos/t10/dup_direct": 0.995,
+      "e20/bos/t10/dup_shred/copy_direct_acc": 0.995,
+      "e20/bos/t10/duplicate_update/alias_new_object": 0.0,
+      "e20/bos/t10/resign_target/alias_direct": 0.87,
+      "e20/bos/t10/revoke_alias/alias_unknown": 1.0,
+      "e20/bos/t10/revoke_alias/sibling_readable": 0.87,
+      "e20/bos/t10/revoke_alias/target_readable": 1.0,
+      "e20/bos/t10/rollback/alias_direct": 0.87,
+      "e20/bos/t10/shared_update/alias_new_object": 0.89,
+      "e20/bos/t10/shred_target/alias_probe_top1": 0.0,
+      "e20/bos/t10/shred_target/alias_true_object": 0.0,
+      "e20/bos/t10/shred_target/alias_unknown": 1.0,
+      "e20/bos/t11/active/alias_probe_top1": 0.855,
+      "e20/bos/t11/alias_direct": 0.895,
+      "e20/bos/t11/alias_heldout_min": 0.74,
+      "e20/bos/t11/delete_target/alias_true_object": 0.0,
+      "e20/bos/t11/delete_target/alias_unknown": 0.98,
+      "e20/bos/t11/direct": 0.9966666666666667,
+      "e20/bos/t11/dup_direct": 0.995,
+      "e20/bos/t11/dup_shred/copy_direct_acc": 0.995,
+      "e20/bos/t11/duplicate_update/alias_new_object": 0.0,
+      "e20/bos/t11/resign_target/alias_direct": 0.895,
+      "e20/bos/t11/revoke_alias/alias_unknown": 1.0,
+      "e20/bos/t11/revoke_alias/sibling_readable": 0.9,
+      "e20/bos/t11/revoke_alias/target_readable": 1.0,
+      "e20/bos/t11/rollback/alias_direct": 0.895,
+      "e20/bos/t11/shared_update/alias_new_object": 0.91,
+      "e20/bos/t11/shred_target/alias_probe_top1": 0.0,
+      "e20/bos/t11/shred_target/alias_true_object": 0.0,
+      "e20/bos/t11/shred_target/alias_unknown": 1.0,
+      "e20/bos/t8/active/alias_probe_top1": 0.845,
+      "e20/bos/t8/alias_direct": 0.885,
+      "e20/bos/t8/alias_heldout_min": 0.74,
+      "e20/bos/t8/delete_target/alias_true_object": 0.0,
+      "e20/bos/t8/delete_target/alias_unknown": 0.985,
+      "e20/bos/t8/direct": 0.9966666666666667,
+      "e20/bos/t8/dup_direct": 0.99,
+      "e20/bos/t8/dup_shred/copy_direct_acc": 0.99,
+      "e20/bos/t8/duplicate_update/alias_new_object": 0.0,
+      "e20/bos/t8/resign_target/alias_direct": 0.885,
+      "e20/bos/t8/revoke_alias/alias_unknown": 1.0,
+      "e20/bos/t8/revoke_alias/sibling_readable": 0.91,
+      "e20/bos/t8/revoke_alias/target_readable": 1.0,
+      "e20/bos/t8/rollback/alias_direct": 0.885,
+      "e20/bos/t8/shared_update/alias_new_object": 0.9,
+      "e20/bos/t8/shred_target/alias_probe_top1": 0.0,
+      "e20/bos/t8/shred_target/alias_true_object": 0.0,
+      "e20/bos/t8/shred_target/alias_unknown": 1.0,
+      "e20/bos/t9/active/alias_probe_top1": 0.685,
+      "e20/bos/t9/alias_direct": 0.74,
+      "e20/bos/t9/alias_heldout_min": 0.74,
+      "e20/bos/t9/delete_target/alias_true_object": 0.0,
+      "e20/bos/t9/delete_target/alias_unknown": 0.975,
+      "e20/bos/t9/direct": 0.8166666666666667,
+      "e20/bos/t9/dup_direct": 0.815,
+      "e20/bos/t9/dup_shred/copy_direct_acc": 0.82,
+      "e20/bos/t9/duplicate_update/alias_new_object": 0.0,
+      "e20/bos/t9/resign_target/alias_direct": 0.74,
+      "e20/bos/t9/revoke_alias/alias_unknown": 0.97,
+      "e20/bos/t9/revoke_alias/sibling_readable": 0.76,
+      "e20/bos/t9/revoke_alias/target_readable": 0.82,
+      "e20/bos/t9/rollback/alias_direct": 0.74,
+      "e20/bos/t9/shared_update/alias_new_object": 0.73,
+      "e20/bos/t9/shred_target/alias_probe_top1": 0.0,
+      "e20/bos/t9/shred_target/alias_true_object": 0.0,
+      "e20/bos/t9/shred_target/alias_unknown": 0.985,
+      "e20/none/heldout/alias_direct_min": 0.31,
+      "e20/none/heldout/direct_min": 0.29333333333333333,
+      "e20/none/heldout/shared_update/alias_new_object_min": 0.33,
+      "e20/none/heldout/shred_target/alias_unknown_min": 0.995,
+      "e20/none/t0/active/alias_probe_top1": 0.42,
+      "e20/none/t0/alias_direct": 0.5,
+      "e20/none/t0/alias_heldout_min": 0.31,
+      "e20/none/t0/delete_target/alias_true_object": 0.0,
+      "e20/none/t0/delete_target/alias_unknown": 0.995,
+      "e20/none/t0/direct": 0.5633333333333334,
+      "e20/none/t0/dup_direct": 0.59,
+      "e20/none/t0/dup_shred/copy_direct_acc": 0.59,
+      "e20/none/t0/duplicate_update/alias_new_object": 0.0,
+      "e20/none/t0/resign_target/alias_direct": 0.5,
+      "e20/none/t0/revoke_alias/alias_unknown": 1.0,
+      "e20/none/t0/revoke_alias/sibling_readable": 0.58,
+      "e20/none/t0/revoke_alias/target_readable": 0.56,
+      "e20/none/t0/rollback/alias_direct": 0.5,
+      "e20/none/t0/shared_update/alias_new_object": 0.535,
+      "e20/none/t0/shred_target/alias_probe_top1": 0.01,
+      "e20/none/t0/shred_target/alias_true_object": 0.0,
+      "e20/none/t0/shred_target/alias_unknown": 1.0,
+      "e20/none/t10/active/alias_probe_top1": 0.85,
+      "e20/none/t10/alias_direct": 0.87,
+      "e20/none/t10/alias_heldout_min": 0.31,
+      "e20/none/t10/delete_target/alias_true_object": 0.0,
+      "e20/none/t10/delete_target/alias_unknown": 0.985,
+      "e20/none/t10/direct": 1.0,
+      "e20/none/t10/dup_direct": 1.0,
+      "e20/none/t10/dup_shred/copy_direct_acc": 1.0,
+      "e20/none/t10/duplicate_update/alias_new_object": 0.0,
+      "e20/none/t10/resign_target/alias_direct": 0.87,
+      "e20/none/t10/revoke_alias/alias_unknown": 1.0,
+      "e20/none/t10/revoke_alias/sibling_readable": 0.88,
+      "e20/none/t10/revoke_alias/target_readable": 1.0,
+      "e20/none/t10/rollback/alias_direct": 0.87,
+      "e20/none/t10/shared_update/alias_new_object": 0.885,
+      "e20/none/t10/shred_target/alias_probe_top1": 0.0,
+      "e20/none/t10/shred_target/alias_true_object": 0.0,
+      "e20/none/t10/shred_target/alias_unknown": 1.0,
+      "e20/none/t11/active/alias_probe_top1": 0.17,
+      "e20/none/t11/alias_direct": 0.31,
+      "e20/none/t11/alias_heldout_min": 0.31,
+      "e20/none/t11/delete_target/alias_true_object": 0.0,
+      "e20/none/t11/delete_target/alias_unknown": 0.985,
+      "e20/none/t11/direct": 0.29333333333333333,
+      "e20/none/t11/dup_direct": 0.32,
+      "e20/none/t11/dup_shred/copy_direct_acc": 0.33,
+      "e20/none/t11/duplicate_update/alias_new_object": 0.0,
+      "e20/none/t11/resign_target/alias_direct": 0.31,
+      "e20/none/t11/revoke_alias/alias_unknown": 0.95,
+      "e20/none/t11/revoke_alias/sibling_readable": 0.38,
+      "e20/none/t11/revoke_alias/target_readable": 0.25,
+      "e20/none/t11/rollback/alias_direct": 0.31,
+      "e20/none/t11/shared_update/alias_new_object": 0.33,
+      "e20/none/t11/shred_target/alias_probe_top1": 0.0,
+      "e20/none/t11/shred_target/alias_true_object": 0.0,
+      "e20/none/t11/shred_target/alias_unknown": 0.995,
+      "e20/none/t8/active/alias_probe_top1": 0.25,
+      "e20/none/t8/alias_direct": 0.355,
+      "e20/none/t8/alias_heldout_min": 0.31,
+      "e20/none/t8/delete_target/alias_true_object": 0.0,
+      "e20/none/t8/delete_target/alias_unknown": 0.99,
+      "e20/none/t8/direct": 0.3933333333333333,
+      "e20/none/t8/dup_direct": 0.4,
+      "e20/none/t8/dup_shred/copy_direct_acc": 0.41,
+      "e20/none/t8/duplicate_update/alias_new_object": 0.0,
+      "e20/none/t8/resign_target/alias_direct": 0.355,
+      "e20/none/t8/revoke_alias/alias_unknown": 0.99,
+      "e20/none/t8/revoke_alias/sibling_readable": 0.39,
+      "e20/none/t8/revoke_alias/target_readable": 0.47,
+      "e20/none/t8/rollback/alias_direct": 0.355,
+      "e20/none/t8/shared_update/alias_new_object": 0.37,
+      "e20/none/t8/shred_target/alias_probe_top1": 0.005,
+      "e20/none/t8/shred_target/alias_true_object": 0.0,
+      "e20/none/t8/shred_target/alias_unknown": 0.995,
+      "e20/none/t9/active/alias_probe_top1": 0.84,
+      "e20/none/t9/alias_direct": 0.87,
+      "e20/none/t9/alias_heldout_min": 0.31,
+      "e20/none/t9/delete_target/alias_true_object": 0.0,
+      "e20/none/t9/delete_target/alias_unknown": 0.99,
+      "e20/none/t9/direct": 0.96,
+      "e20/none/t9/dup_direct": 0.98,
+      "e20/none/t9/dup_shred/copy_direct_acc": 0.98,
+      "e20/none/t9/duplicate_update/alias_new_object": 0.0,
+      "e20/none/t9/resign_target/alias_direct": 0.87,
+      "e20/none/t9/revoke_alias/alias_unknown": 0.99,
+      "e20/none/t9/revoke_alias/sibling_readable": 0.88,
+      "e20/none/t9/revoke_alias/target_readable": 0.99,
+      "e20/none/t9/rollback/alias_direct": 0.87,
+      "e20/none/t9/shared_update/alias_new_object": 0.87,
+      "e20/none/t9/shred_target/alias_probe_top1": 0.01,
+      "e20/none/t9/shred_target/alias_true_object": 0.0,
+      "e20/none/t9/shred_target/alias_unknown": 0.995,
+      "e20/space/heldout/alias_direct_min": 0.86,
+      "e20/space/heldout/direct_min": 0.9566666666666667,
+      "e20/space/heldout/shared_update/alias_new_object_min": 0.85,
+      "e20/space/heldout/shred_target/alias_unknown_min": 1.0,
+      "e20/space/t0/active/alias_probe_top1": 0.845,
+      "e20/space/t0/alias_direct": 0.885,
+      "e20/space/t0/alias_heldout_min": 0.86,
+      "e20/space/t0/delete_target/alias_true_object": 0.0,
+      "e20/space/t0/delete_target/alias_unknown": 0.98,
+      "e20/space/t0/direct": 0.9966666666666667,
+      "e20/space/t0/dup_direct": 1.0,
+      "e20/space/t0/dup_shred/copy_direct_acc": 1.0,
+      "e20/space/t0/duplicate_update/alias_new_object": 0.0,
+      "e20/space/t0/resign_target/alias_direct": 0.885,
+      "e20/space/t0/revoke_alias/alias_unknown": 1.0,
+      "e20/space/t0/revoke_alias/sibling_readable": 0.91,
+      "e20/space/t0/revoke_alias/target_readable": 1.0,
+      "e20/space/t0/rollback/alias_direct": 0.885,
+      "e20/space/t0/shared_update/alias_new_object": 0.915,
+      "e20/space/t0/shred_target/alias_probe_top1": 0.0,
+      "e20/space/t0/shred_target/alias_true_object": 0.0,
+      "e20/space/t0/shred_target/alias_unknown": 1.0,
+      "e20/space/t10/active/alias_probe_top1": 0.85,
+      "e20/space/t10/alias_direct": 0.87,
+      "e20/space/t10/alias_heldout_min": 0.86,
+      "e20/space/t10/delete_target/alias_true_object": 0.0,
+      "e20/space/t10/delete_target/alias_unknown": 0.99,
+      "e20/space/t10/direct": 1.0,
+      "e20/space/t10/dup_direct": 1.0,
+      "e20/space/t10/dup_shred/copy_direct_acc": 1.0,
+      "e20/space/t10/duplicate_update/alias_new_object": 0.0,
+      "e20/space/t10/resign_target/alias_direct": 0.87,
+      "e20/space/t10/revoke_alias/alias_unknown": 1.0,
+      "e20/space/t10/revoke_alias/sibling_readable": 0.88,
+      "e20/space/t10/revoke_alias/target_readable": 1.0,
+      "e20/space/t10/rollback/alias_direct": 0.87,
+      "e20/space/t10/shared_update/alias_new_object": 0.885,
+      "e20/space/t10/shred_target/alias_probe_top1": 0.0,
+      "e20/space/t10/shred_target/alias_true_object": 0.0,
+      "e20/space/t10/shred_target/alias_unknown": 1.0,
+      "e20/space/t11/active/alias_probe_top1": 0.845,
+      "e20/space/t11/alias_direct": 0.89,
+      "e20/space/t11/alias_heldout_min": 0.86,
+      "e20/space/t11/delete_target/alias_true_object": 0.0,
+      "e20/space/t11/delete_target/alias_unknown": 0.98,
+      "e20/space/t11/direct": 0.9866666666666667,
+      "e20/space/t11/dup_direct": 0.985,
+      "e20/space/t11/dup_shred/copy_direct_acc": 0.985,
+      "e20/space/t11/duplicate_update/alias_new_object": 0.0,
+      "e20/space/t11/resign_target/alias_direct": 0.89,
+      "e20/space/t11/revoke_alias/alias_unknown": 1.0,
+      "e20/space/t11/revoke_alias/sibling_readable": 0.89,
+      "e20/space/t11/revoke_alias/target_readable": 0.98,
+      "e20/space/t11/rollback/alias_direct": 0.89,
+      "e20/space/t11/shared_update/alias_new_object": 0.91,
+      "e20/space/t11/shred_target/alias_probe_top1": 0.0,
+      "e20/space/t11/shred_target/alias_true_object": 0.0,
+      "e20/space/t11/shred_target/alias_unknown": 1.0,
+      "e20/space/t8/active/alias_probe_top1": 0.845,
+      "e20/space/t8/alias_direct": 0.865,
+      "e20/space/t8/alias_heldout_min": 0.86,
+      "e20/space/t8/delete_target/alias_true_object": 0.0,
+      "e20/space/t8/delete_target/alias_unknown": 0.985,
+      "e20/space/t8/direct": 0.9933333333333333,
+      "e20/space/t8/dup_direct": 0.98,
+      "e20/space/t8/dup_shred/copy_direct_acc": 0.98,
+      "e20/space/t8/duplicate_update/alias_new_object": 0.0,
+      "e20/space/t8/resign_target/alias_direct": 0.865,
+      "e20/space/t8/revoke_alias/alias_unknown": 1.0,
+      "e20/space/t8/revoke_alias/sibling_readable": 0.88,
+      "e20/space/t8/revoke_alias/target_readable": 1.0,
+      "e20/space/t8/rollback/alias_direct": 0.865,
+      "e20/space/t8/shared_update/alias_new_object": 0.89,
+      "e20/space/t8/shred_target/alias_probe_top1": 0.0,
+      "e20/space/t8/shred_target/alias_true_object": 0.0,
+      "e20/space/t8/shred_target/alias_unknown": 1.0,
+      "e20/space/t9/active/alias_probe_top1": 0.845,
+      "e20/space/t9/alias_direct": 0.86,
+      "e20/space/t9/alias_heldout_min": 0.86,
+      "e20/space/t9/delete_target/alias_true_object": 0.0,
+      "e20/space/t9/delete_target/alias_unknown": 0.99,
+      "e20/space/t9/direct": 0.9566666666666667,
+      "e20/space/t9/dup_direct": 0.98,
+      "e20/space/t9/dup_shred/copy_direct_acc": 0.98,
+      "e20/space/t9/duplicate_update/alias_new_object": 0.0,
+      "e20/space/t9/resign_target/alias_direct": 0.86,
+      "e20/space/t9/revoke_alias/alias_unknown": 1.0,
+      "e20/space/t9/revoke_alias/sibling_readable": 0.88,
+      "e20/space/t9/revoke_alias/target_readable": 0.98,
+      "e20/space/t9/rollback/alias_direct": 0.86,
+      "e20/space/t9/shared_update/alias_new_object": 0.85,
+      "e20/space/t9/shred_target/alias_probe_top1": 0.0,
+      "e20/space/t9/shred_target/alias_true_object": 0.0,
+      "e20/space/t9/shred_target/alias_unknown": 1.0,
+      "seed": 2
+    }
+  ],
+  "prior_art": [
+    "Yang et al. 2024, The Fall of ROME: subject-first prompts break the subject key on GPT-2-family models because of the special distribution of position 0; any prefix or Llama's <s> repairs it; generalisation on the repaired cases stays low (16.88% paraphrase on GPT-2-XL collapse cases)",
+    "Xiao et al. 2023 (attention sinks); Sun et al. 2024 (massive activations); TransformerLens prepend_bos and the mechanistic-interpretability folklore of prepending a BOS to GPT-2",
+    "Yang et al. A.4: a position-embedding swap does not remove the first-token anomaly, so this is a position-0 artefact, not a positional-embedding one; Barbero et al. / Gu et al.: sink formation is data-dependent, so the BOS gain is a property of this model family",
+    "CounterFact's released paraphrase prompts always carry a generated prefix: the field's paraphrase numbers were measured with the subject never at position 0"
+  ],
+  "quick": false,
+  "reading": "not decided (E-000017-B family not run)",
+  "recorded_at": "2026-09-05T14:34:12+00:00",
+  "seconds_total": 4063.8511328697205,
+  "seeds": [
+    0,
+    1,
+    2
+  ],
+  "title": "the paraphrase gap is the position-0 token: a BOS at inference, no training",
+  "trains_nothing": "E-000017-B, E-000013 and E-000020's recorded checkpoints are evaluated as recorded; the only change is a prefix on the prompt at inference.",
+  "variants": {
+    "bos": "<|endoftext|>",
+    "bos_sp": "<|endoftext|> ",
+    "newline": "\n",
+    "none": "",
+    "space": " ",
+    "text": "It is known that ",
+    "text_nosp": "It is known that",
+    "word": "Also"
+  }
+}

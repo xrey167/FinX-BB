@@ -1,0 +1,626 @@
+{
+  "aggregate": {
+    "active/alias_forced_choice": {
+      "max": 0.56,
+      "mean": 0.4566666666666667,
+      "min": 0.39,
+      "n": 3
+    },
+    "active/alias_probe_top1": {
+      "max": 0.005,
+      "mean": 0.0016666666666666668,
+      "min": 0.0,
+      "n": 3
+    },
+    "alias_direct": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 3
+    },
+    "alias_heldout_mean": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 3
+    },
+    "alias_heldout_min": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 3
+    },
+    "alias_template10_heldout": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 3
+    },
+    "alias_template11_heldout": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 3
+    },
+    "alias_template1_train": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 3
+    },
+    "alias_template8_heldout": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 3
+    },
+    "alias_template9_heldout": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 3
+    },
+    "delete_target/alias_true_object": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 3
+    },
+    "delete_target/alias_unknown": {
+      "max": 1.0,
+      "mean": 0.995,
+      "min": 0.985,
+      "n": 3
+    },
+    "direct": {
+      "max": 0.6566666666666666,
+      "mean": 0.6288888888888889,
+      "min": 0.5766666666666667,
+      "n": 3
+    },
+    "dup_direct": {
+      "max": 0.71,
+      "mean": 0.6866666666666666,
+      "min": 0.655,
+      "n": 3
+    },
+    "dup_shred/copy_direct_acc": {
+      "max": 0.71,
+      "mean": 0.6933333333333334,
+      "min": 0.67,
+      "n": 3
+    },
+    "dup_shred/copy_forced_choice": {
+      "max": 0.98,
+      "mean": 0.9783333333333334,
+      "min": 0.975,
+      "n": 3
+    },
+    "dup_shred/copy_probe_top1": {
+      "max": 0.625,
+      "mean": 0.5683333333333334,
+      "min": 0.515,
+      "n": 3
+    },
+    "duplicate_update/alias_new_object": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 3
+    },
+    "duplicate_update/alias_old_object": {
+      "max": 0.705,
+      "mean": 0.6866666666666665,
+      "min": 0.655,
+      "n": 3
+    },
+    "probe_calibration_top1": {
+      "max": 0.525,
+      "mean": 0.48333333333333334,
+      "min": 0.425,
+      "n": 3
+    },
+    "resign_target/alias_direct": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 3
+    },
+    "revoke_alias/alias_unknown": {
+      "max": 0.98,
+      "mean": 0.9733333333333333,
+      "min": 0.96,
+      "n": 3
+    },
+    "revoke_alias/sibling_readable": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 3
+    },
+    "revoke_alias/target_readable": {
+      "max": 0.71,
+      "mean": 0.6533333333333333,
+      "min": 0.56,
+      "n": 3
+    },
+    "rollback/alias_direct": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 3
+    },
+    "shared_update/alias_new_object": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 3
+    },
+    "shared_update/alias_old_object": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 3
+    },
+    "shred_target/alias_forced_choice": {
+      "max": 0.545,
+      "mean": 0.45166666666666666,
+      "min": 0.395,
+      "n": 3
+    },
+    "shred_target/alias_mean_rank": {
+      "max": 139.69,
+      "mean": 131.43500000000003,
+      "min": 120.03,
+      "n": 3
+    },
+    "shred_target/alias_probe_top1": {
+      "max": 0.005,
+      "mean": 0.0016666666666666668,
+      "min": 0.0,
+      "n": 3
+    },
+    "shred_target/alias_top1_among_entities": {
+      "max": 0.01,
+      "mean": 0.005,
+      "min": 0.0,
+      "n": 3
+    },
+    "shred_target/alias_true_object": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 3
+    },
+    "shred_target/alias_unknown": {
+      "max": 1.0,
+      "mean": 0.995,
+      "min": 0.985,
+      "n": 3
+    },
+    "skipped_steps": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 3
+    },
+    "train_seconds": {
+      "max": 4052.0411348342896,
+      "mean": 3812.5843847592673,
+      "min": 3673.189791202545,
+      "n": 3
+    }
+  },
+  "arm": "curriculum",
+  "arm_config": {
+    "ramp_end": 1600,
+    "ramp_start": 600,
+    "steps": 3000
+  },
+  "baseline_e000020": {
+    "active/alias_forced_choice": 0.895,
+    "active/alias_probe_top1": 0.38833333333333336,
+    "alias_direct": 0.5066666666666667,
+    "alias_heldout_min": 0.36999999999999994,
+    "delete_target/alias_true_object": 0.0,
+    "delete_target/alias_unknown": 0.9916666666666667,
+    "direct": 0.57,
+    "dup_direct": 0.5483333333333333,
+    "dup_shred/copy_direct_acc": 0.5583333333333332,
+    "dup_shred/copy_forced_choice": 0.9733333333333333,
+    "dup_shred/copy_probe_top1": 0.49833333333333335,
+    "duplicate_update/alias_new_object": 0.0,
+    "probe_calibration_top1": 0.48055555555555557,
+    "resign_target/alias_direct": 0.5066666666666667,
+    "revoke_alias/alias_unknown": 0.98,
+    "revoke_alias/sibling_readable": 0.5566666666666666,
+    "revoke_alias/target_readable": 0.5766666666666667,
+    "rollback/alias_direct": 0.5066666666666667,
+    "shared_update/alias_new_object": 0.5183333333333334,
+    "shred_target/alias_forced_choice": 0.5100000000000001,
+    "shred_target/alias_mean_rank": 129.61166666666665,
+    "shred_target/alias_probe_top1": 0.0033333333333333335,
+    "shred_target/alias_top1_among_entities": 0.006666666666666667,
+    "shred_target/alias_true_object": 0.0,
+    "shred_target/alias_unknown": 0.995
+  },
+  "claim": "NOT SUPPORTED BY THE MEASUREMENTS (see criteria): ",
+  "claim_groups_met": {
+    "alias_lifecycle": false,
+    "attack_validity": false,
+    "attacks_through_every_alias": true,
+    "one_shred_deletes_every_path": false,
+    "one_update_reaches_every_path": false,
+    "reading_through_an_alias": false
+  },
+  "claim_parts": [
+    {
+      "claim": "reading_through_an_alias",
+      "criteria": [
+        "direct",
+        "alias_direct",
+        "dup_direct",
+        "alias_heldout_min"
+      ],
+      "supported": false
+    },
+    {
+      "claim": "one_update_reaches_every_path",
+      "criteria": [
+        "shared_update/alias_new_object",
+        "duplicate_update/alias_new_object",
+        "rollback/alias_direct",
+        "duplicate_update/alias_old_object"
+      ],
+      "supported": false
+    },
+    {
+      "claim": "one_shred_deletes_every_path",
+      "criteria": [
+        "shred_target/alias_unknown",
+        "shred_target/alias_true_object",
+        "dup_shred/copy_direct_acc",
+        "resign_target/alias_direct"
+      ],
+      "supported": false
+    },
+    {
+      "claim": "attacks_through_every_alias",
+      "criteria": [
+        "shred_target/alias_probe_top1",
+        "shred_target/alias_forced_choice",
+        "shred_target/alias_top1_among_entities"
+      ],
+      "supported": true
+    },
+    {
+      "claim": "attack_validity",
+      "criteria": [
+        "active/alias_probe_top1",
+        "probe_calibration_top1",
+        "dup_shred/copy_probe_top1"
+      ],
+      "supported": false
+    },
+    {
+      "claim": "alias_lifecycle",
+      "criteria": [
+        "revoke_alias/alias_unknown",
+        "revoke_alias/sibling_readable",
+        "revoke_alias/target_readable",
+        "delete_target/alias_unknown",
+        "delete_target/alias_true_object"
+      ],
+      "supported": false
+    }
+  ],
+  "claim_supported": false,
+  "config": {
+    "adapter": {
+      "d_key": 256,
+      "fallback": "unknown",
+      "hard_gate": false,
+      "marker_dim": 16,
+      "match_gate": false,
+      "n_deref": 1,
+      "n_relations": 4,
+      "read_layers": [
+        8,
+        10
+      ],
+      "status_gated": true,
+      "two_channel_null": false,
+      "use_links": true,
+      "use_marker_gate": true
+    },
+    "arm": "curriculum",
+    "eval": {
+      "n_alias_per_group": 2,
+      "n_base": 700,
+      "n_direct": 300,
+      "n_groups": 100,
+      "n_targets": 100
+    },
+    "n_train_templates": 8,
+    "seeds": [
+      0,
+      1,
+      2
+    ]
+  },
+  "criteria": {
+    "active/alias_probe_top1": {
+      "observed": 0.0,
+      "op": ">=",
+      "pass": false,
+      "threshold": 0.25
+    },
+    "alias_direct": {
+      "observed": 0.0,
+      "op": ">=",
+      "pass": false,
+      "threshold": 0.8
+    },
+    "alias_heldout_min": {
+      "observed": 0.0,
+      "op": ">=",
+      "pass": false,
+      "threshold": 0.5
+    },
+    "delete_target/alias_true_object": {
+      "observed": 0.0,
+      "op": "<=",
+      "pass": true,
+      "threshold": 0.05
+    },
+    "delete_target/alias_unknown": {
+      "observed": 0.985,
+      "op": ">=",
+      "pass": true,
+      "threshold": 0.9
+    },
+    "direct": {
+      "observed": 0.5766666666666667,
+      "op": ">=",
+      "pass": false,
+      "threshold": 0.85
+    },
+    "dup_direct": {
+      "observed": 0.655,
+      "op": ">=",
+      "pass": false,
+      "threshold": 0.85
+    },
+    "dup_shred/copy_direct_acc": {
+      "observed": 0.67,
+      "op": ">=",
+      "pass": false,
+      "threshold": 0.85
+    },
+    "dup_shred/copy_probe_top1": {
+      "observed": 0.515,
+      "op": ">=",
+      "pass": true,
+      "threshold": 0.2
+    },
+    "duplicate_update/alias_new_object": {
+      "observed": 0.0,
+      "op": "<=",
+      "pass": true,
+      "threshold": 0.05
+    },
+    "duplicate_update/alias_old_object": {
+      "observed": 0.655,
+      "op": ">=",
+      "pass": false,
+      "threshold": 0.85
+    },
+    "probe_calibration_top1": {
+      "observed": 0.425,
+      "op": ">=",
+      "pass": true,
+      "threshold": 0.2
+    },
+    "resign_target/alias_direct": {
+      "observed": 0.0,
+      "op": ">=",
+      "pass": false,
+      "threshold": 0.8
+    },
+    "revoke_alias/alias_unknown": {
+      "observed": 0.96,
+      "op": ">=",
+      "pass": true,
+      "threshold": 0.9
+    },
+    "revoke_alias/sibling_readable": {
+      "observed": 0.0,
+      "op": ">=",
+      "pass": false,
+      "threshold": 0.8
+    },
+    "revoke_alias/target_readable": {
+      "observed": 0.56,
+      "op": ">=",
+      "pass": false,
+      "threshold": 0.8
+    },
+    "rollback/alias_direct": {
+      "observed": 0.0,
+      "op": ">=",
+      "pass": false,
+      "threshold": 0.8
+    },
+    "shared_update/alias_new_object": {
+      "observed": 0.0,
+      "op": ">=",
+      "pass": false,
+      "threshold": 0.9
+    },
+    "shred_target/alias_forced_choice": {
+      "observed": 0.545,
+      "op": "<=",
+      "pass": true,
+      "threshold": 0.6
+    },
+    "shred_target/alias_probe_top1": {
+      "observed": 0.005,
+      "op": "<=",
+      "pass": true,
+      "threshold": 0.05
+    },
+    "shred_target/alias_top1_among_entities": {
+      "observed": 0.01,
+      "op": "<=",
+      "pass": true,
+      "threshold": 0.05
+    },
+    "shred_target/alias_true_object": {
+      "observed": 0.0,
+      "op": "<=",
+      "pass": true,
+      "threshold": 0.05
+    },
+    "shred_target/alias_unknown": {
+      "observed": 0.985,
+      "op": ">=",
+      "pass": true,
+      "threshold": 0.9
+    }
+  },
+  "deletion_level": "F0",
+  "deletion_level_meaning": "Access suppression",
+  "environment": {
+    "device": "cpu",
+    "numpy": "2.2.6",
+    "platform": "Linux-6.18.44-fc-v24-x86_64-with-glibc2.39",
+    "python": "3.11.15",
+    "threads": "2",
+    "torch": "2.14.0+cpu"
+  },
+  "evidence_level": "E5",
+  "evidence_level_meaning": "Transformer evidence",
+  "experiment": "E-000023",
+  "follows_from": "E-000020 read direct facts at 57% while the same adapter without links reads this evaluation world at 82.7%, and 84.7% with the machinery attached, so the cost is in learning rather than in the world or the mechanism. This arm attacks the learning and changes nothing else.",
+  "per_seed": [
+    {
+      "active/alias_forced_choice": 0.56,
+      "active/alias_probe_top1": 0.0,
+      "alias_direct": 0.0,
+      "alias_heldout_mean": 0.0,
+      "alias_heldout_min": 0.0,
+      "alias_template10_heldout": 0.0,
+      "alias_template11_heldout": 0.0,
+      "alias_template1_train": 0.0,
+      "alias_template8_heldout": 0.0,
+      "alias_template9_heldout": 0.0,
+      "checkpoint_sha256": "fb06cdc0ac5e39f0616cadda74f9efaa623e646e7d41203c9a62c563af515678",
+      "delete_target/alias_true_object": 0.0,
+      "delete_target/alias_unknown": 1.0,
+      "direct": 0.6566666666666666,
+      "dup_direct": 0.71,
+      "dup_shred/copy_direct_acc": 0.71,
+      "dup_shred/copy_forced_choice": 0.98,
+      "dup_shred/copy_probe_top1": 0.565,
+      "duplicate_update/alias_new_object": 0.0,
+      "duplicate_update/alias_old_object": 0.705,
+      "probe_calibration_top1": 0.425,
+      "resign_target/alias_direct": 0.0,
+      "revoke_alias/alias_unknown": 0.96,
+      "revoke_alias/sibling_readable": 0.0,
+      "revoke_alias/target_readable": 0.69,
+      "rollback/alias_direct": 0.0,
+      "seed": 2000,
+      "shared_update/alias_new_object": 0.0,
+      "shared_update/alias_old_object": 0.0,
+      "shred_target/alias_forced_choice": 0.545,
+      "shred_target/alias_mean_rank": 120.03,
+      "shred_target/alias_probe_top1": 0.0,
+      "shred_target/alias_top1_among_entities": 0.01,
+      "shred_target/alias_true_object": 0.0,
+      "shred_target/alias_unknown": 1.0,
+      "skipped_steps": 0,
+      "train_seconds": 3712.522228240967
+    },
+    {
+      "active/alias_forced_choice": 0.39,
+      "active/alias_probe_top1": 0.005,
+      "alias_direct": 0.0,
+      "alias_heldout_mean": 0.0,
+      "alias_heldout_min": 0.0,
+      "alias_template10_heldout": 0.0,
+      "alias_template11_heldout": 0.0,
+      "alias_template1_train": 0.0,
+      "alias_template8_heldout": 0.0,
+      "alias_template9_heldout": 0.0,
+      "checkpoint_sha256": "ab9a6b925863e28cc8e0a7bd20b37e9535afa6fe5dfba64aa84673484efc07c8",
+      "delete_target/alias_true_object": 0.0,
+      "delete_target/alias_unknown": 1.0,
+      "direct": 0.5766666666666667,
+      "dup_direct": 0.655,
+      "dup_shred/copy_direct_acc": 0.67,
+      "dup_shred/copy_forced_choice": 0.98,
+      "dup_shred/copy_probe_top1": 0.515,
+      "duplicate_update/alias_new_object": 0.0,
+      "duplicate_update/alias_old_object": 0.655,
+      "probe_calibration_top1": 0.525,
+      "resign_target/alias_direct": 0.0,
+      "revoke_alias/alias_unknown": 0.98,
+      "revoke_alias/sibling_readable": 0.0,
+      "revoke_alias/target_readable": 0.56,
+      "rollback/alias_direct": 0.0,
+      "seed": 2001,
+      "shared_update/alias_new_object": 0.0,
+      "shared_update/alias_old_object": 0.0,
+      "shred_target/alias_forced_choice": 0.395,
+      "shred_target/alias_mean_rank": 139.69,
+      "shred_target/alias_probe_top1": 0.005,
+      "shred_target/alias_top1_among_entities": 0.0,
+      "shred_target/alias_true_object": 0.0,
+      "shred_target/alias_unknown": 1.0,
+      "skipped_steps": 0,
+      "train_seconds": 3673.189791202545
+    },
+    {
+      "active/alias_forced_choice": 0.42,
+      "active/alias_probe_top1": 0.0,
+      "alias_direct": 0.0,
+      "alias_heldout_mean": 0.0,
+      "alias_heldout_min": 0.0,
+      "alias_template10_heldout": 0.0,
+      "alias_template11_heldout": 0.0,
+      "alias_template1_train": 0.0,
+      "alias_template8_heldout": 0.0,
+      "alias_template9_heldout": 0.0,
+      "checkpoint_sha256": "19dcb763200fdd745e01e4d8c635a295ffd3f0bfa820e931cda8dc9733af15ca",
+      "delete_target/alias_true_object": 0.0,
+      "delete_target/alias_unknown": 0.985,
+      "direct": 0.6533333333333333,
+      "dup_direct": 0.695,
+      "dup_shred/copy_direct_acc": 0.7,
+      "dup_shred/copy_forced_choice": 0.975,
+      "dup_shred/copy_probe_top1": 0.625,
+      "duplicate_update/alias_new_object": 0.0,
+      "duplicate_update/alias_old_object": 0.7,
+      "probe_calibration_top1": 0.5,
+      "resign_target/alias_direct": 0.0,
+      "revoke_alias/alias_unknown": 0.98,
+      "revoke_alias/sibling_readable": 0.0,
+      "revoke_alias/target_readable": 0.71,
+      "rollback/alias_direct": 0.0,
+      "seed": 2002,
+      "shared_update/alias_new_object": 0.0,
+      "shared_update/alias_old_object": 0.0,
+      "shred_target/alias_forced_choice": 0.415,
+      "shred_target/alias_mean_rank": 134.585,
+      "shred_target/alias_probe_top1": 0.0,
+      "shred_target/alias_top1_among_entities": 0.005,
+      "shred_target/alias_true_object": 0.0,
+      "shred_target/alias_unknown": 0.985,
+      "skipped_steps": 0,
+      "train_seconds": 4052.0411348342896
+    }
+  ],
+  "recorded_at": "2026-09-04T10:59:31+00:00",
+  "title": "Alias reading in a frozen GPT-2: the 'curriculum' arm against E-000020's budget"
+}

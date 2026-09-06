@@ -1,0 +1,18 @@
+__pycache__/
+*.pyc
+.pytest_cache/
+so/results/checkpoints/
+
+# local environment created by setup.sh
+.venv/
+# reduced runs: `make smoke` and the smoke tests write these, they are not records
+so/results/*-quick.json
+so/results/*-quick.md
+so/results/*-smoke.json
+so/results/*-smoke.md
+
+# scratch logs written into the working tree by background runs; records live in so/results/
+*.log
+
+# workflow worktrees created by the Claude Code Workflow tool -- tool artefacts, never repository content
+.claude/

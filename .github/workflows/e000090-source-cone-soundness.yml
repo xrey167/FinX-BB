@@ -1,0 +1,43 @@
+name: E000090 source-cone soundness
+on:
+  push:
+    branches: [research/e000090-source-cone-soundness]
+    paths:
+      - so/experiments/e000090_source_cone_soundness.py
+      - so/tests/test_e000090_source_cone_soundness.py
+      - .github/workflows/e000090-source-cone-soundness.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  countermodels:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    env:
+      OMP_NUM_THREADS: '1'
+      OPENBLAS_NUM_THREADS: '1'
+      MKL_NUM_THREADS: '1'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - name: Install pinned CPU dependencies
+        run: |
+          python -m pip install numpy==2.3.5 pytest==9.0.2
+          python -m pip install torch==2.10.0 --index-url https://download.pytorch.org/whl/cpu
+      - name: Run five-seed countermodels and independent tests
+        run: |
+          set -euo pipefail
+          mkdir -p ci-e90
+          python -c "import gzip,hashlib,pathlib; b=gzip.decompress(pathlib.Path('results/e000090/e000090-results.json.gz').read_bytes()); assert hashlib.sha256(b).hexdigest() == 'c2dea79d8c73ca01cde9557837c8090bd01ddf87d371cc44a77acb59e56bbd8d'"
+          python -m so.experiments.e000090_source_cone_soundness --seeds 0 1 2 3 4 --output ci-e90/results.json
+          python -m pytest so/tests/test_e000090_source_cone_soundness.py -q -ra | tee ci-e90/pytest.txt
+          python -m pip freeze > ci-e90/environment.txt
+          sha256sum so/experiments/e000090_source_cone_soundness.py so/tests/test_e000090_source_cone_soundness.py ci-e90/results.json > ci-e90/sha256.txt
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: e000090-source-cone-soundness
+          path: ci-e90/
+          if-no-files-found: error

@@ -1,0 +1,568 @@
+{
+  "aggregate": {
+    "active/control_acc": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 5
+    },
+    "active/forced_choice_win": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 5
+    },
+    "active/gated_value_contribution": {
+      "max": 14.183673858642578,
+      "mean": 13.975341033935546,
+      "min": 13.844796180725098,
+      "n": 5
+    },
+    "active/probe_top1": {
+      "max": 0.98,
+      "mean": 0.952,
+      "min": 0.9,
+      "n": 5
+    },
+    "active/probe_top5": {
+      "max": 0.98,
+      "mean": 0.952,
+      "min": 0.9,
+      "n": 5
+    },
+    "active/routing_mass_on_target": {
+      "max": 0.9980819821357727,
+      "mean": 0.9979484796524047,
+      "min": 0.9976862072944641,
+      "n": 5
+    },
+    "active/target_acc": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 5
+    },
+    "active/target_unknown": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 5
+    },
+    "active/true_obj_mean_rank": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 5
+    },
+    "active/true_obj_top1_among_entities": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 5
+    },
+    "revoked/control_acc": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 5
+    },
+    "revoked/forced_choice_win": {
+      "max": 0.68,
+      "mean": 0.552,
+      "min": 0.4,
+      "n": 5
+    },
+    "revoked/gated_value_contribution": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 5
+    },
+    "revoked/probe_top1": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 5
+    },
+    "revoked/probe_top5": {
+      "max": 0.02,
+      "mean": 0.012,
+      "min": 0.0,
+      "n": 5
+    },
+    "revoked/routing_mass_on_target": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 5
+    },
+    "revoked/target_acc": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 5
+    },
+    "revoked/target_unknown": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 5
+    },
+    "revoked/true_obj_mean_rank": {
+      "max": 130.32,
+      "mean": 123.98799999999999,
+      "min": 115.8,
+      "n": 5
+    },
+    "revoked/true_obj_top1_among_entities": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 5
+    },
+    "shredded/control_acc": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 5
+    },
+    "shredded/forced_choice_win": {
+      "max": 0.7,
+      "mean": 0.604,
+      "min": 0.44,
+      "n": 5
+    },
+    "shredded/gated_value_contribution": {
+      "max": 1.5742204189300537,
+      "mean": 1.2678353428840636,
+      "min": 0.9621627926826477,
+      "n": 5
+    },
+    "shredded/probe_top1": {
+      "max": 0.08,
+      "mean": 0.044,
+      "min": 0.02,
+      "n": 5
+    },
+    "shredded/probe_top5": {
+      "max": 0.12,
+      "mean": 0.072,
+      "min": 0.02,
+      "n": 5
+    },
+    "shredded/routing_mass_on_target": {
+      "max": 0.9980819821357727,
+      "mean": 0.9979484796524047,
+      "min": 0.9976862072944641,
+      "n": 5
+    },
+    "shredded/target_acc": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 5
+    },
+    "shredded/target_unknown": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 5
+    },
+    "shredded/true_obj_mean_rank": {
+      "max": 134.74,
+      "mean": 109.556,
+      "min": 91.52,
+      "n": 5
+    },
+    "shredded/true_obj_top1_among_entities": {
+      "max": 0.04,
+      "mean": 0.016,
+      "min": 0.0,
+      "n": 5
+    },
+    "suppressed/control_acc": {
+      "max": 1.0,
+      "mean": 0.984,
+      "min": 0.96,
+      "n": 5
+    },
+    "suppressed/forced_choice_win": {
+      "max": 1.0,
+      "mean": 0.9560000000000001,
+      "min": 0.86,
+      "n": 5
+    },
+    "suppressed/gated_value_contribution": {
+      "max": 8.985879898071289,
+      "mean": 8.277906894683838,
+      "min": 7.83616828918457,
+      "n": 5
+    },
+    "suppressed/probe_top1": {
+      "max": 0.94,
+      "mean": 0.8640000000000001,
+      "min": 0.74,
+      "n": 5
+    },
+    "suppressed/probe_top5": {
+      "max": 0.96,
+      "mean": 0.908,
+      "min": 0.84,
+      "n": 5
+    },
+    "suppressed/routing_mass_on_target": {
+      "max": 0.6884593367576599,
+      "mean": 0.622796630859375,
+      "min": 0.5886979699134827,
+      "n": 5
+    },
+    "suppressed/target_acc": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 5
+    },
+    "suppressed/target_unknown": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 5
+    },
+    "suppressed/true_obj_mean_rank": {
+      "max": 33.38,
+      "mean": 9.860000000000001,
+      "min": 0.5,
+      "n": 5
+    },
+    "suppressed/true_obj_top1_among_entities": {
+      "max": 0.96,
+      "mean": 0.836,
+      "min": 0.62,
+      "n": 5
+    }
+  },
+  "claim": "NOT SUPPORTED BY THE MEASUREMENTS (see criteria): Suppression (fine-tuned refusal) and deletion (REVOKE / SHRED) are behaviourally identical on the targets, but the internal signals separate them: under suppression the target cell still receives value contribution and a linear probe still decodes the object from the hidden state; under SHRED the cell is still routed to (routing mass stays, by construction of the key) but its gated value contribution and the probe reading vanish; under REVOKE both are zero by the mask. The gated value contribution is the separating signal; its causal role (payload -> answer) is what E-000005 intervenes on.",
+  "claim_parts": [
+    {
+      "claim": "Output suppression (fine-tuned refusal) is behaviourally identical to deletion on the targets but keeps the target cell's value contribution and a probe leak; REVOKE removes both (mask). The gated value contribution separates suppression from representational removal.",
+      "criteria": [
+        "suppressed/target_unknown",
+        "suppressed/control_acc",
+        "suppressed/gated_value_contribution",
+        "suppressed/probe_top1",
+        "revoked/probe_top1"
+      ],
+      "supported": true
+    },
+    {
+      "claim": "SHRED (unsupervised gate) removes the value contribution and the probe leak to the F4 thresholds.",
+      "criteria": [
+        "shredded/target_unknown",
+        "shredded/gated_value_contribution",
+        "shredded/probe_top1"
+      ],
+      "supported": false
+    }
+  ],
+  "claim_supported": false,
+  "config": {
+    "n_controls": 50,
+    "n_targets": 50,
+    "seeds": [
+      0,
+      1,
+      2,
+      3,
+      4
+    ]
+  },
+  "criteria": {
+    "revoked/probe_top1": {
+      "observed": 0.0,
+      "op": "<=",
+      "pass": true,
+      "threshold": 0.05
+    },
+    "shredded/gated_value_contribution": {
+      "observed": 1.5742204189300537,
+      "op": "<=",
+      "pass": false,
+      "threshold": 0.1
+    },
+    "shredded/probe_top1": {
+      "observed": 0.08,
+      "op": "<=",
+      "pass": false,
+      "threshold": 0.05
+    },
+    "shredded/target_unknown": {
+      "observed": 1.0,
+      "op": ">=",
+      "pass": true,
+      "threshold": 0.95
+    },
+    "suppressed/control_acc": {
+      "observed": 0.96,
+      "op": ">=",
+      "pass": true,
+      "threshold": 0.95
+    },
+    "suppressed/gated_value_contribution": {
+      "observed": 7.83616828918457,
+      "op": ">=",
+      "pass": true,
+      "threshold": 0.3
+    },
+    "suppressed/probe_top1": {
+      "observed": 0.74,
+      "op": ">=",
+      "pass": true,
+      "threshold": 0.5
+    },
+    "suppressed/target_unknown": {
+      "observed": 1.0,
+      "op": ">=",
+      "pass": true,
+      "threshold": 0.95
+    }
+  },
+  "deletion_level": "F3",
+  "deletion_level_meaning": "Functional forgetting",
+  "deletion_level_targeted": "F4",
+  "environment": {
+    "device": "cpu",
+    "numpy": "2.2.6",
+    "platform": "Linux-6.18.44-fc-v24-x86_64-with-glibc2.39",
+    "python": "3.11.15",
+    "threads": "2",
+    "torch": "2.14.0+cpu"
+  },
+  "evidence_level": "E4",
+  "evidence_level_meaning": "Controlled neural-network evidence",
+  "experiment": "E-000007",
+  "not_claimed": "A deletion certificate for real LLMs; robustness of the marker beyond this synthetic system.",
+  "per_seed": [
+    {
+      "active/control_acc": 1.0,
+      "active/forced_choice_win": 1.0,
+      "active/gated_value_contribution": 13.844796180725098,
+      "active/probe_top1": 0.94,
+      "active/probe_top5": 0.94,
+      "active/routing_mass_on_target": 0.9980819821357727,
+      "active/target_acc": 1.0,
+      "active/target_unknown": 0.0,
+      "active/true_obj_mean_rank": 0.0,
+      "active/true_obj_top1_among_entities": 1.0,
+      "base_checkpoint_sha256": "49197919faff163b562b048a65b31a555ee9841ecb413e10ff4aab4769d92ba8",
+      "revoked/control_acc": 1.0,
+      "revoked/forced_choice_win": 0.58,
+      "revoked/gated_value_contribution": 0.0,
+      "revoked/probe_top1": 0.0,
+      "revoked/probe_top5": 0.0,
+      "revoked/routing_mass_on_target": 0.0,
+      "revoked/target_acc": 0.0,
+      "revoked/target_unknown": 1.0,
+      "revoked/true_obj_mean_rank": 123.28,
+      "revoked/true_obj_top1_among_entities": 0.0,
+      "seed": 0,
+      "shredded/control_acc": 1.0,
+      "shredded/forced_choice_win": 0.68,
+      "shredded/gated_value_contribution": 1.231646180152893,
+      "shredded/probe_top1": 0.02,
+      "shredded/probe_top5": 0.02,
+      "shredded/routing_mass_on_target": 0.9980819821357727,
+      "shredded/target_acc": 0.0,
+      "shredded/target_unknown": 1.0,
+      "shredded/true_obj_mean_rank": 107.62,
+      "shredded/true_obj_top1_among_entities": 0.02,
+      "suppressed/control_acc": 1.0,
+      "suppressed/forced_choice_win": 0.98,
+      "suppressed/gated_value_contribution": 7.854197978973389,
+      "suppressed/probe_top1": 0.8,
+      "suppressed/probe_top5": 0.84,
+      "suppressed/routing_mass_on_target": 0.5959246158599854,
+      "suppressed/target_acc": 0.0,
+      "suppressed/target_unknown": 1.0,
+      "suppressed/true_obj_mean_rank": 4.72,
+      "suppressed/true_obj_top1_among_entities": 0.9
+    },
+    {
+      "active/control_acc": 1.0,
+      "active/forced_choice_win": 1.0,
+      "active/gated_value_contribution": 13.956584930419922,
+      "active/probe_top1": 0.98,
+      "active/probe_top5": 0.98,
+      "active/routing_mass_on_target": 0.9980316758155823,
+      "active/target_acc": 1.0,
+      "active/target_unknown": 0.0,
+      "active/true_obj_mean_rank": 0.0,
+      "active/true_obj_top1_among_entities": 1.0,
+      "base_checkpoint_sha256": "75d83f6bc9156d66e886b4d6865332d694accbd7906b44e5909af10d9076446b",
+      "revoked/control_acc": 1.0,
+      "revoked/forced_choice_win": 0.58,
+      "revoked/gated_value_contribution": 0.0,
+      "revoked/probe_top1": 0.0,
+      "revoked/probe_top5": 0.02,
+      "revoked/routing_mass_on_target": 0.0,
+      "revoked/target_acc": 0.0,
+      "revoked/target_unknown": 1.0,
+      "revoked/true_obj_mean_rank": 130.32,
+      "revoked/true_obj_top1_among_entities": 0.0,
+      "seed": 1,
+      "shredded/control_acc": 1.0,
+      "shredded/forced_choice_win": 0.7,
+      "shredded/gated_value_contribution": 1.1830191612243652,
+      "shredded/probe_top1": 0.08,
+      "shredded/probe_top5": 0.08,
+      "shredded/routing_mass_on_target": 0.9980316758155823,
+      "shredded/target_acc": 0.0,
+      "shredded/target_unknown": 1.0,
+      "shredded/true_obj_mean_rank": 91.52,
+      "shredded/true_obj_top1_among_entities": 0.04,
+      "suppressed/control_acc": 0.96,
+      "suppressed/forced_choice_win": 1.0,
+      "suppressed/gated_value_contribution": 8.985879898071289,
+      "suppressed/probe_top1": 0.94,
+      "suppressed/probe_top5": 0.96,
+      "suppressed/routing_mass_on_target": 0.6884593367576599,
+      "suppressed/target_acc": 0.0,
+      "suppressed/target_unknown": 1.0,
+      "suppressed/true_obj_mean_rank": 0.5,
+      "suppressed/true_obj_top1_among_entities": 0.96
+    },
+    {
+      "active/control_acc": 1.0,
+      "active/forced_choice_win": 1.0,
+      "active/gated_value_contribution": 13.883016586303711,
+      "active/probe_top1": 0.96,
+      "active/probe_top5": 0.96,
+      "active/routing_mass_on_target": 0.9976862072944641,
+      "active/target_acc": 1.0,
+      "active/target_unknown": 0.0,
+      "active/true_obj_mean_rank": 0.0,
+      "active/true_obj_top1_among_entities": 1.0,
+      "base_checkpoint_sha256": "dea4462faa19da797f49dda7c50fb7795c485a88ec752ffebedcd52570ab0571",
+      "revoked/control_acc": 1.0,
+      "revoked/forced_choice_win": 0.4,
+      "revoked/gated_value_contribution": 0.0,
+      "revoked/probe_top1": 0.0,
+      "revoked/probe_top5": 0.02,
+      "revoked/routing_mass_on_target": 0.0,
+      "revoked/target_acc": 0.0,
+      "revoked/target_unknown": 1.0,
+      "revoked/true_obj_mean_rank": 128.32,
+      "revoked/true_obj_top1_among_entities": 0.0,
+      "seed": 2,
+      "shredded/control_acc": 1.0,
+      "shredded/forced_choice_win": 0.44,
+      "shredded/gated_value_contribution": 0.9621627926826477,
+      "shredded/probe_top1": 0.02,
+      "shredded/probe_top5": 0.02,
+      "shredded/routing_mass_on_target": 0.9976862072944641,
+      "shredded/target_acc": 0.0,
+      "shredded/target_unknown": 1.0,
+      "shredded/true_obj_mean_rank": 115.68,
+      "shredded/true_obj_top1_among_entities": 0.0,
+      "suppressed/control_acc": 1.0,
+      "suppressed/forced_choice_win": 0.96,
+      "suppressed/gated_value_contribution": 7.83616828918457,
+      "suppressed/probe_top1": 0.92,
+      "suppressed/probe_top5": 0.92,
+      "suppressed/routing_mass_on_target": 0.5891799926757812,
+      "suppressed/target_acc": 0.0,
+      "suppressed/target_unknown": 1.0,
+      "suppressed/true_obj_mean_rank": 9.42,
+      "suppressed/true_obj_top1_among_entities": 0.76
+    },
+    {
+      "active/control_acc": 1.0,
+      "active/forced_choice_win": 1.0,
+      "active/gated_value_contribution": 14.183673858642578,
+      "active/probe_top1": 0.98,
+      "active/probe_top5": 0.98,
+      "active/routing_mass_on_target": 0.9978653788566589,
+      "active/target_acc": 1.0,
+      "active/target_unknown": 0.0,
+      "active/true_obj_mean_rank": 0.0,
+      "active/true_obj_top1_among_entities": 1.0,
+      "base_checkpoint_sha256": "54ee6d58e114cfff95e0e1926ffba9225fcb954a9ff2e0b0de18fb493d542689",
+      "revoked/control_acc": 1.0,
+      "revoked/forced_choice_win": 0.52,
+      "revoked/gated_value_contribution": 0.0,
+      "revoked/probe_top1": 0.0,
+      "revoked/probe_top5": 0.02,
+      "revoked/routing_mass_on_target": 0.0,
+      "revoked/target_acc": 0.0,
+      "revoked/target_unknown": 1.0,
+      "revoked/true_obj_mean_rank": 122.22,
+      "revoked/true_obj_top1_among_entities": 0.0,
+      "seed": 3,
+      "shredded/control_acc": 1.0,
+      "shredded/forced_choice_win": 0.62,
+      "shredded/gated_value_contribution": 1.3881281614303589,
+      "shredded/probe_top1": 0.04,
+      "shredded/probe_top5": 0.12,
+      "shredded/routing_mass_on_target": 0.9978653788566589,
+      "shredded/target_acc": 0.0,
+      "shredded/target_unknown": 1.0,
+      "shredded/true_obj_mean_rank": 98.22,
+      "shredded/true_obj_top1_among_entities": 0.02,
+      "suppressed/control_acc": 1.0,
+      "suppressed/forced_choice_win": 0.98,
+      "suppressed/gated_value_contribution": 8.024141311645508,
+      "suppressed/probe_top1": 0.92,
+      "suppressed/probe_top5": 0.96,
+      "suppressed/routing_mass_on_target": 0.5886979699134827,
+      "suppressed/target_acc": 0.0,
+      "suppressed/target_unknown": 1.0,
+      "suppressed/true_obj_mean_rank": 1.28,
+      "suppressed/true_obj_top1_among_entities": 0.94
+    },
+    {
+      "active/control_acc": 1.0,
+      "active/forced_choice_win": 1.0,
+      "active/gated_value_contribution": 14.008633613586426,
+      "active/probe_top1": 0.9,
+      "active/probe_top5": 0.9,
+      "active/routing_mass_on_target": 0.9980771541595459,
+      "active/target_acc": 1.0,
+      "active/target_unknown": 0.0,
+      "active/true_obj_mean_rank": 0.0,
+      "active/true_obj_top1_among_entities": 1.0,
+      "base_checkpoint_sha256": "23098dc16120265f6237b1de1b2d6346347ec5b27eb11488d686cdbd02a072dd",
+      "revoked/control_acc": 1.0,
+      "revoked/forced_choice_win": 0.68,
+      "revoked/gated_value_contribution": 0.0,
+      "revoked/probe_top1": 0.0,
+      "revoked/probe_top5": 0.0,
+      "revoked/routing_mass_on_target": 0.0,
+      "revoked/target_acc": 0.0,
+      "revoked/target_unknown": 1.0,
+      "revoked/true_obj_mean_rank": 115.8,
+      "revoked/true_obj_top1_among_entities": 0.0,
+      "seed": 4,
+      "shredded/control_acc": 1.0,
+      "shredded/forced_choice_win": 0.58,
+      "shredded/gated_value_contribution": 1.5742204189300537,
+      "shredded/probe_top1": 0.06,
+      "shredded/probe_top5": 0.12,
+      "shredded/routing_mass_on_target": 0.9980771541595459,
+      "shredded/target_acc": 0.0,
+      "shredded/target_unknown": 1.0,
+      "shredded/true_obj_mean_rank": 134.74,
+      "shredded/true_obj_top1_among_entities": 0.0,
+      "suppressed/control_acc": 0.96,
+      "suppressed/forced_choice_win": 0.86,
+      "suppressed/gated_value_contribution": 8.689146995544434,
+      "suppressed/probe_top1": 0.74,
+      "suppressed/probe_top5": 0.86,
+      "suppressed/routing_mass_on_target": 0.6517212390899658,
+      "suppressed/target_acc": 0.0,
+      "suppressed/target_unknown": 1.0,
+      "suppressed/true_obj_mean_rank": 33.38,
+      "suppressed/true_obj_top1_among_entities": 0.62
+    }
+  ],
+  "recorded_at": "2026-09-03T00:01:36+00:00",
+  "title": "Biomarker: output suppression versus representational change"
+}
