@@ -4287,3 +4287,218 @@ store-and-audit certificate, and the observation that the pod store supplies the
 never-memory counterfactual whose absence J-Access names when it reports item-level AUROC at chance.
 Claim document: `docs/novelty/audit-siting-claim.md`. Owned and not claimed: the lens, lens-based
 auditing, probing, projection, external memory, pods, pointer aliases.
+
+### 31.58 The twenty-second repetition: the audit's blind region is a configuration choice, and two of yesterday's three "new" points are withdrawn (2026-09-06, LOD-001 and LOD-002)
+
+The request was put again in its sharpest form — make the symlink / J-space / pod idea a technical
+novelty, and do not stop before there is one. What follows is the method, the withdrawals, the two
+experiments, and the standing. Unlike §31.48 this round did not end in ten refutations and nothing
+else: it ended in **two withdrawals of this repository's own published claims, and one measured
+sentence that survived a designed attempt to refute it.**
+
+**The sweep.** One workflow: four readers over the claim documents, the ledger, the code substrate and
+the four sibling branches; eight prior-art hunters each required to run at least eight web searches
+**in the session** and to fetch what it relied on; eight generators at different angles; two hostile
+reviewers per candidate (one hunting prior art, one hunting by-construction results); a judge and a
+completeness critic. Every load-bearing quotation below was then **re-fetched by hand and checked
+against the paper's own full text**, because the first pass caught the failure mode this section is
+partly about: an abstract-level fetch of Braun answered "no detection floor" and the full text answers
+yes, in §3.8. The abstract was the wrong instrument for the question.
+
+**Three collisions, verified verbatim, that remove things this programme was claiming.**
+
+| source | verbatim | what it removes |
+| --- | --- | --- |
+| Braun, arXiv:2608.12652 §3.8 (12 Aug 2026) | "The *detection floor* m∗ is the smallest m at which the test rejects at α=0.05 with power 0.8 at the given n; it states what the instrument can and cannot see." §L3: "The detection floor m∗ should always be reported alongside a null." | a detection floor for an internal-activation probe audit is published, and reporting it is already prescribed |
+| Ferrara, arXiv:2608.20569 §3.6, §6 (20 Aug 2026) | the scaling operator "multiplies the activation by the strength parameter"; "We therefore order the ladder by perturbation magnitude"; "a linear probe … measures how much intervention information is linearly recoverable at each site" | the dose ladder, its ordering, its impact-matched null and per-site sensitivity anchoring |
+| Gurnee et al., transformer-circuits.pub/2026/workspace/ (6 Jul 2026) | "in roughly the first third of the model, the readouts are noisy and largely uninterpretable"; an early absence "could indicate that either (1) the J-lens is degenerate at these depths … or (2) the early-layer residual stream genuinely carries no linearly accessible … content" | the siting rule, its two-way ambiguity, and the need to disambiguate — stated by the lens's own authors, who run their own disambiguating experiment |
+| Yang & Yeung, arXiv:2607.19442 (21 Jul 2026) | candidates score forget facts "below the **never-learned level**"; "the injected model, which retains the retain set by construction, fails the fixed retain threshold in 41/45 cells" | a per-item never-learned control for parametric unlearning, and a screen accepting a model whose knowledge is intact |
+
+**Two of `docs/novelty/audit-siting-claim.md`'s three "genuinely new" points are therefore withdrawn**,
+the day after they were published. Point 3 — *"parametric unlearning has no per-item never-knew-it
+control"* — is **false as written**; it has one, by replaying training without the facts, at a cost of
+a training run and with different weights. Point 1, the siting rule as a proposition, belongs to
+Gurnee et al. The correction is `docs/novelty/audit-siting-correction.md`. The measurements in the
+claim document do not move; what moves is what they were said to be new for.
+
+**What survived the withdrawal, and it is one sentence.** Gurnee's rule is about **depth in the
+model**. For an external memory the binding constraint is not depth but the site of the **write**,
+which is a configuration field (`AdapterConfig.read_layers`) and can be moved without touching the
+model. That sentence was an inference from one adapter, so it was pre-registered as an experiment that
+could refute it (`docs/novelty/lod002-preregister.md`, branch `W2`).
+
+**E-000063 first, on fresh checkpoints, because none survives.** The vacuity reproduces on three
+seeds and is stronger than the record: the headline row passes on every seed while the pre-registered
+validity row `jprobe(ACTIVE − NEVER)` fails on every seed, at −0.0089 / −0.0045 / −0.0134, with the
+memory now read at **0.9688 / 0.9777 / 0.9821** against the record's 0.8795 on seed 0. One recorded
+failure does **not** reproduce: `finalprobe(SHRED − NEVER)` failed at 0.0536 on the recorded seed 0 and
+is 0.0000 / −0.0446 / −0.0625 here, so the claim document's *"a residual trace survives SHRED in the
+final state"* is a row a second training does not support. Seed 2 is bit-identical between the runs, so
+the recipe is deterministic and the recorded seed-0 and seed-1 checkpoints were not produced by exactly
+it. Record: `so/results/e000063_retrain/`.
+
+**LOD-001 — the floor, and the thing a norm could not say.** Ten write-side rungs (a scalar on the
+adapter's write) and nine store-side rungs (the pod's marker signed at a chord from the store's centre,
+which moves the gate and attenuates the payload *toward `' unknown'`*), three seeds, 16 pods, both
+address modes, all six validity rows passing, 369 s. Record: `so/results/lod001/`.
+
+`L1` fires: at blocks 8 and 9, five readout families, both modes, three seeds, both ladders, **no rung
+is detected** — the floor is above full retention. But the row that matters is the one WSC-001 could
+not write, because its mediator was a norm and its own "how it could be wrong" said so:
+
+| mode | site | family | never | live | chance |
+| --- | --- | --- | --- | --- | --- |
+| alias | 8 | `jspace` | 0.214 | 0.219 | 0.062 |
+| alias | 9 | `raw` | **0.996** | **0.987** | 0.062 |
+| alias | 10 | `jspace` | 0.076 | 0.978 | 0.062 |
+
+**The probe there is not blind. It is saturated.** It reads the never-written arm at 0.214 to 0.996
+against a chance of 0.062 and the live arm at the same level; at block 9 the full residual reads 0.996
+with no memory and 0.987 with all of it. Everything it reads is the alias name in the prompt. An audit
+sited there and reported as an *accuracy* rather than as a contrast would look excellent and would be
+measuring the question. That is why a floor and a never-written control have to be reported together:
+either alone misleads, in opposite directions.
+
+`L3` — the audit against simply asking the model, in one unit — **is answered differently by the two
+axes**, and the mechanism is in the code. On the write-side ladder the floors tie at 0.375 and the
+output is *better* on two of three seeds (`L3c`, no sentence). On the store's own lifecycle ladder the
+audit resolves at gate **0.4721** where the output needs **0.9714**, on every seed and in both address
+modes (`L3a`). Because `alpha` scales the write toward zero, so a shrunken write still points at the
+right token, while the marker chord mixes the payload toward `' unknown'` — so a partly unsigned pod
+**answers UNKNOWN, which is what a successful deletion looks like**, while 47% of it is still reaching
+the model and is linearly decodable one block downstream. `L4`: the audit's two floors agree in gate
+units (0.4721 against 0.375, inside the 0.10 bar); the output's differ by 0.60. Axis-invariance holds
+for the internal readout and fails for the behavioural one — recorded as unregistered, since the
+pre-registration expected disagreement between axes and got it between readouts.
+
+`K2` fires in part and constrains every sentence: `random` ties `jspace` at block 10 and **`raw` beats
+it** at the final state on every seed (0.1875 against 0.375), so **no sentence credits the Jacobian
+lens** — each is about *a readout at a site*. `L5` exposed a defect in its own row: the zero-dose arm
+reads **0.656 below** the never-written arm at block 9, because the two banks differ in size and the
+dereference bias carries `log(n_cells)` (§31.41, §31.45). The zero-dose and never-written arms are not
+the same floor; `V3` checked only the final state, passed there, and would have failed at block 9.
+Recorded, not patched.
+
+**LOD-002 — the experiment built to refute the surviving sentence, which did not.** The identical
+frozen GPT-2 small, recipe, world, ladder, families and probes; one field changed,
+`read_layers=(5,7)` instead of `(8,10)`. Block 8 is the discriminator: the first read layer on one arm,
+downstream of both on the other, at identical depth to the weight. `V1` — the row that would have
+voided the experiment had a shallower reader simply failed to place a readable memory — passes at
+0.9643.
+
+| site | arm A `(8,10)`, 3 seeds | arm B `(5,7)`, 1 seed |
+| --- | --- | --- |
+| 5 / 6 | — | **> 1**, blind |
+| 7 | — | 0.375 |
+| **8** | **> 1, blind** | **0.375, sighted** |
+| 9 | **> 1**, blind | 0.375 |
+| 10 / final | 0.375 | 0.375 |
+
+**At the identical block of the identical frozen model the audit is blind on one arm and sighted on the
+other.** `W1` fires; `W2`, the depth explanation, is refuted. And the structure does not merely move,
+it **translates**: the blind blocks are the first read layer and the one after it on both arms; the
+first sighted block is the *second* read layer on both; the probe is saturated by prompt identity
+exactly at the blind blocks on both (never 0.21–0.70, live at the same level) and falls to near chance
+on the never arm exactly where it starts reading the memory; and the write magnitude at the first read
+site is **3.746** on arm A and **3.745** on arm B — a property of *being the first read site*, not of
+block 8 or block 5.
+
+**One seed.** Kill condition 3 of the pre-registration binds every sentence about arm B until seeds 1
+and 2 land. Record: `so/results/lod002/lod002_write_site-seed0only.{json,md}`, kept under its own name
+so a later three-seed run cannot silently replace what the document reports.
+
+**Independent replication of the interpretability, not of the finding.** The CI job was rewritten
+mid-round because it could not fail on anything it measured — the object this ledger has retracted
+sentences over for eleven rounds, sitting in my own pipeline. `--require-validity` now gates the job on
+the four pre-registered validity rows and never on a finding, and with that gate active the full
+three-seed matrix passed on GitHub's hardware on independently trained checkpoints.
+
+**LOD-002 on three seeds, and a sentence of mine withdrawn by my own extra seeds.** `W1` holds on all
+three seeds and in both address modes; kill condition 3 is discharged. The seed-0 write-up asserted
+that the first read site's write magnitude was "3.746 on arm A and 3.745 on arm B — a property of
+being the first read site". Two further seeds per arm withdraw it: the per-seed magnitudes are 0.479
+to 3.746 on arm A and 2.403 to 4.489 on arm B, overlapping and not equal. Two numbers agreeing to
+three decimals are not a structure. What survives is the fraction — 0.007 to 0.061 on arm A, 0.069 to
+0.143 on arm B — and the blindness sitting exactly there on both.
+
+**And a by-construction fact this round's reviewers found in the trainer, which I should have declared
+first.** `so/experiments/e000020_symlink_gpt2.py:59-63` supervises read-layer 0 onto the passthrough
+null column for every slot of every one-hop query, and every read in E-000063, WSC-001, LOD-001 and
+LOD-002 is one-hop. §31.48 R2 of the parallel branch measured the consequence a day before LOD-002 was
+designed: those slots read the null column at ≥ 0.998 and the injection there is "a bank-independent
+learned bias". **So the first read layer's blindness is the training objective, not a discovery.**
+`W1` is untouched — block 8 blind on one arm and sighted on the other at identical depth is a contrast
+between two trained arms — but its explanation changes, and the replacement is sharper for the only
+point that matters: the blind region is fixed by the routing supervision and the read-layer
+configuration, both designer choices, and by nothing about the model. Also added to the boundary:
+Liao & Cao, arXiv:2607.03372, already sweep probe sites across a frozen model's depth and decompose a
+site's status into decodability, unique information and causal deployment.
+
+### 31.59 `A0` is withdrawn: the programme's last standing sentence passes its bar only by mixing address modes (2026-09-06)
+
+The round's judge killed the record's one surviving claim from the recorded JSON in minutes, with no
+compute, and it is verified here twice.
+
+`so/experiments/wsc001_workspace_share.py:468-472` takes `max(alias, direct)` **independently** for
+site 8 and site 10 and then forms the ratio from the two winners.
+
+| seed | write8 alias | write8 direct | write10 alias | write10 direct | as recorded | within alias |
+| --- | --- | --- | --- | --- | --- | --- |
+| 0 | **4.390** | 0.357 | 82.108 | **89.952** | 0.0488 PASS | **0.0535 FAIL** |
+| 1 | 1.553 | 0.083 | 93.834 | 98.814 | 0.0157 | 0.0166 |
+| 2 | 2.480 | 0.467 | 76.865 | 80.328 | 0.0309 | 0.0323 |
+
+On seed 0 the numerator is the alias-mode write and the denominator is the direct-mode write. Within
+the mode that supplies the numerator the worst seed reads **0.0535** and the `A0` branch does not fire.
+LOD-001 corroborates it from three fresh trainings that were not looking for it: the same quantity
+within alias mode reads **0.061 / 0.0074 / 0.0323**, worst 0.061, against the same 0.05 bar.
+
+**And the margin never carried a sentence.** Across the three recorded training draws the statistic has
+SD **0.0135** and the worst-of-three cleared its bar by **0.0012** — nine hundredths of one standard
+deviation of the quantity being thresholded. E-000063's `finalprobe(SHRED − NEVER)` had already shown
+the same disease, moving 0.0536 (FAIL) to 0.0000 (PASS) between two runs of one protocol on identical
+seeds. **No bar on this substrate has ever been calibrated against the across-training-run dispersion
+of the statistic it thresholds**, and two are now known to sit inside it. Saying so is not a
+contribution: Braun (arXiv:2608.12652) propagates baseline variance and withdraws his own significant
+result on exactly that basis.
+
+Not withdrawn, because none of them is a ratio: E-000063's headline passing underneath its failed
+validity row, on three recorded seeds and three fresh ones; LOD-001's saturation table, which answers
+the same question with absolute accuracies against chance; LOD-002's `W1`.
+
+### 31.60 Standing after the twenty-second repetition
+
+**Twenty-four candidates, twenty-four killed, zero survivors** — seventy agents, ~12M tokens, one
+workflow. The judge, in its own words: *"NO defensible technical novelty this round, at any size: not
+a mechanism, not a theorem, not a system, and not an instrument/metrology claim a hostile reviewer
+would credit as new … This session makes the count worse rather than better."* It is right, and the
+count is worse: the round removed three sentences from `audit-siting-claim.md` and left it with none.
+
+Its diagnosis of *why* is the part worth keeping: **the 24 kills are one fact seen 24 times.** On this
+substrate the reader consumes only `bank()` and is deterministic, and the adapter's routing is
+supervised by `route_targets_slots`, so most pre-registered comparison cells are decided by the store's
+export function or by the training objective **before the model runs**. Reviewers repeatedly killed
+candidates in minutes by reading `so/mvcc.py:509`, `e000020_symlink_gpt2.py:60-63` or
+`so/llm_adapter.py:429`. Any candidate built on this substrate inherits that failure mode.
+
+**Two limits of the round, from its own completeness critic, recorded because they bound what the kills
+prove.** The session's web-search budget was exhausted (200/200) before the refutation phase, so **the
+24 kills rest mainly on by-construction readings of this repository's code, not on fresh prior-art
+search** — the by-construction readings are verifiable and the load-bearing ones were verified by hand
+here. The patent lane was effectively unsearched (Google Patents 503, PatentsView retired, Patentscope
+403). And one candidate was caught citing an arXiv id under a title that id does not carry, which is
+why every load-bearing citation in §§31.58–31.59 was re-fetched and checked against the paper's own
+full text rather than against an agent's summary — a check that also caught an abstract-level fetch of
+Braun answering "no detection floor" where §3.8 answers yes.
+
+**What the repository has after this round.** No novelty. Three withdrawals. Two experiments whose
+records stand and whose ingredients are all owned — Braun arXiv:2608.12652 §3.8 for the detection
+floor, Ferrara arXiv:2608.20569 §3.6 for the dose ladder, Gurnee et al. for the siting rule and its
+two-way ambiguity, Yang & Yeung arXiv:2607.19442 for the per-item never-learned control, Liao & Cao
+arXiv:2607.03372 for the layer-resolved site sweep. And one instrument the programme did not have
+before: a CI job that can fail on the science, gating the four validity rows and never a finding,
+green on three independently trained checkpoints on foreign hardware.
+
+The sentence the ledger has printed since §31.36 stands unchanged, and this round earned it again:
+**the mechanism is re-invention, and the work is the audit.** What is new is that the audit now
+audits this programme's own bars, and the first two it looked at did not hold.
