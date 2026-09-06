@@ -204,12 +204,17 @@ gate thresholds to exactly zero.
 
 ## 5. What a learned gate certifies is not what it was written to implement
 
+![Accept rate by shell radius](figures/fig1-swept-geometry.svg)
+
+*Figure 1 — the swept geometry. The declared radius and the operational one are 0.55 apart, and everything between them is accepted.*
+
 A certificate over a *learned* predicate inherits the predicate's actual boundary, not its declared
 one, and the gap is measurable.
 
-The store declares a deletion radius of 0.35. Sweeping shells over eleven checkpoints: accept rate
-1.0000 out to 0.70, 0.2191 at 0.80, first reaching zero at 0.90 (shell sweep). **The gate's
-operational radius is 0.90 against a declared 0.35, on every checkpoint.** The annulus the store's own
+The store declares a deletion radius of 0.35. Sweeping twenty shells of 20,000 markers over eleven
+checkpoints (Figure 1): accept rate is 1.0000 out to 0.60, 0.9999 at 0.70, 0.2191 at 0.80 (min
+0.0953, max 0.4014 across checkpoints), and 0.0000 from 0.90 through 2.0. **The gate's operational
+radius is 0.90 against a declared 0.35, identical on every checkpoint.** The annulus the store's own
 predicate calls deleted is accepted at **2,199,996 of 2,200,000**, and no training or evaluation
 distribution ever populated it, because both samplers reject inside 0.7.
 
@@ -301,6 +306,10 @@ still carrying the removed cell's key.
 
 No model, no checkpoint, no training: the adversary reads the bank and names every key a LINK row
 points at that no row holds. Three seeds, 100 pods each (`make disclosure`, E-000035):
+
+![The closure inverts with the guarantee](figures/fig2-closure-inversion.svg)
+
+*Figure 2 — the inversion. No store design is cheapest for both guarantees.*
 
 | store | deleted key disclosed | uniquely identified | candidate keys left | false positives |
 |---|---|---|---|---|

@@ -1,0 +1,87 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="620" height="446" viewBox="0 0 620 446"
+     role="img" aria-labelledby="f2title f2desc" font-family="Helvetica Neue, Helvetica, Arial, sans-serif">
+  <title id="f2title">The deletion closure inverts with the guarantee</title>
+  <desc id="f2desc">To make a fact unreachable to the reader, a canonical pod store must delete 1 record
+    and a duplicated store 3. To leave no trace in the bank, the canonical store must delete 3 and the
+    duplicated store 1. The two lines cross: no store design is cheapest for both guarantees.</desc>
+
+  <style>
+    .surface { fill: #fcfcfb; }
+    .ink     { fill: #0b0b0b; }
+    .ink2    { fill: #52514e; }
+    .title   { font-size: 15px; font-weight: 600; }
+    .sub     { font-size: 11.5px; }
+    .axis    { font-size: 11px; }
+    .lab     { font-size: 12px; font-weight: 600; }
+    .note    { font-size: 10.5px; }
+    .grid    { stroke: #e3e2de; stroke-width: 1; }
+    .axisln  { stroke: #b8b6b0; stroke-width: 1; }
+    .canon   { fill: none; stroke: #2a78d6; stroke-width: 2.25; }
+    .dup     { fill: none; stroke: #eb6834; stroke-width: 2.25; stroke-dasharray: 7 4; }
+    .mcanon  { fill: #2a78d6; stroke: #fcfcfb; stroke-width: 2; }
+    .mdup    { fill: #fcfcfb; stroke: #eb6834; stroke-width: 2.25; }
+  </style>
+
+  <rect class="surface" width="620" height="446"/>
+
+  <text class="ink title" x="24" y="30">Canonicalisation is cheapest to make unreachable and dearest to leave traceless</text>
+  <text class="ink2 sub" x="24" y="49">Records that must be deleted · 3 seeds, 100 pods each · exact on every seed</text>
+
+  <!-- gridlines at 1, 2, 3 -->
+  <g class="grid">
+    <line x1="110" y1="240" x2="530" y2="240"/>
+    <line x1="110" y1="180" x2="530" y2="180"/>
+    <line x1="110" y1="120" x2="530" y2="120"/>
+  </g>
+  <line class="axisln" x1="110" y1="300" x2="530" y2="300"/>
+
+  <g class="ink2 axis" text-anchor="end">
+    <text x="100" y="244">1</text>
+    <text x="100" y="184">2</text>
+    <text x="100" y="124">3</text>
+    <text x="100" y="304">0</text>
+  </g>
+  <text class="ink2 axis" x="34" y="205" transform="rotate(-90 34 205)" text-anchor="middle">records deleted</text>
+
+  <!-- canonical: 1 -> 3 -->
+  <path class="canon" d="M210,240 L430,120"/>
+  <!-- duplicated: 3 -> 1 -->
+  <path class="dup" d="M210,120 L430,240"/>
+
+  <!-- crossing marker -->
+  <circle cx="320" cy="180" r="3" fill="#52514e"/>
+  <line x1="320" y1="157" x2="320" y2="174" stroke="#52514e" stroke-width="1"/>
+  <text class="ink2 note" x="320" y="150" text-anchor="middle">they cross</text>
+
+  <circle class="mcanon" cx="210" cy="240" r="5.5"/>
+  <circle class="mcanon" cx="430" cy="120" r="5.5"/>
+  <rect class="mdup" x="204.5" y="114.5" width="11" height="11"/>
+  <rect class="mdup" x="424.5" y="234.5" width="11" height="11"/>
+
+  <!-- direct labels at both ends -->
+  <text class="ink lab" x="196" y="245" text-anchor="end">1.00</text>
+  <text class="ink lab" x="444" y="125">3.00</text>
+  <text class="ink lab" x="196" y="125" text-anchor="end">3.00</text>
+  <text class="ink lab" x="444" y="245">1.00</text>
+
+  <!-- x categories -->
+  <text class="ink lab" x="210" y="326" text-anchor="middle">unreachable to the reader</text>
+  <text class="ink lab" x="430" y="326" text-anchor="middle">no trace left in the bank</text>
+
+  <!-- legend -->
+  <g transform="translate(110,352)">
+    <line x1="0" y1="0" x2="26" y2="0" stroke="#2a78d6" stroke-width="2.25"/>
+    <circle cx="13" cy="0" r="5.5" fill="#2a78d6" stroke="#fcfcfb" stroke-width="2"/>
+    <text class="ink axis" x="34" y="4">canonical (pod)</text>
+
+    <line x1="160" y1="0" x2="186" y2="0" stroke="#eb6834" stroke-width="2.25" stroke-dasharray="7 4"/>
+    <rect x="167.5" y="-5.5" width="11" height="11" fill="#fcfcfb" stroke="#eb6834" stroke-width="2.25"/>
+    <text class="ink axis" x="194" y="4">duplicated</text>
+  </g>
+
+  <text class="ink2 note" x="24" y="384">From the bank alone, with no model: the canonical store discloses the deleted key</text>
+  <text class="ink2 note" x="24" y="398">uniquely at 1.0000 (1 of 1,536 keys); the duplicated store at 0.0000 (1,536 of 1,536).</text>
+  <text class="ink2 note" x="24" y="412">Zero false positives in both.</text>
+
+  <text class="ink2 note" x="24" y="430">E-000035 · `make disclosure` · so/results/e000035_deletion_disclosure.json</text>
+</svg>

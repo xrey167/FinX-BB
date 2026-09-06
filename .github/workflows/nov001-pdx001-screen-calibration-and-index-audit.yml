@@ -16,6 +16,8 @@ on:
       - "so/experiments/nov003_unread_coordinates_e103.py"
       - "docs/novelty/nov004-instrument-audit-result.md"
       - "docs/paper/deletion-certificates-draft-2026-09-06.md"
+      - "docs/paper/figures/fig1-swept-geometry.svg"
+      - "docs/paper/figures/fig2-closure-inversion.svg"
       - "so/experiments/nov004_instrument_audit.py"
       - "so/tests/test_nov004_instrument_audit.py"
       - "so/tests/test_nov003_unread_coordinates_e103.py"
@@ -105,6 +107,8 @@ jobs:
             so/experiments/nov004_instrument_audit.py \
             so/tests/test_nov004_instrument_audit.py \
             docs/paper/deletion-certificates-draft-2026-09-06.md \
+            docs/paper/figures/fig1-swept-geometry.svg \
+            docs/paper/figures/fig2-closure-inversion.svg \
             > ci-nov001/source-sha256.txt
           find ci-nov001 ci-pdx001 ci-nov002 ci-nov003 ci-nov004 -maxdepth 1 -name '*.json' -print0 | sort -z \
             | xargs -0 -r sha256sum > ci-nov001/result-sha256.txt
