@@ -4287,3 +4287,98 @@ store-and-audit certificate, and the observation that the pod store supplies the
 never-memory counterfactual whose absence J-Access names when it reports item-level AUROC at chance.
 Claim document: `docs/novelty/audit-siting-claim.md`. Owned and not claimed: the lens, lens-based
 auditing, probing, projection, external memory, pods, pointer aliases.
+
+### 31.58 The audit window, and the placement that opens it: an accessibility audit needs a site with the content AND a lens that is not the output (2026-09-06, SIT-001)
+
+§31.57 established that E-000063's audit is read at a block the pod never reaches. It left the useful
+half open — is there any siting at which that certificate would mean something? — and the answer is a
+rule with two halves, a placement on which they cannot both hold, and a placement on which they can.
+
+A site is admissible for an accessibility audit only if BOTH hold there:
+
+* **ARRIVAL.** The state moves when the item is removed from the store. The mediator decides this, not
+  the readout: without it "the audit sees nothing" is unfalsifiable.
+* **DISTINCTNESS.** The lens at this site is not already the token's own unembedding row. At cosine
+  1.000 an audit "in J-space" is the logit lens under another name, and E-000042 recorded what that is
+  worth here — removing every one of eight top logit-lens directions stopped GPT-2 answering nothing.
+
+`so/siting.py` is that rule; `certify()` marks a verdict read outside the window VACUOUS rather than
+negative. Pre-registration `docs/novelty/sit001-preregister.md`, committed before the arm's
+checkpoints existed; bars arrival ratio ≥ 0.50 and |cos| ≤ 0.90.
+
+**The recorded adapter's window is empty, and that much is a CONSOLIDATION, not a finding.** Arrival
+was measured in §31.57 and the cosine curve in §31.56; this is the first time they were applied as one
+rule. It is pinned as a fixture in `so/tests/test_siting.py` rather than re-measured to look new. The
+bar sensitivity is measured too, and is narrower than first asserted: the window is empty for every
+arrival floor at or above 0.06 and stops being empty only below 0.0502, where the rule would admit a
+site carrying five per cent of the movement.
+
+**arm `recorded`, `read_layers=(8, 10)`, three seeds, 16 pods.** Capability reproduces E-000063
+exactly (active 0.8795 / 0.9732 / 0.9821, unknown 1.0000 / 0.9955 / 1.0000, true object 0.0000,
+bystander 1.0000, never-memory answer floor 0.0000).
+
+| site | moves(SHRED) | arrival | lens cos | window | jprobe(A−N) | jprobe(S−N) | probe on NEVER |
+|---|---|---|---|---|---|---|---|
+| block 8 (E-000063's) | 4.39 / 1.54 / 2.48 | .055 / .016 / .032 | .777 / .785 / .791 | no | −.009 / −.013 / −.013 | −.013 / −.009 / −.018 | .196 / .246 / .250 |
+| block 9 | 7.32 / 1.42 / 3.81 | .091 / .015 / .050 | .809 / .826 / .831 | no | −.022 / −.009 / −.005 | −.022 / −.013 / −.009 | .656 / .821 / .808 |
+| block 10 | 80.39 / 93.67 / 76.51 | 1.000 | 1.000 | no | **+.933 / +.929 / +.915** | +.076 / +.005 / −.022 | .049 / .058 / .080 |
+| final | 18.73 / 31.15 / 31.28 | .233 / .333 / .409 | 1.000 | no | +.929 / +.915 / +.929 | +.080 / −.013 / +.049 | .049 / .080 / .049 |
+
+Three rows there were not known before. **(i) The audit is misplaced, not broken** — the same lens
+family, probe and transfer protocol that read −0.013 at E-000063's capture site read a live pod at
++0.915 to +0.933 one block later; §31.57 argued this from the mediator, here it is shown with the
+audit's own instrument. **(ii) A probe's accuracy on the NEVER control is itself a validity row, and
+it is not flat with depth**: at block 9 a probe trained on ACTIVE reads the pod on NEVER states at
+0.656–0.821 — the alias name in the query identifies it with no memory at all — so an
+`ACTIVE − NEVER ≥ 0.30` bar is **unreachable there by construction** on two seeds, the ceiling being
+0.18 and 0.19. At block 8, where E-000063 captures, NEVER sits at 0.196–0.250, the ceiling is
+0.75–0.80, and its bar was reachable and simply not met. **(iii)** At block 10 — where the content is,
+and where the lens IS the unembedding — `jprobe(SHRED − NEVER)` reads +0.076 / +0.005 / −0.022 against
+a ≤ 0.05 bar, so worst-of-three the deletion row would FAIL where the pod actually is while passing
+where the pod never reaches. One seed, 0.125 against a chance of 0.0625, at an inadmissible site:
+nothing is concluded from it, and it is why the second arm exists.
+
+**arm `early`, `read_layers=(4, 6)`** — identical trainer, 3000 steps, BOS, seeds, world, pods,
+templates and probe; the write placement is the only change. **The window opens: blocks 6, 7, 8 and 9
+on all three seeds**, and every registered prediction passes.
+
+| prediction | reads | bar |
+|---|---|---|
+| P0 the siting rule replicates at a new placement | first read site arrival **0.075 / 0.078 / 0.087** | < 0.50 |
+| P1 window non-empty on every seed | {6, 7, 8, 9} | non-empty |
+| P2 the audit sees a live pod at the registered site (block 6) | **+0.7723 / +0.8304 / +0.8661** | ≥ 0.30 |
+| P3 the deletion verdict, now non-vacuous | **−0.0402 / −0.0089 / +0.0179** | ≤ 0.05 |
+
+P3 holds at every site in the window, worst value +0.0491. **P2 is exactly E-000063's failed validity
+row**, which reads −0.0134 / −0.0045 / −0.0134 where E-000063 sites it. This is the first time in this
+programme that a composed store-and-audit certificate has been read at an admissible site at all.
+
+**The price, recorded with it.** Moving the write costs alias reading 0.8795 → 0.8482, 0.9732 →
+0.9286, 0.9821 → 0.9375 (0.031 to 0.045 per seed) and deletion reach 0.9955 → 0.9732 on the worst
+seed. VE1–VE3 and kill condition 1 pass on both arms, so the window is not bought by breaking the
+memory — but it is not free either.
+
+**And an exploratory control that costs the result its most tempting reading.** Scored off the
+registered verdict, in its own record: at the registered site, worst seed, `ACTIVE − NEVER` by family
+is `jspace` +0.772, **`random` +0.781**, `pca` +0.750, `unembed` +0.799, `raw` +0.723. A
+dimension-matched random projection reads the pod as well as the audit does. **Nothing here supports
+the J-lens basis being the right one**, and the claim document says so. That is the cleaner reading,
+not a weaker one: every family sits at −0.05 to +0.00 at blocks 4 and 5 and at +0.72 to +0.87 from
+block 6 on, so the discontinuity is the SITE and not the readout, on five families at once.
+
+**The DISTINCTNESS half, re-measured in CI on a clean environment** (16 entity tokens, run
+34013717005): mean `|cos(v_u, W_U[u])|` = 0.587 at hidden state 5, 0.690 at 7, 0.782 at 9, **0.822** at
+10, 1.000 at 11. §31.56 read 0.593 / 0.698 / 0.783 / 0.783 / 1.000 over eight tokens; the two agree
+except at hidden state 10, where the wider set reads 0.822 and the adapter sweep independently reads
+0.809–0.831 — so §31.56's 0.783 there is the outlier of three measurements. The workflow asserts the
+curve rises with depth, is ≤ 0.80 at hidden state 5 and ≥ 0.99 one block from the output, then feeds
+those fresh numbers through the rule to assert the recorded adapter's window is still empty, so no
+change to the lens, the rule or the bars can silently make E-000063's verdict admissible.
+
+**What this does and does not license.** It licenses: an accessibility audit of an external memory
+must be read at a site that carries the content and retains depth to the output; where those two are
+irreconcilable the certificate is vacuous whatever it reports; and on this backbone the constraint is
+satisfiable by moving the write, at a measured cost. It does not license anything about the J-lens
+basis, about models above 124M, multi-token entities, free text, or any backbone but GPT-2 small, and
+the deletion verdict it rescues remains a verdict about decodability from a residual stream, not a
+deletion guarantee.

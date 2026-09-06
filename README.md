@@ -39,7 +39,16 @@ Forschungsprojekt **SO — Modular Neural Operating System**: adressierbares, ve
   dessen, was die zweite tut, und dort trennt **kein** Auslesen — auch nicht der volle
   768-dimensionale Residualstrom — lebenden Speicher von nie geschriebenem. Zwei der vier Sätze
   dieses Dokuments sind an ihren eigenen vorregistrierten Schranken zurückgezogen.
-  Vorregistrierung: [WSC-001](docs/novelty/wsc001-preregister.md).
+  **SIT-001 ergänzt die zweite Hälfte:** ein Audit ist nur dort zulässig, wo der Inhalt angekommen ist
+  *und* die Linse noch nicht die Unembedding-Zeile ist — beim aufgezeichneten Adapter ist dieses
+  **Fenster leer**, weil beide Bedingungen einander ausschließen. Verlegt man die Schreibstellen von
+  Block (8, 10) auf (4, 6), **öffnet es sich** (Blöcke 6–9 auf allen drei Seeds): dieselbe
+  Gültigkeitszeile, die vorher fiel, liest dort +0.77 / +0.83 / +0.87, und das Löschurteil hält
+  (−0.040 / −0.009 / +0.018) — zum Preis von 0.031 bis 0.045 an Alias-Lesequalität. Eine
+  Kontrollmessung verweigert die verlockendste Lesart: eine dimensionsgleiche Zufallsprojektion liest
+  den Pod genauso gut wie das Audit, die Basis ist es also nicht, sondern die Stelle.
+  Vorregistrierungen: [WSC-001](docs/novelty/wsc001-preregister.md),
+  [SIT-001](docs/novelty/sit001-preregister.md).
 - [Was hier neu ist und was nicht](docs/so-novelty-2026-09-04.md) (Stand 04.09.2026) — die Kalibrierung
   gegen den Stand der Forschung. Der Mechanismus ist Wiedererfindung (SERAC, GRACE, Larimar, SILO, LMLM,
   MUNKEY); was bleibt, ist die Prüfung: dass ein Gate auf Werten kein Löschprimitiv ist, wenn ein anderer
