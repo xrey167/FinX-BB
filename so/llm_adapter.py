@@ -162,6 +162,7 @@ class KnowledgeAdapterLM(nn.Module):
         self.scale = nn.Parameter(torch.tensor(1.0))
         self._ctx: Optional[Dict] = None
         self._inject_projection = None      # evaluation-only; see set_inject_projection
+        self._inject_override = None        # evaluation-only; see set_inject_override
         blocks = transformer_blocks(lm)
         self._hooks = [blocks[l].register_forward_hook(self._make_hook(i, l)) for i, l in enumerate(cfg.read_layers)]
 
@@ -299,6 +300,45 @@ class KnowledgeAdapterLM(nn.Module):
             per_layer[int(l)] = (b, mode)
         self._inject_projection = per_layer
 
+    def set_inject_override(self, vectors, layers: Optional[Sequence[int]] = None,
+                            match_norm: bool = True) -> None:
+        """Replace the write itself with a supplied (B, d) direction, at the write's own norm.
+
+        The projection arms ask what a basis accounts for in the write the adapter learned. This asks
+        the other half: what would a write that is BY CONSTRUCTION the object's own output-embedding
+        row do instead? Before training, ``v_proj`` and ``o_proj`` are the identity, so that row IS
+        the write (so/llm_adapter.py, ``nn.init.eye_``); training moves it a long way off
+        (relative Frobenius distance 2.42 / 1.71 / 1.24, ledger 31.39). Keeping the magnitude and
+        changing only the direction makes the two writes comparable.
+
+        Pass None to clear. ``vectors`` is (B, d) and must match the batch.
+        """
+        if vectors is None:
+            self._inject_override = None
+            return
+        v = torch.as_tensor(vectors, dtype=torch.float32)
+        if v.ndim != 2 or v.shape[1] != self.d:
+            raise ValueError(f"override must be (B, d={self.d}), got {tuple(v.shape)}")
+        sites = tuple(self.cfg.read_layers if layers is None else layers)
+        unknown = [l for l in sites if l not in self.cfg.read_layers]
+        if unknown:
+            raise ValueError(f"layers {unknown} are not read layers {tuple(self.cfg.read_layers)}")
+        self._inject_override = (v, tuple(int(l) for l in sites), bool(match_norm))
+
+    def _override_injection(self, read: torch.Tensor, layer: int) -> torch.Tensor:
+        o = getattr(self, "_inject_override", None)
+        if not o:
+            return read
+        v, sites, match_norm = o
+        if layer not in sites:
+            return read
+        if v.shape[0] != read.shape[0]:
+            raise ValueError(f"override batch {v.shape[0]} does not match read batch {read.shape[0]}")
+        out = v.to(read.dtype)
+        if match_norm:
+            out = out * (read.norm(dim=-1, keepdim=True) / out.norm(dim=-1, keepdim=True).clamp_min(1e-6))
+        return out
+
     def _project_injection(self, read: torch.Tensor, layer: int) -> torch.Tensor:
         p = getattr(self, "_inject_projection", None)
         if not p or layer not in p:
@@ -388,7 +428,7 @@ class KnowledgeAdapterLM(nn.Module):
                 ref = self.o_proj[str(layer)](val)
                 rms_r = ref.pow(2).mean(-1, keepdim=True).sqrt().clamp_min(1e-3 * rms_h + 1e-6)
                 read = read * (rms_h / rms_r) * self.inject_gain[read_index]
-            read = self._project_injection(read, layer)
+            read = self._project_injection(self._override_injection(read, layer), layer)
             ctx.setdefault("injected", []).append(read.detach())
             delta = torch.zeros_like(h)
             delta[ar, ctx["last_idx"]] = read
