@@ -10,6 +10,10 @@ on:
       - 'so/experiments/e000063_workspace_pod_certificate.py'
       - 'so/tests/test_jlens.py'
       - 'so/tests/test_inject_projection.py'
+      - 'so/siting.py'
+      - 'so/tests/test_siting.py'
+      - 'so/experiments/sit001_audit_window.py'
+      - 'so/experiments/sit001_early_read_train.py'
       - '.github/workflows/wsc001-instruments.yml'
   workflow_dispatch:
 
@@ -69,4 +73,40 @@ jobs:
               assert keep >= 0.99, f"keep arm loses first-order mass at layer {layer}: {keep}"
               assert rnd < 0.9, f"a random subspace retains as much as the atom span at layer {layer}"
           print(json.dumps(out, indent=2))
+          PY
+      - name: The premise the audit window's DISTINCTNESS half rests on
+        env:
+          SO_THREADS: '2'
+        run: |
+          python - <<'PY'
+          import json, torch
+          torch.set_num_threads(2)
+          from transformers import AutoTokenizer, AutoModelForCausalLM
+          from so.jlens import jlens_vectors
+          from so.siting import audit_window, lens_alignment, window_sites
+          from so.experiments.e000008_gpt2_adapter import select_entities
+          from so.experiments.wsc001_workspace_share import LENS_CORPUS
+          tok = AutoTokenizer.from_pretrained("gpt2"); tok.pad_token = tok.eos_token
+          lm = AutoModelForCausalLM.from_pretrained("gpt2").eval()
+          for p in lm.parameters():
+              p.requires_grad_(False)
+          w = lm.get_output_embeddings().weight
+          ids = select_entities(tok, 16)
+          enc = tok(LENS_CORPUS, return_tensors="pt", padding=True)
+          rows = w[torch.as_tensor(ids)]
+          cos = {}
+          for hs in (5, 7, 9, 10, 11):
+              jl = jlens_vectors(lm, hs, ids, enc["input_ids"], enc["attention_mask"], w, batch=2)
+              cos[hs] = lens_alignment(jl.vectors, rows)
+          print(json.dumps(cos, indent=2))
+          # The whole DISTINCTNESS half is this curve: the J-lens becomes the logit lens as the site
+          # approaches the output, because no computation is left for the Jacobian to be about. If
+          # that stops holding, the window rule is measuring something else and must be re-derived.
+          assert cos[11] >= 0.99, f"the lens is not degenerate one block from the output: {cos[11]}"
+          assert cos[5] <= 0.80, f"the lens is already the logit lens at hidden state 5: {cos[5]}"
+          assert cos[5] < cos[9] < cos[11], f"the alignment is not increasing with depth: {cos}"
+          # And the recorded adapter's window stays empty on freshly measured cosines.
+          med = {"site8": 2.81, "site9": 4.19, "site10": 83.55, "final": 27.06}
+          live = {"site8": cos[9], "site9": cos[10], "site10": cos[11], "final": cos[11]}
+          assert window_sites(audit_window(med, live)) == [], "the recorded adapter's window is not empty"
           PY
