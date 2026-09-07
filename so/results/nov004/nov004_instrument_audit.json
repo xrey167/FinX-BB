@@ -49,7 +49,7 @@
     "e000105_stable_gate_cohort_transport_reduction.py",
     "e000107_state_only_causal_lineage_identifiability.py"
   ],
-  "class_a_incidental_count": 18,
+  "class_a_incidental_count": 22,
   "class_a_incidental_duplicates": [
     {
       "assigned_to": [
@@ -59,8 +59,8 @@
       "callee": "zeros",
       "file": "e000015_symlink_cells.py",
       "lines": [
-        145,
-        146
+        149,
+        150
       ],
       "results_are_compared": false,
       "scope": "bank_with_links"
@@ -73,8 +73,8 @@
       "callee": "zeros",
       "file": "e000015_symlink_cells.py",
       "lines": [
-        227,
-        228
+        231,
+        232
       ],
       "results_are_compared": false,
       "scope": "encode_slots"
@@ -87,8 +87,8 @@
       "callee": "zeros",
       "file": "e000015_symlink_cells.py",
       "lines": [
-        228,
-        231
+        232,
+        235
       ],
       "results_are_compared": false,
       "scope": "encode_slots"
@@ -232,6 +232,62 @@
       ],
       "results_are_compared": false,
       "scope": "run"
+    },
+    {
+      "assigned_to": [
+        "rng",
+        "rng2"
+      ],
+      "callee": "default_rng",
+      "file": "e000087_marker_validity_contract.py",
+      "lines": [
+        91,
+        97
+      ],
+      "results_are_compared": false,
+      "scope": "proposal_measure"
+    },
+    {
+      "assigned_to": [
+        "s0",
+        "s1"
+      ],
+      "callee": "zeros",
+      "file": "e000089_nonlinear_delta_repair_boundary.py",
+      "lines": [
+        104,
+        104
+      ],
+      "results_are_compared": false,
+      "scope": "_block_local"
+    },
+    {
+      "assigned_to": [
+        "repair",
+        "verified"
+      ],
+      "callee": "copy",
+      "file": "e000090_source_cone_soundness.py",
+      "lines": [
+        143,
+        149
+      ],
+      "results_are_compared": false,
+      "scope": "routing_screen"
+    },
+    {
+      "assigned_to": [
+        "conventional",
+        "repaired"
+      ],
+      "callee": "replay_local",
+      "file": "e000090_source_cone_soundness.py",
+      "lines": [
+        97,
+        101
+      ],
+      "results_are_compared": false,
+      "scope": "If"
     },
     {
       "assigned_to": [
@@ -741,6 +797,56 @@
     },
     {
       "assigned_to": [
+        "gk"
+      ],
+      "callee": "GPT2Knowledge",
+      "file": "e000054_two_token_subjects.py",
+      "invariant_in": [
+        "AdapterConfig"
+      ],
+      "line": 171,
+      "loop_line": 170
+    },
+    {
+      "assigned_to": [
+        "a"
+      ],
+      "callee": "astype",
+      "file": "e000056_epoch_capacity.py",
+      "invariant_in": [
+        "float"
+      ],
+      "line": 179,
+      "loop_line": 170
+    },
+    {
+      "assigned_to": [
+        "mask"
+      ],
+      "callee": "ones",
+      "file": "e000057_dependency_closure.py",
+      "invariant_in": [
+        "bank",
+        "bool"
+      ],
+      "line": 183,
+      "loop_line": 162
+    },
+    {
+      "assigned_to": [
+        "mask"
+      ],
+      "callee": "ones",
+      "file": "e000057_dependency_closure.py",
+      "invariant_in": [
+        "bank",
+        "bool"
+      ],
+      "line": 183,
+      "loop_line": 182
+    },
+    {
+      "assigned_to": [
         "m"
       ],
       "callee": "evaluate",
@@ -845,8 +951,8 @@
       "invariant_in": [
         "n_class"
       ],
-      "line": 118,
-      "loop_line": 113
+      "line": 119,
+      "loop_line": 114
     },
     {
       "assigned_to": [
@@ -1108,7 +1214,7 @@
       "loop_line": 130
     }
   ],
-  "class_b_count": 61,
+  "class_b_count": 65,
   "class_b_files": [
     "e000008_gpt2_adapter.py",
     "e000011_gpt2_v2.py",
@@ -1129,6 +1235,9 @@
     "e000045_fanout.py",
     "e000049_template_nullspace_addressing.py",
     "e000050_bos_artefact.py",
+    "e000054_two_token_subjects.py",
+    "e000056_epoch_capacity.py",
+    "e000057_dependency_closure.py",
     "e000057_three_state_router.py",
     "e000058_single_read_three_state.py",
     "e000062_jspace_address_abi.py",
@@ -1146,7 +1255,7 @@
   ],
   "decision": "SCANNER_VALID",
   "experiment": "NOV-004",
-  "files_scanned": 106,
+  "files_scanned": 118,
   "how_to_read_this": "Class A is decidable from the syntax: two names in one scope bound to identical call expressions, so any predicate comparing them cannot fail. Each is a finding. Class B is a heuristic and each entry is a candidate for review, never a verdict \u2014 a call can be loop-invariant and still necessary, and an invariant call in the *candidate* arm is not a defect at all. It becomes one only when it sits on the baseline, where it inflates the candidate's margin for free, which is what NOV-003 found in E-000103. Reading Class B as a list of defects would be \u00a731.46's error repeated: scoring something the instrument cannot resolve.",
   "known_sites_found": [
     "e000104_tensor_train_lifecycle_quotient_reduction.py:local_update_multiplies",

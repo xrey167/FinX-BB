@@ -161,6 +161,9 @@ class KnowledgeAdapterLM(nn.Module):
             self.null_value = nn.Parameter(torch.zeros(len(cfg.read_layers), d), requires_grad=False)
         self.scale = nn.Parameter(torch.tensor(1.0))
         self._ctx: Optional[Dict] = None
+        self._inject_projection = None      # evaluation-only; see set_inject_projection
+        self._inject_override = None        # evaluation-only; see set_inject_override
+        self._inject_scale = None           # evaluation-only; see set_inject_scale
         blocks = transformer_blocks(lm)
         self._hooks = [blocks[l].register_forward_hook(self._make_hook(i, l)) for i, l in enumerate(cfg.read_layers)]
 
@@ -241,6 +244,168 @@ class KnowledgeAdapterLM(nn.Module):
         allowed = bank["routable"] if (self.cfg.status_gated and "routable" in bank) else bank["active"]
         return {"keys": keys, "values": values, "values_payload": payload, "gate": g.squeeze(-1), "active": allowed}
 
+    # -------------------------------------------------- the injected read, restricted to a subspace
+    #
+    # EVALUATION-ONLY INSTRUMENT, off by default, so every recorded number is unaffected: with no
+    # projection set this is the identity and the forward is bit-identical to the one that produced
+    # the records (pinned by so/tests/test_inject_projection.py).
+    #
+    # WHY IT EXISTS. The adapter's write is RMS-matched to the residual stream, so a memory read is a
+    # LARGE perturbation, not an infinitesimal one. A first-order interpretability basis -- the
+    # J-lens, the logit lens, an SAE dictionary -- is only guaranteed to account for infinitesimal
+    # ones. Restricting the injected read to a basis and to its orthogonal complement, and reading the
+    # model's answer in each case, is what separates "the basis represents the channel" from "the
+    # basis is where the first-order term lives by definition".
+    #
+    # WHY BOTH MAGNITUDES. Projection removes norm as well as direction, so a bare projection confounds
+    # "the wrong directions" with "a smaller write". The ``_renorm`` modes restore the unprojected
+    # read's norm, isolating direction; the bare modes are what an audit of the real write would see.
+    # Both are reported rather than one being chosen.
+    MODES = ("keep", "drop", "keep_renorm", "drop_renorm", "zero")
+
+    def set_inject_projection(self, basis, mode: str = "keep", layers: Optional[Sequence[int]] = None) -> None:
+        """``basis`` is (d, r) with ORTHONORMAL COLUMNS, or None to restore the trained behaviour.
+
+        Modes: ``keep`` / ``drop`` -- inject the component inside / outside the span; ``keep_renorm``
+        / ``drop_renorm`` -- the same direction at the unprojected read's norm; ``zero`` -- inject
+        nothing (the no-memory floor, which needs no basis).
+
+        ``basis`` may also be a ``{layer: basis}`` mapping, and ``layers`` may name a subset of the
+        read layers. Both exist because the arms are PER READ SITE: a lens basis is a property of one
+        layer, and restricting an earlier write changes which cell a later read routes to, so an arm
+        applied at every site is a different object from one applied at a single site. Sites not named
+        keep the trained write.
+        """
+        if mode not in self.MODES:
+            raise ValueError(f"mode must be one of {self.MODES}, got {mode!r}")
+        sites = tuple(self.cfg.read_layers if layers is None else layers)
+        unknown = [l for l in sites if l not in self.cfg.read_layers]
+        if unknown:
+            raise ValueError(f"layers {unknown} are not read layers {tuple(self.cfg.read_layers)}")
+        if basis is None and mode != "zero":
+            self._inject_projection = None
+            return
+        per_layer: Dict[int, Tuple[Optional[torch.Tensor], str]] = {}
+        for l in sites:
+            b = None
+            if mode != "zero":
+                raw = basis[l] if isinstance(basis, dict) else basis
+                b = torch.as_tensor(raw, dtype=torch.float32)
+                if b.ndim != 2 or b.shape[0] != self.d:
+                    raise ValueError(f"basis for layer {l} must be (d={self.d}, r), got {tuple(b.shape)}")
+                gram = b.t() @ b
+                off = (gram - torch.eye(b.shape[1], dtype=gram.dtype)).abs().max()
+                if float(off) > 1e-3:
+                    raise ValueError(f"basis columns are not orthonormal (max |G - I| = {float(off):.2e}); "
+                                     "orthonormalise it, or 'keep' and 'drop' do not partition the read")
+            per_layer[int(l)] = (b, mode)
+        self._inject_projection = per_layer
+
+    def set_inject_override(self, vectors, layers: Optional[Sequence[int]] = None,
+                            match_norm: bool = True) -> None:
+        """Replace the write itself with a supplied (B, d) direction, at the write's own norm.
+
+        The projection arms ask what a basis accounts for in the write the adapter learned. This asks
+        the other half: what would a write that is BY CONSTRUCTION the object's own output-embedding
+        row do instead? Before training, ``v_proj`` and ``o_proj`` are the identity, so that row IS
+        the write (so/llm_adapter.py, ``nn.init.eye_``); training moves it a long way off
+        (relative Frobenius distance 2.42 / 1.71 / 1.24, ledger 31.39). Keeping the magnitude and
+        changing only the direction makes the two writes comparable.
+
+        Pass None to clear. ``vectors`` is (B, d) and must match the batch.
+        """
+        if vectors is None:
+            self._inject_override = None
+            return
+        v = torch.as_tensor(vectors, dtype=torch.float32)
+        if v.ndim != 2 or v.shape[1] != self.d:
+            raise ValueError(f"override must be (B, d={self.d}), got {tuple(v.shape)}")
+        sites = tuple(self.cfg.read_layers if layers is None else layers)
+        unknown = [l for l in sites if l not in self.cfg.read_layers]
+        if unknown:
+            raise ValueError(f"layers {unknown} are not read layers {tuple(self.cfg.read_layers)}")
+        self._inject_override = (v, tuple(int(l) for l in sites), bool(match_norm))
+
+    def _override_injection(self, read: torch.Tensor, layer: int) -> torch.Tensor:
+        o = getattr(self, "_inject_override", None)
+        if not o:
+            return read
+        v, sites, match_norm = o
+        if layer not in sites:
+            return read
+        if v.shape[0] != read.shape[0]:
+            raise ValueError(f"override batch {v.shape[0]} does not match read batch {read.shape[0]}")
+        out = v.to(read.dtype)
+        if match_norm:
+            out = out * (read.norm(dim=-1, keepdim=True) / out.norm(dim=-1, keepdim=True).clamp_min(1e-6))
+        return out
+
+    def _project_injection(self, read: torch.Tensor, layer: int) -> torch.Tensor:
+        p = getattr(self, "_inject_projection", None)
+        if not p or layer not in p:
+            return read
+        basis, mode = p[layer]
+        if mode == "zero":
+            return torch.zeros_like(read)
+        inside = (read @ basis) @ basis.t()
+        out = inside if mode.startswith("keep") else read - inside
+        if mode.endswith("_renorm"):
+            out = out * (read.norm(dim=-1, keepdim=True) / out.norm(dim=-1, keepdim=True).clamp_min(1e-6))
+        return out
+
+    # -------------------------------------------------- the injected read, at a fraction of its size
+    #
+    # EVALUATION-ONLY INSTRUMENT, off by default, so every recorded number is unaffected: with no
+    # scale set this is the identity and the forward is bit-identical to the one that produced the
+    # records (pinned by so/tests/test_inject_scale.py).
+    #
+    # WHY IT EXISTS. ``set_inject_projection(..., "zero")`` gives a write of nothing and the trained
+    # forward gives a write of everything, and between those two there was no state this harness could
+    # ask about. An audit that reports "no residual trace after deletion" is making a claim about
+    # everything in between: it is asserting that had a residue been there, it would have been seen.
+    # Nothing in this repository, and nothing in the accessibility-audit literature the ledger cites,
+    # has ever measured the smallest residue such an audit can actually see, because a residue is not
+    # a thing a parametric memory can be given in a known amount. Here the write is a tensor this
+    # harness holds, so it can be given in a known amount: ``alpha`` is the fraction of the trained
+    # write that survives, 0.0 is the no-memory floor and 1.0 is the trained forward.
+    #
+    # WHAT IT IS AND IS NOT. It is a MAGNITUDE ladder on the adapter's write, applied after gating,
+    # RMS matching, any override and any projection, at the site named. It is NOT a model of how a
+    # partial deletion arises in the store -- the store's own graded dial is the marker chord, which
+    # moves the gate ``g`` in ``encode_bank`` and attenuates the payload TOWARD ' unknown' rather than
+    # toward zero. The two axes answer different questions and an experiment that wants the second
+    # must move the marker, not this. Both are reported separately wherever both are run.
+    def set_inject_scale(self, alpha: Optional[float], layers: Optional[Sequence[int]] = None) -> None:
+        """Inject ``alpha`` times the write this forward would otherwise make, or None to restore it.
+
+        ``alpha`` is a non-negative float; 1.0 is the trained behaviour and 0.0 injects nothing (and is
+        therefore the same state as ``set_inject_projection(None, "zero")`` at the same sites). Values
+        above 1.0 are permitted so that the ladder can bracket the trained write from both sides, which
+        is what distinguishes "the audit is saturated here" from "the audit is blind here".
+
+        ``layers`` may name a subset of the read layers; sites not named keep the trained write. The
+        subset exists for the same reason it exists on ``set_inject_projection``: restricting an
+        earlier write changes which cell a later read routes to (ledger 31.56), so a ladder applied at
+        every site is a different object from one applied at a single site.
+        """
+        if alpha is None:
+            self._inject_scale = None
+            return
+        a = float(alpha)
+        if not (a >= 0.0) or a != a:                      # rejects negatives and NaN
+            raise ValueError(f"alpha must be a non-negative float, got {alpha!r}")
+        sites = tuple(self.cfg.read_layers if layers is None else layers)
+        unknown = [l for l in sites if l not in self.cfg.read_layers]
+        if unknown:
+            raise ValueError(f"layers {unknown} are not read layers {tuple(self.cfg.read_layers)}")
+        self._inject_scale = {int(l): a for l in sites}
+
+    def _scale_injection(self, read: torch.Tensor, layer: int) -> torch.Tensor:
+        s = getattr(self, "_inject_scale", None)
+        if not s or layer not in s:
+            return read
+        return read * s[layer]
+
     def _make_hook(self, read_index: int, layer: int):
         def hook(module, inputs, output):
             if self._ctx is None:
@@ -317,6 +482,9 @@ class KnowledgeAdapterLM(nn.Module):
                 ref = self.o_proj[str(layer)](val)
                 rms_r = ref.pow(2).mean(-1, keepdim=True).sqrt().clamp_min(1e-3 * rms_h + 1e-6)
                 read = read * (rms_h / rms_r) * self.inject_gain[read_index]
+            read = self._scale_injection(
+                self._project_injection(self._override_injection(read, layer), layer), layer)
+            ctx.setdefault("injected", []).append(read.detach())
             delta = torch.zeros_like(h)
             delta[ar, ctx["last_idx"]] = read
             if self.cfg.n_deref == 0:
@@ -345,5 +513,9 @@ class KnowledgeAdapterLM(nn.Module):
         # return value so that every existing call site keeps its four-tuple.
         self.last_query = (torch.stack(self._ctx["query"], dim=1)
                            if self._ctx is not None and self._ctx.get("query") else None)
+        # (B, len(read_layers), d): the vector actually added to the residual at each read site, after
+        # gating, RMS matching and any injection projection. The geometry rows read this.
+        self.last_injected = (torch.stack(self._ctx["injected"], dim=1)
+                              if self._ctx is not None and self._ctx.get("injected") else None)
         self._ctx = None
         return cand, full, routing, hidden

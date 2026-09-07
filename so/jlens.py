@@ -86,7 +86,15 @@ def jlens_vectors(lm, layer: int, token_ids: Sequence[int], input_ids: torch.Ten
     for start in range(0, input_ids.shape[0], batch):
         chunk = input_ids[start: start + batch].to(dev)
         mask = attention_mask[start: start + batch].to(dev)
-        out = lm(input_ids=chunk, attention_mask=mask, output_hidden_states=True)
+        # The forward runs from the token EMBEDDINGS as a leaf that requires grad. On a frozen model --
+        # ``KnowledgeAdapterLM`` sets ``requires_grad_(False)`` on every core parameter -- a forward from
+        # ``input_ids`` builds no autograd graph at all, and the VJP below raises "element 0 of tensors
+        # does not require grad" (E-000063's CI run died on exactly that line at step 2000 of its
+        # training, both seeds). The lens is a derivative with respect to the hidden STATE, never the
+        # weights, so a leaf at the embeddings gives the identical quantity on a trainable model and the
+        # only working one on a frozen model.
+        emb = lm.get_input_embeddings()(chunk).detach().requires_grad_(True)
+        out = lm(inputs_embeds=emb, attention_mask=mask, output_hidden_states=True)
         h = out.hidden_states[layer]                       # (B, T, d), the state being differentiated
         z = out.hidden_states[target_layer]                # (B, T, d), the target the paper uses
         keep = mask.unsqueeze(-1).to(z.dtype)
@@ -111,3 +119,87 @@ def jlens_logits(h: torch.Tensor, jl: JLens) -> torch.Tensor:
     monotone per-row rescaling does not change which directions a state is made of.
     """
     return h.reshape(-1, h.shape[-1]) @ jl.vectors.t()
+
+
+def workspace_basis(lm, layer: int, token_ids, input_ids: torch.Tensor, attention_mask: torch.Tensor,
+                    w_out: torch.Tensor, target_layer: int = -2, rank: Optional[int] = None,
+                    energy: float = 1.0, batch: int = 4):
+    """An orthonormal basis of ``span{v_u : u in token_ids}`` at ``layer``, with its spectrum.
+
+    Returns ``(basis (d, r), singular_values, jl)``. ``rank`` fixes r; otherwise r is the smallest
+    number of singular directions holding ``energy`` of the J-lens family's squared spectrum.
+
+    WHAT THIS SUBSPACE IS. Each J-lens vector is the direction at ``layer`` whose inner product with
+    the residual gives the first-order contribution to one token's final logit. Their span is
+    therefore the subspace in which a perturbation at this layer has ANY first-order effect on the
+    tokens concerned: a perturbation in the orthogonal complement moves those logits only through
+    second-order terms. Anthropic's workspace paper reads a state's coordinates in this family; an
+    accessibility audit built on it (J-Access) sees exactly this subspace and nothing else.
+
+    WHY THE SPECTRUM MATTERS AND IS RETURNED. The family is far from orthogonal (on GPT-2 small the
+    mean |cos| between two entity atoms at layer 8 is 0.51), so 256 atoms do not span 256 useful
+    directions: r99 is 210 at layer 8 and 216 at layer 10. A caller comparing against a matched-rank
+    random subspace must match THIS r, not the number of tokens, or the null is not matched.
+    """
+    jl = jlens_vectors(lm, layer, token_ids, input_ids, attention_mask, w_out, target_layer, batch)
+    u, s, _ = torch.linalg.svd(jl.vectors.t().to(torch.float32), full_matrices=False)
+    if rank is None:
+        if energy >= 1.0:
+            rank = int((s > s[0] * 1e-6).sum())        # the numerical rank: the whole span
+        else:
+            frac = (s ** 2).cumsum(0) / (s ** 2).sum()
+            rank = int((frac < energy).sum()) + 1
+    return u[:, :rank].contiguous(), s, jl
+
+
+def first_order_retention(basis: torch.Tensor, atoms: torch.Tensor, drop: bool = True) -> torch.Tensor:
+    """How much first-order effect on each token survives projecting a write onto (or out of) ``basis``.
+
+    A write ``r`` moves token u's final logit, to first order, by ``<v_u, r>``. After projection the
+    surviving first-order term is ``<v_u, P r> = <P v_u, r>``, so what a caller needs to know before
+    reading any arm is ``||P v_u|| / ||v_u||`` for every scored token: at 0 the arm is EXACTLY
+    first-order null and any answer it produces is second order; at 0.09 it is not, and a surviving
+    answer may be nothing but truncation leakage. Returned per token so the worst one can be reported.
+    """
+    a = torch.nn.functional.normalize(atoms.to(torch.float32), dim=-1)
+    inside = (a @ basis) @ basis.t()
+    kept = (a - inside) if drop else inside
+    return kept.norm(dim=-1)
+
+
+def token_matched_basis(lm, layer: int, exclude_ids, n_tokens: int, input_ids: torch.Tensor,
+                        attention_mask: torch.Tensor, w_out: torch.Tensor, seed: int,
+                        target_layer: int = -2, batch: int = 4):
+    """The structure-matched null: the same lens construction over OTHER vocabulary tokens.
+
+    An isotropic random subspace is not the right null for a J-lens span. The family is strongly
+    anisotropic (mean |cos| 0.51 between two entity atoms at layer 8), so a random subspace of matched
+    rank differs from it in shape as well as in identity, and an arm that separates them has shown only
+    that the write is not isotropic. This basis is built by the identical procedure over an equally
+    sized set of tokens that are NOT scored, so it matches rank, construction and anisotropy and
+    differs only in which tokens it belongs to.
+    """
+    g = torch.Generator().manual_seed(int(seed))
+    excl = set(int(t) for t in exclude_ids)
+    vocab = w_out.shape[0]
+    pick: List[int] = []
+    while len(pick) < n_tokens:
+        t = int(torch.randint(0, vocab, (1,), generator=g))
+        if t not in excl:
+            excl.add(t)
+            pick.append(t)
+    return workspace_basis(lm, layer, pick, input_ids, attention_mask, w_out, target_layer,
+                           rank=None, energy=1.0, batch=batch) + (pick,)
+
+
+def random_basis(d: int, rank: int, seed: int) -> torch.Tensor:
+    """A uniformly random orthonormal (d, rank) basis: the structure-matched null for ``workspace_basis``.
+
+    The null a subspace result needs is not "a random vector" but a random subspace OF THE SAME RANK:
+    projecting onto any r-dimensional subspace keeps r/d of a random vector's mass, so a keep/drop
+    contrast that is really about rank reproduces itself here and the arm is void.
+    """
+    g = torch.Generator().manual_seed(int(seed))
+    a = torch.randn(d, rank, generator=g)
+    q, _ = torch.linalg.qr(a)
+    return q[:, :rank].contiguous()

@@ -10,3 +10,6 @@ test = ["pytest>=8"]
 
 [tool.pytest.ini_options]
 testpaths = ["so/tests"]
+markers = [
+  "network: requires downloading or loading external model artifacts",
+]

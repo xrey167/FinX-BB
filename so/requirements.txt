@@ -3,3 +3,7 @@ torch>=2.2          # CPU build is enough: pip install torch --index-url https:/
 pytest>=8
 transformers>=4.40  # only the frozen-GPT-2 experiments need this
 safetensors>=0.4
+scipy>=1.11         # so/experiments/qcr001_rounding_cell_repair.py imports scipy.linalg.qr, so the
+                    # test suite cannot be collected without it. QCR001's own workflow pins
+                    # scipy==1.17.0 and this file never declared it, so a clean environment built from
+                    # these requirements failed at collection (PR #20, run 34003854438).

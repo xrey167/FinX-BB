@@ -269,11 +269,11 @@ CLAIMS: tuple[Claim, ...] = (
     Claim("E29 band 0.80 max", "e000029_marker_geometry.json", "per_checkpoint/*/band_accept/7", "0.4014", "dp4", "max"),
     Claim("E29 band 0.90 mean", "e000029_marker_geometry.json", "per_checkpoint/*/band_accept/8", "0.0000", "dp4", "mean"),
 
-    # NOV-004 — the sweep's own coverage. This went stale the moment the base branch grew by six
-    # experiments, and nothing caught it: the paper's "100" was passing its presence test on
-    # E-000035's pod count, a different quantity that renders the same way.
+    # NOV-004 — the sweep's own coverage. This first went stale when the base branch grew by six
+    # experiments, and moved again when the research histories were consolidated. The value is
+    # deliberately bound to the generated audit rather than treated as durable prose.
     Claim("NOV004 experiments scanned", "nov004/nov004_instrument_audit.json", "files_scanned",
-          "106", "int", "", "", "mechanical sweep"),
+          "118", "int", "", "", "mechanical sweep"),
     Claim("NOV004 class A confirmed", "nov004/nov004_instrument_audit.json",
           "class_a_confirmed_count", "3", "int", "", "three", "mechanical sweep"),
 

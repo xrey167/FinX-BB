@@ -31,7 +31,7 @@
       "chance_top1": 0.00390625,
       "leaks_above_chance": true,
       "mean_candidates_remaining": 2.9166666666666665,
-      "mean_posterior_on_true_payload": 0.3916666666666666,
+      "mean_posterior_on_true_payload": 0.39166666666666666,
       "payload_derived_channels": [
         "adjacency"
       ],

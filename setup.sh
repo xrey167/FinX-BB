@@ -58,7 +58,7 @@ print(f"   python {sys.version.split()[0]}  torch {torch.__version__}  "
       f"numpy {numpy.__version__}  transformers {transformers.__version__}")
 print(f"   threads torch sees: {torch.get_num_threads()}")
 PYCHK
-"$PY" -m pytest so/tests -q 2>&1 | tail -2
+"$PY" -m pytest so/tests -q -m "not network" 2>&1 | tail -2
 
 cat <<'MSG'
 

@@ -13,12 +13,13 @@ THREADS ?= $(shell nproc)
 SEEDS ?= 0 1 2
 RUN = OMP_NUM_THREADS=$(THREADS) SO_THREADS=$(THREADS) $(PY) -m
 
-.PHONY: help test smoke synthetic gpt2 demo compare rescore certify closure retrieval pointers \
+.PHONY: help test test-network smoke synthetic gpt2 demo compare rescore certify closure retrieval pointers \
         disclosure traceless keychannel calibrate pdxaudit charged unread auditinstr papernums novelty realindex closurereal untied \
-        report clean-results env
+        report clean-results env lod001
 
 help:
-	@echo "make test        unit tests, ~3 min (the deletion certificate sweeps its whole payload domain)"
+	@echo "make test        offline unit and contract tests; no model downloads"
+	@echo "make test-network model-backed integration tests; downloads/loads GPT-2"
 	@echo "make smoke       reduced synthetic chain from scratch, ~35 min on 4 cores, writes *-quick records"
 	@echo "make synthetic   recorded synthetic chain, ~3 h on 4 cores"
 	@echo "make gpt2        frozen-GPT-2 chain, ~20 h on 4 cores, downloads GPT-2 once"
@@ -43,6 +44,7 @@ help:
 	@echo "make closurereal E-000033's protocol with an encoder that clears its control. ~3 min"
 	@echo "make untied      the layer on a model that does not tie its embeddings (downloads Pythia-160m)"
 	@echo "make report      rebuild docs/so-results-2026-09-02.md from so/results/"
+	@echo "make lod001      the detection limit of the audit: train 3 BOS symlink seeds, then both ladders"
 	@echo "make env         print what will be used"
 	@echo ""
 	@echo "variables: PY=$(PY)  THREADS=$(THREADS)  SEEDS=$(SEEDS)"
@@ -53,7 +55,10 @@ env:
 	@echo "note: the full gpt2 target writes about 500 MB of checkpoints into so/results/checkpoints/"
 
 test:
-	$(PY) -m pytest so/tests -q
+	$(PY) -m pytest so/tests -q -m "not network"
+
+test-network:
+	$(PY) -m pytest so/tests/test_jlens.py so/tests/test_two_token_subjects.py -q -m network
 
 # ------------------------------------------------- smoke: trains everything at a reduced budget
 # Its models and records live in a -quick namespace, so it never reuses or overwrites a recorded one.
@@ -184,3 +189,9 @@ report:
 # results are the record; this only removes the reduced smoke output
 clean-results:
 	rm -f so/results/*-quick.json so/results/*-quick.md so/results/*-smoke.json so/results/*-smoke.md
+
+# LOD-001: the smallest residue the accessibility audit could have seen. The training is the whole
+# cost (~20 min per seed on 4 cores); the ladders themselves are forward passes and probe fits.
+lod001:
+	SO_BOS=1 SO_CKPT_SUFFIX=_bos $(RUN) so.experiments.e000052_symlink_bos_train --seeds $(SEEDS) --steps 3000
+	SO_BOS=1 $(RUN) so.experiments.lod001_detection_limit --seeds $(SEEDS) --threads $(THREADS)

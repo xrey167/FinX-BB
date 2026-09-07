@@ -565,9 +565,10 @@ def test_a_pinned_claim_only_matches_in_its_own_context():
     """`100` is five different quantities here, and binding one let another go stale.
 
     E-000035's pod count and NOV-004's count of scanned experiments both rendered "100". The pod
-    claim's presence test found *some* occurrence and passed, so when the repository grew to 106
-    experiments the paper's sweep count went stale behind a green check. `near` pins a claim to the
-    paragraph that identifies which quantity it is.
+    claim's presence test found *some* occurrence and passed, so when the repository first grew to
+    106 experiments the paper's sweep count went stale behind a green check. `near` pins a claim to
+    the paragraph that identifies which quantity it is; the bound value now tracks the consolidated
+    repository.
     """
     pinned = [c for c in CLAIMS if c.near]
     assert pinned, "nothing is pinned; this test is checking nothing"
@@ -596,12 +597,12 @@ def test_a_pin_naming_no_paragraph_is_reported_not_ignored():
 
 
 def test_the_sweep_count_tracks_the_repository_rather_than_the_prose():
-    """It went stale when the base branch grew by six experiments, not when anyone edited the paper."""
+    """The generated audit, registry, and current prose move together as the repository grows."""
     import json
     from pathlib import Path
     rec = json.loads(Path("so/results/nov004/nov004_instrument_audit.json").read_text())
-    assert rec["files_scanned"] == 106
-    assert "sweep of all 106 recorded experiments" in _PAPER_TEXT
+    assert rec["files_scanned"] == 118
+    assert "sweep of all 118 recorded experiments" in _PAPER_TEXT
     # the old count survives only inside backticks, where §9 quotes it as the claim that went stale
     # -- the same convention that lets the coverage pass ignore it
     for m in re.finditer(r"100 recorded experiments", _PAPER_TEXT):

@@ -30,6 +30,16 @@ Forschungsprojekt **SO — Modular Neural Operating System**: adressierbares, ve
   die sie überstehen muss. Ein Pod macht einen Fakt in **einer** Löschung unerreichbar statt in k — und
   macht die Löschung selbst aus dem Store allein eindeutig identifizierbar (1.0000 gegen 0.0000), wo
   Duplikation den gesamten Schlüsselraum offen lässt. Die beiden Abschlüsse invertieren exakt.
+- **[Wo ein Zugänglichkeits-Audit eines externen Speichers gelesen werden muss](docs/novelty/audit-siting-claim.md)**
+  (Stand 06.09.2026) — E-000063, das zusammengesetzte Zertifikat aus Speicheroperation und kausalem
+  Audit, hat zum ersten Mal gemessen: auf allen drei Seeds liefert es sein Urteil *keine
+  Workspace-Spur nach der Löschung*, während seine eigene vorregistrierte Gültigkeitszeile — sieht
+  das Instrument einen lebenden Pod überhaupt? — auf allen drei Seeds fällt. WSC-001 sagt warum, und
+  es liegt nicht an der Basis: der Schreibvorgang an der ersten Lesestelle bewegt sich um 0.032
+  dessen, was die zweite tut, und dort trennt **kein** Auslesen — auch nicht der volle
+  768-dimensionale Residualstrom — lebenden Speicher von nie geschriebenem. Zwei der vier Sätze
+  dieses Dokuments sind an ihren eigenen vorregistrierten Schranken zurückgezogen.
+  Vorregistrierung: [WSC-001](docs/novelty/wsc001-preregister.md).
 - [Was hier neu ist und was nicht](docs/so-novelty-2026-09-04.md) (Stand 04.09.2026) — die Kalibrierung
   gegen den Stand der Forschung. Der Mechanismus ist Wiedererfindung (SERAC, GRACE, Larimar, SILO, LMLM,
   MUNKEY); was bleibt, ist die Prüfung: dass ein Gate auf Werten kein Löschprimitiv ist, wenn ein anderer
