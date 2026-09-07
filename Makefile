@@ -14,7 +14,8 @@ SEEDS ?= 0 1 2
 RUN = OMP_NUM_THREADS=$(THREADS) SO_THREADS=$(THREADS) $(PY) -m
 
 .PHONY: help test smoke synthetic gpt2 demo compare rescore certify closure retrieval pointers \
-        disclosure traceless keychannel untied report clean-results env
+        disclosure traceless keychannel calibrate pdxaudit charged unread auditinstr papernums novelty realindex closurereal untied \
+        report clean-results env
 
 help:
 	@echo "make test        unit tests, ~3 min (the deletion certificate sweeps its whole payload domain)"
@@ -31,6 +32,15 @@ help:
 	@echo "make disclosure  what a deletion leaves behind: a pod's aliases point at what was removed"
 	@echo "make traceless   the law: canonicalisation moves U from k to 1 and leaves T at k"
 	@echo "make keychannel  the channel SHRED does not close: recover a shredded object from the keys"
+	@echo "make calibrate   run the novelty screen against mechanisms of known standing. Seconds, stdlib only"
+	@echo "make pdxaudit    the keychannel attack as a store-independent instrument. Seconds, stdlib only"
+	@echo "make charged     re-screen E-000104 and E-000105 with the representation charged. ~10 s, stdlib only"
+	@echo "make unread      E-000103 on the coordinates nobody counts: depth and resident state. Seconds"
+	@echo "make auditinstr  scan every recorded experiment for the two known instrument defects. Seconds"
+	@echo "make papernums   re-read every figure the paper prints from the record it came from. Instant"
+	@echo "make novelty     re-run the novelty search against its own claims, calibrated. Instant"
+	@echo "make realindex   audit deletion in the real hnswlib index (needs hnswlib). Seconds"
+	@echo "make closurereal E-000033's protocol with an encoder that clears its control. ~3 min"
 	@echo "make untied      the layer on a model that does not tie its embeddings (downloads Pythia-160m)"
 	@echo "make report      rebuild docs/so-results-2026-09-02.md from so/results/"
 	@echo "make env         print what will be used"
@@ -116,6 +126,52 @@ traceless:
 # no training: the channel SHRED does not close, against the recorded E-000010 checkpoints, ~3 min per seed
 keychannel:
 	$(RUN) so.experiments.e000028_key_channel --seeds 0 1 2 3 4
+
+# no model, no numpy, no torch: run the programme's own reduction screen against mechanisms whose
+# standing is not in question, and read its verdicts. Seconds.
+calibrate:
+	$(PY) -m so.experiments.nov001_screen_calibration
+
+# no model, no numpy, no torch: E-000028 restated over an abstract store, so it can be pointed at one
+# this programme did not write. Exhaustive over the payload domain. Seconds.
+pdxaudit:
+	$(PY) -m so.experiments.pdx001_payload_derived_index_audit
+
+# no model, no numpy, no torch: re-screen the two largest reported reductions with the cost of
+# building the representation charged to whoever builds it. ~10 s.
+charged:
+	$(PY) -m so.experiments.nov002_charged_rerun_e104_e105
+
+# no model, no numpy, no torch: the two coordinates no experiment here counts, on E-000103. Seconds.
+unread:
+	$(PY) -m so.experiments.nov003_unread_coordinates_e103
+
+# no model, no numpy, no torch: scan all 100 recorded experiments for a comparison whose two sides
+# share a source, and for baseline work rebuilt inside a loop. Seconds.
+auditinstr:
+	$(PY) -m so.experiments.nov004_instrument_audit
+
+# no model, no numpy, no torch: every figure the paper prints, re-read from the record it came from.
+# Exits non-zero when the prose and the records have parted. Instant.
+papernums:
+	$(PY) -m so.paper_numbers
+
+# no model, no numpy, no torch: the literature search that produced this programme's novelty
+# verdicts, with the positive controls it never had, and the verdicts it returns when it has them.
+# Exits non-zero when a withdrawn claim is still asserted somewhere. Instant.
+novelty:
+	$(PY) -m so.experiments.nov005_novelty_claim_audit
+
+# §13(c): PDX-001's instrument pointed at the real hnswlib index, unmodified, from PyPI.
+# Needs `pip install hnswlib numpy`. Seconds.
+realindex:
+	$(PY) -m so.experiments.pdx002_real_index_deletion_audit
+
+# §13(b): E-000033's protocol with the one component that failed its control replaced --
+# a sentence encoder instead of mean-pooled gpt2. Needs `pip install sentence-transformers`.
+# Downloads all-MiniLM-L6-v2 once. ~3 min for three seeds.
+closurereal:
+	$(PY) -m so.experiments.pdx003_retrieval_closure_real_embedder --seeds $(SEEDS)
 
 # the layer on a model that does NOT tie its embeddings; downloads Pythia-160m once, ~40 min per seed per arm
 untied:

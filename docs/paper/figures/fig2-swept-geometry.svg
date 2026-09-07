@@ -1,0 +1,104 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="720" height="438" viewBox="0 0 720 438"
+     role="img" aria-labelledby="f1title f1desc" font-family="Helvetica Neue, Helvetica, Arial, sans-serif">
+  <title id="f1title">Marker-gate accept rate by shell radius</title>
+  <desc id="f1desc">Accept rate is 1.0000 for shells out to radius 0.6, 0.9999 at 0.7, 0.2191 at 0.8,
+    and 0.0000 from 0.9 onward. The store declares a deletion radius of 0.35, but the gate's
+    operational radius is 0.90 on all eleven checkpoints. The annulus between the two — which the
+    store's own predicate calls deleted — is accepted at 2,199,996 of 2,200,000.</desc>
+
+  <style>
+    .surface { fill: #fcfcfb; }
+    .ink     { fill: #0b0b0b; }
+    .ink2    { fill: #52514e; }
+    .title   { font-size: 15px; font-weight: 600; }
+    .sub     { font-size: 11.5px; }
+    .axis    { font-size: 11px; }
+    .lab     { font-size: 11px; font-weight: 600; }
+    .note    { font-size: 10.5px; }
+    .grid    { stroke: #e3e2de; stroke-width: 1; }
+    .axisln  { stroke: #b8b6b0; stroke-width: 1; }
+    .series  { fill: none; stroke: #2a78d6; stroke-width: 2; stroke-linejoin: round; }
+    .ribbon  { fill: #2a78d6; opacity: 0.16; }
+    .ref     { stroke: #0b0b0b; stroke-width: 1.25; fill: none; }
+    .mark    { fill: #2a78d6; stroke: #fcfcfb; stroke-width: 2; }
+  </style>
+
+  <defs>
+    <pattern id="hatch" width="7" height="7" patternTransform="rotate(45)" patternUnits="userSpaceOnUse">
+      <rect width="7" height="7" fill="#0b0b0b" opacity="0.045"/>
+      <line x1="0" y1="0" x2="0" y2="7" stroke="#0b0b0b" stroke-width="1.1" opacity="0.20"/>
+    </pattern>
+  </defs>
+
+  <rect class="surface" width="720" height="438"/>
+
+  <text class="ink title" x="24" y="30">The gate's boundary is 0.90, not the declared 0.35</text>
+  <text class="ink2 sub" x="24" y="49">Marker accept rate by shell radius · 11 checkpoints · 20,000 markers per band · mean, band = min–max across checkpoints</text>
+
+  <!-- the annulus the store calls deleted: 0.35 to 0.90 -->
+  <rect x="255.2" y="72" width="259.6" height="248" fill="url(#hatch)"/>
+
+  <!-- gridlines -->
+  <g class="grid">
+    <line x1="90" y1="72"  x2="680" y2="72"/>
+    <line x1="90" y1="134" x2="680" y2="134"/>
+    <line x1="90" y1="196" x2="680" y2="196"/>
+    <line x1="90" y1="258" x2="680" y2="258"/>
+  </g>
+  <line class="axisln" x1="90" y1="320" x2="680" y2="320"/>
+
+  <!-- y axis -->
+  <g class="ink2 axis" text-anchor="end">
+    <text x="80" y="76">1.00</text>
+    <text x="80" y="138">0.75</text>
+    <text x="80" y="200">0.50</text>
+    <text x="80" y="262">0.25</text>
+    <text x="80" y="324">0</text>
+  </g>
+  <text class="ink2 axis" x="24" y="200" transform="rotate(-90 24 200)" text-anchor="middle">accept rate</text>
+
+  <!-- min-max ribbon (zero width except at 0.7 and 0.8) -->
+  <path class="ribbon" d="M137.2,72.0 L137.2,72.0 L184.4,72.0 L231.6,72.0 L278.8,72.0 L326.0,72.0 L373.2,72.0 L420.4,72.2 L467.6,296.4 L514.8,320.0 L562.0,320.0 L609.2,320.0 L656.4,320.0 L656.4,320.0 L609.2,320.0 L562.0,320.0 L514.8,320.0 L467.6,220.5 L420.4,72.0 L373.2,72.0 L326.0,72.0 L278.8,72.0 L231.6,72.0 L184.4,72.0 L137.2,72.0 Z"/>
+
+  <!-- mean series -->
+  <path class="series" d="M137.2,72.0 L184.4,72.0 L231.6,72.0 L278.8,72.0 L326.0,72.0 L373.2,72.0 L420.4,72.0 L467.6,265.7 L514.8,320.0 L562.0,320.0 L609.2,320.0 L656.4,320.0"/>
+
+  <!-- reference lines -->
+  <line class="ref" x1="255.2" y1="66" x2="255.2" y2="326" stroke-dasharray="5 4"/>
+  <line class="ref" x1="514.8" y1="66" x2="514.8" y2="326" stroke-dasharray="1.5 3.5"/>
+
+  <!-- markers on the two bands that move -->
+  <circle class="mark" cx="420.4" cy="72.1" r="4.5"/>
+  <circle class="mark" cx="467.6" cy="265.7" r="4.5"/>
+  <circle class="mark" cx="514.8" cy="320" r="4.5"/>
+
+  <!-- direct labels -->
+  <text class="ink lab" x="200" y="64" text-anchor="middle">1.0000</text>
+  <text class="ink lab" x="420.4" y="64" text-anchor="middle">0.9999</text>
+  <text class="ink lab" x="478" y="243">0.2191</text>
+  <text class="ink2 note" x="478" y="256">min 0.0953 · max 0.4014</text>
+  <text class="ink lab" x="524" y="315">0.0000</text>
+  <text class="ink2 note" x="524" y="328">and for every band through 2.0</text>
+
+  <!-- reference-line labels -->
+  <text class="ink lab" x="251" y="346" text-anchor="end">declared radius 0.35</text>
+  <text class="ink lab" x="519" y="346">operational radius 0.90</text>
+  <text class="ink2 note" x="519" y="359">identical on all 11 checkpoints</text>
+
+  <!-- annulus annotation -->
+  <text class="ink lab" x="368" y="292" text-anchor="middle">the annulus the store calls deleted</text>
+  <text class="ink2 note" x="368" y="306" text-anchor="middle">accepted at 2,199,996 of 2,200,000</text>
+
+  <!-- x axis -->
+  <g class="ink2 axis" text-anchor="middle">
+    <text x="137.2" y="378">0.1</text>
+    <text x="231.6" y="378">0.3</text>
+    <text x="326"   y="378">0.5</text>
+    <text x="420.4" y="378">0.7</text>
+    <text x="514.8" y="378">0.9</text>
+    <text x="609.2" y="378">1.1</text>
+  </g>
+  <text class="ink2 axis" x="385" y="398" text-anchor="middle">shell radius: distance from the signed centre κ</text>
+
+  <text class="ink2 note" x="24" y="424">E-000029 · `make certify` chain · so/results/e000029_marker_geometry.json</text>
+</svg>

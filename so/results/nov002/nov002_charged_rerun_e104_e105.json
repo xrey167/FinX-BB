@@ -1,0 +1,90 @@
+{
+  "arms_still_reach_identical_exact_states": true,
+  "counters_reproduce_originals": true,
+  "decision": "BOTH_KILLS_SURVIVE_CHARGING",
+  "experiment": "NOV-002",
+  "finding": "Both kills survive, and they survive for different reasons \u2014 which is why the two had to be run separately rather than treated as one family. In E-000104 the candidate and the generic path consume the same cached environments and perform arithmetic of identical shape, so charging the build charges both arms the same and the tie is real, not an artefact of the accounting. In E-000105 the two arms build the sensitivity matrix by different algorithms, and charging that build does not rescue the candidate \u2014 it makes the candidate strictly worse, because propagating a matrix costs width^3 per layer where the generic column-by-column propagation costs width^2 per layer per pod axis. The candidate spends more to build the representation whose free provision NOV-001 showed the screen was assuming. So the subsidy was real and was not what produced these two verdicts. NOV-001's instrument findings stand; the dichotomy in the frontier update also stands, and now rests on measured cost rather than on a work term that could not fail.",
+  "kills_reversed": [],
+  "kills_surviving": [
+    "E-000104",
+    "E-000105"
+  ],
+  "not_claimed": "This covers two of the twenty-three kills \u2014 the two NOV-001 nominated as carrying the most information. It says nothing about the other twenty-one, and it does not show that no representation-based mechanism can win under a charged accounting; it shows these two do not. Cost is counted in exact multiplies over each experiment's own registered workload; memory traffic and sequential depth are not instrumented in either original and are not invented here.",
+  "results": [
+    {
+      "candidate_cost": {
+        "multiplies": 243200,
+        "representation_multiplies": 259840,
+        "sequential_rounds": 1,
+        "slow_memory_words": 0
+      },
+      "candidate_total_charged": 503040,
+      "cells": 240,
+      "charged_screen_detail": {
+        "improved_coordinates": {},
+        "regressed_coordinates": {},
+        "same_exact_state": true,
+        "verdict": "KILL"
+      },
+      "counter_disagreements_with_original": 0,
+      "exact_state_mismatches": 0,
+      "experiment": "E-000104",
+      "full_replay_multiplies": 1542400,
+      "generic_cost": {
+        "multiplies": 243200,
+        "representation_multiplies": 259840,
+        "sequential_rounds": 1,
+        "slow_memory_words": 0
+      },
+      "generic_total_charged": 503040,
+      "kill_survives_charging": true,
+      "representation_build_ratio_candidate_over_generic": 1.0,
+      "verdict_as_originally_screened": "KILL",
+      "verdict_charged": "KILL"
+    },
+    {
+      "candidate_cost": {
+        "multiplies": 31104,
+        "representation_multiplies": 906624,
+        "sequential_rounds": 1,
+        "slow_memory_words": 0
+      },
+      "candidate_total_charged": 937728,
+      "cells": 144,
+      "charged_screen_detail": {
+        "improved_coordinates": {},
+        "regressed_coordinates": {
+          "multiplies": [
+            937728,
+            329472
+          ]
+        },
+        "same_exact_state": true,
+        "verdict": "KILL"
+      },
+      "counter_disagreements_with_original": 0,
+      "exact_state_mismatches": 0,
+      "experiment": "E-000105",
+      "full_replay_multiplies": 8008704,
+      "generic_cost": {
+        "multiplies": 31104,
+        "representation_multiplies": 298368,
+        "sequential_rounds": 1,
+        "slow_memory_words": 0
+      },
+      "generic_total_charged": 329472,
+      "kill_survives_charging": true,
+      "representation_build_ratio_candidate_over_generic": 3.0386100386100385,
+      "verdict_as_originally_screened": "KILL",
+      "verdict_charged": "KILL"
+    }
+  ],
+  "scope": "E-000104 and E-000105 re-screened with the representation charged",
+  "work_term_audit": {
+    "cases": 64,
+    "e000104_work_mismatches": 0,
+    "e000105_work_mismatches": 0,
+    "either_reachable": false,
+    "note": "e000104 lines 224-225 and e000105 lines 176-177 each call one pure function twice on one argument. Neither kill's work term is a measurement; both kills rest on exact-state equality alone."
+  }
+}

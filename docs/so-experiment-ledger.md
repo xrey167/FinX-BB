@@ -2991,6 +2991,810 @@ marker channel), the two-clause store/reader structure (Garg, Goldwasser and Vas
 half is queued behind E-000050 and decides whether a frozen language model's adapter, which routes
 with the same dense softmax, carries the same two channels.
 
+### 31.42 The screen that returned twenty-three kills had never had a positive control (2026-09-06, NOV-001)
+
+E-000086 to E-000108 return the same verdict twenty-three times. All of them come from one screen,
+written the same way each time: kill when a generic baseline, handed the candidate's own
+representation, reaches identical exact states with an identical multiply count. NOV-001 ran
+mechanisms of known standing through it, which is what E-000019 does for its attacks — the probe
+reads live cells at 0.893-0.927, so "at chance" means something — and had never been done for the
+screen.
+
+Three defects, each with an exact witness. **False kill:** identical states, multiplies 72 = 72,
+slow-memory traffic 36 against 60, refused, because the coordinate it wins on is not read. **False
+promote:** identical result at 32 multiplies against 16, better at nothing, passed, because the
+predicate asks whether the counts differ rather than whether the candidate is better. **Subsidy:**
+handed its own precomputed table a baseline ties and the candidate dies; charged for building it, the
+same candidate on the same states and the same queries lives, 16 against 121. Every candidate from
+E-000102 onward is representation-based, which is the class the subsidy ties by construction.
+
+And in E-000105 itself, lines 176-178: `candidate_work` and `generic_work` are both
+`mutation_multiplies(net)` on the same `net`. 512 inputs, 0 mismatches, unreachable. Both work terms
+in that kill predicate are tautologies, so the kill rests on exact-state equality alone — and the
+frontier update reported "exactly the same mutation work" as a measured quantity. **§31.15 for the
+fourth time, and the first on the screen rather than on an audit instrument: an instrument that
+cannot fail is not evidence.**
+
+No kill is claimed to reverse; NOV-001 re-runs none of them, and the screen is genuinely passable —
+it promotes a pure arithmetic schedule. What is owed is E-000104 and E-000105 re-run with the full
+cost vector on both arms and the representation charged, those two because each reported a large
+arithmetic reduction (3.0x-9.8x, 89.78x-541.33x) and was killed anyway.
+
+### 31.43 E-000028 leaves the repository, and its own headline metric would have missed the vector index (2026-09-06, PDX-001)
+
+The novelty statement of 2026-09-04 §5 named one small experiment — port E-000028 to a store someone
+else built — and thirty experiments were run after it, none of them that one. What blocked it was
+mechanical: the attack is welded to `so/model.py`, the E-000010 checkpoints and torch.
+
+PDX-001 unwelds it. The audit takes a store as an argument and does both halves exhaustively over a
+256-value payload domain: sweep every value and keep the candidates consistent with what the store
+exposes, and sweep again to check whether any observable moves at all. Validity floor met — the same
+attack reads a live payload at 1.0000 — and the two halves agree on all five policies.
+
+The channel is not about `k_rev`. A gated value beside an ungated payload-derived reverse key, and a
+cleared value beside a codebook key derived from it, both name the payload at top-1 1.0000. Removing
+the row from the addressable set, and gating every derived quantity, both reach chance and are
+certified over the whole domain — no attack of this shape exists, rather than none was found.
+
+**The row that corrects E-000028's own reporting:** a tombstoned vector-index node keeping the
+adjacency list built from its own embedding scores top-1 **0.0000** and leaks anyway, narrowing 256
+candidates to 2.92 — posterior 0.3917 against chance 0.0039, an 88x cut in the search space. Under a
+top-1 headline that is a clean deletion. It is not. §8 of the findings document had already named
+this arrangement — "every soft-deleting vector index that keeps its edges" — and it is now measured,
+with the metric that makes it visible. Any run of this audit against a real index must report the
+candidate-set posterior or it will report a false negative.
+
+§5 is not discharged: no published system has been run, there being no checkpoints, torch or network
+here, and the five policies are reconstructions of shapes. What changed is that running it is now
+configuration rather than a rewrite.
+
+### 31.44 The subsidy was real and did not produce the two kills that mattered most (2026-09-06, NOV-002)
+
+§31.42 left one thing open and named the run that would close it: re-screen E-000104 and E-000105
+with the representation charged, those two because each reported a large arithmetic reduction and was
+killed anyway. Done. **Both kills survive**, and the two survive for different reasons, which is why
+they could not be treated as one family.
+
+E-000104's arms consume the same cached environments and do arithmetic of identical shape --
+`candidate_local_update` and `generic_cached_environment_update` are two spellings of (1xR)(RxR) then
+(1xR)(Rx1). Build ratio candidate/generic is exactly **1.00**, charged totals 503,040 against
+503,040. There was no asymmetry for a subsidy to hide.
+
+E-000105's arms build the sensitivity matrix by different algorithms, and this is the sharp one:
+`candidate_sensitivity` propagates a matrix at `depth*(w^3 + w^2*pd) + od*w*pd`, the generic
+propagates one column at a time at `pd*(depth*w^2 + od*w)`. Build ratio **3.04**, charged totals
+937,728 against 329,472. Charging the representation does not rescue the candidate -- it exposes a
+regression the original accounting was concealing **in the candidate's favour**. The screen was
+subsidising the arm that spends more.
+
+Counted variants were validated against the originals operation for operation (0 disagreements) and
+the arms still reach identical exact states, so this is an accounting change and not an arithmetic
+one. Against full replay both mechanisms remain far cheaper -- 1,542,400 and 8,008,704 against
+503,040 and 329,472 -- so the verdict is "no advantage over the generic arm", never "no advantage
+over recomputation".
+
+Also recorded: §31.42's work-term tautology holds in E-000104 as well (lines 224-225, the same pure
+function twice on one argument), so both of these kills rested on exact-state equality alone. That is
+still worth fixing and is still not what produced them.
+
+**What it settles.** The strongest objection to the programme's own reading of its record -- that the
+kills might be an artefact of a broken screen -- has been tested on its two best candidates and does
+not hold. The dichotomy stands and now rests on measured cost on both arms. **What it does not.**
+Two of twenty-three; nothing about the other twenty-one; and neither original instruments memory
+traffic or sequential depth, so §31.42's M1/M2 defects remain untested on this pair.
+
+### 31.45 The screen replaced, with the vacuity defect made unrepresentable (2026-09-06, so/screen.py)
+
+§31.42 found three defects in the reduction screen and §31.44 showed the third of them did not
+produce the two kills most likely to have been produced by it. The verdicts stand; the predicate
+still had to be replaced, because an instrument that can pass a strict regression will eventually
+pass one.
+
+`so/screen.py` closes all three -- promote on a strict improvement rather than on any difference of
+counts, read every declared coordinate rather than multiplies alone, charge the representation to
+whoever builds it -- and adds the guard the old predicate had no way to express. A `Measurement` must
+name where its cost figure came from, and two arms carrying the same provenance label raise
+`VacuousComparison`. The `mutation_multiplies(net)` / `local_update_multiplies(rank)` pattern of
+e000105:176-177 and e000104:224-225 becomes unrepresentable rather than remembered: §31.15 enforced
+by the type rather than by whoever reads the diff next. The guard refuses a shared *source*, not a
+tied *number* -- two independently measured arms that cost the same are a real tie and kill normally,
+and there is a test for that, since a guard that refused genuine ties would be the same error
+mirrored.
+
+**Nothing recorded is touched.** E-000102..E-000108 keep the predicate that produced their records,
+with §31.42 and §31.44 attached saying what it was. Rewriting an instrument underneath a recorded
+result is how a ledger stops meaning anything, and this programme has paid three times already for
+instruments that were not what they were believed to be. New work imports from `so.screen`.
+
+One thing the replacement makes visible that the old one could not: `unread_coordinates`. §31.44
+could not test the M1 and M2 defects against E-000104 or E-000105 because neither original
+instruments memory traffic or sequential depth, and under the old predicate that absence had nowhere
+to appear. It now appears in every verdict.
+
+### 31.46 E-000103's verdict was underdetermined, and a screen can be unfair in the other direction (2026-09-06, NOV-003)
+
+§31.44 left one gap: M1 and M2 could not be tested on E-000104 or E-000105 because neither
+instruments memory traffic or sequential depth. E-000103 was picked to close it -- two sequential
+rank-1 Sherman-Morrison updates against one rank-2 Woodbury block, with the candidate carrying
+`z_del`, `z_add` and two denominators between events.
+
+**The baseline as written is not a baseline.** `woodbury_rankk_solution` rebuilds `inv_u` and
+`middle_inv` on every one of the 24 sessions though neither depends on that session's right-hand
+side, so the candidate beats it 3.5x-4.2x without the mechanism doing anything. This is the mirror of
+the representation subsidy: there the baseline is handed the candidate's representation for free,
+here it is denied an optimisation the candidate is already using -- caching z and denom is exactly
+what the candidate does. A screen can be unfair in both directions and this programme had only looked
+for one. Hoisting costs no arithmetic at all: `woodbury_rankk_inverse` already builds both quantities
+internally (lines 121-125), so a hoisted implementation retains rather than rebuilds.
+
+**Against a fair baseline there is no single verdict.** Candidate `8n^2 + 98n + 48` against hoisted
+`6n^2 + 104n + 104`: a worse quadratic bought against a better linear term. PROMOTE at n=4 and n=6
+(568 vs 616, 924 vs 944), KILL at n=8 and n=10 (1,344 vs 1,320, 1,828 vs 1,744). **The crossover sits
+inside E-000103's own registered domain of (4,6,8,10).** The aggregate returns KILL and that number
+is not the answer -- a domain weighted toward small n returns PROMOTE with equal authority.
+E-000103's kill was not wrong so much as underdetermined: one verdict for a comparison that does not
+have one.
+
+**And a defect this experiment found in itself.** Its first run screened `slow_memory_words` and
+promoted at every dimension, including where the candidate spends more arithmetic: every arm's
+resident state is `n^2 + 2n + O(1)` and the two differ by a constant 2 words, so a 2-word gap
+outranked a 484-multiply regression. A coordinate a model cannot resolve must be declared unread, not
+scored -- otherwise the screen manufactures an advantage out of its own rounding, which is §31.42's
+defect committed by the file auditing it. First use of `so/screen.py`'s `unread_coordinates`, and
+what it was added for. The general lesson §31.45 does not yet enforce: **a strict improvement is not
+the same as a material one.** The screen has no notion of margin, so "improved on at least one
+coordinate" can still be satisfied by noise.
+
+No mechanism promoted. A candidate that wins small, loses large, and pays roughly twice the
+sequential depth throughout is not an invention.
+
+### 31.47 The vacuity pattern is in a third experiment, and a sweep found it (2026-09-06, NOV-004)
+
+§31.42 found it in E-000105 by reading, §31.44 found it again in E-000104 by reading, §31.46 found a
+second and unrelated class in E-000103 by reading. Two defect classes from three readings is a rate
+that makes hand-reading the remaining twenty both slow and a poor instrument -- whoever reads them
+finds what they are looking for and stops. NOV-004 scans all 100 recorded experiments for exactly the
+two patterns already demonstrated.
+
+**Its own validity floor caught its first bug.** The scanner must rediscover the two known Class A
+sites; the first run reported SCANNER_INVALID because it globbed `e0000*.py`, which silently excludes
+every experiment from E-000100 onward -- where both known sites live. E-000019's discipline, working
+on the file auditing everyone else.
+
+**Class A, 3 confirmed sites.** e000104:224-225 and e000105:176-177 as known, plus a new one:
+**e000107:93-94**, where `oracle` and `direct` are the same pure call on the same arguments
+(`delete_target` copies a tuple and sets one index; `fn` is one of four pure state functions), so
+`oracle_failures` is identically zero for every input. It is nonetheless reported as
+`oracle_history_failures`, is a conjunct of the kill predicate at line 187, and is asserted in
+`test_oracle_history_resolves_registered_ambiguity` as evidence. The comment says "by construction",
+so the tautology was understood when written; what was not carried through is that a quantity true by
+construction must not then be reported, screened and tested as a measurement. §31.15 for the fifth
+time, third distinct experiment. E-000107's substantive result -- the indistinguishable-history
+witnesses -- is untouched; what falls is one of three conjuncts that never guarded anything.
+
+**What the discriminator had to add, and this is the part that generalises.** The first version
+flagged 87 sites on syntactic identity alone and most were legitimate: `bank_from_store(store)`
+before and after a deletion is the same expression and a different value, because the store moved.
+Two refinements brought 87 to 3 -- a window that closes on any statement rebinding the call's free
+names, and a requirement that something actually compare the two results. A duplicated call is only a
+defect when a predicate reads the difference; allocating two zero vectors duplicates the expression,
+not the value. 18 incidental duplicates are recorded separately and are not findings.
+
+**Class B, 94 candidates in 43 files, and they are candidates.** The loop-invariant pattern of
+§31.46, which is a defect only on the baseline arm, where it inflates the candidate's margin for
+free; on the candidate arm it is merely slow. Reading the list as 94 defects would be §31.46's error
+repeated. It is a review queue, and nothing beyond E-000103 is claimed.
+
+No verdict is revisited. The pattern is a reporting and screening defect, not so far a wrong answer:
+E-000104's and E-000105's kills survive a proper accounting (§31.44) and E-000107's rests on its
+witnesses.
+
+### 31.48 Class B triaged 94 to 2, at the cost of two more bugs in the scanner (2026-09-06, NOV-004 addendum)
+
+§31.47 left 94 Class B candidates unsorted. Working them the way Class A was worked cost the scanner
+two more bugs, both of the same shape as the ones it was built to find.
+
+**Mutation that rebinds nothing.** `_bound_names` counted only `ast.Name` stores, so `aff[idx] = new`
+-- a write through a subscript -- did not count as moving `aff`, and `compose_all(aff, ...)` in
+E-000097 was reported loop-invariant with `aff` written on the line above it. Method calls are the
+same: `tree.update(idx, new)` mutates its receiver and rebinds nothing. Counting in-place mutation
+removed every E-000097 site, 94 to 70. **Nondeterministic calls.** `idx = rng.randrange(length)` is
+invariant by the syntax and different every iteration; 70 to 61.
+
+Of the 61, 18 are in the reduction family and exactly **2** sit on a baseline arm, both in E-000102.
+`e000102:250` (`old_fresh = fresh_numeric(...)`) is genuinely invariant and not a defect -- it feeds
+a correctness assertion, not the work comparison. `e000102:296` (`generic =
+GenericDependencyProduct(factors)`) is on the cost-compared arm: `__init__` builds the product DAG at
+`size-1` multiplications and `generic_ops = generic.update(...)` counts only the update walk, so the
+generic's per-event cost is understated by the construction, while the candidate is a pure function
+needing no reset.
+
+**And the reading that cuts against the obvious one.** Charging that construction would move E-000102
+*toward* the candidate -- opposite to §31.44's E-000105 -- but it would charge the baseline for the
+harness's choice, not the algorithm's: a real generic keeps one DAG and updates incrementally, and
+rebuilds here only because the loop must reset mutable state per edit. Charging it would be §31.46
+run backwards: deny the baseline an optimisation, then bill it for the denial. So the finding is
+about measurement, not verdict -- E-000102's work comparison counts update cost on both arms while
+one arm pays an uncounted O(n) reset. Fix the harness, then the comparison measures what it claims.
+No verdict revisited.
+
+Three scanner bugs now, all caught by its own outputs rather than by review: the glob that excluded
+E-000100 onward, syntactic identity without a mutation window (87 to 3), and mutation that rebinds
+nothing (94 to 61). An instrument built to find instruments that cannot fail keeps failing, which is
+the only evidence available that it can.
+
+### 31.49 The prose had drifted from the records three times, and nothing here noticed (2026-09-06, so/paper_numbers.py)
+
+Writing the paper produced three disagreements between what the draft printed and what
+`so/results/` holds, and all three were caught the same way: a human opened the JSON.
+
+* E-000028's revoke/delete mean rank was written `128.0`; the record says **128.02**.
+* The marker accept rate was written "1.0000 out to 0.70"; the band sweep says **0.9999** at 0.70,
+  and **0.9992** on the weakest checkpoint.
+* §7's head-to-head table was presented with no seed count. The record is seed 0 alone: **n = 1**
+  behind every aggregate in it.
+
+Three for three is not a run of bad luck, it is the absence of an instrument. Prose drifts from the
+record whenever either side is edited, and the repository had no check that would notice. `make
+papernums` is that check: 65 figures printed in the prose, 30 more printed inside the three drawn
+figures, and 7 scope claims, each bound to a record path, each re-read and re-rendered under the
+rounding rule the paper used. It exits non-zero when they part. Figures from a list are addressed by
+name (`policies/policy=hnsw_tombstone/top1_recovery`) rather than by position, so a claim cannot keep
+passing through a reordering. The drawn figures get their own pass because they drift on their own
+and are what a reader looks at first -- but that pass reads the numbers a reader sees, **not the
+geometry that places them**: Figure 2 was once drawn with a y-scale putting 0.2191 at the height of
+0.50, and no string check would have caught it. A render did.
+
+**The scope claims are the half that matters most**, and the half a number-checker would miss. A
+figure can be exactly right and still mislead if the reader is not told it rests on one seed. Three
+are registered, and all three were `UNDISCLOSED` on first run -- true of the records, absent from the
+paper. The paper now states each in words, and the check fails if that sentence is ever deleted.
+
+**The floor.** A checker that prints `0 failing` and has never been shown to fail is not evidence.
+`so/tests/test_paper_numbers.py` mutates each registered figure by one in its last place and requires
+a `MISMATCH`, and deletes each from the paper text and requires an `ABSENT` -- for **every** claim,
+not a sample, because a claim whose path silently failed to resolve would pass the clean run too.
+228 tests, of which 204 are that floor.
+
+**And the check needed calibrating, exactly like every other instrument here.** Its presence test
+started as `printed in text`, which is close to vacuous for a short token: `"0.0"` is inside
+`0.0040`, `"12"` is inside `128.02`, `"1"` is inside `1,536`. Requiring a standalone match --
+nothing extends the number on either side, while a trailing full stop or comma is punctuation --
+immediately failed two claims that had been passing on a coincidence: the paper writes **eleven**
+checkpoints and **twelve** templates in words and never prints them as numerals, so `appears_as`
+now binds the spelled form. A third category cannot be fixed and is instead reported: 14 of the
+figures are round enough to recur across the paper (`1.0000`, `256`), so their presence test does
+not discriminate and only their record comparison counts. That is the §31.15 rule applied to the
+rule's own enforcement -- a passing check whose failure mode is unreachable was not evidence for
+those 14, and now says so.
+
+The registry is **partial by construction**: `coverage()` reports what it binds, and a figure not in
+it is unchecked, not verified. What the check does not do: it compares the paper against the
+records, never the records against reality. A wrong number written identically in both passes.
+
+### 31.50 A read-through found four things the green check could not (2026-09-06, paper review)
+
+§31.49 built the registry and it ran clean. A close reading of the draft then found four
+disagreements it had been green through, every one of them outside its bindings.
+
+**One wrong number.** §7's prose said a relearning attack against the relabel arm "recovers 76% of
+the half they never supplied". The record says `relabel/relearn/heldout_acc = 0.72`, and nothing in
+E-000024 is 0.76. The *table* in the same section printed 0.72 correctly, so the paper contradicted
+itself on one page.
+
+**Three scope errors, all of the §31.49 shape.**
+
+* §2 read as one deletion attacked five ways. It is two experiments: the four-attack battery is
+  E-000019 on **seeds 5–7** (750 trials, held out from configuration selection); the fifth attack is
+  E-000028 on **seeds 0–4** (500 trials) -- the selection seeds. Held-out seeds are what make an
+  *at-chance* reading evidence and are irrelevant to a recovery at 500 of 500, so no finding moves;
+  the disclosure was simply missing.
+* §8's inversion table combined E-000032 (`n_groups = 25`) with E-000035 (`n_groups = 100`) under a
+  heading reading "Three seeds, 100 pods each". Figure 3's subtitle carried the same error, in a
+  figure written this session.
+* §6's 0.0954 and 0.0688 come from E-000025, whose own `provenance_note` says a forced re-run
+  overwrote E-000020's seed-0 and seed-1 checkpoints and only seed 2 still matches the recorded
+  SHA-256. E-000025 is internally sound -- it hashes what it scored -- but §0's "reproducible by the
+  `make` target beside it" does not hold for that pair in the ordinary sense.
+
+**And one understatement, which is the pleasant kind of error.** §2 said the shredded row is "equal
+to the live cell to four decimals". Per seed, the shred arm's top-1, top-5, mean rank and margin are
+**bit-identical** to the active arm's on all five seeds. The claim was weaker than the record.
+
+**What this says about §31.49.** The check was green the whole time, and it was not lying: it reports
+what it binds, and none of these four was bound. A green run is a statement about the bindings that
+exist, and the bindings that exist are the ones somebody thought to write -- which is why
+`coverage()` and `not_claimed` are part of the output rather than a footnote. The registry's value
+here was not catching these; it was making it cheap to fix them permanently. All four are now bound
+(70 prose figures, 31 drawn, 10 scope claims), including the E-000025 claim, which is bound to the
+provenance note *itself* rather than to some stable neighbouring field -- binding a caveat to an
+unrelated number would have been §31.42's defect in a new costume.
+
+### 31.51 Measuring how partial "partial by construction" was: 45 of 95 (2026-09-06, coverage)
+
+§31.50 found four errors the green check could not, all of them outside its bindings, and concluded
+that a green run is a statement about the bindings that exist. That is a true sentence and a useless
+one, because nothing said *how many* bindings that was. So `unregistered()` measures it: take every
+numeric token in the paper, strip the ones that are not measurements, subtract the registered
+figures, report what is left.
+
+**First run: 45 of 95 distinct numbers bound to nothing.** Almost the whole of §7's head-to-head
+table was among them, and working it produced **three more wrong figures** in a table that had
+already been read twice this session:
+
+| §7 printed | record says | what happened |
+|---|---|---|
+| `137` seconds | `ga/delete_seconds` = **129.49** | 137.2 is `cells/after/true_obj_mean_rank` -- a rank read off the wrong row |
+| `311` seconds | `relabel/delete_seconds` = **334.94** | 311 appears nowhere in E-000024 |
+| `8.49e+06` perplexity | `relabel/ppl_after` = **6,388,351.97** | absent from the record; 8.49 is §5's false-accept mantissa |
+
+`0.96` in the same table turned out correct but doubly-printed: both LoRA arms share **one**
+`weights/before/direct_acc`, so the table shows one measurement twice. Said so.
+
+**Coverage is now zero unbound**, and `make papernums` exits non-zero if that changes. Getting there
+required an exclusion list, which is the obvious way to make a coverage number say whatever you
+want -- so every exclusion carries the reason it is not a measurement, a test asserts every entry
+has one, and the list is in the output. The most useful of them turned out to be a convention the
+paper already followed without stating it: **an asserted figure is plain or bold; a numeral being
+talked about is in backticks.** All seven backticked numerals in the draft are examples or quoted
+errors, none an asserted result.
+
+**And the check now checks its own description.** The three numbers saying how large the registry is
+cannot be bound to a record -- their source is the registry. They had drifted 33 -> 65 -> 70 -> 87,
+corrected by hand every time, which is precisely the failure §31.49 exists to stop, committed by
+§31.49's own author in §31.49's own paragraph. `check_self_description` compares them to `len()`
+instead. It caught its own drift on the first run.
+
+Seven prose/record disagreements now, in one document, found by four different means: three by
+reading JSON, one by reading the paper, three by measuring what the check did not cover. The
+progression is the point -- each instrument found what the previous one could not, and none of them
+found what came after.
+
+### 31.52 The verdict columns were never checked at all (2026-09-06, verdict claims)
+
+§31.51 got coverage of the paper's *numbers* to zero unbound and stopped there, which left the
+obvious question unasked: the tables also have columns that are not numbers. §4's certificate table
+says `CERTIFIED` four times. §3's policy table says `yes` twice and `no` three times. **Nothing bound
+any of them.** A wrong decimal misstates a magnitude; a wrong `CERTIFIED` misstates whether the
+paper's central claim holds.
+
+`VerdictClaim` binds a categorical cell to the record boolean behind it -- and checks it against
+**its own table row**, not the document, because `**CERTIFIED**` appears four times in §4 and a
+document-wide substring test would let any of them pass on another's evidence. A test asserts that
+misdirection is caught.
+
+All 19 were already correct, which is the expected and least interesting outcome. Two things came
+out of building them anyway.
+
+**A verdict row nobody could bind.** Sweeping for yes/no rows found §7's `a certificate is even
+available | yes | no | no`, which is in no record and could not be: it follows from a LoRA having no
+finite payload domain to sweep, a property of the representation rather than an outcome. It had been
+sitting among six measured rows looking identical to them. The paper now says it is an argument, and
+a test requires that sentence to stay.
+
+**And §2's table was point estimates.** E-000028 records exact Clopper--Pearson intervals per arm and
+whether each contains chance; the paper printed neither, in a paper whose §9 makes an interval
+load-bearing. The table now carries them: shred at [0.9926, 1.0000] excluding chance is the finding
+stated as evidence rather than as a number to be trusted. `contains_chance` is itself bound as a
+verdict on all three arms.
+
+The pattern across §31.49 to §31.52 is one instrument per kind of claim -- numbers, extent, coverage,
+verdicts -- and each was built only after the previous one's silence was mistaken for evidence. The
+honest summary is not that the paper is now checked; it is that four kinds of claim are, and nobody
+has yet asked what the fifth is.
+
+### 31.53 The fifth kind: do the pointers point at anything? (2026-09-06, reference integrity)
+
+§31.52 ended by naming the gap rather than filling it: four kinds of claim were checked -- numbers,
+extent, coverage, verdicts -- and "nobody has yet asked what the fifth is". It is **reference
+integrity**, and it was worth asking, because §0 of the paper makes a promise none of the four could
+test: *every number is reproducible by the `make` target named beside it.* A target that does not
+exist makes that promise false in a way no amount of correct arithmetic would reveal.
+
+`check_references` resolves five kinds of pointer, forty in total: every backticked `make` target
+against the Makefile, every cited `E-\d{6}` against `so/results/`, every `§N` against the paper's own
+headings, every quoted `so/`or `docs/` path against the disk, and every embedded figure against
+`docs/paper/figures/`. All forty resolve.
+
+**The one finding is structural rather than broken.** `E-000033` is the only experiment identifier in
+the paper with no record behind it, because it has never been run -- §13(b) names it as the closure
+reproduced in a chunked vector index. Citing an id with no record is honest only if the text says so,
+so `_CITED_BUT_UNRUN` pairs the id with the sentence that must be present, §13(b) now says "The
+target exists and has never been run" in those words, and removing that sentence turns the row
+`UNDISCLOSED`. It is the scope-claim pattern applied to a citation.
+
+**The first draft of the checker was too loose and said so.** Matching `make (\w+)` without backticks
+reported `make of`, `make the`, `make this` and `make unanswerable` as missing targets -- all prose
+("the question an erasure guarantee is supposed to make unanswerable"). Requiring the backticks is
+the same convention §31.51 found for numerals: the paper marks a thing being *named* differently from
+a thing being *said*, and it had been doing so consistently without stating it.
+
+Five kinds of claim now, five instruments, each built after the previous one's silence was mistaken
+for evidence. The pattern has not yet stopped producing findings, which is the only reason to expect
+a sixth.
+
+### 31.54 A claim that went stale because the repository grew (2026-09-06, merge from base)
+
+§31.53 said the pattern "has not yet stopped producing findings, which is the only reason to expect
+a sixth". The sixth arrived without anyone editing the paper.
+
+The base branch gained **six experiments overnight** -- E-000109 through E-000114, all reduction
+experiments of exactly the family NOV-004 audits. Merging them turned `A mechanical sweep of all 100
+recorded experiments` into a false statement: it is **106** now. **No edit to the paper caused it.**
+Every previous finding came from prose and record disagreeing after one of them changed; this one
+came from the world the claim describes getting bigger.
+
+**Why five passes stayed green through it, which is the useful part.** `100` is *five different
+quantities* in that paper: E-000028's targets per seed, E-000035's pods per seed (three times), and
+NOV-004's count of scanned files. Exactly one was bound -- E-000035's -- and its presence test found
+*some* standalone `100` and passed. §31.51 had already labelled such figures "round enough to recur,
+presence test does not discriminate" and treated that as a disclosure. It was not merely a weak
+check; it was **actively concealing a different quantity that had gone wrong.**
+
+`near` fixes the mechanism rather than the number: a claim may name the paragraph that identifies
+which quantity it is, and is then sought only there. Paragraph, not line, because prose wraps and
+"found three" lands after the phrase that disambiguates it. The swept count is now bound to
+NOV-004's own record, so it tracks the repository instead of the prose.
+
+**The audit re-run is itself the reassuring result.** 106 files scanned, validity floor still met,
+still exactly three Class A sites, and **none of the six new experiments appears in either class** --
+the first evidence that the vacuity pattern is not recurring in work written after it was published.
+With the standing caveat that absence from both lists is not clearance: they were checked for two
+things.
+
+Six kinds of staleness now. The fifth was "the pointers might not point"; the sixth is "the claim may
+be about a world that moved". A registry cannot anticipate the seventh, and saying so is not modesty,
+it is the only accurate description of what a green run means.
+
+### 31.55 §13(b) was not blocked, and running it falsified it (2026-09-07, E-000033)
+
+§13(b) had been listed for a day as blocked on "torch and network". That was an assumption, not a
+measurement. It is wrong: `pip install torch --index-url .../cpu` works here, `transformers`
+installs, and `huggingface.co` answers 200. **The environment was never the obstacle.**
+
+So E-000033 was run at its registered parameters -- three seeds, 150 facts, 4 chunks each, 600
+chunks, frozen `gpt2` as the embedder. It completes in seconds per seed and **fails its own
+pre-registered control**:
+
+| criterion | required | observed (worst seed) | |
+|---|---|---|---|
+| `control/read_before_deletion` | >= 0.80 | **0.0250** | FAIL |
+| `duplicated/still_retrievable_after_one` | >= 0.50 | 0.0550 | FAIL |
+
+The experiment's own docstring says why this ends the matter: *"Both arms must ANSWER before any
+deletion, or the comparison is between a working store and a broken one."* Mean-pooled GPT-2
+embeddings do not retrieve the right chunk out of 600 -- 0.0467 mean read rate against a registered
+0.80 -- so nothing downstream is interpretable.
+
+**And the trap is that the result looks right.** Closure 1.00 canonical against 4.00 duplicated;
+canonical knows its closure without searching at 1.0000, duplicated at 0.0000. That is the shape
+E-000032 predicts, and reporting it would be §31.15 in its purest form: a comparison between two
+stores neither of which can be read from, agreeing with the hypothesis for no reason. **§13(b) is
+not discharged.** What it needs is an embedder that clears the control -- a design change to a
+pre-registered experiment, which is the author's call and not a thing to substitute silently.
+
+**Two lessons, and the second is about this session.** First: "blocked" claims deserve the same
+scepticism as any other, and this one had been repeated in three check-in prompts without being
+tested once. Second, the correction had to be made against my own preference for the tidy outcome --
+the run was started expecting to *discharge* §13(b), and the honest reading of the output is the
+opposite.
+
+### 31.56 A pairing guarded in one direction only (2026-09-07, reference pass)
+
+§31.53 added `_CITED_BUT_UNRUN`: an experiment cited with no record is honest only while the paper
+says it was never run, and deleting that sentence turns the row `UNDISCLOSED`. Correct, and guarded
+in exactly one direction.
+
+Running E-000033 exercised the other. A record appeared, so `check_references` took its `record
+present` branch and reported **OK** -- while §13(b) still read "The target exists and has never been
+run". The pass was green across a flat contradiction, inside the hour, in machinery written to catch
+precisely that class of thing.
+
+An id declared unrun that acquires a record is now `CONTRADICTED`. `_CITED_BUT_UNRUN` is kept
+deliberately **empty** rather than deleted, because the mechanism outlived its only entry.
+
+**And one further hole, closed before it bit.** The paper is bound to NOV-004's record, which fixed
+§31.54's staleness for the *paper*; nothing stopped the *record* going stale. If the repository
+grows and nobody re-runs the sweep, record and paper agree with each other and both disagree with
+the world, and every pass stays green. `check_record_freshness` recounts the experiment files by the
+sweep's own rule and compares. It is the first check here that looks at something other than two
+documents.
+
+### 31.57 The network was there the whole time, and six citations check out (2026-09-07, §13(d))
+
+§31.55 found that §13(b) was never blocked. The same question, asked of the other three, gives:
+
+| item | claimed blocker | actual |
+|---|---|---|
+| (a) sweep on the symlink arms | torch + checkpoints | **checkpoints only** — none on disk; needs a training run. torch was never the issue |
+| (b) closure in a vector index | torch + network | **neither**; run, and it falsifies itself (§31.55) |
+| (c) instrument vs a published system | network | **not blocked** |
+| (d) the citations | network | **not blocked** |
+
+The draft opened with "Nothing in the environment this draft was written in has network access."
+**Untested, and false.** Search and fetch both work. The sentence was true when written and false
+every time it was repeated, which is the §31.54 shape again: a claim about a world that moved.
+
+**Six of eight clusters verified**, with method and status per entry in `docs/paper/references.md`:
+Larimar (arXiv:2403.11901), GRACE (arXiv:2211.11031), Ghost Vectors (arXiv:2606.18497), the 2026
+audit (arXiv:2607.00605), the resilience literature, and Carlini--Wagner with Kraska et al.
+
+**Three of them were load-bearing, and all three held.**
+
+* **Ghost Vectors is different in kind, as §2 says.** It recovers embeddings a soft delete left
+  physically on disk, read beneath the API — a retention failure. §2's payload *was* gated and its
+  value channel *is* at chance. The distinction survives.
+* **GRACE keys its codebook on the original embedding**, so PDX-001's `codebook_key` policy models
+  a real design rather than an invented one. That row was the weakest link in the "faithful
+  reconstructions" claim and it is now anchored.
+* **The audit's §9 says what the draft says it says**, verified in the source's own text: it
+  proposes canonicalisation, calls it "directly testable within our framework", does not implement
+  it, and measures neither closure size nor closure-finding cost. §6's "what is ours" stands
+  exactly as written. Its own result — the unlearning boundary "drawn primarily by the database
+  administrator rather than by the model" — is independent support for the record/fact distinction,
+  and is now cited for that rather than only as an unrun proposal.
+
+**What is not established.** Verification is bibliographic. No cited result has been reproduced, a
+real citation can still be misread, and two clusters remain unchecked — including attack-based
+unlearning benchmarks, which the draft's whole framing of "the standard" depends on. That is the
+next one to do, and it is now merely work rather than a blocker.
+
+The pattern worth keeping: **"blocked" is a claim, and it had never been given a positive control.**
+Four items carried it, three were wrong, and the wrongness was cheap to detect and expensive to
+leave — one command each.
+
+### 31.58 The last two clusters, and a critique that sharpens F1 instead of agreeing with it (2026-09-07)
+
+§31.57 left two of eight citation clusters unchecked and named the more important one. Both are now
+done, so §13(d) is discharged bibliographically.
+
+**The standard is the standard.** TOFU (arXiv:2401.06121), WMDP (arXiv:2403.03218) and MUSE
+(arXiv:2407.06460) are real, and MUSE lists *no privacy leakage* among its six desiderata — an
+attack-based criterion. The draft's framing was not a straw man, which is what this cluster had to
+establish.
+
+**And the critique is more interesting than a confirmation.** Diamant, Glazer and Fetaya, *Stress
+Testing Unlearning Algorithms* (arXiv:2608.22527, 23 Aug 2026), object in the abstract that existing
+benchmarks "do not actively test whether unlearned information can still be forcibly extracted" --
+and their remedy is to attack harder (WMDP++).
+
+**F1 says that is not the fix.** §2's fifth attack was written *after* the four returned at chance.
+The space of attacks is not closed, so no quantity of adversarial effort turns "not yet broken" into
+a guarantee; only a proof over the payload domain does. The critique is therefore two things at once:
+independent evidence that the standard is the standard, **and an instance of the response this paper
+argues is insufficient.** That is a stronger position than agreement, and it only became available by
+reading what the critique actually proposes rather than that it exists.
+
+**The copy bound.** *Provably Confidential Language Modelling* (arXiv:2205.01863) — Confidentially
+Redacted Training screens the corpus into public and private sets and masks repeated sentences,
+yielding a provable confidentiality guarantee **from the training algorithm**. Exactly why §10
+declines "provably" for the copy bound here and hands the argument to prior work.
+
+**Where §13 now stands**, all four having been tested rather than assumed:
+
+| | status |
+|---|---|
+| (a) sweep on the symlink arms | blocked on checkpoints; needs a training run |
+| (b) closure in a vector index | run, fails its own control, **not discharged** |
+| (c) instrument vs a published system | **not blocked** — open question to the user, not started |
+| (d) the citations | **done bibliographically**, eight of eight |
+
+What none of it establishes: no cited result has been reproduced. A citation can be real, quoted
+accurately, and still misread — and the check for that is (c), which is the one item deliberately
+left to the user, because it makes a claim about someone else's software.
+
+### 31.59 §13(c) run: the reconstruction understated the real library (2026-09-07, PDX-002)
+
+§13(c) named the experiment that would decide whether this programme matters outside itself: point
+§3's instrument at a *published* system rather than a reconstruction. It predicted PDX-001's
+restructure would make that configuration rather than a rewrite. **It did** -- PDX-002 is a new
+`observe()` over a real index and nothing else.
+
+**System under test: `hnswlib` 0.8.0**, the reference HNSW implementation, from PyPI, used as
+documented. Payload domain 256, 16 targets, floor met, control clean.
+
+| policy | top-1 | candidates | posterior |
+|---|---|---|---|
+| live (floor) | **1.0000** | 1.00 | 1.000000 |
+| `mark_deleted`, public API | **1.0000** | 1.00 | 1.000000 |
+| `mark_deleted`, disk only | **1.0000** | 1.00 | 1.000000 |
+| rebuilt without the row | 0.0000 | 256.00 | 0.003906 |
+
+**The API is consistent, and that is worth saying first.** After `mark_deleted`, `get_items` raises
+`Label not found` and `knn_query` never returns the label -- including across a save/load round trip.
+The naive "a soft delete still serves the payload" failure does **not** occur. Anyone expecting it
+would have reported it wrongly.
+
+What survives is the tombstone. `unmark_deleted` is a documented public call and returns the payload
+exactly; the bytes are also still in the serialised index. So recovery needs no exploit and no file
+parsing -- it needs the API.
+
+**PDX-001 understated it.** The reconstruction modelled the tombstone as a *partial* channel: 256
+candidates down to 2.92, posterior 0.391667, invisible to top-1. That was a fair model of one shape.
+The reference implementation is **exact**: top-1 1.0000. A reconstruction being weaker than the thing
+it reconstructs is the good direction to be wrong in, and it is worth recording that the model was
+conservative rather than flattering.
+
+**What is not claimed, in the record itself and not only here.** This is not a vulnerability and
+nothing is undocumented: `mark_deleted` is specified as reversible and shipped with `unmark_deleted`,
+which is the correct primitive for capacity reuse. The finding is about **deployments that discharge
+a deletion request with it**. No hosted service was touched, no vendor product tested, nothing
+reverse-engineered. A test asserts the record says so, so the disclaimer cannot quietly fall out.
+
+**And it failed its own test first.** The draft embedding used `% 251`, mapping 256 payloads onto 251
+vectors -- five colliding pairs -- and still reported top-1 1.0000, because the sixteen targets
+happened to miss every collision. **Right by luck.** The injectivity test caught it; the modulus is
+257 now, so the k=0 component alone is injective and the attack is well-posed by construction. Fourth
+instrument in this branch to fail its own test before reporting.
+
+**What it settles for the draft.** F1's rule -- gate every derived quantity, or take the row out of
+the addressable set -- was supported by our own store plus reconstructions. The right-hand disjunct
+is now the only arm that reaches chance **on a real, widely-used index**. §13(c) also converts the
+scale objection: this repository's setup is the instrument now, not the subject.
+
+**What it does not settle.** The audit measures what is recoverable from the index. It does not show
+that any deployed system serves deletion requests this way; that is a claim about operators, and no
+experiment here can make it.
+
+### 31.60 §13(b) answered by registering a second experiment, not by amending the first (2026-09-07, PDX-003)
+
+§31.55 left §13(b) failing its own control and said the fix was a design change, "the author's call".
+Given the call, the question became *how* to make it without manufacturing a result.
+
+**What was not done: editing E-000033.** Its record, criteria and source are untouched; a test
+asserts both that its embedder is still `gpt2` and that its control still fails. Swapping a component
+of a pre-registered experiment until it passes is the move this programme distrusts, and the
+distrust does not lapse because the swap is mine.
+
+**What was done: PDX-003**, a separate registration of the same protocol with **exactly one declared
+change** -- `all-MiniLM-L6-v2` instead of mean-pooled `gpt2`. The justification is not "it works
+better": a causal LM's mean-pooled hidden state is not a retrieval representation and was never
+trained to be one. Everything else is E-000033's own code, *imported and called* -- `build_facts`,
+`question`, `build_index`, `read_rate`, `retrieve`, `resolve` -- and a test asserts those imports, so
+"same protocol, one swap" is a property of the code rather than of this paragraph.
+
+**Result, 3 seeds, 150 facts, 4 chunks each, every criterion passing:**
+
+| | canonical | duplicated |
+|---|---|---|
+| answers before deletion | 0.8967 | 0.9350 |
+| chunks holding the fact | **1.00** | **4.00** |
+| still retrievable after one deletion | **0.1333** | **0.9867** |
+
+The control E-000033 missed by a factor of thirty -- 0.0250 against 0.80 -- is met at **0.8800 on the
+worst seed**. **§6's closure reproduces in a chunked retrieval store.** Deleting the chunk a fact's
+own question retrieves removes the fact canonically and leaves the duplicated store answering
+0.9867 of the time: Codd's modification anomaly applied to a delete, measured where practitioners
+meet it.
+
+**What it does not show**, in the record and not only here: that E-000033's configuration was sound.
+It was not, on its own evidence, and that record stands.
+
+### 31.61 The venue, decided and dated (2026-09-07)
+
+The one remaining decision that was not an experiment. **IEEE SaTML 2027**: abstract **22 September
+2026**, full paper **29 September 2026**, decisions 16 December, Reykjavik 8--10 May 2027. Twelve
+pages of body text, double-blind, **artifact evaluation required** -- artifacts within three days of
+the deadline, Zenodo on acceptance.
+
+**Why.** Its scope lists novel attacks, privacy in machine learning, ML system security, and
+verification of algorithms and systems. §2 and §3 are an attack; §8 is a privacy disclosure; §4 is
+verification. The dates were read from the call, not recalled.
+
+**The gap, stated rather than glossed.** The call does *not* name machine unlearning, deletion or the
+right to be forgotten; data auditing appears only obliquely under trustworthy data curation. That is
+an argument the submission must make, not one it can assume. If it is rejected on scope rather than
+merit, PoPETs is the fallback -- rolling deadlines, and the right-to-be-forgotten framing is
+explicitly in its remit.
+
+**Artifact evaluation is an advantage here, not a tax.** Every figure is bound to a committed record,
+`make papernums` fails when prose and record part, and CI runs the chain on every push. Most
+submissions have to build that; this one has it.
+
+**What blocks submission is now one item: §13(a).** Not a decision -- compute. The symlink
+checkpoints are not on disk and making them is a training run.
+
+### 31.62 The one document nothing binds: the PR description had drifted five ways (2026-09-07)
+
+`make papernums` binds the paper to the records, `check_self_description` binds the paragraph
+describing the registry to `len()` of the registry, and `check_record_freshness` binds a record to
+the repository it counts. **The pull request description is bound to nothing**, and it had gone
+stale in five separate places while every one of those checks stayed green:
+
+| the description said | by 2026-09-07 |
+|---|---|
+| "the seven suites this PR adds" | nine |
+| "**five** kinds of claim are now checked" | six -- record freshness was added in §31.56 |
+| "every external citation is a lead and not a checked fact ... no network here" | all eight clusters verified; the network claim was false and untested (§31.57) |
+| "two experiments block honest submission" | one, §13(a) |
+| "`E-000033` ... has never been run" | run, failing its own control, and answered by PDX-003 |
+
+Two of the five are the *same* sentences the paper carried and that §31.55 and §31.57 corrected
+there -- corrected in the document an instrument reads, left standing in the document a reviewer
+reads first. The description even warns, in its own second paragraph, that restating counts is how
+it drifted twice before; the warning was about counts, and four of the five drifts are not counts
+but claims about what has and has not been established.
+
+**Why this is not simply fixed by adding a seventh pass.** A PR body is not in the working tree, so
+binding it would mean a check that reaches the GitHub API and fails when a network call fails --
+which makes the check itself an instrument that can report red for reasons unrelated to its subject.
+The honest alternative is the one taken: the body is rewritten from the records whenever a claim in
+it changes, and this entry records that it was not, for a day, and that nothing noticed.
+
+**The general form, which is §31.15's cousin rather than §31.15.** Not "a comparison whose two sides
+share a source", but *a claim with no source at all* -- the class of statement that cannot fail
+because nothing reads it. Four instruments exist here now precisely because that class kept
+producing wrong sentences; the description was outside all four, and behaved exactly as predicted.
+
+### 31.63 The novelty search had never been calibrated either (2026-09-07, NOV-005)
+
+§31.62 was about a document no instrument reads. This is about the **nulls** every claim of novelty in
+this programme rests on, and it is the more expensive of the two.
+
+Every load-bearing novelty statement here is negative: "Nothing I verified covers this", "I found no
+work that demonstrates", "the combination is unclaimed", "the paired arms in one reader I could not
+find". They came from a 41-agent workflow whose own note disclaims its external citations, in an
+environment three drafts asserted had no network — untested and false (§31.57). By 2026-09-07 the
+*positives* had been checked in full (`references.md`, eight clusters) and the *negatives* had never
+been checked at all. **§31.15, fifth instance, now on the literature review: an instrument that
+cannot fail is not evidence.** NOV-001 calibrated the screen behind twenty-three kills; nothing had
+calibrated the screen behind the verdicts that decide whether any of it is publishable.
+
+**The calibration first.** Three propositions of known standing, phrased as novelty claims, run
+through the same instrument: Codd 1970 for one-operation-reaches-all, Carlini and Wagner for learned
+predicates failing adversarially, the resilience literature for the minimum contingency set. All
+three returned. Plus the half usually omitted — a **negative control**, a fabricated construct, which
+returned nothing. A searcher that manufactures a hit for anything is as useless as one that finds
+nothing, and only the second failure mode is normally tested.
+
+**Then the verdicts. Two withdrawn, two narrowed, three survive.**
+
+| claim | verdict | by |
+|---|---|---|
+| N1 payload-derived index channel | NARROWED | Yao et al., arXiv:2609.04875 (4 Sep 2026) |
+| N3 margin + floor + held-out seeds | **WITHDRAWN** | Yang and Yeung, arXiv:2607.19442 (21 Jul 2026) |
+| N7 composition with a record-level certificate | **WITHDRAWN** | Garg, Goldwasser and Vasudevan, Eurocrypt 2020 |
+| N8 F1, the attack standard is not a guarantee | NARROWED | Yang and Yeung, same paper |
+| N2, N5, N6 | survive | these queries found nothing |
+
+**N3.** Yang and Yeung have all three parts at 45 model-seed cells over five architecture families: a
+tolerance δ_equiv = 0.93 nats from retraining redraws with TOST-equivalence to never-learned; a
+sealed challenge panel of known-label models where "the screen rejects M_inj in 45/45 cells and
+accepts the reference in 44/45" — **two-sided**, where E-000019's floor is one-sided; and an analysis
+rule fixed before the held-out families. E-000019 is three seeds on one synthetic model.
+
+**N7, and this is the one that mattered.** Garg, Goldwasser and Vasudevan's Fig. 5 collector
+"maintains a dataset as a history-independent dictionary Dict", takes any learning algorithm with a
+deletion operation, and calls `delete(Dict, model, key)`; Theorem 3.4 bounds its 1-representative
+deletion-compliance error at `1/λ + poly(λ)/2^λ`. **The programme already knew** — §6 of the
+2026-09-04 novelty statement withdrew this claim the day it was written. The withdrawal reached that
+document and never reached the paper, which asserted it for three days. §31.62's drift in the other
+direction, and with a real cost: a submission would have claimed a Eurocrypt 2020 result.
+
+**N8.** The same Yang and Yeung paper carries F1 as a section heading — "forward-only certification
+is not sound" — and demonstrates it: a logit-suppression penalty leaves "the entire forward battery
+accepts a suppressed model" in 12 of 45 cells with knowledge intact. F1 is corroborated, not owned,
+and by better evidence than this repository has. What it leaves is the constructive half, which that
+paper explicitly declines ("not an adversarially sound certificate"), and §2's specific mechanism,
+which a forward battery cannot reach in principle because recovery runs through a term that never
+holds the payload.
+
+**The enforcement, which is the part that will still be working next month.** A verdict recorded in a
+document nobody reads, against a claim in one everybody does, is exactly §31.62. So NOV-005 is a
+check rather than a note: a claim it marks withdrawn or narrowed must leave a **visible marked
+withdrawal** in the document that asserted it, and deleting the sentence instead is caught separately
+— a withdrawal that leaves no trace is not a withdrawal. It fired four times on the first run.
+
+**Two defects it found in itself.** A registry phrase that spanned a line wrap, so its enforcement
+checked nothing silently — caught by the test requiring every phrase to be findable. And two new
+coverage exclusions written as `%\b`, which can never match because `%` is not a word character:
+dead on arrival, caught by the coverage pass. The rule holding in the instrument written to enforce
+the rule, twice, in one afternoon.
+
+**What it does not establish.** No cited result reproduced. WITHDRAWN is a claim about priority, not
+about quality. And it is not a systematic review: SURVIVES means "these queries did not find it", and
+the queries are in the record so the next reader can beat them.
+
 ### 31.8 Boundary
 
 CPU only, no GPU, no LLM above 124M parameters, synthetic worlds, single-token entities, two surface forms per relation, one session. Nothing here shows unlearning of facts already encoded in pretrained weights. Evidence levels recorded: E3–E4 for the synthetic system (F4 for SHRED with the verified gate, E-000010 — **on the value channel only**: E-000028 recovers the shredded object at 1.0000 through the ungated reverse key, where REVOKE and DELETE are at chance, so F4 for SHRED is a claim about answers, logits, hidden states and probes and not about routing); E5 as substrate for the frozen-GPT-2 experiment, with reading, composition, update and the copy bound supported and behavioural deletion not yet supported at the pre-registered thresholds.
