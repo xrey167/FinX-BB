@@ -23,6 +23,7 @@ from so.paper_numbers import (
     _CITED_BUT_UNRUN,
     _NOT_A_MEASUREMENT,
     _figure_text,
+    check_record_freshness,
     check_references,
     _fmt,
     _resolve,
@@ -400,6 +401,37 @@ def test_every_pointer_in_the_paper_points_at_something():
     assert len(rows) > 30
 
 
+def test_the_sweeps_record_is_still_true_of_the_repository():
+    """A registry that only compares two documents cannot notice the world moving underneath both."""
+    rows = check_record_freshness()
+    assert rows, "nothing is checked for freshness"
+    assert [r["status"] for r in rows] == ["OK"] * len(rows), rows
+
+
+def test_record_freshness_can_fail_when_the_repository_grows(tmp_path, monkeypatch):
+    """Floor: add an experiment file and the sweep's record must be reported stale.
+
+    This is the hole the sixth finding left. Binding the paper to NOV-004's record stopped the
+    *paper* going stale silently; nothing stopped the *record* going stale, and then paper and
+    record agree with each other while both disagree with the repository.
+    """
+    import so.paper_numbers as pn
+
+    real = sorted(p.name for p in pn.EXPERIMENTS.glob("*.py")
+                  if re.match(r"^e\d{6}[a-z]?_.*\.py$", p.name))
+    fake = tmp_path / "experiments"
+    fake.mkdir()
+    for name in real:
+        (fake / name).write_text("")
+    (fake / "e999999_a_newly_landed_experiment.py").write_text("")
+
+    monkeypatch.setattr(pn, "EXPERIMENTS", fake)
+    rows = pn.check_record_freshness()
+    assert rows[0]["status"] == "STALE", rows
+    assert f"repository now holds {len(real) + 1}" in rows[0]["detail"]
+    assert "re-run the sweep" in rows[0]["detail"]
+
+
 def test_a_make_target_that_does_not_exist_is_caught():
     text = _PAPER_TEXT + "\n\nReproduce it with `make nosuchtarget`.\n"
     rows = check_references(text)
@@ -414,16 +446,43 @@ def test_an_experiment_cited_with_no_record_is_caught():
     assert "not declared unrun" in row["detail"]
 
 
-def test_the_one_recordless_citation_is_honest_only_while_the_paper_says_so():
-    """E-000033 is cited and has no record. That is fine *because* §13(b) says it is unrun."""
-    eid, sentence = next(iter(_CITED_BUT_UNRUN.items()))
-    assert sentence in _PAPER_TEXT
-    ok = next(r for r in check_references() if r["name"] == eid)
-    assert ok["status"] == "OK" and "the paper says so" in ok["detail"]
+def test_an_id_declared_unrun_that_acquires_a_record_is_a_contradiction():
+    """This is the direction the first version missed, and it mattered within the hour.
 
-    stripped = _PAPER_TEXT.replace(sentence, "<removed>")
-    row = next(r for r in check_references(stripped) if r["name"] == eid)
-    assert row["status"] == "UNDISCLOSED", row
+    E-000033 sat in `_CITED_BUT_UNRUN` because §13(b) said it had never been run. When it *was*
+    run, the reference pass took the "record present" branch and reported OK — while the paper
+    still said "has never been run". A checker that only guards one direction of a pairing is
+    the same defect as a comparison whose two sides share a source: it cannot fail the way it
+    needs to.
+    """
+    import so.paper_numbers as pn
+    declared = dict(pn._CITED_BUT_UNRUN)
+    declared["E-000033"] = "never been run"          # E-000033 does have a record now
+    monkey = pn._CITED_BUT_UNRUN
+    try:
+        pn._CITED_BUT_UNRUN = declared
+        rows = pn.check_references(_PAPER_TEXT)
+    finally:
+        pn._CITED_BUT_UNRUN = monkey
+    row = next(r for r in rows if r["name"] == "E-000033")
+    assert row["status"] == "CONTRADICTED", row
+    assert "a record now exists" in row["detail"]
+
+
+def test_an_id_with_no_record_and_no_declaration_still_fails():
+    """The other direction, kept alive now that the declaration list is empty."""
+    import so.paper_numbers as pn
+    rows = pn.check_references(_PAPER_TEXT + "\n\nSee E-999998 for the sequel.\n")
+    row = next(r for r in rows if r["name"] == "E-999998")
+    assert row["status"] == "MISSING"
+    assert "not declared unrun" in row["detail"]
+
+
+def test_section_13b_reports_the_failed_control_not_the_data_columns():
+    """The run happened; its own control failed; the two data columns must not be read as a result."""
+    assert "fails its own pre-registered control" in _PAPER_TEXT
+    assert "§13(b) is not\ndischarged" in _PAPER_TEXT or "not\ndischarged" in _PAPER_TEXT
+    assert "0.0467" in _PAPER_TEXT and "0.0250" in _PAPER_TEXT
 
 
 def test_a_dangling_section_reference_is_caught():

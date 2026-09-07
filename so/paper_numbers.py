@@ -277,6 +277,15 @@ CLAIMS: tuple[Claim, ...] = (
     Claim("NOV004 class A confirmed", "nov004/nov004_instrument_audit.json",
           "class_a_confirmed_count", "3", "int", "", "three", "mechanical sweep"),
 
+    # E-000033 — §13(b). Bound because the number that matters is the one that FAILED: the
+    # control the experiment set for itself, which is why its two data columns are not reported.
+    Claim("E33 control read rate", "e000033_retrieval_closure.json",
+          "aggregate/control/read_before_deletion/mean", "0.0467", "dp4"),
+    Claim("E33 control worst seed", "e000033_retrieval_closure.json",
+          "aggregate/control/read_before_deletion/min", "0.0250", "dp4"),
+    Claim("E33 chunks", "e000033_retrieval_closure.json", "per_seed/0/n_chunks", "600", "int"),
+    Claim("E33 facts", "e000033_retrieval_closure.json", "n_facts", "150", "int"),
+
     # E-000021 — the published false-accept rate the paper contrasts against
     Claim("E21 false-accept rate", "e000021_gate_error_rates.json", "totals/false_accept_rate", "8.49e-04", "exp2"),
     Claim("E21 n", "e000021_gate_error_rates.json", "totals/ci_false_accept/n", "2,200,000", "thousands"),
@@ -817,9 +826,10 @@ MAKEFILE = Path("Makefile")
 
 # An experiment the paper cites without a record is honest only if the paper says it has not been
 # run. Each entry pairs the id with the words that must appear for the citation to stand.
-_CITED_BUT_UNRUN: dict[str, str] = {
-    "E-000033": "The target exists and has never been run",
-}
+# Empty, and deliberately kept rather than deleted: E-000033 lived here until it was run. The
+# machinery matters more than the entries — an id declared unrun that acquires a record is a
+# contradiction the reference pass reports, which is how §13(b) got corrected.
+_CITED_BUT_UNRUN: dict[str, str] = {}
 
 
 def check_references(paper_text: str | None = None) -> list[dict]:
@@ -849,7 +859,14 @@ def check_references(paper_text: str | None = None) -> list[dict]:
     records = {p.name for p in RESULTS.glob("**/*.json")}
     for eid in sorted(set(re.findall(r"E-\d{6}", text))):
         stem = "e" + eid.split("-")[1]
-        if any(r.startswith(stem) for r in records):
+        has_record = any(r.startswith(stem) for r in records)
+        if has_record and eid in _CITED_BUT_UNRUN:
+            # the direction this originally missed: the id was declared unrun, and then somebody ran
+            # it. Record and paper now contradict each other, and the "record present" branch would
+            # have reported OK while the paper still said "has never been run".
+            rows.append({"kind": "experiment", "name": eid, "status": "CONTRADICTED",
+                         "detail": "declared unrun in the paper, but a record now exists"})
+        elif has_record:
             rows.append({"kind": "experiment", "name": eid, "status": "OK", "detail": "record present"})
         elif eid in _CITED_BUT_UNRUN and _CITED_BUT_UNRUN[eid] in text:
             rows.append({"kind": "experiment", "name": eid, "status": "OK",
@@ -879,6 +896,49 @@ def check_references(paper_text: str | None = None) -> list[dict]:
         rows.append({"kind": "figure", "name": fig, "status": "OK" if ok else "MISSING",
                      "detail": "exists" if ok else "embedded but not on disk"})
 
+    return rows
+
+
+EXPERIMENTS = Path("so/experiments")
+
+# Records whose value is a count over the repository itself, and therefore goes stale when the
+# repository changes rather than when anyone edits anything. Each pairs a record field with the
+# live quantity it should equal.
+_REPO_DERIVED: tuple[tuple[str, str, str], ...] = (
+    ("nov004/nov004_instrument_audit.json", "files_scanned", "recorded experiment files"),
+)
+
+
+def check_record_freshness() -> list[dict]:
+    """Is the *record* still true of the repository it counted?
+
+    The sixth kind of staleness was a paper claim invalidated by the repository growing. Binding it
+    to NOV-004's record fixed the paper, and left the same hole one level down: if the repository
+    grows again and nobody re-runs the sweep, the record and the paper agree with each other and
+    disagree with the world. Everything upstream stays green.
+
+    So this compares the record's own count against a live count made by the same rule the sweep
+    uses. A registry that only ever compares two documents to each other cannot notice this.
+    """
+    pattern = re.compile(r"^e\d{6}[a-z]?_.*\.py$")
+    live = sorted(p.name for p in EXPERIMENTS.glob("*.py") if pattern.match(p.name))
+    rows = []
+    for record, field, what in _REPO_DERIVED:
+        doc = _load(record)
+        if doc is None:
+            rows.append({"record": record, "status": "PATH", "detail": f"no record {record}"})
+            continue
+        value, err = _resolve(doc, field)
+        if err:
+            rows.append({"record": record, "status": "PATH", "detail": f"{field}: {err}"})
+            continue
+        if value != len(live):
+            rows.append({"record": record, "status": "STALE",
+                         "detail": f"{field} says {value}, the repository now holds {len(live)} "
+                                   f"{what} — re-run the sweep"})
+            continue
+        rows.append({"record": record, "status": "OK",
+                     "detail": f"{field} = {value} {what}, matching the repository"})
     return rows
 
 
@@ -1004,6 +1064,12 @@ def main() -> None:
         mark = " ok " if r["status"] == "OK" else r["status"]
         print(f"[{mark:>11}] {('self-description: ' + r['where']):<52} {r['detail']}")
 
+    fresh_rows = check_record_freshness()
+    for r in fresh_rows:
+        mark = " ok " if r["status"] == "OK" else r["status"]
+        print(f"[{mark:>11}] {('freshness: ' + r['record']):<52} {r['detail']}")
+    stale = [r for r in fresh_rows if r["status"] != "OK"]
+
     ref_rows = check_references()
     for r in ref_rows:
         if r["status"] != "OK":
@@ -1028,7 +1094,7 @@ def main() -> None:
         print(f"{len(weak)} figures are round enough to recur; their presence test does not "
               f"discriminate and only the record comparison counts for them.")
     failed_self = [r for r in self_rows if r["status"] != "OK"]
-    if not report["clean"] or failed_self or cov["unbound_count"] or bad_refs:
+    if not report["clean"] or failed_self or cov["unbound_count"] or bad_refs or stale:
         raise SystemExit(1)
 
 

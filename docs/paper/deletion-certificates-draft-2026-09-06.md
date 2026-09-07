@@ -423,7 +423,7 @@ is cheap.
 and `so/results/`, and each was caught by a person opening a JSON file: a mean rank written 128.0
 where the record says 128.02; an accept rate written 1.0000 where the sweep says 0.9999; and §7's
 table presented with no seed count where the record is one seed. Three for three is the absence of
-an instrument, so there is now a registry (`make papernums`) binding 94 figures printed in this text
+an instrument, so there is now a registry (`make papernums`) binding 98 figures printed in this text
 and 31 more printed inside the three drawn figures to the record paths they came from, re-rendered
 under the rounding rule used, plus 19 **verdicts** — categorical cells like `CERTIFIED`, each
 bound to the record boolean behind it and checked against its own table row — and 10 **scope
@@ -564,9 +564,20 @@ arms, so §8's "nothing recoverable" is value-channel-only for those arms. Named
 
 **(b) The closure reproduced in a chunked vector index.** Until §6's closure is shown in the
 arrangement almost every deployed system uses, the result is about one store implementation rather
-than about the pattern. **The target exists and has never been run**: `make retrieval`, E-000033,
-with no record in `so/results/`. It is the one experiment identifier this paper cites that has no
-record behind it, and the only reason citing it is honest is this sentence.
+than about the pattern. **The target has now been run, and it fails its own pre-registered control**
+(`make retrieval`, E-000033: three seeds, 150 facts, 4 chunks each, frozen GPT-2 as the embedder).
+
+The experiment requires both arms to *answer* before any deletion — "or the comparison is between a
+working store and a broken one" — at a registered threshold of **0.80**. Observed: **0.0467** mean,
+**0.0250** on the worst seed. Mean-pooled GPT-2 embeddings do not retrieve the right chunk out of
+600. The falsification condition the experiment wrote for itself fired.
+
+**So the two data columns must not be read.** They look like the result: closure `1.00` canonical
+against `4.00` duplicated, and the canonical arm knowing its closure without searching at `1.0000`
+where the duplicated arm is at `0.0000`. Reporting that would be this programme's own §31.15 failure in its
+purest form — a comparison between two stores, neither of which can be read from. **§13(b) is not
+discharged.** What it needs is not a run but a design change: an embedder that clears the control,
+which is a different experiment from the one registered, and not ours to substitute unilaterally.
 
 **(c) The one that decides whether this matters outside the project.** Run §3's instrument against a
 *published* system with its own reported deletion metric — a codebook editor, an episodic memory, or
@@ -593,5 +604,5 @@ are what a practitioner will act on.
 
 Every number above: `make keychannel certify closure retrieval disclosure compare pdxaudit`. Records
 in `so/results/`. Instrument audits: `make calibrate charged unread auditinstr`. To check this text
-against those records: `make papernums` (94 figures in the prose, 31 in the drawn figures, 19 verdicts, 10 scope
+against those records: `make papernums` (98 figures in the prose, 31 in the drawn figures, 19 verdicts, 10 scope
 claims; non-zero exit when any of them parts from its record).

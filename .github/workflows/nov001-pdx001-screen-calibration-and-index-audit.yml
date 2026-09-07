@@ -42,6 +42,7 @@ on:
       - "so/results/e000030_deletion_certificate.json"
       - "so/results/e000032_deletion_closure.json"
       - "so/results/e000035_deletion_disclosure.json"
+      - "so/results/e000033_retrieval_closure.json"
       - "so/results/pdx001/pdx001_payload_derived_index_audit.json"
       - "so/results/nov004/nov004_instrument_audit.json"
   workflow_dispatch:
@@ -147,6 +148,7 @@ jobs:
             so/results/e000030_deletion_certificate.json \
             so/results/e000032_deletion_closure.json \
             so/results/e000035_deletion_disclosure.json \
+            so/results/e000033_retrieval_closure.json \
             so/results/pdx001/pdx001_payload_derived_index_audit.json \
             so/results/nov004/nov004_instrument_audit.json \
             > ci-nov001/source-sha256.txt

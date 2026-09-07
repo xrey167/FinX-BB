@@ -3446,6 +3446,60 @@ Six kinds of staleness now. The fifth was "the pointers might not point"; the si
 be about a world that moved". A registry cannot anticipate the seventh, and saying so is not modesty,
 it is the only accurate description of what a green run means.
 
+### 31.55 §13(b) was not blocked, and running it falsified it (2026-09-07, E-000033)
+
+§13(b) had been listed for a day as blocked on "torch and network". That was an assumption, not a
+measurement. It is wrong: `pip install torch --index-url .../cpu` works here, `transformers`
+installs, and `huggingface.co` answers 200. **The environment was never the obstacle.**
+
+So E-000033 was run at its registered parameters -- three seeds, 150 facts, 4 chunks each, 600
+chunks, frozen `gpt2` as the embedder. It completes in seconds per seed and **fails its own
+pre-registered control**:
+
+| criterion | required | observed (worst seed) | |
+|---|---|---|---|
+| `control/read_before_deletion` | >= 0.80 | **0.0250** | FAIL |
+| `duplicated/still_retrievable_after_one` | >= 0.50 | 0.0550 | FAIL |
+
+The experiment's own docstring says why this ends the matter: *"Both arms must ANSWER before any
+deletion, or the comparison is between a working store and a broken one."* Mean-pooled GPT-2
+embeddings do not retrieve the right chunk out of 600 -- 0.0467 mean read rate against a registered
+0.80 -- so nothing downstream is interpretable.
+
+**And the trap is that the result looks right.** Closure 1.00 canonical against 4.00 duplicated;
+canonical knows its closure without searching at 1.0000, duplicated at 0.0000. That is the shape
+E-000032 predicts, and reporting it would be §31.15 in its purest form: a comparison between two
+stores neither of which can be read from, agreeing with the hypothesis for no reason. **§13(b) is
+not discharged.** What it needs is an embedder that clears the control -- a design change to a
+pre-registered experiment, which is the author's call and not a thing to substitute silently.
+
+**Two lessons, and the second is about this session.** First: "blocked" claims deserve the same
+scepticism as any other, and this one had been repeated in three check-in prompts without being
+tested once. Second, the correction had to be made against my own preference for the tidy outcome --
+the run was started expecting to *discharge* §13(b), and the honest reading of the output is the
+opposite.
+
+### 31.56 A pairing guarded in one direction only (2026-09-07, reference pass)
+
+§31.53 added `_CITED_BUT_UNRUN`: an experiment cited with no record is honest only while the paper
+says it was never run, and deleting that sentence turns the row `UNDISCLOSED`. Correct, and guarded
+in exactly one direction.
+
+Running E-000033 exercised the other. A record appeared, so `check_references` took its `record
+present` branch and reported **OK** -- while §13(b) still read "The target exists and has never been
+run". The pass was green across a flat contradiction, inside the hour, in machinery written to catch
+precisely that class of thing.
+
+An id declared unrun that acquires a record is now `CONTRADICTED`. `_CITED_BUT_UNRUN` is kept
+deliberately **empty** rather than deleted, because the mechanism outlived its only entry.
+
+**And one further hole, closed before it bit.** The paper is bound to NOV-004's record, which fixed
+§31.54's staleness for the *paper*; nothing stopped the *record* going stale. If the repository
+grows and nobody re-runs the sweep, record and paper agree with each other and both disagree with
+the world, and every pass stays green. `check_record_freshness` recounts the experiment files by the
+sweep's own rule and compares. It is the first check here that looks at something other than two
+documents.
+
 ### 31.8 Boundary
 
 CPU only, no GPU, no LLM above 124M parameters, synthetic worlds, single-token entities, two surface forms per relation, one session. Nothing here shows unlearning of facts already encoded in pretrained weights. Evidence levels recorded: E3–E4 for the synthetic system (F4 for SHRED with the verified gate, E-000010 — **on the value channel only**: E-000028 recovers the shredded object at 1.0000 through the ungated reverse key, where REVOKE and DELETE are at chance, so F4 for SHRED is a claim about answers, logits, hidden states and probes and not about routing); E5 as substrate for the frozen-GPT-2 experiment, with reading, composition, update and the copy bound supported and behavioural deletion not yet supported at the pre-registered thresholds.
