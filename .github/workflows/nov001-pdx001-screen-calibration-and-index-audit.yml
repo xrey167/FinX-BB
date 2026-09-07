@@ -50,6 +50,10 @@ on:
       - "so/experiments/pdx002_real_index_deletion_audit.py"
       - "so/tests/test_pdx002_real_index_deletion_audit.py"
       - "docs/novelty/pdx002-real-index-deletion-audit-result.md"
+      - "so/results/pdx003/pdx003_retrieval_closure_real_embedder.json"
+      - "so/experiments/pdx003_retrieval_closure_real_embedder.py"
+      - "so/tests/test_pdx003_retrieval_closure_real_embedder.py"
+      - "docs/novelty/pdx003-retrieval-closure-real-embedder-result.md"
   workflow_dispatch:
 
 jobs:
@@ -87,7 +91,8 @@ jobs:
             so/tests/test_nov003_unread_coordinates_e103.py \
             so/tests/test_nov004_instrument_audit.py \
             so/tests/test_paper_numbers.py \
-            so/tests/test_pdx002_real_index_deletion_audit.py
+            so/tests/test_pdx002_real_index_deletion_audit.py \
+            so/tests/test_pdx003_retrieval_closure_real_embedder.py
       - name: Paper figures agree with the records
         run: |
           mkdir -p ci-paper
@@ -172,6 +177,10 @@ jobs:
             so/experiments/pdx002_real_index_deletion_audit.py \
             so/tests/test_pdx002_real_index_deletion_audit.py \
             docs/novelty/pdx002-real-index-deletion-audit-result.md \
+            so/results/pdx003/pdx003_retrieval_closure_real_embedder.json \
+            so/experiments/pdx003_retrieval_closure_real_embedder.py \
+            so/tests/test_pdx003_retrieval_closure_real_embedder.py \
+            docs/novelty/pdx003-retrieval-closure-real-embedder-result.md \
             > ci-nov001/source-sha256.txt
           find ci-nov001 ci-pdx001 ci-pdx002 ci-nov002 ci-nov003 ci-nov004 ci-paper -maxdepth 1 -name '*.json' -print0 | sort -z \
             | xargs -0 -r sha256sum > ci-nov001/result-sha256.txt

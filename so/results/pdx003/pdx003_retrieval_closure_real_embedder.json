@@ -1,0 +1,179 @@
+{
+  "aggregate": {
+    "canonical/closure_known_without_search": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "canonical/fact_closure_max": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "canonical/fact_closure_mean": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "canonical/read_before_deletion": {
+      "max": 0.915,
+      "mean": 0.8966666666666666,
+      "min": 0.88,
+      "n": 3
+    },
+    "canonical/still_retrievable_after_one": {
+      "max": 0.16,
+      "mean": 0.13333333333333333,
+      "min": 0.12,
+      "n": 3
+    },
+    "control/read_before_deletion": {
+      "max": 0.915,
+      "mean": 0.8966666666666666,
+      "min": 0.88,
+      "n": 3
+    },
+    "control/read_gap": {
+      "max": 0.050000000000000044,
+      "mean": 0.03833333333333333,
+      "min": 0.020000000000000018,
+      "n": 3
+    },
+    "duplicated/closure_known_without_search": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 3
+    },
+    "duplicated/fact_closure_max": {
+      "max": 4.0,
+      "mean": 4.0,
+      "min": 4.0,
+      "n": 3
+    },
+    "duplicated/fact_closure_mean": {
+      "max": 4.0,
+      "mean": 4.0,
+      "min": 4.0,
+      "n": 3
+    },
+    "duplicated/read_before_deletion": {
+      "max": 0.96,
+      "mean": 0.935,
+      "min": 0.915,
+      "n": 3
+    },
+    "duplicated/still_retrievable_after_one": {
+      "max": 1.0,
+      "mean": 0.9866666666666667,
+      "min": 0.96,
+      "n": 3
+    }
+  },
+  "control_met": true,
+  "criteria": {
+    "canonical/fact_closure_max": {
+      "observed": 1.0,
+      "op": "<=",
+      "pass": true,
+      "threshold": 1.0
+    },
+    "control/read_before_deletion": {
+      "observed": 0.88,
+      "op": ">=",
+      "pass": true,
+      "threshold": 0.8
+    },
+    "control/read_gap": {
+      "observed": 0.050000000000000044,
+      "op": "<=",
+      "pass": true,
+      "threshold": 0.15
+    },
+    "duplicated/fact_closure_mean": {
+      "observed": 4.0,
+      "op": ">=",
+      "pass": true,
+      "threshold": 4.0
+    }
+  },
+  "decision": "CLOSURE_REPRODUCED_IN_A_RETRIEVAL_STORE",
+  "does_not_replace": "E-000033: its record, criteria and source are untouched",
+  "experiment": "PDX-003",
+  "k": 4,
+  "n_facts": 150,
+  "not_claimed": "Swapping a component of a pre-registered experiment to make it pass is exactly the move this programme distrusts, so: the change is one function, it is declared, and this run carries its own registration instead of inheriting E-000033's. E-000033's failing record stands as recorded. This shows the closure survives in a retrieval store when the store can actually be read; it does not show that E-000033's own configuration was sound.",
+  "per_seed": [
+    {
+      "canonical/closure_known_without_search": 1.0,
+      "canonical/fact_closure_max": 1.0,
+      "canonical/fact_closure_mean": 1.0,
+      "canonical/read_before_deletion": 0.88,
+      "canonical/still_retrievable_after_one": 0.16,
+      "control/read_before_deletion": 0.88,
+      "control/read_gap": 0.050000000000000044,
+      "duplicated/closure_known_without_search": 0.0,
+      "duplicated/fact_closure_max": 4.0,
+      "duplicated/fact_closure_mean": 4.0,
+      "duplicated/read_before_deletion": 0.93,
+      "duplicated/still_retrievable_after_one": 1.0,
+      "embedder": "sentence-transformers/all-MiniLM-L6-v2",
+      "k": 4,
+      "n_chunks": 600,
+      "n_facts": 150,
+      "seed": 0
+    },
+    {
+      "canonical/closure_known_without_search": 1.0,
+      "canonical/fact_closure_max": 1.0,
+      "canonical/fact_closure_mean": 1.0,
+      "canonical/read_before_deletion": 0.895,
+      "canonical/still_retrievable_after_one": 0.12,
+      "control/read_before_deletion": 0.895,
+      "control/read_gap": 0.020000000000000018,
+      "duplicated/closure_known_without_search": 0.0,
+      "duplicated/fact_closure_max": 4.0,
+      "duplicated/fact_closure_mean": 4.0,
+      "duplicated/read_before_deletion": 0.915,
+      "duplicated/still_retrievable_after_one": 0.96,
+      "embedder": "sentence-transformers/all-MiniLM-L6-v2",
+      "k": 4,
+      "n_chunks": 600,
+      "n_facts": 150,
+      "seed": 1
+    },
+    {
+      "canonical/closure_known_without_search": 1.0,
+      "canonical/fact_closure_max": 1.0,
+      "canonical/fact_closure_mean": 1.0,
+      "canonical/read_before_deletion": 0.915,
+      "canonical/still_retrievable_after_one": 0.12,
+      "control/read_before_deletion": 0.915,
+      "control/read_gap": 0.04499999999999993,
+      "duplicated/closure_known_without_search": 0.0,
+      "duplicated/fact_closure_max": 4.0,
+      "duplicated/fact_closure_mean": 4.0,
+      "duplicated/read_before_deletion": 0.96,
+      "duplicated/still_retrievable_after_one": 1.0,
+      "embedder": "sentence-transformers/all-MiniLM-L6-v2",
+      "k": 4,
+      "n_chunks": 600,
+      "n_facts": 150,
+      "seed": 2
+    }
+  ],
+  "seeds": [
+    0,
+    1,
+    2
+  ],
+  "single_declared_change": {
+    "from": "mean-pooled gpt2",
+    "to": "sentence-transformers/all-MiniLM-L6-v2"
+  },
+  "title": "E-000033's protocol with an encoder that clears its own control",
+  "trains_nothing": true
+}

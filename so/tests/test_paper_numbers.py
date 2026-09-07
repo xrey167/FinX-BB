@@ -478,11 +478,21 @@ def test_an_id_with_no_record_and_no_declaration_still_fails():
     assert "not declared unrun" in row["detail"]
 
 
-def test_section_13b_reports_the_failed_control_not_the_data_columns():
-    """The run happened; its own control failed; the two data columns must not be read as a result."""
+def test_section_13b_reports_the_failed_control_and_keeps_the_two_records_apart():
+    """E-000033 failed its own control; PDX-003 answers the substance. Both must stay visible.
+
+    The risk once a passing run exists is that the failing one quietly disappears and the paper reads
+    as though §13(b) had worked first time. E-000033's numbers stay printed, its record stays
+    unamended, and the replacement says it is a separate registration.
+    """
     assert "fails its own pre-registered control" in _PAPER_TEXT
-    assert "§13(b) is not\ndischarged" in _PAPER_TEXT or "not\ndischarged" in _PAPER_TEXT
     assert "0.0467" in _PAPER_TEXT and "0.0250" in _PAPER_TEXT
+    assert "must not be read" in _PAPER_TEXT
+    # and the separately-registered answer, stated as separate
+    assert "separately registered experiment (PDX-003)" in _PAPER_TEXT
+    assert "is not amended" in _PAPER_TEXT
+    assert "exactly one declared thing" in _PAPER_TEXT
+    assert "does **not** show that E-000033's own configuration was sound" in _PAPER_TEXT
 
 
 def test_a_dangling_section_reference_is_caught():

@@ -14,7 +14,7 @@ SEEDS ?= 0 1 2
 RUN = OMP_NUM_THREADS=$(THREADS) SO_THREADS=$(THREADS) $(PY) -m
 
 .PHONY: help test smoke synthetic gpt2 demo compare rescore certify closure retrieval pointers \
-        disclosure traceless keychannel calibrate pdxaudit charged unread auditinstr papernums realindex untied \
+        disclosure traceless keychannel calibrate pdxaudit charged unread auditinstr papernums realindex closurereal untied \
         report clean-results env
 
 help:
@@ -39,6 +39,7 @@ help:
 	@echo "make auditinstr  scan every recorded experiment for the two known instrument defects. Seconds"
 	@echo "make papernums   re-read every figure the paper prints from the record it came from. Instant"
 	@echo "make realindex   audit deletion in the real hnswlib index (needs hnswlib). Seconds"
+	@echo "make closurereal E-000033's protocol with an encoder that clears its control. ~3 min"
 	@echo "make untied      the layer on a model that does not tie its embeddings (downloads Pythia-160m)"
 	@echo "make report      rebuild docs/so-results-2026-09-02.md from so/results/"
 	@echo "make env         print what will be used"
@@ -158,6 +159,12 @@ papernums:
 # Needs `pip install hnswlib numpy`. Seconds.
 realindex:
 	$(PY) -m so.experiments.pdx002_real_index_deletion_audit
+
+# §13(b): E-000033's protocol with the one component that failed its control replaced --
+# a sentence encoder instead of mean-pooled gpt2. Needs `pip install sentence-transformers`.
+# Downloads all-MiniLM-L6-v2 once. ~3 min for three seeds.
+closurereal:
+	$(PY) -m so.experiments.pdx003_retrieval_closure_real_embedder --seeds $(SEEDS)
 
 # the layer on a model that does NOT tie its embeddings; downloads Pythia-160m once, ~40 min per seed per arm
 untied:

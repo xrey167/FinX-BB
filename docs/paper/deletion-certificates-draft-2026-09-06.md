@@ -1,8 +1,8 @@
 # Is "no attack recovered it" a deletion guarantee? A falsification, a construction, and what the construction costs
 
-**Status: DRAFT. Not submittable as it stands.** Two experiments named in §13 remain: one has never
-been run, and one was run on 2026-09-07 and failed its own control. Every external citation has now
-been checked against its source (§0, `docs/paper/references.md`); none has been reproduced.
+**Status: DRAFT. One item blocks submission — §13(a).** Every external citation has been checked
+against its source (§0, `docs/paper/references.md`), though none has been reproduced. §13(b), (c)
+and (d) are answered; (a) needs the symlink checkpoints, which means a training run.
 
 *Revision 2, 2026-09-06: restructured around a single research question. Revision 1 was organised as
 a list of seven findings, which is a record, not a paper. No number changed in the restructure.*
@@ -24,7 +24,8 @@ verified against the sources**, with status and method recorded per entry in
 has been read in the source's own text. Verification is bibliographic: no cited result has been
 reproduced.
 
-**Two experiments block honest submission.** They are named in §13 and neither is optional.
+**One item blocks honest submission: §13(a).** It is not optional, and it is compute rather than a
+decision. §13(b), (c) and (d) are answered — see §13.
 
 Every number attributed to this repository is from a committed record and is reproducible by the
 `make` target named beside it.
@@ -429,7 +430,7 @@ is cheap.
 and `so/results/`, and each was caught by a person opening a JSON file: a mean rank written 128.0
 where the record says 128.02; an accept rate written 1.0000 where the sweep says 0.9999; and §7's
 table presented with no seed count where the record is one seed. Three for three is the absence of
-an instrument, so there is now a registry (`make papernums`) binding 105 figures printed in this text
+an instrument, so there is now a registry (`make papernums`) binding 112 figures printed in this text
 and 31 more printed inside the three drawn figures to the record paths they came from, re-rendered
 under the rounding rule used, plus 19 **verdicts** — categorical cells like `CERTIFIED`, each
 bound to the record boolean behind it and checked against its own table row — and 10 **scope
@@ -625,12 +626,33 @@ working store and a broken one" — at a registered threshold of **0.80**. Obser
 **0.0250** on the worst seed. Mean-pooled GPT-2 embeddings do not retrieve the right chunk out of
 600. The falsification condition the experiment wrote for itself fired.
 
-**So the two data columns must not be read.** They look like the result: closure `1.00` canonical
-against `4.00` duplicated, and the canonical arm knowing its closure without searching at `1.0000`
-where the duplicated arm is at `0.0000`. Reporting that would be this programme's own §31.15 failure in its
-purest form — a comparison between two stores, neither of which can be read from. **§13(b) is not
-discharged.** What it needs is not a run but a design change: an embedder that clears the control,
-which is a different experiment from the one registered, and not ours to substitute unilaterally.
+**So that run's two data columns must not be read.** They look like the result: closure `1.00`
+canonical against `4.00` duplicated. Reporting them would be this programme's own §31.15 failure in
+its purest form — a comparison between two stores, neither of which can be read from.
+
+**The substance is nonetheless established, by a separately registered experiment (PDX-003).**
+E-000033's failing record stands as recorded and is not amended. PDX-003 imports E-000033's protocol
+— its facts, its twelve templates, its index construction, its read test, its closure search — and
+changes **exactly one declared thing**: the encoder, `all-MiniLM-L6-v2` instead of mean-pooled
+GPT-2. A causal LM's mean-pooled hidden state is not a retrieval representation and was never
+trained to be one.
+
+Three seeds, 150 facts, 4 chunks each. Every registered criterion passes:
+
+| | canonical | duplicated |
+|---|---|---|
+| answers before deletion | 0.8967 | 0.9350 |
+| chunks holding the fact | **1.00** | **4.00** |
+| still retrievable after one deletion | **0.1333** | **0.9867** |
+
+The control E-000033 failed at 0.0250 is met at **0.8800 on the worst seed**. **§6's closure
+reproduces in a chunked retrieval store**: deleting the chunk a fact's own question retrieves removes
+the fact canonically and leaves the duplicated store answering almost always.
+
+**What that does not show.** Swapping a component of a pre-registered experiment until it passes is
+the move this programme distrusts, so PDX-003 carries its own registration rather than inheriting
+E-000033's, and the swap is one function. It shows the closure survives in a retrieval store *when
+the store can be read*. It does **not** show that E-000033's own configuration was sound.
 
 **(c) Done. The instrument has been run against a real index (PDX-002).** This item asked for §3's
 audit to be pointed at a published system rather than a reconstruction, and predicted the
@@ -678,9 +700,28 @@ accurately, and still misread. The check that would catch that is (c).
 
 ## 14. Venue
 
-Not an architecture paper. A short measurement-and-audit paper, at a venue that takes empirical
-audits of forgetting in memory-augmented models. §6 and §8 are what a reviewer will weigh; §2 and §3
-are what a practitioner will act on.
+Not an architecture paper. A short measurement-and-audit paper. §6 and §8 are what a reviewer will
+weigh; §2 and §3 are what a practitioner will act on.
+
+**Target: IEEE SaTML 2027.** Abstract 22 September 2026, full paper 29 September 2026 (both 11:59pm
+AoE), decisions 16 December, conference Reykjavik 8–10 May 2027. Research papers run to 12 pages of
+body text, double-blind, and **artifact evaluation is required** — artifacts shared within three days
+of the deadline and deposited on Zenodo if accepted.
+
+**Why this venue.** Its scope covers novel attacks, privacy in machine learning, machine-learning
+system security, and verification of algorithms and systems: §2 and §3 are an attack, §8 is a
+privacy disclosure, and §4 is verification. **Be aware of the gap**: the call does not name machine
+unlearning, deletion or the right to be forgotten explicitly, and data auditing appears only
+obliquely under trustworthy data curation. That is an argument the submission has to make rather
+than assume.
+
+**The artifact requirement is an advantage here, not a cost.** Every number is bound to a committed
+record, `make papernums` fails when the prose and the records part, and the whole chain is
+reproducible from `make` targets that CI runs on every push.
+
+**What still blocks submission: §13(a) alone.** (b) is answered by PDX-003, (c) by PDX-002, and (d)
+is complete. (a) needs the symlink checkpoints, which means a training run — not a decision, just
+compute.
 
 ---
 
@@ -688,5 +729,5 @@ are what a practitioner will act on.
 
 Every number above: `make keychannel certify closure retrieval disclosure compare pdxaudit`. Records
 in `so/results/`. Instrument audits: `make calibrate charged unread auditinstr`. To check this text
-against those records: `make papernums` (105 figures in the prose, 31 in the drawn figures, 19 verdicts, 10 scope
+against those records: `make papernums` (112 figures in the prose, 31 in the drawn figures, 19 verdicts, 10 scope
 claims; non-zero exit when any of them parts from its record).

@@ -300,6 +300,24 @@ CLAIMS: tuple[Claim, ...] = (
     Claim("PDX2 rebuilt posterior", "pdx002/pdx002_real_index_deletion_audit.json",
           "policies/policy=rebuild_without_row/mean_posterior_on_true_payload", "0.003906", "dp6", "", "", "rebuilt without"),
 
+    # PDX-003 — §13(b) established by a separately registered run. Pinned with `near` because
+    # 1.00 and 4.00 also appear as E-000032's closure figures, which is the point of comparison
+    # and exactly the confusion to avoid.
+    Claim("PDX3 canonical read", "pdx003/pdx003_retrieval_closure_real_embedder.json",
+          "aggregate/canonical/read_before_deletion/mean", "0.8967", "dp4", "", "", "answers before deletion"),
+    Claim("PDX3 duplicated read", "pdx003/pdx003_retrieval_closure_real_embedder.json",
+          "aggregate/duplicated/read_before_deletion/mean", "0.9350", "dp4", "", "", "answers before deletion"),
+    Claim("PDX3 canonical still retrievable", "pdx003/pdx003_retrieval_closure_real_embedder.json",
+          "aggregate/canonical/still_retrievable_after_one/mean", "0.1333", "dp4", "", "", "still retrievable"),
+    Claim("PDX3 duplicated still retrievable", "pdx003/pdx003_retrieval_closure_real_embedder.json",
+          "aggregate/duplicated/still_retrievable_after_one/mean", "0.9867", "dp4", "", "", "still retrievable"),
+    Claim("PDX3 canonical closure", "pdx003/pdx003_retrieval_closure_real_embedder.json",
+          "aggregate/canonical/fact_closure_mean/mean", "1.00", "dp2", "", "", "chunks holding the fact"),
+    Claim("PDX3 duplicated closure", "pdx003/pdx003_retrieval_closure_real_embedder.json",
+          "aggregate/duplicated/fact_closure_mean/mean", "4.00", "dp2", "", "", "chunks holding the fact"),
+    Claim("PDX3 worst-seed control", "pdx003/pdx003_retrieval_closure_real_embedder.json",
+          "aggregate/control/read_before_deletion/min", "0.8800", "dp4", "", "", "worst seed"),
+
     # E-000021 — the published false-accept rate the paper contrasts against
     Claim("E21 false-accept rate", "e000021_gate_error_rates.json", "totals/false_accept_rate", "8.49e-04", "exp2"),
     Claim("E21 n", "e000021_gate_error_rates.json", "totals/ci_false_accept/n", "2,200,000", "thousands"),
@@ -809,6 +827,9 @@ _NOT_A_MEASUREMENT: tuple[tuple[str, str], ...] = (
     (r"\b\d+\.\d+\.\d+\b",   "a semantic version string, e.g. hnswlib 0.8.0 — an identifier"),
     (r"\d{4}-\d{2}-\d{2}",    "ISO date — must precede the bare-year rule"),
     (r"\b(?:19|20)\d{2}\b",   "calendar year"),
+    (r"\b\d{1,2}(?:\s?[–-]\s?\d{1,2})?\s+(?:January|February|March|April|May|June|July|August|September|October|November|December)\b", "a calendar date in prose (venue deadlines)"),
+    (r"\b\d{1,2} pages\b",     "a venue page limit, not a measurement"),
+    (r"11:59",                  "a deadline time of day"),
     (r"(?m)^\d+\. ",          "numbered list item in §11"),
     (r"\*Figure \d+ —",       "figure caption number"),
     (r"\b1 in 256\b",         "chance stated in words; the figure itself is bound as 0.0039"),

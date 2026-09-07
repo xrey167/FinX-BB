@@ -3636,6 +3636,64 @@ scale objection: this repository's setup is the instrument now, not the subject.
 that any deployed system serves deletion requests this way; that is a claim about operators, and no
 experiment here can make it.
 
+### 31.60 §13(b) answered by registering a second experiment, not by amending the first (2026-09-07, PDX-003)
+
+§31.55 left §13(b) failing its own control and said the fix was a design change, "the author's call".
+Given the call, the question became *how* to make it without manufacturing a result.
+
+**What was not done: editing E-000033.** Its record, criteria and source are untouched; a test
+asserts both that its embedder is still `gpt2` and that its control still fails. Swapping a component
+of a pre-registered experiment until it passes is the move this programme distrusts, and the
+distrust does not lapse because the swap is mine.
+
+**What was done: PDX-003**, a separate registration of the same protocol with **exactly one declared
+change** -- `all-MiniLM-L6-v2` instead of mean-pooled `gpt2`. The justification is not "it works
+better": a causal LM's mean-pooled hidden state is not a retrieval representation and was never
+trained to be one. Everything else is E-000033's own code, *imported and called* -- `build_facts`,
+`question`, `build_index`, `read_rate`, `retrieve`, `resolve` -- and a test asserts those imports, so
+"same protocol, one swap" is a property of the code rather than of this paragraph.
+
+**Result, 3 seeds, 150 facts, 4 chunks each, every criterion passing:**
+
+| | canonical | duplicated |
+|---|---|---|
+| answers before deletion | 0.8967 | 0.9350 |
+| chunks holding the fact | **1.00** | **4.00** |
+| still retrievable after one deletion | **0.1333** | **0.9867** |
+
+The control E-000033 missed by a factor of thirty -- 0.0250 against 0.80 -- is met at **0.8800 on the
+worst seed**. **§6's closure reproduces in a chunked retrieval store.** Deleting the chunk a fact's
+own question retrieves removes the fact canonically and leaves the duplicated store answering
+0.9867 of the time: Codd's modification anomaly applied to a delete, measured where practitioners
+meet it.
+
+**What it does not show**, in the record and not only here: that E-000033's configuration was sound.
+It was not, on its own evidence, and that record stands.
+
+### 31.61 The venue, decided and dated (2026-09-07)
+
+The one remaining decision that was not an experiment. **IEEE SaTML 2027**: abstract **22 September
+2026**, full paper **29 September 2026**, decisions 16 December, Reykjavik 8--10 May 2027. Twelve
+pages of body text, double-blind, **artifact evaluation required** -- artifacts within three days of
+the deadline, Zenodo on acceptance.
+
+**Why.** Its scope lists novel attacks, privacy in machine learning, ML system security, and
+verification of algorithms and systems. §2 and §3 are an attack; §8 is a privacy disclosure; §4 is
+verification. The dates were read from the call, not recalled.
+
+**The gap, stated rather than glossed.** The call does *not* name machine unlearning, deletion or the
+right to be forgotten; data auditing appears only obliquely under trustworthy data curation. That is
+an argument the submission must make, not one it can assume. If it is rejected on scope rather than
+merit, PoPETs is the fallback -- rolling deadlines, and the right-to-be-forgotten framing is
+explicitly in its remit.
+
+**Artifact evaluation is an advantage here, not a tax.** Every figure is bound to a committed record,
+`make papernums` fails when prose and record part, and CI runs the chain on every push. Most
+submissions have to build that; this one has it.
+
+**What blocks submission is now one item: §13(a).** Not a decision -- compute. The symlink
+checkpoints are not on disk and making them is a training run.
+
 ### 31.8 Boundary
 
 CPU only, no GPU, no LLM above 124M parameters, synthetic worlds, single-token entities, two surface forms per relation, one session. Nothing here shows unlearning of facts already encoded in pretrained weights. Evidence levels recorded: E3–E4 for the synthetic system (F4 for SHRED with the verified gate, E-000010 — **on the value channel only**: E-000028 recovers the shredded object at 1.0000 through the ungated reverse key, where REVOKE and DELETE are at chance, so F4 for SHRED is a claim about answers, logits, hidden states and probes and not about routing); E5 as substrate for the frozen-GPT-2 experiment, with reading, composition, update and the copy bound supported and behavioural deletion not yet supported at the pre-registered thresholds.
