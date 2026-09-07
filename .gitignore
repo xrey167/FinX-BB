@@ -1,6 +1,7 @@
 __pycache__/
 *.pyc
 .pytest_cache/
+.vite/
 so/results/checkpoints/
 
 # local environment created by setup.sh

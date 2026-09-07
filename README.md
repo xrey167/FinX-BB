@@ -1,70 +1,104 @@
-# FinX-Moda
+# FinX-BB
 
-**Der AI-Fashion-Agent, der dich wirklich kennt.**
+FinX-BB verbindet zwei Arbeitsstränge:
 
-FinX-Moda (kurz: **Moda**) ist ein AI-natives Consumer-Frontend für Premium- und Luxus-Fashion-Commerce. Ein persönlicher Agent, der einen individualisierten Katalog on the fly generiert, Outfits komponiert, zu Größe und Passform berät und den Kauf wirklich abschließt — auf Live-Merchant-Infrastruktur (Genesys/Stockchain + Stripe).
+- **FinX-Moda**: ein ausführbarer, lokaler Fashion-Commerce-Prototyp.
+- **SO**: ein Forschungsprogramm zu versionierbarem und widerrufbarem neuronalen Wissen.
 
-Der Unterschied zu jedem GPT-Adapter: ein echter Lernkern (**finx-memory**) über L1-Graph, L2-Episoden, L3-Stilvektor — und L4-Adapter später. Lernen und vergessen sind Teil der Architektur.
+> **Status:** Forschungs- und Engineering-Prototyp, kein produktionsreifer Commerce- oder
+> Löschdienst. Checkout ist simuliert; die Lifecycle-API nutzt standardmäßig In-Memory-State. Die
+> dokumentierte PostgreSQL-Migration ist noch nicht an den HTTP-Prozess angebunden. Receipts und
+> Tests belegen weder physische Löschung noch semantisches Vergessen oder Patentneuheit.
 
-## Architektur
+## Moda lokal starten
 
-Kanonische Referenz: [Systemarchitektur v1.0](docs/systemarchitektur-v1.md) (Stand 30.08.2026).
-
-Invarianten: ein Schreibpfad ins Warehouse (`finx-ingest`), kein LLM im Feed-Pfad, Zonengrenzen als Code, jede Modellart versioniert.
-
-Dieses Repository ist die Home-Base (`xrey167/FinX-BB`).
-
-## Forschung: SO
-
-Forschungsprojekt **SO — Modular Neural Operating System**: adressierbares, veränderbares, versionierbares und widerrufbares neuronales Wissen, das direkt an der neuronalen Berechnung teilnimmt statt nur als externer Kontext.
-
-- [Projektstand, Vision und Architektur](docs/so-modular-neural-os.md) (Stand 02.09.2026) — Forschungsfrage, Löschung versus Unterdrückung, Provenienz, Abhängigkeitsgraph, Symlink- und Marker-Konzepte, aktuelle Architektur sowie die Ergebnisse der Experimente E-000001-A und E-000001-B.
-- [Experiment- und Evidenz-Ledger](docs/so-experiment-ledger.md) (Stand 02.09.2026) — Durchbruchskriterien, Evidenzskala E0–E7, Löschmodell F0–F5, Neural-MVCC, Biomarker, Rekonstruktionsangriffe, Kausal- und Ablationstests, Stand der C-Serie; Abschnitt 31 protokolliert die in dieser Sitzung durchgeführten Experimente.
-- [Sitzungsergebnisse 02.09.2026](docs/so-results-2026-09-02.md) — automatisch aus den Ergebnisdateien erzeugt: alle Messwerte, vorregistrierte Kriterien, Evidenz- und Löschstufen, Grenzen der Evidenz.
-- [Was dieses Programm tatsächlich gefunden hat](docs/so-what-was-found-2026-09-04.md) (Stand 04.09.2026) —
-  die Zusammenfassung: warum der Angriffs-Standard hier gebrochen ist, das Zertifikat, das über die gesamte
-  Nutzlast-Domäne und über jede mögliche Anfrage quantifiziert, die drei ersten zertifizierten Löschungen,
-  und was das Halten von Fakten in Zeilen messbar einbringt.
-- **[Die Behauptung: Kanonisierung ist eine Löschung-Offenlegung-Dualität](docs/so-claim-erasure-disclosure-duality.md)**
-  (Stand 04.09.2026) — die eine Neuheitsbehauptung dieses Programms, ihre Messung und die Vorarbeiten,
-  die sie überstehen muss. Ein Pod macht einen Fakt in **einer** Löschung unerreichbar statt in k — und
-  macht die Löschung selbst aus dem Store allein eindeutig identifizierbar (1.0000 gegen 0.0000), wo
-  Duplikation den gesamten Schlüsselraum offen lässt. Die beiden Abschlüsse invertieren exakt.
-- **[Wo ein Zugänglichkeits-Audit eines externen Speichers gelesen werden muss](docs/novelty/audit-siting-claim.md)**
-  (Stand 06.09.2026) — E-000063, das zusammengesetzte Zertifikat aus Speicheroperation und kausalem
-  Audit, hat zum ersten Mal gemessen: auf allen drei Seeds liefert es sein Urteil *keine
-  Workspace-Spur nach der Löschung*, während seine eigene vorregistrierte Gültigkeitszeile — sieht
-  das Instrument einen lebenden Pod überhaupt? — auf allen drei Seeds fällt. WSC-001 sagt warum, und
-  es liegt nicht an der Basis: der Schreibvorgang an der ersten Lesestelle bewegt sich um 0.032
-  dessen, was die zweite tut, und dort trennt **kein** Auslesen — auch nicht der volle
-  768-dimensionale Residualstrom — lebenden Speicher von nie geschriebenem. Zwei der vier Sätze
-  dieses Dokuments sind an ihren eigenen vorregistrierten Schranken zurückgezogen.
-  Vorregistrierung: [WSC-001](docs/novelty/wsc001-preregister.md).
-- [Was hier neu ist und was nicht](docs/so-novelty-2026-09-04.md) (Stand 04.09.2026) — die Kalibrierung
-  gegen den Stand der Forschung. Der Mechanismus ist Wiedererfindung (SERAC, GRACE, Larimar, SILO, LMLM,
-  MUNKEY); was bleibt, ist die Prüfung: dass ein Gate auf Werten kein Löschprimitiv ist, wenn ein anderer
-  Term dieselbe Nutzlast liest (E-000028), und dass ein gelerntes Gate den Rand zwischen seinen
-  Trainingsklassen zertifiziert und nicht das Prädikat, das es umsetzen sollte (E-000029).
-- [GPU-Protokoll E-000027](docs/so-e000027-gpu-protocol.md) — ein vorregistrierter, gestufter Plan für den
-  Lauf von E5 nach E6; die erste Stufe kostet nichts, jede Stufe nennt das Ergebnis, das die Ausgaben stoppt.
-- [Fahrplan](docs/so-roadmap-2026-09-02.md) — was heute belegt ist, die Lücken zur Durchbruchsdefinition, Stufen 0–6 bis zur externen Reproduktion, Abbruchkriterien.
-- Experimentalcode: [`so/`](so/README.md).
-
-### Selbst nachvollziehen, auf einem Ubuntu-Server
-
-Es wird keine GPU gebraucht. Alle aufgezeichneten Zahlen stammen von einer Maschine mit vier CPU-Kernen.
+Alles in einem Befehl (empfohlen: Node.js 24.15+ innerhalb der 24er-Linie; ebenfalls
+unterstuetzt sind Node.js 22.22.2+ innerhalb der 22er-Linie sowie Node.js 26+):
 
 ```bash
-./setup.sh          # apt-Pakete, virtuelle Umgebung, PyTorch als CPU-Build, danach die Unit-Tests
-make test           # 48 Tests, etwa 10 Sekunden
-make smoke          # verkleinerte Fassung der synthetischen Kette, etwa 35 Minuten
-make synthetic      # die aufgezeichnete synthetische Kette, etwa 3 Stunden
-make gpt2           # die Kette mit eingefrorenem GPT-2, etwa 20 Stunden, lädt GPT-2 einmalig
-make demo           # eine Löschung live: Modell antwortet, eine Operation, vier Angriffe auf Zufallsniveau
-make report         # baut docs/so-results-2026-09-02.md aus so/results/ neu
+./run-moda.sh
 ```
 
-`make env` zeigt vorab Interpreter, Versionen, Threadzahl und freien Speicher. Stellschrauben sind
-`PY`, `THREADS` und `SEEDS`, etwa `make gpt2 SEEDS="0"` für einen statt drei Seeds. Die gemessenen
-Laufzeiten je Experiment stehen in [so/README.md](so/README.md); sie stammen aus dem Feld
-`train_seconds` der Ergebnisdateien und sind damit keine Schätzung.
+Der Launcher installiert die beiden Lockfiles, baut API und Storefront, startet beide nur auf
+Loopback, prüft ihre Erreichbarkeit und öffnet die UI auf einem lokalen Desktop. `Ctrl+C` beendet
+beide Prozesse. Mit `./run-moda.sh --verify` laufen vorher zusätzlich alle App-Tests; Ports lassen
+sich über `API_PORT` und `WEB_PORT` ändern.
+
+Einzelstart für die Entwicklung:
+
+Frontend (React, Vite, TypeScript):
+
+```bash
+cd apps/moda-web
+npm ci
+npm test
+npm run dev -- --host 127.0.0.1
+```
+
+Lifecycle-API (Fastify, Zod, TypeScript):
+
+```bash
+cd apps/moda-api
+npm ci
+npm test
+npm run dev
+```
+
+Der Web-Prototyp enthält Kuratierungen, Varianten, Favoriten, Warenkorb und einen simulierten
+Checkout. Die API demonstriert separat einen resurrection-sicheren Event-/Delete-Pfad mit
+terminalem Tombstone, lückenlosen Generationen, Idempotenz und stale Outbox-Unterdrückung. Eine
+Produktintegration zwischen beiden Apps ist bewusst noch nicht behauptet.
+
+- [Moda-Web-Dokumentation](apps/moda-web/README.md)
+- [Lifecycle-API-Dokumentation](apps/moda-api/README.md)
+- [Ausführbare PostgreSQL-16-Migration](db/migrations/0001_moda.sql)
+- [Desktop-Konzept](docs/design/moda-desktop-concept.png) und
+  [Mobile-Konzept](docs/design/moda-mobile-concept.png)
+- [Herkunft und Freigabegrenzen der Design-Assets](docs/design/README.md)
+
+## Lifecycle-Integrität
+
+Die aktuelle Engineering-Grenze ist ein einziger Authority-Vertrag: Payload-Revision und monotone
+Authority-Generation sind getrennt; Alias-Pfade tragen vollständige Witnesses; in-scope Fehler sind
+`UNKNOWN` statt stiller Modell-Fallback; Consumption und Publication müssen Freshness live prüfen.
+
+- [Lifecycle Integrity v1](docs/architecture/lifecycle-integrity-v1.md)
+- [Umsetzungsplan](docs/keystone/tasks/2026-09-07-lifecycle-integrity.md)
+- [Projektaudit der Vorkonsolidierungs-Baseline](docs/audit/2026-09-07-project-audit.md)
+- [Konsolidierungsprotokoll](docs/research/2026-09-07-branch-consolidation.md)
+
+Die ältere [Systemarchitektur v1.0](docs/systemarchitektur-v1.md) bleibt als Produkt-Zielbild
+erhalten. Bei Schema- oder Lifecycle-Widersprüchen gelten die ausführbare Migration und der neue
+Lifecycle-Vertrag als aktuelle Referenz.
+
+## SO-Forschung
+
+SO untersucht adressierbares, veränderbares und widerrufbares Wissen, das an neuronaler Berechnung
+teilnimmt. Die konsolidierte Evidenz enthält ausdrücklich auch falsifizierende und negative
+Resultate. Die aktuelle Prior-Art-Prüfung trägt **keine breite Neuheitsbehauptung**: Editing,
+externe Speicher, MVCC, Fencing, Capabilities, Tombstones, Cache-Invalidierung und Integritätslogs
+sind etablierte Bausteine.
+
+- [Begrenzte Lifecycle-Prior-Art-Prüfung](docs/research/2026-09-07-lifecycle-integrity-prior-art.md)
+- [Was das Programm tatsächlich gefunden hat](docs/so-what-was-found-2026-09-04.md)
+- [Experiment- und Evidenz-Ledger](docs/so-experiment-ledger.md)
+- [Paper-Draft mit offenen Submission-Blockern](docs/paper/deletion-certificates-draft-2026-09-06.md)
+- [Experimentalcode und Reproduktionsziele](so/README.md)
+
+Historische Claim-Dokumente bleiben als Provenienz erhalten; sie sind im Licht späterer Kontrollen,
+Korrekturen und des aktuellen Audits zu lesen.
+
+## SO reproduzieren (Python 3.11+)
+
+```bash
+./setup.sh                 # virtuelle Umgebung, deklarierte Dependencies, Offline-Suite
+make test                  # Offline-Unit- und Contract-Tests; keine Modelldownloads
+make test-network          # getrennte modellgestützte Tests; lädt/liest GPT-2
+make papernums             # Paper-Zahlen gegen aufgezeichnete Resultate prüfen
+make auditinstr            # nummerierte E-Serien-Experimente auf zwei Defektklassen prüfen
+make novelty               # Claim-Registry prüfen; keine neue Web-Literatursuche
+```
+
+Die schweren Targets `make smoke`, `make synthetic` und `make gpt2` trainieren beziehungsweise
+laden Modelle und sind in [so/README.md](so/README.md) beschrieben. `make env` zeigt Interpreter,
+Versionen, Threadzahl und freien Speicher. `PY`, `THREADS` und `SEEDS` sind überschreibbar.
