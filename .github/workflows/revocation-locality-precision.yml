@@ -1,0 +1,64 @@
+name: RL-MIX-001 strict precision control
+on:
+  push:
+    branches: [research/revocation-locality-mix001]
+    paths: [.github/workflows/revocation-locality-precision.yml]
+permissions:
+  contents: read
+jobs:
+  precision:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - model: openai-community/gpt2
+            name: gpt2
+            revision: 607a30d783dfa663caf39e06633721c8d4cfcd7e
+          - model: EleutherAI/pythia-70m
+            name: pythia70m
+            revision: a39f36b100fe8a5377810d56c3f4789b9c53ac42
+    env:
+      OMP_NUM_THREADS: '2'
+      MKL_NUM_THREADS: '2'
+      TOKENIZERS_PARALLELISM: 'false'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: 13692f2632ba1593d76c04bc8c99c7837a1582da
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install pinned CPU dependencies
+        run: |
+          python -m pip install torch==2.8.0 --index-url https://download.pytorch.org/whl/cpu
+          python -m pip install transformers==4.45.2 numpy==2.2.6 safetensors==0.6.2
+      - name: Record exact precision-only change and preserve all controls
+        run: |
+          mkdir -p precision
+          python - <<'PY'
+          from pathlib import Path
+          import difflib, hashlib, json
+          src = Path('research/revocation_locality/coalition_probe.py').read_text()
+          old = 'torch_dtype=torch.float32'
+          assert src.count(old) == 1
+          patched = src.replace(old, 'torch_dtype=torch.float64')
+          old_protocol = 'RL-MIX-001-v1.1-cache-compat'
+          assert patched.count(old_protocol) == 1
+          patched = patched.replace(old_protocol, 'RL-MIX-001-v1.2-fp64-reference')
+          Path('precision/coalition_probe_original.py').write_text(src)
+          Path('precision/coalition_probe.py').write_text(patched)
+          Path('precision/precision_only.diff').write_text(''.join(difflib.unified_diff(src.splitlines(True), patched.splitlines(True), fromfile='fp32', tofile='fp64')))
+          Path('precision/provenance.json').write_text(json.dumps({'experiment_source_commit':'13692f2632ba1593d76c04bc8c99c7837a1582da','previous_run':33966550019,'reason':'fp32 Pythia cached-versus-full-forward maxabs exceeded the fixed 0.0005 control. Change arithmetic precision, not tolerance or case selection. No failed fp32 row is promoted.','original_sha256':hashlib.sha256(src.encode()).hexdigest(),'executed_sha256':hashlib.sha256(patched.encode()).hexdigest(),'control_maxabs_unchanged':0.0005,'dtype':'float64','breakthrough':False},indent=2))
+          PY
+          python -m pip freeze > precision/environment.txt
+      - name: Execute all seeds, amplitudes and coalitions with fixed tolerance
+        run: |
+          python precision/coalition_probe.py --selftest --model '${{ matrix.model }}' --revision '${{ matrix.revision }}' --seeds 0 1 2 --rms 0.1 1.0 4.0 --output precision/result.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: rl-mix001-fp64-${{ matrix.name }}-${{ github.run_id }}
+          path: precision/
+          retention-days: 30
