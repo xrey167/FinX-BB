@@ -1,7 +1,8 @@
 # Is "no attack recovered it" a deletion guarantee? A falsification, a construction, and what the construction costs
 
-**Status: DRAFT. Not submittable as it stands.** Two experiments named in §13 have not been run, and
-every external citation below is a *lead*, not a checked fact — see §0.
+**Status: DRAFT. Not submittable as it stands.** Two experiments named in §13 remain: one has never
+been run, and one was run on 2026-09-07 and failed its own control. Every external citation has now
+been checked against its source (§0, `docs/paper/references.md`); none has been reproduced.
 
 *Revision 2, 2026-09-06: restructured around a single research question. Revision 1 was organised as
 a list of seven findings, which is a record, not a paper. No number changed in the restructure.*
@@ -10,17 +11,18 @@ a list of seven findings, which is a record, not a paper. No number changed in t
 
 ## 0. Two things a reader must know before the abstract
 
-**External citations were unverified, and six clusters now are.** The literature positions in this
+**External citations were unverified. All eight clusters now are.** The literature positions in this
 draft descend from a 41-agent literature workflow recorded in `docs/so-novelty-2026-09-04.md`, whose
 own provenance note disclaims them: its claims about this repository were checked against
 `so/results/*.json` and match, but titles, authors, venues, identifiers and reported numbers were
 **not** independently checked.
 
 This draft then repeated, for a day, that "nothing in the environment has network access". **That was
-never tested and is false** — search and fetch both work here. The six load-bearing clusters have
-now been verified against the sources, with status and method recorded per entry in
-`docs/paper/references.md`; §12 carries the results. Two clusters remain unchecked and are named
-there. Where a source is quoted below, the quotation has been read in the source's own text.
+never tested and is false** — search and fetch both work here. **All eight clusters have now been
+verified against the sources**, with status and method recorded per entry in
+`docs/paper/references.md`; §12 carries the results. Where a source is quoted below, the quotation
+has been read in the source's own text. Verification is bibliographic: no cited result has been
+reproduced.
 
 **Two experiments block honest submission.** They are named in §13 and neither is optional.
 
@@ -588,9 +590,24 @@ Structures*, SIGMOD 2018 (arXiv:1712.01208). §5's analogy holds exactly: a lear
 an **exact backup filter** over the keys the model scores below threshold, so that no false negative
 survives.
 
-**Still unverified** (§0): masked-value training and corpus isolation for the copy bound; and
-attack-based unlearning benchmarks with their published critiques. The second is the more important
-gap, because the draft's framing of "the standard" rests on that cluster being real.
+**Attack-based unlearning benchmarks, and a critique that sharpens F1 rather than agreeing with it.**
+The standard is real: TOFU (arXiv:2401.06121), WMDP (arXiv:2403.03218) and MUSE (arXiv:2407.06460),
+the last of which lists *no privacy leakage* among its six desiderata — an attack-based criterion.
+Diamant, Glazer and Fetaya, *Stress Testing Unlearning Algorithms* (arXiv:2608.22527), object that
+these benchmarks "do not actively test whether unlearned information can still be forcibly
+extracted", and propose attacking harder.
+
+**F1 says attacking harder is not the fix.** §2's fifth attack was written *after* the four returned
+at chance; the space of attacks is not closed, so no quantity of adversarial effort converts "not yet
+broken" into a guarantee. Only a proof over the payload domain does. That critique is therefore two
+things at once: independent evidence that the standard is the standard, and an instance of the
+response this paper argues is insufficient.
+
+**Masked-value training and corpus isolation for the copy bound.** *Provably Confidential Language
+Modelling* (arXiv:2205.01863): Confidentially Redacted Training screens the corpus into public and
+private sets and masks repeated sentences, yielding a provable confidentiality guarantee **from the
+training algorithm**. That is exactly why §10 declines the word "provably" for the copy bound here
+and attributes the argument to prior work.
 
 ## 13. What must be run before this is honest to send
 
@@ -623,13 +640,15 @@ system people cite, or a null that localises the defect. No training; inference 
 checkpoints. **This is also the answer to the reviewer who objects to the scale of our own setup** —
 it converts that setup from the subject of the paper into its instrument.
 
-**(d) Finish the citations. Six of eight clusters are now done.** This item said the references had
+**(d) Done, bibliographically. All eight clusters are verified.** This item said the references had
 to be found before they could be verified, and that the environment had no network to find them
-with. The second half was false and untested; §12 now carries real works, with per-entry method and
-status in `docs/paper/references.md`. What remains: masked-value training and corpus isolation for
-the copy bound, and attack-based unlearning benchmarks with their critiques — the latter being the
-cluster the draft's framing of "the standard" depends on, so it is the one to do next. Verification
-so far is bibliographic only: **no cited result has been reproduced**.
+with. The second half was false and untested. §12 now carries real works, with per-entry method and
+status in `docs/paper/references.md`; the two claims the argument most depends on — Ghost Vectors
+being different in kind, and the 2026 audit proposing canonicalisation without testing it — were
+read in the sources and both hold.
+
+**What (d) does not cover: no cited result has been reproduced.** A citation can be real, quoted
+accurately, and still misread. The check that would catch that is (c).
 
 ## 14. Venue
 

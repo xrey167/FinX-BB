@@ -3543,6 +3543,46 @@ The pattern worth keeping: **"blocked" is a claim, and it had never been given a
 Four items carried it, three were wrong, and the wrongness was cheap to detect and expensive to
 leave — one command each.
 
+### 31.58 The last two clusters, and a critique that sharpens F1 instead of agreeing with it (2026-09-07)
+
+§31.57 left two of eight citation clusters unchecked and named the more important one. Both are now
+done, so §13(d) is discharged bibliographically.
+
+**The standard is the standard.** TOFU (arXiv:2401.06121), WMDP (arXiv:2403.03218) and MUSE
+(arXiv:2407.06460) are real, and MUSE lists *no privacy leakage* among its six desiderata — an
+attack-based criterion. The draft's framing was not a straw man, which is what this cluster had to
+establish.
+
+**And the critique is more interesting than a confirmation.** Diamant, Glazer and Fetaya, *Stress
+Testing Unlearning Algorithms* (arXiv:2608.22527, 23 Aug 2026), object in the abstract that existing
+benchmarks "do not actively test whether unlearned information can still be forcibly extracted" --
+and their remedy is to attack harder (WMDP++).
+
+**F1 says that is not the fix.** §2's fifth attack was written *after* the four returned at chance.
+The space of attacks is not closed, so no quantity of adversarial effort turns "not yet broken" into
+a guarantee; only a proof over the payload domain does. The critique is therefore two things at once:
+independent evidence that the standard is the standard, **and an instance of the response this paper
+argues is insufficient.** That is a stronger position than agreement, and it only became available by
+reading what the critique actually proposes rather than that it exists.
+
+**The copy bound.** *Provably Confidential Language Modelling* (arXiv:2205.01863) — Confidentially
+Redacted Training screens the corpus into public and private sets and masks repeated sentences,
+yielding a provable confidentiality guarantee **from the training algorithm**. Exactly why §10
+declines "provably" for the copy bound here and hands the argument to prior work.
+
+**Where §13 now stands**, all four having been tested rather than assumed:
+
+| | status |
+|---|---|
+| (a) sweep on the symlink arms | blocked on checkpoints; needs a training run |
+| (b) closure in a vector index | run, fails its own control, **not discharged** |
+| (c) instrument vs a published system | **not blocked** — open question to the user, not started |
+| (d) the citations | **done bibliographically**, eight of eight |
+
+What none of it establishes: no cited result has been reproduced. A citation can be real, quoted
+accurately, and still misread — and the check for that is (c), which is the one item deliberately
+left to the user, because it makes a claim about someone else's software.
+
 ### 31.8 Boundary
 
 CPU only, no GPU, no LLM above 124M parameters, synthetic worlds, single-token entities, two surface forms per relation, one session. Nothing here shows unlearning of facts already encoded in pretrained weights. Evidence levels recorded: E3–E4 for the synthetic system (F4 for SHRED with the verified gate, E-000010 — **on the value channel only**: E-000028 recovers the shredded object at 1.0000 through the ungated reverse key, where REVOKE and DELETE are at chance, so F4 for SHRED is a claim about answers, logits, hidden states and probes and not about routing); E5 as substrate for the frozen-GPT-2 experiment, with reading, composition, update and the copy bound supported and behavioural deletion not yet supported at the pre-registered thresholds.

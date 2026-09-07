@@ -1,6 +1,6 @@
 # References for the deletion-certificates draft — verification status
 
-**Verified 2026-09-07 with live network access from the drafting environment.** Until this date the
+**All eight clusters verified 2026-09-07 with live network access from the drafting environment.** Until this date the
 draft carried a blanket warning that every external citation was an unchecked lead, because the
 environment was believed to have no network. That belief was never tested and was wrong: `pip`
 reaches an index, `huggingface.co` answers, and web search and fetch both work. The warning was
@@ -92,17 +92,50 @@ arXiv:[1712.01208](https://arxiv.org/abs/1712.01208).
 keys the model scores below threshold, precisely so that no false negative survives. A learned
 predicate backed by an exact structure is the established remedy, which is what §5 says.
 
+### 7. Attack-based unlearning benchmarks, and a published critique `FULL TEXT` (critique)
+
+The benchmarks: Maini et al., *TOFU: A Task of Fictitious Unlearning for LLMs*
+(arXiv:[2401.06121](https://arxiv.org/abs/2401.06121)); Li et al., *The WMDP Benchmark: Measuring and
+Reducing Malicious Use With Unlearning* (arXiv:[2403.03218](https://arxiv.org/abs/2403.03218));
+Shi et al., *MUSE: Machine Unlearning Six-Way Evaluation for Language Models*
+(arXiv:[2407.06460](https://arxiv.org/abs/2407.06460)).
+
+**This is the cluster the draft's framing of "the standard" depends on, and it is real.** MUSE
+enumerates six desiderata for an unlearned model, one of which is *no privacy leakage* — an
+attack-based criterion. Evaluation by "delete, attack, report the attack failed" is the convention,
+not a straw man.
+
+The critique, read in the source: Noam Diamant, Neta Glazer and Ethan Fetaya, *Stress Testing
+Unlearning Algorithms*, 23 August 2026 (arXiv:[2608.22527](https://arxiv.org/abs/2608.22527)). From
+the abstract:
+
+> "they do not actively test whether unlearned information can still be forcibly extracted, and
+> (2) they fail to evaluate performance preservation on boundary questions"
+
+**And the relationship to F1 is worth stating precisely, because it is not agreement.** That critique
+argues the benchmarks *do not attack hard enough*, and proposes attacking harder (WMDP++). The
+draft's F1 is the sharper claim: attacking harder is not the fix, because the space of attacks is not
+closed. §2's fifth attack was written *after* the four had returned at chance, and no amount of
+adversarial effort closes that gap — only a proof over the payload domain does. The critique is
+therefore independent evidence that the standard is the standard, and simultaneously an instance of
+the response F1 says is insufficient.
+
+### 8. Masked-value training and corpus isolation for the copy bound `METADATA`
+
+*Provably Confidential Language Modelling*, arXiv:[2205.01863](https://arxiv.org/abs/2205.01863) —
+Confidentially Redacted Training (CRT), which screens the corpus into a public set and a private set
+and replaces repeated sentences with a `MASK` token from the second occurrence, yielding a provable
+confidentiality guarantee.
+
+Supports §10's concession exactly: the guarantee comes from **the training algorithm**, not from
+inspecting the weights afterwards. That is why §10 declines the word "provably" for the copy bound
+and attributes the argument to prior work.
+
 ---
 
 ## Still unverified
 
-These remain leads. They are **not** cited as fact anywhere the draft's argument turns on them, and
-§0 continues to disclaim them.
-
-* **Masked-value training and corpus isolation for the copy bound.** §10 already declines to claim
-  "provably" for this and attributes the argument to prior work; the specific works are unchecked.
-* **Attack-based unlearning benchmarks and their published critiques.** The draft's framing of "the
-  standard" rests on this cluster being real, so it is the most important remaining gap.
+None of the eight clusters. See below for what that does and does not mean.
 
 ## What this does not establish
 
