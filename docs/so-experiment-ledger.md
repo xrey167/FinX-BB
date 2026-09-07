@@ -3694,6 +3694,38 @@ submissions have to build that; this one has it.
 **What blocks submission is now one item: §13(a).** Not a decision -- compute. The symlink
 checkpoints are not on disk and making them is a training run.
 
+### 31.62 The one document nothing binds: the PR description had drifted five ways (2026-09-07)
+
+`make papernums` binds the paper to the records, `check_self_description` binds the paragraph
+describing the registry to `len()` of the registry, and `check_record_freshness` binds a record to
+the repository it counts. **The pull request description is bound to nothing**, and it had gone
+stale in five separate places while every one of those checks stayed green:
+
+| the description said | by 2026-09-07 |
+|---|---|
+| "the seven suites this PR adds" | nine |
+| "**five** kinds of claim are now checked" | six -- record freshness was added in §31.56 |
+| "every external citation is a lead and not a checked fact ... no network here" | all eight clusters verified; the network claim was false and untested (§31.57) |
+| "two experiments block honest submission" | one, §13(a) |
+| "`E-000033` ... has never been run" | run, failing its own control, and answered by PDX-003 |
+
+Two of the five are the *same* sentences the paper carried and that §31.55 and §31.57 corrected
+there -- corrected in the document an instrument reads, left standing in the document a reviewer
+reads first. The description even warns, in its own second paragraph, that restating counts is how
+it drifted twice before; the warning was about counts, and four of the five drifts are not counts
+but claims about what has and has not been established.
+
+**Why this is not simply fixed by adding a seventh pass.** A PR body is not in the working tree, so
+binding it would mean a check that reaches the GitHub API and fails when a network call fails --
+which makes the check itself an instrument that can report red for reasons unrelated to its subject.
+The honest alternative is the one taken: the body is rewritten from the records whenever a claim in
+it changes, and this entry records that it was not, for a day, and that nothing noticed.
+
+**The general form, which is §31.15's cousin rather than §31.15.** Not "a comparison whose two sides
+share a source", but *a claim with no source at all* -- the class of statement that cannot fail
+because nothing reads it. Four instruments exist here now precisely because that class kept
+producing wrong sentences; the description was outside all four, and behaved exactly as predicted.
+
 ### 31.8 Boundary
 
 CPU only, no GPU, no LLM above 124M parameters, synthetic worlds, single-token entities, two surface forms per relation, one session. Nothing here shows unlearning of facts already encoded in pretrained weights. Evidence levels recorded: E3–E4 for the synthetic system (F4 for SHRED with the verified gate, E-000010 — **on the value channel only**: E-000028 recovers the shredded object at 1.0000 through the ungated reverse key, where REVOKE and DELETE are at chance, so F4 for SHRED is a claim about answers, logits, hidden states and probes and not about routing); E5 as substrate for the frozen-GPT-2 experiment, with reading, composition, update and the copy bound supported and behavioural deletion not yet supported at the pre-registered thresholds.
