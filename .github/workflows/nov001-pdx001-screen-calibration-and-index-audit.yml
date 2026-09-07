@@ -54,6 +54,11 @@ on:
       - "so/experiments/pdx003_retrieval_closure_real_embedder.py"
       - "so/tests/test_pdx003_retrieval_closure_real_embedder.py"
       - "docs/novelty/pdx003-retrieval-closure-real-embedder-result.md"
+      - "so/experiments/nov005_novelty_claim_audit.py"
+      - "so/tests/test_nov005_novelty_claim_audit.py"
+      - "so/results/nov005/nov005_novelty_claim_audit.json"
+      - "docs/novelty/nov005-novelty-claim-audit-result.md"
+      - "docs/so-novelty-2026-09-04.md"
   workflow_dispatch:
 
 jobs:
@@ -81,6 +86,7 @@ jobs:
           python -m py_compile so/experiments/nov004_instrument_audit.py
           python -m py_compile so/paper_numbers.py
           python -m py_compile so/experiments/pdx002_real_index_deletion_audit.py
+          python -m py_compile so/experiments/nov005_novelty_claim_audit.py
       - name: Focused regressions
         run: |
           python -m pytest -q \
@@ -92,7 +98,8 @@ jobs:
             so/tests/test_nov004_instrument_audit.py \
             so/tests/test_paper_numbers.py \
             so/tests/test_pdx002_real_index_deletion_audit.py \
-            so/tests/test_pdx003_retrieval_closure_real_embedder.py
+            so/tests/test_pdx003_retrieval_closure_real_embedder.py \
+            so/tests/test_nov005_novelty_claim_audit.py
       - name: Paper figures agree with the records
         run: |
           mkdir -p ci-paper
@@ -117,6 +124,13 @@ jobs:
           mkdir -p ci-pdx002
           python -m so.experiments.pdx002_real_index_deletion_audit \
             --results-dir ci-pdx002 | tee ci-pdx002/stdout.txt
+      - name: NOV005 novelty-claim audit
+        # Exits non-zero if a claim this audit withdrew is still asserted in the paper or the
+        # novelty statement. That is the check, not the document.
+        run: |
+          mkdir -p ci-nov005
+          python -m so.experiments.nov005_novelty_claim_audit \
+            --results-dir ci-nov005 | tee ci-nov005/stdout.txt
       - name: NOV002 charged re-screen of E-000104 and E-000105
         run: |
           mkdir -p ci-nov002
@@ -180,9 +194,15 @@ jobs:
             so/results/pdx003/pdx003_retrieval_closure_real_embedder.json \
             so/experiments/pdx003_retrieval_closure_real_embedder.py \
             so/tests/test_pdx003_retrieval_closure_real_embedder.py \
+            so/tests/test_nov005_novelty_claim_audit.py \
             docs/novelty/pdx003-retrieval-closure-real-embedder-result.md \
+            so/experiments/nov005_novelty_claim_audit.py \
+            so/tests/test_nov005_novelty_claim_audit.py \
+            so/results/nov005/nov005_novelty_claim_audit.json \
+            docs/novelty/nov005-novelty-claim-audit-result.md \
+            docs/so-novelty-2026-09-04.md \
             > ci-nov001/source-sha256.txt
-          find ci-nov001 ci-pdx001 ci-pdx002 ci-nov002 ci-nov003 ci-nov004 ci-paper -maxdepth 1 -name '*.json' -print0 | sort -z \
+          find ci-nov001 ci-pdx001 ci-pdx002 ci-nov002 ci-nov003 ci-nov004 ci-nov005 ci-paper -maxdepth 1 -name '*.json' -print0 | sort -z \
             | xargs -0 -r sha256sum > ci-nov001/result-sha256.txt
       - uses: actions/upload-artifact@v4
         with:
@@ -194,5 +214,6 @@ jobs:
             ci-nov002/
             ci-nov003/
             ci-nov004/
+            ci-nov005/
             ci-paper/
           if-no-files-found: error

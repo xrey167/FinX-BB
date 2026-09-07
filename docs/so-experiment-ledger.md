@@ -3726,6 +3726,75 @@ share a source", but *a claim with no source at all* -- the class of statement t
 because nothing reads it. Four instruments exist here now precisely because that class kept
 producing wrong sentences; the description was outside all four, and behaved exactly as predicted.
 
+### 31.63 The novelty search had never been calibrated either (2026-09-07, NOV-005)
+
+§31.62 was about a document no instrument reads. This is about the **nulls** every claim of novelty in
+this programme rests on, and it is the more expensive of the two.
+
+Every load-bearing novelty statement here is negative: "Nothing I verified covers this", "I found no
+work that demonstrates", "the combination is unclaimed", "the paired arms in one reader I could not
+find". They came from a 41-agent workflow whose own note disclaims its external citations, in an
+environment three drafts asserted had no network — untested and false (§31.57). By 2026-09-07 the
+*positives* had been checked in full (`references.md`, eight clusters) and the *negatives* had never
+been checked at all. **§31.15, fifth instance, now on the literature review: an instrument that
+cannot fail is not evidence.** NOV-001 calibrated the screen behind twenty-three kills; nothing had
+calibrated the screen behind the verdicts that decide whether any of it is publishable.
+
+**The calibration first.** Three propositions of known standing, phrased as novelty claims, run
+through the same instrument: Codd 1970 for one-operation-reaches-all, Carlini and Wagner for learned
+predicates failing adversarially, the resilience literature for the minimum contingency set. All
+three returned. Plus the half usually omitted — a **negative control**, a fabricated construct, which
+returned nothing. A searcher that manufactures a hit for anything is as useless as one that finds
+nothing, and only the second failure mode is normally tested.
+
+**Then the verdicts. Two withdrawn, two narrowed, three survive.**
+
+| claim | verdict | by |
+|---|---|---|
+| N1 payload-derived index channel | NARROWED | Yao et al., arXiv:2609.04875 (4 Sep 2026) |
+| N3 margin + floor + held-out seeds | **WITHDRAWN** | Yang and Yeung, arXiv:2607.19442 (21 Jul 2026) |
+| N7 composition with a record-level certificate | **WITHDRAWN** | Garg, Goldwasser and Vasudevan, Eurocrypt 2020 |
+| N8 F1, the attack standard is not a guarantee | NARROWED | Yang and Yeung, same paper |
+| N2, N5, N6 | survive | these queries found nothing |
+
+**N3.** Yang and Yeung have all three parts at 45 model-seed cells over five architecture families: a
+tolerance δ_equiv = 0.93 nats from retraining redraws with TOST-equivalence to never-learned; a
+sealed challenge panel of known-label models where "the screen rejects M_inj in 45/45 cells and
+accepts the reference in 44/45" — **two-sided**, where E-000019's floor is one-sided; and an analysis
+rule fixed before the held-out families. E-000019 is three seeds on one synthetic model.
+
+**N7, and this is the one that mattered.** Garg, Goldwasser and Vasudevan's Fig. 5 collector
+"maintains a dataset as a history-independent dictionary Dict", takes any learning algorithm with a
+deletion operation, and calls `delete(Dict, model, key)`; Theorem 3.4 bounds its 1-representative
+deletion-compliance error at `1/λ + poly(λ)/2^λ`. **The programme already knew** — §6 of the
+2026-09-04 novelty statement withdrew this claim the day it was written. The withdrawal reached that
+document and never reached the paper, which asserted it for three days. §31.62's drift in the other
+direction, and with a real cost: a submission would have claimed a Eurocrypt 2020 result.
+
+**N8.** The same Yang and Yeung paper carries F1 as a section heading — "forward-only certification
+is not sound" — and demonstrates it: a logit-suppression penalty leaves "the entire forward battery
+accepts a suppressed model" in 12 of 45 cells with knowledge intact. F1 is corroborated, not owned,
+and by better evidence than this repository has. What it leaves is the constructive half, which that
+paper explicitly declines ("not an adversarially sound certificate"), and §2's specific mechanism,
+which a forward battery cannot reach in principle because recovery runs through a term that never
+holds the payload.
+
+**The enforcement, which is the part that will still be working next month.** A verdict recorded in a
+document nobody reads, against a claim in one everybody does, is exactly §31.62. So NOV-005 is a
+check rather than a note: a claim it marks withdrawn or narrowed must leave a **visible marked
+withdrawal** in the document that asserted it, and deleting the sentence instead is caught separately
+— a withdrawal that leaves no trace is not a withdrawal. It fired four times on the first run.
+
+**Two defects it found in itself.** A registry phrase that spanned a line wrap, so its enforcement
+checked nothing silently — caught by the test requiring every phrase to be findable. And two new
+coverage exclusions written as `%\b`, which can never match because `%` is not a word character:
+dead on arrival, caught by the coverage pass. The rule holding in the instrument written to enforce
+the rule, twice, in one afternoon.
+
+**What it does not establish.** No cited result reproduced. WITHDRAWN is a claim about priority, not
+about quality. And it is not a systematic review: SURVIVES means "these queries did not find it", and
+the queries are in the record so the next reader can beat them.
+
 ### 31.8 Boundary
 
 CPU only, no GPU, no LLM above 124M parameters, synthetic worlds, single-token entities, two surface forms per relation, one session. Nothing here shows unlearning of facts already encoded in pretrained weights. Evidence levels recorded: E3–E4 for the synthetic system (F4 for SHRED with the verified gate, E-000010 — **on the value channel only**: E-000028 recovers the shredded object at 1.0000 through the ungated reverse key, where REVOKE and DELETE are at chance, so F4 for SHRED is a claim about answers, logits, hidden states and probes and not about routing); E5 as substrate for the frozen-GPT-2 experiment, with reading, composition, update and the copy bound supported and behavioural deletion not yet supported at the pre-registered thresholds.

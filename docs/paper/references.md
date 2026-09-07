@@ -1,6 +1,9 @@
 # References for the deletion-certificates draft — verification status
 
-**All eight clusters verified 2026-09-07 with live network access from the drafting environment.** Until this date the
+**All thirteen clusters verified 2026-09-07 with live network access from the drafting environment.**
+Clusters 1-8 were checked first; **clusters 9-13 were added later the same day by NOV-005**, the audit
+that calibrated this programme's literature search and then ran it against its own novelty claims.
+Three of the five change a claim rather than support one. Until this date the
 draft carried a blanket warning that every external citation was an unchecked lead, because the
 environment was believed to have no network. That belief was never tested and was wrong: `pip`
 reaches an index, `huggingface.co` answers, and web search and fetch both work. The warning was
@@ -133,9 +136,102 @@ and attributes the argument to prior work.
 
 ---
 
+
+### 9. The paper that reached F1 first, and takes N3 with it `FULL TEXT`
+
+Sen Yang and Yuen-Hei Yeung, *Unlearning as Distribution Restoration: A Controlled Counterfactual
+Study, a Validated Selective Screen, and the Limits of Oracle-Free Certification*, 21 July 2026.
+arXiv:[2607.19442](https://arxiv.org/abs/2607.19442).
+
+**The most consequential citation in this file, and it was found by looking for prior art against
+our own nulls rather than for support.** Two things.
+
+*It has F1.* Its section heading is "the adversarial boundary: forward-only certification is not
+sound", and it earns it: a fixed-magnitude logit-suppression penalty "lands the forget-answer NLL
+within family tolerance, and the entire forward battery accepts a suppressed model" in **12 of 45
+cells**, on a model whose knowledge is intact. Independently, two months before this draft, over
+five architecture families. F1 is therefore corroborated and not owned; §12 says so.
+
+*It has all three parts of the residual-equivalence protocol §13 used to call unclaimed.* A declared
+tolerance built from retraining redraws, with survivors tested for equivalence against it — "only
+28.0% of survivors (CI [22.6%,34.0%]) are TOST-equivalent to never-learned at that tolerance"; a
+**sealed challenge panel of known-label models** as the floor — "the screen rejects Minj in 45/45
+cells and accepts the reference in 44/45", which is a two-sided control where E-000019 has one; and
+an analysis rule "fixed before evaluating held-out families". E-000019 is three seeds on one
+synthetic model. The claim is withdrawn.
+
+*What it leaves open, and it is this paper's remaining half.* It declines the constructive step in
+its own words: its result is "an empirical selective test for methods-as-produced, not an
+adversarially sound certificate".
+
+### 10. Derived artifacts surviving a plaintext-layer delete `FULL TEXT`
+
+Chao Yao et al., *Forgetting Without Restarting: Execution-State Unlearning for Stateful LLM
+Agents*, 4 September 2026. arXiv:[2609.04875](https://arxiv.org/abs/2609.04875).
+
+**Narrows §2's most transferable claim to a measurement.** Deployed stacks "offer only a forgetting
+affordance that operates on plaintext at a single layer: delete the memory record, edit the Markdown
+file, drop the message from retrieval", and deleting the persistent memory record "leaves leakage
+*exactly* unchanged from doing nothing". Their derived artifacts are compressed summaries, authored
+plans, and KV-cache tensors; behavioural extraction succeeds in 80-100% of episodes with zero string
+matches.
+
+So *enumerate every quantity derived from a payload and gate all of them* is published, three days
+before this audit. Two gaps remain and both are narrow: their artifacts **carry** the content, where
+`k_rev(LN(o + r))` holds no payload and names none yet still discriminates; and they measure presence
+and behaviour, not a candidate-set posterior, so they would read PDX-001's tombstone row exactly as a
+top-1 audit does — 0.0000, with the search space cut 88x.
+
+### 11. The composition, proved in 2020 `FULL TEXT` (Garg et al.) / `METADATA` (Cohen et al.)
+
+Sanjam Garg, Shafi Goldwasser and Prashant Nalini Vasudevan, *Formalizing Data Deletion in the
+Context of the Right to be Forgotten*, Eurocrypt 2020.
+[eprint 2020/254](https://eprint.iacr.org/2020/254). And Aloni Cohen, Adam D. Smith, Marika Swanberg
+and Prashant Nalini Vasudevan, *Control, Confidentiality, and the Right to be Forgotten*, CCS 2023.
+arXiv:[2210.07876](https://arxiv.org/abs/2210.07876).
+
+**Kills §6's composition claim, which the programme had already withdrawn internally and re-asserted
+in the draft.** Read in the source: the data collector of their Fig. 5 "maintains a dataset as a
+history-independent dictionary Dict", takes "any learning algorithm with such a deletion operation",
+and on a deletion request "updates model to be the output of delete(Dict, model, key)". Theorem 3.4
+bounds it: "The data collector (M, pi, piD) as described in Fig. 5 has 1-representative
+deletion-compliance error at most (1/lambda + poly(lambda)/2^lambda)." That is a store-side guarantee
+composed with a learned reader's certified deletion, proved, six years earlier. Cohen et al. then
+"build a unified formalism for deletion that encompasses previous approaches as special cases".
+
+### 12. The nearest prior art to F2's certificate `METADATA`
+
+Vishwajith Ramesh, *Subtract, Transport, or Replay? Auditable Deletion from Language-Model Memory*,
+30 July 2026 (revised 13 August). arXiv:[2607.27539](https://arxiv.org/abs/2607.27539). With
+*Verifiable and Provably Secure Machine Unlearning* (arXiv:[2210.09126](https://arxiv.org/abs/2210.09126))
+and *Proof of Unlearning: Definitions and Instantiation*
+(arXiv:[2210.11334](https://arxiv.org/abs/2210.11334)).
+
+**F2 is not alone in its line and the draft must stop implying it is.** Ramesh audits deletion from a
+frozen LM's persistent memory with intermediate arrays inspected — "zero residual on final logits and
+all 80 audited KDA arrays verifies restoration across the declared checkpoint surface" — at 1B, 4B
+and 12B. The distinction F2 keeps is the *kind* of certificate: that work verifies a **recomputation**
+(this state is what replay without the record produces) and still leans on behavioural attacks
+reaching never-stored baselines for the residual argument, while §4 sweeps the **whole payload
+domain** and checks nothing downstream moves for any value it could have held. The cryptographic line
+(2210.09126, 2210.11334) proves the deleted point is absent from the *training set*, which is a claim
+about provenance rather than about the computation.
+
+### 13. Stale edges as a cost, and nobody calling them a channel `METADATA`
+
+*MERIT: Efficient In-Place Deletion for Dynamic Graph-Based Approximate Nearest Neighbor Indexes*,
+July 2026. arXiv:[2607.29173](https://arxiv.org/abs/2607.29173).
+
+**Checked as prior art against §8 and PDX-001, and it is not.** The same structure is the subject —
+after deleting a vertex the index "does not know which other vertices contain outgoing edges to it",
+and stale incoming edges survive — but entirely as a performance problem: they "consume search
+capacity" and degrade recall. There is no privacy or disclosure claim anywhere in it. That a proximity
+graph's surviving adjacency is an *information* channel about the deleted row, and that it is
+invisible to top-1, is not said here or, as far as these searches reach, anywhere else.
+
 ## Still unverified
 
-None of the eight clusters. See below for what that does and does not mean.
+None of the thirteen clusters. See below for what that does and does not mean.
 
 ## What this does not establish
 

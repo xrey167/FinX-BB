@@ -837,6 +837,19 @@ _NOT_A_MEASUREMENT: tuple[tuple[str, str], ...] = (
      r"|\*\*scope claims\*\*|\*\*scope\s+claims\*\*|figures in the prose|in the drawn figures|scope\s+claims)",
                               "the registry's own size: checked by check_self_description, not bound to a record"),
     (r"PDX-\d+|NOV-\d+",      "experiment identifier"),
+    (r"[Cc]lusters? \d+(?:\s?[–-]\s?\d+)?(?: and \d+)?",
+                              "a pointer into references.md's numbered clusters — a citation "
+                              "address, like a section reference, not a measurement"),
+    # NB: no trailing \b after a '%' — '%' is not a word character, so '%\b' can never match.
+    (r"\b12 of 45\b|\b45 model-seed cells\b|\b28\.0%|\b0\.93 nats\b|\b45/45\b|\b44/45\b"
+     r"|\b80 audited\b|\b80\s?[–-]\s?100%|\b1B\b|\b4B\b|\b12B\b",
+                              "figures quoted from a cited external work (NOV-005, §12), attributed "
+                              "in the sentence that carries them; this repository has no record "
+                              "behind another group's numbers and must not pretend to"),
+    (r"Theorem \d+(?:\.\d+)?", "a theorem number in a cited work — an address, like a section "
+                               "reference"),
+    (r"1/λ \+ poly\(λ\)/2\^λ", "a bound quoted verbatim from Garg, Goldwasser and Vasudevan's "
+                               "Theorem 3.4, not a quantity measured here"),
     (r"\bF[123]\b",           "sub-question label"),
     (r"GPT-2|top-[15]|rank-\d", "term of art containing a digit"),
     (r"\b124M\b|\b7B\b",      "model size named in prose, not read from a record"),

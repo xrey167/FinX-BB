@@ -11,18 +11,26 @@ a list of seven findings, which is a record, not a paper. No number changed in t
 
 ## 0. Two things a reader must know before the abstract
 
-**External citations were unverified. All eight clusters now are.** The literature positions in this
+**External citations were unverified. All thirteen clusters now are — and checking the *negative* claims cost three of ours.** The literature positions in this
 draft descend from a 41-agent literature workflow recorded in `docs/so-novelty-2026-09-04.md`, whose
 own provenance note disclaims them: its claims about this repository were checked against
 `so/results/*.json` and match, but titles, authors, venues, identifiers and reported numbers were
 **not** independently checked.
 
 This draft then repeated, for a day, that "nothing in the environment has network access". **That was
-never tested and is false** — search and fetch both work here. **All eight clusters have now been
+never tested and is false** — search and fetch both work here. **All thirteen clusters have now been
 verified against the sources**, with status and method recorded per entry in
 `docs/paper/references.md`; §12 carries the results. Where a source is quoted below, the quotation
 has been read in the source's own text. Verification is bibliographic: no cited result has been
 reproduced.
+
+**And the harder half, which had never been done at all.** Verifying a citation checks a *positive*
+claim. Every claim of novelty in this work is a *negative* one — "we could not find" — and until
+2026-09-07 nothing had tested whether the search behind those nulls could find anything. NOV-005
+calibrated it against propositions of known standing, then ran it on this paper's own claims. **It
+took three.** F1's thesis was published two months earlier and is cited as prior art in §12; the
+composition in §6 was proved at Eurocrypt 2020; and §2's general rule appeared three days before
+this draft. What survives is narrower and is stated as such in each place.
 
 **One item blocks honest submission: §13(a).** It is not optional, and it is compute rather than a
 decision. §13(b), (c) and (d) are answered — see §13.
@@ -61,8 +69,11 @@ names the deleted key uniquely at 1.0000, where a duplicated store leaves the en
 construction we recommend in answer to the second question buys certifiability with exactly the
 property an erasure guarantee exists to provide.
 
-We do not claim the architecture, which is prior art. The contribution is the audit, the composition,
-and four negative results with mechanism.
+We do not claim the architecture, which is prior art — nor, after the NOV-005 citation audit, F1's
+thesis or the composition, both of which have owners named in §12. The contribution is the audit and
+four negative results with mechanism: specifically the measurement that the published instruments and
+our own first attack both miss, a candidate-set posterior where a top-1 reading reports a clean
+deletion.
 
 ---
 
@@ -84,7 +95,7 @@ is the reason the answer to F2 is not simply "canonicalise everything and certif
 
 **Why this question and not "is our architecture good".** It is not. An external addressable store
 read by a frozen core, with per-entry lifecycle operations and a forgetting primitive, is prior art
-at larger scale (*unverified*). The system here is an instrument for asking F1–F3, not a proposal.
+at larger scale (Larimar; verified, `references.md` cluster 1). The system here is an instrument for asking F1–F3, not a proposal.
 
 ---
 
@@ -140,7 +151,7 @@ object before and after, because `shred()` never touches them.
 
 **This is not "soft-deleted data still on the medium."** The payload *was* gated; the value channel
 *is* at chance; the recovery runs through a derived index the primitive never touched. The nearest
-prior work we are aware of (Ghost Vectors — *unverified*) recovers *undeleted* embeddings from a
+prior work (Ghost Vectors; verified, cluster 3) recovers *undeleted* embeddings from a
 soft-deleting index. This is different in kind.
 
 **The rule this yields:** enumerate every quantity derived from a payload and gate all of them, or
@@ -256,7 +267,7 @@ The published false-accept rate of 8.49e-04 reproduces at 8.550e-04 *on the dist
 measured on*, and is not the false-accept rate of the thing being claimed.
 
 That learned detectors fail adversarially is old (Carlini & Wagner; learned index structures needing
-an exact backup filter — *unverified*). Demonstrating the specification-versus-boundary gap as a
+an exact backup filter; both verified, cluster 6). Demonstrating the specification-versus-boundary gap as a
 **swept geometry on a deletion mechanism, with both rates side by side**, is what we could not find.
 The fix is to the data, not the architecture: show the gate the predicate's boundary.
 
@@ -286,11 +297,22 @@ the greedy search *meets* that bound. (`make closure`.)
 PTIME/NP-complete dichotomy and an LP-tight solver in print. The certified lower bound is that
 literature's standard disjoint-witness packing bound. And the remedy — canonicalisation at write time
 — is proposed verbatim in §9 of a 2026 audit of forgetting in limited-memory language models, which
-calls it "directly testable within our framework" and does not test it (*all unverified*).
+calls it "directly testable within our framework" and does not test it (both verified against their
+sources; see `docs/paper/references.md`, clusters 4 and 5).
 
-What is ours is the measurement, the composition with a record-level certificate, and the price the
-reader charges for the indirection: 0.0954 for sharing and 0.0688 for link training, worst of three
-seeds over twelve phrasings (`make rescore`, E-000025).
+**And the composition is not ours either — corrected by NOV-005, 2026-09-07.** An earlier draft of
+this section claimed the composition of a store-side guarantee with a record-level certificate over a
+learned reader. Garg, Goldwasser and Vasudevan (Eurocrypt 2020) build exactly that and prove it: a
+data collector that "maintains a dataset as a history-independent dictionary `Dict`" and calls
+`delete(Dict, model, key)` on any learning algorithm equipped with a deletion operation, with
+Theorem 3.4 bounding its 1-representative deletion-compliance error at `1/λ + poly(λ)/2^λ`. Cohen,
+Smith, Swanberg and Vasudevan (CCS 2023) then fold the store-side and model-side definitions into
+one. The programme's own novelty statement withdrew this claim on 2026-09-04; the withdrawal reached
+that document and not this one, for three days.
+
+What is ours in this section is the measurement, and the price the reader charges for the
+indirection: 0.0954 for sharing and 0.0688 for link training, worst of three seeds over twelve
+phrasings (`make rescore`, E-000025).
 
 **Provenance caveat on those two numbers.** E-000025's own record notes that a forced re-run
 overwrote the seed-0 and seed-1 checkpoints of E-000020 after that record was written; only seed 2
@@ -554,8 +576,9 @@ irrelevant, by making it the instrument rather than the subject.
 
 ## 12. Related work, in one place
 
-Consolidated here rather than distributed. Six clusters are verified against the sources; the method
-and status of each is in `docs/paper/references.md`. Two remain unchecked and are marked.
+Consolidated here rather than distributed. **All thirteen clusters are verified against their
+sources**, with the method and status of each in `docs/paper/references.md`. Clusters 9-13 were added
+by NOV-005 on 2026-09-07 and three of them change a claim rather than support one.
 
 **Memory-augmented architectures with per-entry lifecycle operations.** Das et al., *Larimar: Large
 Language Models with Episodic Memory Control*, ICML 2024 (arXiv:2403.11901) — one-shot updates
@@ -598,17 +621,55 @@ Diamant, Glazer and Fetaya, *Stress Testing Unlearning Algorithms* (arXiv:2608.2
 these benchmarks "do not actively test whether unlearned information can still be forcibly
 extracted", and propose attacking harder.
 
-**F1 says attacking harder is not the fix.** §2's fifth attack was written *after* the four returned
+**F1 says attacking harder is not the fix** — and F1 is not ours to claim, per the NOV-005 correction
+immediately below. §2's fifth attack was written *after* the four returned
 at chance; the space of attacks is not closed, so no quantity of adversarial effort converts "not yet
 broken" into a guarantee. Only a proof over the payload domain does. That critique is therefore two
 things at once: independent evidence that the standard is the standard, and an instance of the
 response this paper argues is insufficient.
+
+**F1's thesis is not new, and NOV-005 found who had it first (2026-09-07).** Yang and Yeung,
+*Unlearning as Distribution Restoration* (arXiv:2607.19442, 21 July 2026), state it as a section
+heading — "the adversarial boundary: forward-only certification is not sound" — and demonstrate it:
+a fixed-magnitude logit-suppression penalty "lands the forget-answer NLL within family tolerance, and
+the entire forward battery accepts a suppressed model" in **12 of 45 cells**, on a model whose
+knowledge is intact. That is F1, reached independently two months earlier, across five architecture
+families, with a positive control this paper cannot match. It must be cited as prior art and not as
+agreement. What it leaves open is exactly this paper's remaining half: it calls its own result "an
+empirical selective test for methods-as-produced, not an adversarially sound certificate", and
+proposes no construction to replace what it falsifies. F2 is that construction, and §2's channel is a
+mechanism their forward battery would not see either — it recovers through a term that never holds
+the payload, so no elicitation of the payload can reach it.
 
 **Masked-value training and corpus isolation for the copy bound.** *Provably Confidential Language
 Modelling* (arXiv:2205.01863): Confidentially Redacted Training screens the corpus into public and
 private sets and masks repeated sentences, yielding a provable confidentiality guarantee **from the
 training algorithm**. That is exactly why §10 declines the word "provably" for the copy bound here
 and attributes the argument to prior work.
+
+**Derived artifacts surviving a plaintext-layer delete.** Yao et al., *Forgetting Without Restarting:
+Execution-State Unlearning for Stateful LLM Agents* (arXiv:2609.04875, 4 September 2026). Deployed
+stacks "offer only a forgetting affordance that operates on *plaintext at a single layer*", and
+deleting the memory record "leaves leakage *exactly* unchanged from doing nothing" — summaries, plans
+and KV tensors keep it, with behavioural extraction in 80–100% of episodes at zero string matches.
+**§2's general rule is theirs**, and §2 should be read as the narrower case their setting does not
+cover: an index term that holds no payload and names none, recovered by a measurement their binary
+reading would score at 0.0000.
+
+**Deletion certificates for language-model memory.** Ramesh, *Subtract, Transport, or Replay?
+Auditable Deletion from Language-Model Memory* (arXiv:2607.27539, July 2026), audits deletion from a
+frozen model's persistent memory with intermediate arrays inspected — "zero residual on final logits
+and all 80 audited KDA arrays" — at 1B, 4B and 12B. §4 is not the first certificate in this line. The
+distinction it keeps is the kind: that work verifies a **recomputation** and still leans on
+behavioural attacks reaching never-stored baselines, where §4 sweeps the **entire payload domain**.
+The cryptographic line (arXiv:2210.09126, arXiv:2210.11334) proves absence from the *training set*,
+which is provenance rather than computation.
+
+**And one place the prior art stops.** *MERIT* (arXiv:2607.29173) studies exactly the structure §3
+and §8 exploit — after a vertex is deleted the index "does not know which other vertices contain
+outgoing edges to it" — purely as a cost: stale edges "consume search capacity". No disclosure claim
+appears in it. That a proximity graph's surviving adjacency is an information channel about the
+deleted row, and that top-1 cannot see it, is not claimed there.
 
 ## 13. What must be run before this is honest to send
 
@@ -688,15 +749,25 @@ control does here (`rebuild_without_row`), and it is the only arm that reaches c
 answers the reviewer who objects to the scale of our setup: that setup is now the instrument rather
 than the subject.
 
-**(d) Done, bibliographically. All eight clusters are verified.** This item said the references had
+**(d) Done, bibliographically. All thirteen clusters are verified, and the audit went the other way.** This item said the references had
 to be found before they could be verified, and that the environment had no network to find them
 with. The second half was false and untested. §12 now carries real works, with per-entry method and
 status in `docs/paper/references.md`; the two claims the argument most depends on — Ghost Vectors
 being different in kind, and the 2026 audit proposing canonicalisation without testing it — were
 read in the sources and both hold.
 
+**And then the negative half, which (d) as written did not ask for.** Verifying a citation tests a
+claim that something *exists*. Every novelty claim here tests that something *does not*, and nothing
+had ever checked whether the search behind those nulls could find anything at all. NOV-005 calibrated
+it — three propositions of known standing, all of whose prior art it returned, plus a fabricated
+construct it correctly failed to find — and then ran it on this paper. It withdrew two claims and
+narrowed two more, including F1's thesis. Clusters 9–13 of `references.md` are the result, and three
+of the five change a claim rather than support one. `make novelty` re-runs it and **exits non-zero if
+a withdrawn claim is still asserted anywhere in this draft**.
+
 **What (d) does not cover: no cited result has been reproduced.** A citation can be real, quoted
-accurately, and still misread. The check that would catch that is (c).
+accurately, and still misread. The check that would catch that is (c). And a null here means "these
+queries did not find it": the queries are in the record so a reviewer can beat them.
 
 ## 14. Venue
 

@@ -14,7 +14,7 @@ SEEDS ?= 0 1 2
 RUN = OMP_NUM_THREADS=$(THREADS) SO_THREADS=$(THREADS) $(PY) -m
 
 .PHONY: help test smoke synthetic gpt2 demo compare rescore certify closure retrieval pointers \
-        disclosure traceless keychannel calibrate pdxaudit charged unread auditinstr papernums realindex closurereal untied \
+        disclosure traceless keychannel calibrate pdxaudit charged unread auditinstr papernums novelty realindex closurereal untied \
         report clean-results env
 
 help:
@@ -38,6 +38,7 @@ help:
 	@echo "make unread      E-000103 on the coordinates nobody counts: depth and resident state. Seconds"
 	@echo "make auditinstr  scan every recorded experiment for the two known instrument defects. Seconds"
 	@echo "make papernums   re-read every figure the paper prints from the record it came from. Instant"
+	@echo "make novelty     re-run the novelty search against its own claims, calibrated. Instant"
 	@echo "make realindex   audit deletion in the real hnswlib index (needs hnswlib). Seconds"
 	@echo "make closurereal E-000033's protocol with an encoder that clears its control. ~3 min"
 	@echo "make untied      the layer on a model that does not tie its embeddings (downloads Pythia-160m)"
@@ -154,6 +155,12 @@ auditinstr:
 # Exits non-zero when the prose and the records have parted. Instant.
 papernums:
 	$(PY) -m so.paper_numbers
+
+# no model, no numpy, no torch: the literature search that produced this programme's novelty
+# verdicts, with the positive controls it never had, and the verdicts it returns when it has them.
+# Exits non-zero when a withdrawn claim is still asserted somewhere. Instant.
+novelty:
+	$(PY) -m so.experiments.nov005_novelty_claim_audit
 
 # §13(c): PDX-001's instrument pointed at the real hnswlib index, unmodified, from PyPI.
 # Needs `pip install hnswlib numpy`. Seconds.
