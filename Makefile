@@ -14,7 +14,7 @@ SEEDS ?= 0 1 2
 RUN = OMP_NUM_THREADS=$(THREADS) SO_THREADS=$(THREADS) $(PY) -m
 
 .PHONY: help test smoke synthetic gpt2 demo compare rescore certify closure retrieval pointers \
-        disclosure traceless keychannel calibrate pdxaudit charged unread auditinstr papernums untied \
+        disclosure traceless keychannel calibrate pdxaudit charged unread auditinstr papernums realindex untied \
         report clean-results env
 
 help:
@@ -38,6 +38,7 @@ help:
 	@echo "make unread      E-000103 on the coordinates nobody counts: depth and resident state. Seconds"
 	@echo "make auditinstr  scan every recorded experiment for the two known instrument defects. Seconds"
 	@echo "make papernums   re-read every figure the paper prints from the record it came from. Instant"
+	@echo "make realindex   audit deletion in the real hnswlib index (needs hnswlib). Seconds"
 	@echo "make untied      the layer on a model that does not tie its embeddings (downloads Pythia-160m)"
 	@echo "make report      rebuild docs/so-results-2026-09-02.md from so/results/"
 	@echo "make env         print what will be used"
@@ -152,6 +153,11 @@ auditinstr:
 # Exits non-zero when the prose and the records have parted. Instant.
 papernums:
 	$(PY) -m so.paper_numbers
+
+# §13(c): PDX-001's instrument pointed at the real hnswlib index, unmodified, from PyPI.
+# Needs `pip install hnswlib numpy`. Seconds.
+realindex:
+	$(PY) -m so.experiments.pdx002_real_index_deletion_audit
 
 # the layer on a model that does NOT tie its embeddings; downloads Pythia-160m once, ~40 min per seed per arm
 untied:

@@ -286,6 +286,20 @@ CLAIMS: tuple[Claim, ...] = (
     Claim("E33 chunks", "e000033_retrieval_closure.json", "per_seed/0/n_chunks", "600", "int"),
     Claim("E33 facts", "e000033_retrieval_closure.json", "n_facts", "150", "int"),
 
+    # PDX-002 — §13(c), the instrument against the real index. Pinned with `near` because these
+    # render like PDX-001's reconstruction figures, which is exactly the confusion to avoid.
+    Claim("PDX2 targets", "pdx002/pdx002_real_index_deletion_audit.json", "validity_control/targets", "16", "int", "", "", "hnswlib"),
+    Claim("PDX2 payload domain", "pdx002/pdx002_real_index_deletion_audit.json", "validity_control/payload_domain", "256", "int", "", "", "hnswlib"),
+    Claim("PDX2 live top-1", "pdx002/pdx002_real_index_deletion_audit.json", "validity_control/top1_recovery", "1.0000", "dp4", "", "", "validity floor"),
+    Claim("PDX2 api top-1", "pdx002/pdx002_real_index_deletion_audit.json",
+          "policies/policy=mark_deleted_api/top1_recovery", "1.0000", "dp4", "", "", "public API"),
+    Claim("PDX2 file top-1", "pdx002/pdx002_real_index_deletion_audit.json",
+          "policies/policy=mark_deleted_file/top1_recovery", "1.0000", "dp4", "", "", "disk access only"),
+    Claim("PDX2 rebuilt candidates", "pdx002/pdx002_real_index_deletion_audit.json",
+          "policies/policy=rebuild_without_row/mean_candidates_remaining", "256.00", "dp2", "", "", "rebuilt without"),
+    Claim("PDX2 rebuilt posterior", "pdx002/pdx002_real_index_deletion_audit.json",
+          "policies/policy=rebuild_without_row/mean_posterior_on_true_payload", "0.003906", "dp6", "", "", "rebuilt without"),
+
     # E-000021 — the published false-accept rate the paper contrasts against
     Claim("E21 false-accept rate", "e000021_gate_error_rates.json", "totals/false_accept_rate", "8.49e-04", "exp2"),
     Claim("E21 n", "e000021_gate_error_rates.json", "totals/ci_false_accept/n", "2,200,000", "thousands"),
@@ -792,6 +806,7 @@ _NOT_A_MEASUREMENT: tuple[tuple[str, str], ...] = (
     (r"\(Figure \d\)",        "inline figure reference"),
     (r"arXiv:\d{4}\.\d{4,5}", "arXiv identifier — must precede the bare-year rule, which would "
                               "otherwise eat its first half"),
+    (r"\b\d+\.\d+\.\d+\b",   "a semantic version string, e.g. hnswlib 0.8.0 — an identifier"),
     (r"\d{4}-\d{2}-\d{2}",    "ISO date — must precede the bare-year rule"),
     (r"\b(?:19|20)\d{2}\b",   "calendar year"),
     (r"(?m)^\d+\. ",          "numbered list item in §11"),

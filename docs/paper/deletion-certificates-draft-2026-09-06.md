@@ -429,7 +429,7 @@ is cheap.
 and `so/results/`, and each was caught by a person opening a JSON file: a mean rank written 128.0
 where the record says 128.02; an accept rate written 1.0000 where the sweep says 0.9999; and §7's
 table presented with no seed count where the record is one seed. Three for three is the absence of
-an instrument, so there is now a registry (`make papernums`) binding 98 figures printed in this text
+an instrument, so there is now a registry (`make papernums`) binding 105 figures printed in this text
 and 31 more printed inside the three drawn figures to the record paths they came from, re-rendered
 under the rounding rule used, plus 19 **verdicts** — categorical cells like `CERTIFIED`, each
 bound to the record boolean behind it and checked against its own table row — and 10 **scope
@@ -632,13 +632,39 @@ purest form — a comparison between two stores, neither of which can be read fr
 discharged.** What it needs is not a run but a design change: an embedder that clears the control,
 which is a different experiment from the one registered, and not ours to substitute unilaterally.
 
-**(c) The one that decides whether this matters outside the project.** Run §3's instrument against a
-*published* system with its own reported deletion metric — a codebook editor, an episodic memory, or
-a real soft-deleting vector index. PDX-001 made this configuration rather than a rewrite: supply a
-store whose `observe()` reads the real index. Two outcomes, both publishable: a recovery channel in a
-system people cite, or a null that localises the defect. No training; inference hours on existing
-checkpoints. **This is also the answer to the reviewer who objects to the scale of our own setup** —
-it converts that setup from the subject of the paper into its instrument.
+**(c) Done. The instrument has been run against a real index (PDX-002).** This item asked for §3's
+audit to be pointed at a published system rather than a reconstruction, and predicted the
+restructured PDX-001 would make that configuration rather than a rewrite. It did.
+
+**System under test: `hnswlib` 0.8.0**, the reference HNSW implementation, from PyPI, used as
+documented — nothing patched or reimplemented. Payload domain 256, 16 targets, validity floor met,
+clean control clean.
+
+| policy | top-1 | candidates left | posterior |
+|---|---|---|---|
+| live (validity floor) | **1.0000** | 1.00 | 1.000000 |
+| `mark_deleted`, public API | **1.0000** | 1.00 | 1.000000 |
+| `mark_deleted`, disk access only | **1.0000** | 1.00 | 1.000000 |
+| rebuilt without the row | 0.0000 | 256.00 | 0.003906 |
+
+**The reconstruction understated the real thing.** §3 modelled the tombstone as a *partial* channel:
+retained adjacency narrowing 256 candidates to 2.92, posterior 0.391667, invisible to top-1. The
+reference implementation needs no partial channel. Its API is consistent — after `mark_deleted`,
+`get_items` raises and `knn_query` never returns the label, across a save/load round trip — but
+`unmark_deleted` is a **documented public call** that returns the payload exactly, and the exact
+bytes remain in the serialised index for anyone with the disk.
+
+**This is not a vulnerability report and the paper must not be read as making one.** `mark_deleted`
+is specified as a reversible tombstone, shipped with `unmark_deleted`, and is the correct primitive
+for capacity reuse. The claim is about **deployments that discharge a deletion request with it**. No
+hosted service was touched and no vendor product was tested.
+
+**What it changes for this paper.** F1's rule — enumerate every quantity derived from a payload and
+gate all of them, or take the row out of the addressable set — is no longer supported only by our
+own store and reconstructions of published shapes. The right-hand disjunct is exactly what the clean
+control does here (`rebuild_without_row`), and it is the only arm that reaches chance. It also
+answers the reviewer who objects to the scale of our setup: that setup is now the instrument rather
+than the subject.
 
 **(d) Done, bibliographically. All eight clusters are verified.** This item said the references had
 to be found before they could be verified, and that the environment had no network to find them
@@ -662,5 +688,5 @@ are what a practitioner will act on.
 
 Every number above: `make keychannel certify closure retrieval disclosure compare pdxaudit`. Records
 in `so/results/`. Instrument audits: `make calibrate charged unread auditinstr`. To check this text
-against those records: `make papernums` (98 figures in the prose, 31 in the drawn figures, 19 verdicts, 10 scope
+against those records: `make papernums` (105 figures in the prose, 31 in the drawn figures, 19 verdicts, 10 scope
 claims; non-zero exit when any of them parts from its record).

@@ -3583,6 +3583,59 @@ What none of it establishes: no cited result has been reproduced. A citation can
 accurately, and still misread — and the check for that is (c), which is the one item deliberately
 left to the user, because it makes a claim about someone else's software.
 
+### 31.59 §13(c) run: the reconstruction understated the real library (2026-09-07, PDX-002)
+
+§13(c) named the experiment that would decide whether this programme matters outside itself: point
+§3's instrument at a *published* system rather than a reconstruction. It predicted PDX-001's
+restructure would make that configuration rather than a rewrite. **It did** -- PDX-002 is a new
+`observe()` over a real index and nothing else.
+
+**System under test: `hnswlib` 0.8.0**, the reference HNSW implementation, from PyPI, used as
+documented. Payload domain 256, 16 targets, floor met, control clean.
+
+| policy | top-1 | candidates | posterior |
+|---|---|---|---|
+| live (floor) | **1.0000** | 1.00 | 1.000000 |
+| `mark_deleted`, public API | **1.0000** | 1.00 | 1.000000 |
+| `mark_deleted`, disk only | **1.0000** | 1.00 | 1.000000 |
+| rebuilt without the row | 0.0000 | 256.00 | 0.003906 |
+
+**The API is consistent, and that is worth saying first.** After `mark_deleted`, `get_items` raises
+`Label not found` and `knn_query` never returns the label -- including across a save/load round trip.
+The naive "a soft delete still serves the payload" failure does **not** occur. Anyone expecting it
+would have reported it wrongly.
+
+What survives is the tombstone. `unmark_deleted` is a documented public call and returns the payload
+exactly; the bytes are also still in the serialised index. So recovery needs no exploit and no file
+parsing -- it needs the API.
+
+**PDX-001 understated it.** The reconstruction modelled the tombstone as a *partial* channel: 256
+candidates down to 2.92, posterior 0.391667, invisible to top-1. That was a fair model of one shape.
+The reference implementation is **exact**: top-1 1.0000. A reconstruction being weaker than the thing
+it reconstructs is the good direction to be wrong in, and it is worth recording that the model was
+conservative rather than flattering.
+
+**What is not claimed, in the record itself and not only here.** This is not a vulnerability and
+nothing is undocumented: `mark_deleted` is specified as reversible and shipped with `unmark_deleted`,
+which is the correct primitive for capacity reuse. The finding is about **deployments that discharge
+a deletion request with it**. No hosted service was touched, no vendor product tested, nothing
+reverse-engineered. A test asserts the record says so, so the disclaimer cannot quietly fall out.
+
+**And it failed its own test first.** The draft embedding used `% 251`, mapping 256 payloads onto 251
+vectors -- five colliding pairs -- and still reported top-1 1.0000, because the sixteen targets
+happened to miss every collision. **Right by luck.** The injectivity test caught it; the modulus is
+257 now, so the k=0 component alone is injective and the attack is well-posed by construction. Fourth
+instrument in this branch to fail its own test before reporting.
+
+**What it settles for the draft.** F1's rule -- gate every derived quantity, or take the row out of
+the addressable set -- was supported by our own store plus reconstructions. The right-hand disjunct
+is now the only arm that reaches chance **on a real, widely-used index**. §13(c) also converts the
+scale objection: this repository's setup is the instrument now, not the subject.
+
+**What it does not settle.** The audit measures what is recoverable from the index. It does not show
+that any deployed system serves deletion requests this way; that is a claim about operators, and no
+experiment here can make it.
+
 ### 31.8 Boundary
 
 CPU only, no GPU, no LLM above 124M parameters, synthetic worlds, single-token entities, two surface forms per relation, one session. Nothing here shows unlearning of facts already encoded in pretrained weights. Evidence levels recorded: E3–E4 for the synthetic system (F4 for SHRED with the verified gate, E-000010 — **on the value channel only**: E-000028 recovers the shredded object at 1.0000 through the ungated reverse key, where REVOKE and DELETE are at chance, so F4 for SHRED is a claim about answers, logits, hidden states and probes and not about routing); E5 as substrate for the frozen-GPT-2 experiment, with reading, composition, update and the copy bound supported and behavioural deletion not yet supported at the pre-registered thresholds.

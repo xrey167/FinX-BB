@@ -46,6 +46,10 @@ on:
       - "so/results/e000033_retrieval_closure.json"
       - "so/results/pdx001/pdx001_payload_derived_index_audit.json"
       - "so/results/nov004/nov004_instrument_audit.json"
+      - "so/results/pdx002/pdx002_real_index_deletion_audit.json"
+      - "so/experiments/pdx002_real_index_deletion_audit.py"
+      - "so/tests/test_pdx002_real_index_deletion_audit.py"
+      - "docs/novelty/pdx002-real-index-deletion-audit-result.md"
   workflow_dispatch:
 
 jobs:
@@ -59,6 +63,10 @@ jobs:
           python-version: "3.11"
       - name: Install test dependency
         run: python -m pip install pytest
+      - name: Install the system under test for PDX-002
+        # PDX-002 audits the real hnswlib. Without it the test skips, and a skipped headline
+        # result is not a checked one.
+        run: python -m pip install "hnswlib==0.8.0" numpy
       - name: Compile
         run: |
           python -m py_compile so/experiments/nov001_screen_calibration.py
@@ -68,6 +76,7 @@ jobs:
           python -m py_compile so/experiments/nov003_unread_coordinates_e103.py
           python -m py_compile so/experiments/nov004_instrument_audit.py
           python -m py_compile so/paper_numbers.py
+          python -m py_compile so/experiments/pdx002_real_index_deletion_audit.py
       - name: Focused regressions
         run: |
           python -m pytest -q \
@@ -77,7 +86,8 @@ jobs:
             so/tests/test_screen.py \
             so/tests/test_nov003_unread_coordinates_e103.py \
             so/tests/test_nov004_instrument_audit.py \
-            so/tests/test_paper_numbers.py
+            so/tests/test_paper_numbers.py \
+            so/tests/test_pdx002_real_index_deletion_audit.py
       - name: Paper figures agree with the records
         run: |
           mkdir -p ci-paper
@@ -97,6 +107,11 @@ jobs:
           mkdir -p ci-pdx001
           python -m so.experiments.pdx001_payload_derived_index_audit \
             --results-dir ci-pdx001 | tee ci-pdx001/stdout.txt
+      - name: PDX002 audit against the real hnswlib index
+        run: |
+          mkdir -p ci-pdx002
+          python -m so.experiments.pdx002_real_index_deletion_audit \
+            --results-dir ci-pdx002 | tee ci-pdx002/stdout.txt
       - name: NOV002 charged re-screen of E-000104 and E-000105
         run: |
           mkdir -p ci-nov002
@@ -153,8 +168,12 @@ jobs:
             so/results/e000033_retrieval_closure.json \
             so/results/pdx001/pdx001_payload_derived_index_audit.json \
             so/results/nov004/nov004_instrument_audit.json \
+            so/results/pdx002/pdx002_real_index_deletion_audit.json \
+            so/experiments/pdx002_real_index_deletion_audit.py \
+            so/tests/test_pdx002_real_index_deletion_audit.py \
+            docs/novelty/pdx002-real-index-deletion-audit-result.md \
             > ci-nov001/source-sha256.txt
-          find ci-nov001 ci-pdx001 ci-nov002 ci-nov003 ci-nov004 ci-paper -maxdepth 1 -name '*.json' -print0 | sort -z \
+          find ci-nov001 ci-pdx001 ci-pdx002 ci-nov002 ci-nov003 ci-nov004 ci-paper -maxdepth 1 -name '*.json' -print0 | sort -z \
             | xargs -0 -r sha256sum > ci-nov001/result-sha256.txt
       - uses: actions/upload-artifact@v4
         with:
@@ -162,6 +181,7 @@ jobs:
           path: |
             ci-nov001/
             ci-pdx001/
+            ci-pdx002/
             ci-nov002/
             ci-nov003/
             ci-nov004/
