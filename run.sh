@@ -14,7 +14,7 @@
 #   ./run.sh all             synthetic, then gpt2                          (~23 h)
 #
 # Everything after the stage name is passed to make, so ./run.sh gpt2 SEEDS="0" works.
-# Setup is skipped automatically once .venv exists and imports cleanly.
+# Setup is skipped automatically once .venv satisfies so/requirements.txt and imports cleanly.
 set -euo pipefail
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 cd "$HERE"
@@ -22,12 +22,51 @@ cd "$HERE"
 STAGE="${1:-smoke}"
 [ $# -gt 0 ] && shift || true
 case "$STAGE" in
-    test|smoke|synthetic|gpt2|demo|compare|rescore|certify|keychannel|untied|report|all) ;;
-    -h|--help|help) sed -n '2,12p' "$0" | sed 's/^# \{0,1\}//'; exit 0 ;;
-    *) echo "unknown stage '$STAGE' — try: test smoke synthetic gpt2 demo compare rescore keychannel untied report all"; exit 2 ;;
+    test|test-network|smoke|synthetic|gpt2|demo|compare|rescore|certify|closure|retrieval|pointers|\
+    disclosure|traceless|keychannel|calibrate|pdxaudit|charged|unread|auditinstr|papernums|novelty|\
+    realindex|closurereal|untied|report|lod001|env|all) ;;
+    -h|--help|help)
+        if command -v make >/dev/null 2>&1; then
+            make help
+        else
+            sed -n '2,17p' "$0" | sed 's/^# \{0,1\}//'
+        fi
+        exit 0
+        ;;
+    *) echo "unknown stage '$STAGE' — run './run.sh help' or 'make help' for the target list"; exit 2 ;;
 esac
 
-if [ -x .venv/bin/python ] && .venv/bin/python -c "import torch, numpy, transformers" 2>/dev/null; then
+if [ -x .venv/bin/python ] && .venv/bin/python - <<'PYREQ' 2>/dev/null
+from importlib.metadata import PackageNotFoundError, version
+from pathlib import Path
+import subprocess
+import sys
+
+from packaging.requirements import Requirement
+
+if sys.version_info < (3, 11):
+    raise SystemExit(1)
+
+for raw in Path("so/requirements.txt").read_text(encoding="utf-8").splitlines():
+    requirement = Requirement(raw.split("#", 1)[0].strip()) if raw.split("#", 1)[0].strip() else None
+    if requirement is None or (requirement.marker and not requirement.marker.evaluate()):
+        continue
+    try:
+        installed = version(requirement.name)
+    except PackageNotFoundError as exc:
+        raise SystemExit(1) from exc
+    if installed not in requirement.specifier:
+        raise SystemExit(1)
+
+subprocess.run(
+    [sys.executable, "-m", "pip", "check"],
+    check=True,
+    stdout=subprocess.DEVNULL,
+    stderr=subprocess.DEVNULL,
+)
+import numpy, pytest, safetensors, scipy, torch, transformers  # noqa: E402,F401
+PYREQ
+then
     echo "== environment already present, skipping setup (delete .venv to force it)"
 else
     ./setup.sh
@@ -45,7 +84,8 @@ else
     # make is normally installed by setup.sh; this keeps the script usable if it is not
     echo "== make not available, calling the modules directly"
     case "$STAGE" in
-        test)      "$PY" -m pytest so/tests -q ;;
+        test)      "$PY" -m pytest so/tests -q -m "not network" ;;
+        test-network) "$PY" -m pytest so/tests/test_jlens.py so/tests/test_two_token_subjects.py -q -m network ;;
         smoke)     "$PY" -m so.experiments.run_all --quick ;;
         synthetic) "$PY" -m so.experiments.run_all && "$PY" -m so.report ;;
         demo)      "$PY" -m so.demo ;;

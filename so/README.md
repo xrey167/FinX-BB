@@ -5,6 +5,11 @@ Code behind the SO documents in `docs/`:
 - [Project state, vision and architecture](../docs/so-modular-neural-os.md)
 - [Experiment and evidence ledger](../docs/so-experiment-ledger.md)
 - [Session results 2026-09-02](../docs/so-results-2026-09-02.md) — what this code has actually demonstrated, with evidence levels
+- [Lifecycle Integrity v1](../docs/architecture/lifecycle-integrity-v1.md) — the bounded systems contract used by the executable reference kernel
+- [Bounded prior-art review](../docs/research/2026-09-07-lifecycle-integrity-prior-art.md) — why the combined architecture is not itself a broad novelty claim
+
+This directory is research code. A green test or signed/hash-linked record is not evidence of
+physical erasure, deletion from base-model weights, complete causal absence, or legal novelty.
 
 ## What is implemented
 
@@ -23,8 +28,9 @@ Code behind the SO documents in `docs/`:
 | `so/closure.py` | The store-side half of an erasure guarantee, with no model involved: how many records must go before a key stops answering (`deletion_closure`) and before no query in a declared workload yields an object (`fact_closure`, also exported as `resilience`), with a certified lower bound; `pod_keys` and `value_keys` for the two ways of individuating a fact |
 | `so/ledger.py` | Result recording (JSON + Markdown) with evidence levels E0–E7 and deletion levels F0–F5 |
 | `so/llm_adapter.py` | The knowledge layer attached to a frozen pretrained GPT-2 as a symlink adapter (E-000008) |
+| `so/lifecycle.py` | Standard-library reference kernel for generations versus revisions, exact multi-hop witnesses, fail-closed routing, capabilities, lineage and audit replay |
 | `so/report.py` | Assembles `docs/so-results-2026-09-02.md` from the recorded results |
-| `so/experiments/` | E-000001-A, E-000001-B, E-000002 … E-000034, `run_all.py` |
+| `so/experiments/` | Recorded experiment implementations and audit tools; use `make auditinstr` for the current inventory |
 | `so/tests/` | Unit tests |
 
 ## Running it on an Ubuntu server
@@ -34,8 +40,9 @@ Nothing here needs a GPU. Every recorded number was produced on a four-core CPU 
 ```bash
 git clone <this repository> && cd FinX-BB
 ./setup.sh                 # apt packages, a virtualenv, CPU-only PyTorch, then the unit tests
-make test                  # 45 unit tests, about 10 seconds
-make smoke                 # a reduced version of the whole synthetic chain, about 15 minutes
+make test                  # offline unit and contract tests; no model download
+make test-network          # model-backed tests, separated because they load/download GPT-2
+make smoke                 # a reduced version of the whole synthetic chain, about 35 minutes
 ```
 
 `setup.sh --system` skips the virtualenv. If you keep the virtualenv but do not activate it, pass it
@@ -43,7 +50,8 @@ along: `make smoke PY=.venv/bin/python`.
 
 | target | what it runs | measured cost on 4 cores |
 |---|---|---|
-| `make test` | unit tests | ~10 s |
+| `make test` | offline unit and contract tests | depends on host and current suite size |
+| `make test-network` | model-backed integration tests | depends on model cache/network; downloads GPT-2 when absent |
 | `make smoke` | the synthetic chain at one seed and 800 steps, trained from scratch in a `-quick` namespace | ~35 min |
 | `make synthetic` | the recorded synthetic chain: E-000001-A through E-000010, plus 10k cells, symlink cells, alias chains, the fresh-seed chance test and the gate error rates | ~3 h |
 | `make gpt2` | the frozen-GPT-2 chain: E-000008, E-000011, E-000012, E-000013, E-000017, E-000020 | ~20 h, downloads GPT-2 once (~550 MB) |
@@ -63,14 +71,15 @@ Disk: the GPT-2 chain writes about 500 MB of cached adapters into `so/results/ch
 is not committed. Re-running an experiment reuses those checkpoints and only re-evaluates; pass
 `--force` to retrain.
 
-Network: only the frozen-GPT-2 experiments need it, and only once, to fetch `gpt2` from the Hugging
-Face hub. Set `HF_HOME` to move the cache. The synthetic chain runs fully offline.
+Network: `make test` explicitly excludes tests marked `network`. `make test-network` and the
+frozen-GPT-2 experiments need access to the Hugging Face hub when `gpt2` is not cached. Set
+`HF_HOME` to move the cache. The synthetic chain runs fully offline.
 
 ## Running individual experiments
 
 ```bash
 pip install -r so/requirements.txt     # numpy, torch (CPU is enough), pytest, transformers (E-000008)
-python -m pytest so/tests -q
+python -m pytest so/tests -q -m "not network"
 python -m so.experiments.e000001a_reference
 python -m so.experiments.e000001b_mini_transformer      # trains 5 models (2-3.5 min each on this 4-core box; 'train_seconds' is in the record)
 python -m so.experiments.e000002_memorization_control

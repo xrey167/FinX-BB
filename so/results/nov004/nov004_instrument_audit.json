@@ -980,6 +980,70 @@
     },
     {
       "assigned_to": [
+        "lhs"
+      ],
+      "callee": "_equivariant_deep",
+      "file": "e000084_revocation_equivariance_screen.py",
+      "invariant_in": [
+        "_rotate",
+        "alpha",
+        "bias",
+        "total_theta",
+        "z0"
+      ],
+      "line": 113,
+      "loop_line": 109
+    },
+    {
+      "assigned_to": [
+        "rhs"
+      ],
+      "callee": "_rotate",
+      "file": "e000084_revocation_equivariance_screen.py",
+      "invariant_in": [
+        "_equivariant_deep",
+        "alpha",
+        "bias",
+        "total_theta",
+        "z0"
+      ],
+      "line": 114,
+      "loop_line": 109
+    },
+    {
+      "assigned_to": [
+        "tmp"
+      ],
+      "callee": "_rotate",
+      "file": "e000084_revocation_equivariance_screen.py",
+      "invariant_in": [
+        "p",
+        "pod_theta",
+        "z_all_out"
+      ],
+      "line": 153,
+      "loop_line": 152
+    },
+    {
+      "assigned_to": [
+        "tmp2"
+      ],
+      "callee": "_equivariant_deep",
+      "file": "e000084_revocation_equivariance_screen.py",
+      "invariant_in": [
+        "_rotate",
+        "alpha",
+        "bias",
+        "p",
+        "pod_theta",
+        "total_theta",
+        "z0"
+      ],
+      "line": 159,
+      "loop_line": 158
+    },
+    {
+      "assigned_to": [
         "unrelated_current"
       ],
       "callee": "reusable",
@@ -1214,7 +1278,7 @@
       "loop_line": 130
     }
   ],
-  "class_b_count": 65,
+  "class_b_count": 69,
   "class_b_files": [
     "e000008_gpt2_adapter.py",
     "e000011_gpt2_v2.py",
@@ -1244,6 +1308,7 @@
     "e000063_workspace_pod_certificate.py",
     "e000079_generation_kv_lineage_race.py",
     "e000080_object_scoped_kv_lineage.py",
+    "e000084_revocation_equivariance_screen.py",
     "e000089_cross_model_generation_attestation.py",
     "e000090_inband_generation_signature.py",
     "e000099_dense_influence_sparse_repair.py",
@@ -1255,7 +1320,7 @@
   ],
   "decision": "SCANNER_VALID",
   "experiment": "NOV-004",
-  "files_scanned": 118,
+  "files_scanned": 124,
   "how_to_read_this": "Class A is decidable from the syntax: two names in one scope bound to identical call expressions, so any predicate comparing them cannot fail. Each is a finding. Class B is a heuristic and each entry is a candidate for review, never a verdict \u2014 a call can be loop-invariant and still necessary, and an invariant call in the *candidate* arm is not a defect at all. It becomes one only when it sits on the baseline, where it inflates the candidate's margin for free, which is what NOV-003 found in E-000103. Reading Class B as a list of defects would be \u00a731.46's error repeated: scoring something the instrument cannot resolve.",
   "known_sites_found": [
     "e000104_tensor_train_lifecycle_quotient_reduction.py:local_update_multiplies",
@@ -1266,6 +1331,6 @@
     "e000105_stable_gate_cohort_transport_reduction.py:mutation_multiplies"
   ],
   "not_claimed": "Two patterns, chosen because each was demonstrated by hand first. This is not a general audit of these experiments and finds nothing about arms that are simply mismatched, domains that hide a crossover (\u00a731.46), or cost coordinates nobody counted. A file absent from both lists has not been cleared; it has been checked for two things.",
-  "scope": "every recorded experiment, scanned for the two defect classes already demonstrated",
+  "scope": "numbered E-series experiment modules matching eNNNNNN[a]_<name>.py, scanned for the two defect classes already demonstrated",
   "validity_floor_met": true
 }

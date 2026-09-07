@@ -15,7 +15,7 @@ what result would stop the spending -- it does not report any outcome.
 # E-000027 — Pre-registered GPU protocol: from E5 to E6
 
 **Proposed path:** `/home/user/FinX-BB/docs/so-e000027-gpu-protocol.md`
-**Status date:** 2026-09-04 · **Companion:** [roadmap](docs/so-roadmap-2026-09-02.md) · [ledger](docs/so-experiment-ledger.md) §4, §28 · [results](docs/so-results-2026-09-02.md)
+**Status date:** 2026-09-04 · **Companion:** [roadmap](so-roadmap-2026-09-02.md) · [ledger](so-experiment-ledger.md) §4, §28 · [results](so-results-2026-09-02.md)
 **Experiment id:** E-000027. **E-000024, E-000025 and E-000026 are taken** — `/home/user/FinX-BB/so/experiments/e000024_weights_vs_cells.py` (653 lines, LoRA-vs-cells, unrun) and `/home/user/FinX-BB/so/experiments/e000025_template_rescoring.py` (unrun) already exist. Three of the four merged plans proposed "E-000024"; all three would have collided.
 
 ---

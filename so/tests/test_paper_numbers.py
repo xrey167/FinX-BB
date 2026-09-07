@@ -601,8 +601,8 @@ def test_the_sweep_count_tracks_the_repository_rather_than_the_prose():
     import json
     from pathlib import Path
     rec = json.loads(Path("so/results/nov004/nov004_instrument_audit.json").read_text())
-    assert rec["files_scanned"] == 118
-    assert "sweep of all 118 recorded experiments" in _PAPER_TEXT
+    assert rec["files_scanned"] == 124
+    assert "sweep of all 124 recorded experiments" in _PAPER_TEXT
     # the old count survives only inside backticks, where §9 quotes it as the claim that went stale
     # -- the same convention that lets the coverage pass ignore it
     for m in re.finditer(r"100 recorded experiments", _PAPER_TEXT):

@@ -1,4 +1,4 @@
-"""NOV-004 — audit every recorded experiment for the two defect classes found so far.
+"""NOV-004 — audit numbered E-series modules for the two defect classes found so far.
 
 NOV-001 found the vacuity pattern in E-000105 and NOV-002 found it again in E-000104. NOV-003 found
 a second, unrelated class in E-000103: a baseline rebuilding loop-invariant work, which is the
@@ -6,7 +6,7 @@ mirror of the representation subsidy — instead of giving the baseline the cand
 for free, it denies the baseline an optimisation the candidate is already using.
 
 Three experiments were read by hand and two defect classes came out of three readings. That rate
-makes hand-reading the remaining twenty a poor use of the next day, and a poor instrument besides:
+makes hand-reading the remaining corpus a poor use of the next day, and a poor instrument besides:
 whoever reads them will find what they are looking for. So this file looks mechanically, at all of
 them, for exactly the two patterns already demonstrated to occur.
 
@@ -257,7 +257,10 @@ def run(experiments_dir: Path | None = None) -> dict:
 
     return {
         "experiment": "NOV-004",
-        "scope": "every recorded experiment, scanned for the two defect classes already demonstrated",
+        "scope": (
+            "numbered E-series experiment modules matching "
+            "eNNNNNN[a]_<name>.py, scanned for the two defect classes already demonstrated"
+        ),
         "files_scanned": len(files),
         "validity_floor_met": floor_met,
         "known_sites_required": sorted(f"{f}:{c}" for f, c in _KNOWN_CLASS_A),

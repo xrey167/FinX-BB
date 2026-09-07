@@ -37,7 +37,7 @@ help:
 	@echo "make pdxaudit    the keychannel attack as a store-independent instrument. Seconds, stdlib only"
 	@echo "make charged     re-screen E-000104 and E-000105 with the representation charged. ~10 s, stdlib only"
 	@echo "make unread      E-000103 on the coordinates nobody counts: depth and resident state. Seconds"
-	@echo "make auditinstr  scan every recorded experiment for the two known instrument defects. Seconds"
+	@echo "make auditinstr  scan numbered E-series experiments for two known instrument defects. Seconds"
 	@echo "make papernums   re-read every figure the paper prints from the record it came from. Instant"
 	@echo "make novelty     re-run the novelty search against its own claims, calibrated. Instant"
 	@echo "make realindex   audit deletion in the real hnswlib index (needs hnswlib). Seconds"
@@ -151,8 +151,8 @@ charged:
 unread:
 	$(PY) -m so.experiments.nov003_unread_coordinates_e103
 
-# no model, no numpy, no torch: scan all 100 recorded experiments for a comparison whose two sides
-# share a source, and for baseline work rebuilt inside a loop. Seconds.
+# no model, no numpy, no torch: scan numbered E-series experiment modules for a comparison whose
+# two sides share a source, and for baseline work rebuilt inside a loop. Seconds.
 auditinstr:
 	$(PY) -m so.experiments.nov004_instrument_audit
 

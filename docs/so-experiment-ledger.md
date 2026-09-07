@@ -3007,6 +3007,13 @@ the frozen reader accepts them.** `MVCCStore(content_markers=True)` draws every 
 the row's exported content instead of the seeded generator (§31.42 registered it; `so/experiments/e000053_hi_markers_reader.py`,
 three seeds, 100 pods, trains nothing). All 23 pre-registered rows pass at the worst seed.
 
+**Correction (2026-09-07, exact-alias schema):** the recorded store/reader instrument omitted stable
+`link_target_kid`. The consolidated store now exports and consumes that field so a LINK names one
+exact duplicate row. Content-derived markers still close the marker-stream channel, but stable target
+identity preserves write history: CASCADE and NEVER are no longer exported-history-independent under
+the stricter schema. The E-000053 JSON and table below remain the historical record and must not be
+read as current-schema `exported_hi` evidence.
+
 | arm (positive vs reference) | AUC, deleted keys | AUC, bystanders | AUC, generic | recorded, bystanders (E-000051) | max KL, bystanders |
 |---|---|---|---|---|---|
 | LIVE vs NEVER (validity) | 1.000 | — | — | — | — |

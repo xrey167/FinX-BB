@@ -1,5 +1,13 @@
 """Experiment E-000053 -- history-independent markers, measured at the reader.
 
+CORRECTION (2026-09-07).  The recorded instrument treated a LINK payload as only
+``(link_subject, link_relation)`` and the reader ignored stable target identity.  The consolidated
+store now exports and consumes ``link_target_kid`` so an alias remains bound to an exact duplicate
+row.  Under that stricter schema CASCADE and NEVER still have equal content-derived markers, but
+they are not exported-history-independent: target kids retain the write history.  The historical
+JSON/Markdown record is preserved as evidence of the earlier instrument; its ``exported_hi`` row
+must not be read as a result under the current exact-identity contract.
+
 E-000051 (ledger §31.41) found that ``MVCCStore`` draws every row's marker from a seeded generator
 whose POSITION encodes how many writes preceded it, so a store that wrote a pod and then evicted every
 row of it (CASCADE) differs from one that never wrote it (NEVER) in the markers of every row written

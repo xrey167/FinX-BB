@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
-# One command from a fresh Ubuntu server to a working SO research environment.
+# One command from a fresh Ubuntu 24.04 server to a working SO research environment.
 #
-#   ./setup.sh              CPU-only PyTorch (small download, what every recorded result used)
+#   ./setup.sh              prefer CPU PyTorch (small download, what every recorded result used)
 #   ./setup.sh --system     no virtualenv, install into the current Python
 #
-# Tested on Ubuntu 22.04 and 24.04. Nothing here needs a GPU.
+# Tested on Ubuntu 24.04. Python 3.11 or newer is required; nothing here needs a GPU.
 set -euo pipefail
 
 VENV=1
@@ -32,6 +32,12 @@ else
     echo "   apt-get not found; install python3, python3-venv, make and git yourself"
 fi
 python3 --version
+python3 - <<'PYVERSION'
+import sys
+
+if sys.version_info < (3, 11):
+    raise SystemExit("Python 3.11 or newer is required")
+PYVERSION
 
 PY=python3
 if [ "$VENV" = "1" ]; then
@@ -41,21 +47,20 @@ if [ "$VENV" = "1" ]; then
     "$PY" -m pip install --quiet --upgrade pip
 fi
 
-if "$PY" -c "import torch, numpy, transformers" >/dev/null 2>&1; then
-    echo "== python packages already importable, skipping the install"
-else
-    echo "== PyTorch, CPU build (about 200 MB)"
-    "$PY" -m pip install --quiet torch --index-url https://download.pytorch.org/whl/cpu \
-        || "$PY" -m pip install --quiet torch
-    echo "== everything else"
-    "$PY" -m pip install --quiet -r so/requirements.txt
-fi
+echo "== PyTorch >=2.2, preferring the CPU build (about 200 MB when absent)"
+"$PY" -m pip install --quiet "torch>=2.2" --index-url https://download.pytorch.org/whl/cpu \
+    || "$PY" -m pip install --quiet "torch>=2.2"
+
+echo "== declared Python environment"
+"$PY" -m pip install --quiet -r so/requirements.txt
+"$PY" -m pip check
 
 echo "== check"
 "$PY" - <<'PYCHK'
-import numpy, torch, transformers, sys
+import numpy, pytest, safetensors, scipy, torch, transformers, sys
 print(f"   python {sys.version.split()[0]}  torch {torch.__version__}  "
-      f"numpy {numpy.__version__}  transformers {transformers.__version__}")
+      f"numpy {numpy.__version__}  transformers {transformers.__version__}  "
+      f"pytest {pytest.__version__}")
 print(f"   threads torch sees: {torch.get_num_threads()}")
 PYCHK
 "$PY" -m pytest so/tests -q -m "not network" 2>&1 | tail -2
@@ -64,7 +69,8 @@ cat <<'MSG'
 
 Ready. Next steps, cheapest first:
 
-  make test        unit tests only, about 10 seconds
+  make test        offline unit and contract tests; no model downloads
+  make test-network model-backed integration tests; downloads/loads GPT-2
   make smoke       a reduced version of the whole synthetic chain, about 35 minutes
   make synthetic   the recorded synthetic chain, about 3 hours on 4 cores
   make gpt2        the frozen-GPT-2 chain, about 20 hours on 4 cores (downloads GPT-2 once, ~550 MB)

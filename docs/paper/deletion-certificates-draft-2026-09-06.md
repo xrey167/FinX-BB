@@ -441,7 +441,7 @@ the evaluation literature this paper joins is built almost entirely from instrum
 
 Every measurement in this paper carries one. §2's probe reads live cells at 0.893–0.927. §3's attack
 recovers a live payload at 1.0000 and refuses to report if it does not. §4's certificate has two
-guards that can void it. A mechanical sweep of all 118 recorded experiments for comparisons whose two
+guards that can void it. A mechanical sweep of all 124 recorded experiments for comparisons whose two
 sides share a source found three — and the sweep's own first run failed its floor and had to be fixed
 before its silence anywhere else meant anything.
 

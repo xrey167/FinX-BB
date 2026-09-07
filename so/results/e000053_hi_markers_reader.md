@@ -1,5 +1,12 @@
 # E-000053 — history-independent markers, measured at the reader
 
+> **Correction (2026-09-07):** This historical result used a LINK export/audit that omitted stable
+> `link_target_kid`, and its reader did not consume that identity. The consolidated exact-alias
+> contract now exports and consumes the target kid. Content-derived markers still remove the marker
+> stream channel, but CASCADE and NEVER remain distinguishable through stable target identity; the
+> recorded `exported_hi = 1.000` is therefore not a result under the current schema. The table below
+> is retained as the original experimental record, not silently rewritten.
+
 Synthetic E-000015 reader, seeds [0, 1, 2], 100 pods per seed, ``MVCCStore(content_markers=True)``, trains nothing. AUCs are E-000051's five-fold cross-validated Mann-Whitney statistics; 'recorded' is E-000051's value on the same seed with the generator scheme.
 
 | arm (positive vs reference) | AUC (i) | AUC (ii) bystanders | AUC (iii) generic | recorded (ii) | max KL (ii) | top-1 agree (ii) |
