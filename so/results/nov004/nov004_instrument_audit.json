@@ -1,0 +1,1336 @@
+{
+  "class_a_confirmed": [
+    {
+      "assigned_to": [
+        "c_work",
+        "g_work"
+      ],
+      "callee": "local_update_multiplies",
+      "file": "e000104_tensor_train_lifecycle_quotient_reduction.py",
+      "lines": [
+        224,
+        225
+      ],
+      "results_are_compared": true,
+      "scope": "For"
+    },
+    {
+      "assigned_to": [
+        "candidate_work",
+        "generic_work"
+      ],
+      "callee": "mutation_multiplies",
+      "file": "e000105_stable_gate_cohort_transport_reduction.py",
+      "lines": [
+        176,
+        177
+      ],
+      "results_are_compared": true,
+      "scope": "For"
+    },
+    {
+      "assigned_to": [
+        "direct",
+        "oracle"
+      ],
+      "callee": "fn",
+      "file": "e000107_state_only_causal_lineage_identifiability.py",
+      "lines": [
+        93,
+        94
+      ],
+      "results_are_compared": true,
+      "scope": "For"
+    }
+  ],
+  "class_a_confirmed_count": 3,
+  "class_a_files": [
+    "e000104_tensor_train_lifecycle_quotient_reduction.py",
+    "e000105_stable_gate_cohort_transport_reduction.py",
+    "e000107_state_only_causal_lineage_identifiability.py"
+  ],
+  "class_a_incidental_count": 22,
+  "class_a_incidental_duplicates": [
+    {
+      "assigned_to": [
+        "l_rel",
+        "l_sub"
+      ],
+      "callee": "zeros",
+      "file": "e000015_symlink_cells.py",
+      "lines": [
+        149,
+        150
+      ],
+      "results_are_compared": false,
+      "scope": "bank_with_links"
+    },
+    {
+      "assigned_to": [
+        "mode",
+        "start"
+      ],
+      "callee": "zeros",
+      "file": "e000015_symlink_cells.py",
+      "lines": [
+        231,
+        232
+      ],
+      "results_are_compared": false,
+      "scope": "encode_slots"
+    },
+    {
+      "assigned_to": [
+        "start",
+        "target"
+      ],
+      "callee": "zeros",
+      "file": "e000015_symlink_cells.py",
+      "lines": [
+        232,
+        235
+      ],
+      "results_are_compared": false,
+      "scope": "encode_slots"
+    },
+    {
+      "assigned_to": [
+        "cell",
+        "read"
+      ],
+      "callee": "zeros",
+      "file": "e000039_address_tying.py",
+      "lines": [
+        268,
+        270
+      ],
+      "results_are_compared": false,
+      "scope": "decompose"
+    },
+    {
+      "assigned_to": [
+        "hit",
+        "null0"
+      ],
+      "callee": "zeros",
+      "file": "e000039_address_tying.py",
+      "lines": [
+        269,
+        271
+      ],
+      "results_are_compared": false,
+      "scope": "decompose"
+    },
+    {
+      "assigned_to": [
+        "cell",
+        "read"
+      ],
+      "callee": "zeros",
+      "file": "e000050_bos_artefact.py",
+      "lines": [
+        221,
+        223
+      ],
+      "results_are_compared": false,
+      "scope": "decompose_prefixed"
+    },
+    {
+      "assigned_to": [
+        "hit",
+        "null0"
+      ],
+      "callee": "zeros",
+      "file": "e000050_bos_artefact.py",
+      "lines": [
+        222,
+        224
+      ],
+      "results_are_compared": false,
+      "scope": "decompose_prefixed"
+    },
+    {
+      "assigned_to": [
+        "base",
+        "soft"
+      ],
+      "callee": "evaluate",
+      "file": "e000055_relevance_calibration.py",
+      "lines": [
+        129,
+        131
+      ],
+      "results_are_compared": false,
+      "scope": "run"
+    },
+    {
+      "assigned_to": [
+        "before",
+        "soft"
+      ],
+      "callee": "evaluate",
+      "file": "e000060_scope_before_routing.py",
+      "lines": [
+        154,
+        158
+      ],
+      "results_are_compared": false,
+      "scope": "run"
+    },
+    {
+      "assigned_to": [
+        "hard",
+        "soft"
+      ],
+      "callee": "evaluate",
+      "file": "e000060_scope_before_routing.py",
+      "lines": [
+        158,
+        162
+      ],
+      "results_are_compared": false,
+      "scope": "run"
+    },
+    {
+      "assigned_to": [
+        "accepted",
+        "consumed_replay"
+      ],
+      "callee": "consume",
+      "file": "e000069_authorized_injection_boundary.py",
+      "lines": [
+        79,
+        82
+      ],
+      "results_are_compared": false,
+      "scope": "run"
+    },
+    {
+      "assigned_to": [
+        "calibrated_soft",
+        "transplanted_soft"
+      ],
+      "callee": "_metrics",
+      "file": "e000072_staged_scope_after_capability.py",
+      "lines": [
+        73,
+        77
+      ],
+      "results_are_compared": false,
+      "scope": "run"
+    },
+    {
+      "assigned_to": [
+        "calibrated_soft",
+        "hard"
+      ],
+      "callee": "_metrics",
+      "file": "e000072_staged_scope_after_capability.py",
+      "lines": [
+        77,
+        79
+      ],
+      "results_are_compared": false,
+      "scope": "run"
+    },
+    {
+      "assigned_to": [
+        "rng",
+        "rng2"
+      ],
+      "callee": "default_rng",
+      "file": "e000087_marker_validity_contract.py",
+      "lines": [
+        91,
+        97
+      ],
+      "results_are_compared": false,
+      "scope": "proposal_measure"
+    },
+    {
+      "assigned_to": [
+        "s0",
+        "s1"
+      ],
+      "callee": "zeros",
+      "file": "e000089_nonlinear_delta_repair_boundary.py",
+      "lines": [
+        104,
+        104
+      ],
+      "results_are_compared": false,
+      "scope": "_block_local"
+    },
+    {
+      "assigned_to": [
+        "repair",
+        "verified"
+      ],
+      "callee": "copy",
+      "file": "e000090_source_cone_soundness.py",
+      "lines": [
+        143,
+        149
+      ],
+      "results_are_compared": false,
+      "scope": "routing_screen"
+    },
+    {
+      "assigned_to": [
+        "conventional",
+        "repaired"
+      ],
+      "callee": "replay_local",
+      "file": "e000090_source_cone_soundness.py",
+      "lines": [
+        97,
+        101
+      ],
+      "results_are_compared": false,
+      "scope": "If"
+    },
+    {
+      "assigned_to": [
+        "k_new",
+        "q_cur"
+      ],
+      "callee": "normalize",
+      "file": "e000092_generation_keyed_addressing.py",
+      "lines": [
+        93,
+        94
+      ],
+      "results_are_compared": false,
+      "scope": "For"
+    },
+    {
+      "assigned_to": [
+        "old",
+        "old_repeat"
+      ],
+      "callee": "_forward_capture",
+      "file": "e000099_dense_influence_sparse_repair.py",
+      "lines": [
+        167,
+        168
+      ],
+      "results_are_compared": false,
+      "scope": "run"
+    },
+    {
+      "assigned_to": [
+        "old",
+        "old2"
+      ],
+      "callee": "_forward_capture",
+      "file": "e000100_oracle_sparse_flop_ceiling.py",
+      "lines": [
+        138,
+        139
+      ],
+      "results_are_compared": false,
+      "scope": "run"
+    },
+    {
+      "assigned_to": [
+        "exact_changed_weight",
+        "material_changed_weight"
+      ],
+      "callee": "zeros",
+      "file": "e000100_oracle_sparse_flop_ceiling.py",
+      "lines": [
+        147,
+        148
+      ],
+      "results_are_compared": false,
+      "scope": "run"
+    },
+    {
+      "assigned_to": [
+        "old",
+        "old2"
+      ],
+      "callee": "_forward_capture",
+      "file": "e000101_mlp_down_exact_transport_barrier.py",
+      "lines": [
+        176,
+        177
+      ],
+      "results_are_compared": false,
+      "scope": "run"
+    }
+  ],
+  "class_b_candidates": [
+    {
+      "assigned_to": [
+        "gk"
+      ],
+      "callee": "GPT2Knowledge",
+      "file": "e000008_gpt2_adapter.py",
+      "invariant_in": [
+        "cfg"
+      ],
+      "line": 414,
+      "loop_line": 413
+    },
+    {
+      "assigned_to": [
+        "mask"
+      ],
+      "callee": "ones",
+      "file": "e000011_gpt2_v2.py",
+      "invariant_in": [
+        "bool",
+        "facts",
+        "len"
+      ],
+      "line": 341,
+      "loop_line": 324
+    },
+    {
+      "assigned_to": [
+        "mask"
+      ],
+      "callee": "ones",
+      "file": "e000011_gpt2_v2.py",
+      "invariant_in": [
+        "bool",
+        "facts",
+        "len"
+      ],
+      "line": 337,
+      "loop_line": 324
+    },
+    {
+      "assigned_to": [
+        "gk"
+      ],
+      "callee": "GPT2Knowledge",
+      "file": "e000011_gpt2_v2.py",
+      "invariant_in": [
+        "AdapterConfig"
+      ],
+      "line": 430,
+      "loop_line": 429
+    },
+    {
+      "assigned_to": [
+        "mask"
+      ],
+      "callee": "ones",
+      "file": "e000011_gpt2_v2.py",
+      "invariant_in": [
+        "bool",
+        "facts",
+        "len"
+      ],
+      "line": 337,
+      "loop_line": 336
+    },
+    {
+      "assigned_to": [
+        "gk"
+      ],
+      "callee": "GPT2Knowledge",
+      "file": "e000012_status_gated_revoke.py",
+      "invariant_in": [
+        "AdapterConfig"
+      ],
+      "line": 83,
+      "loop_line": 82
+    },
+    {
+      "assigned_to": [
+        "gk"
+      ],
+      "callee": "GPT2KnowledgePrior",
+      "file": "e000013_prior_conflict.py",
+      "invariant_in": [
+        "AdapterConfig"
+      ],
+      "line": 546,
+      "loop_line": 545
+    },
+    {
+      "assigned_to": [
+        "enc"
+      ],
+      "callee": "encode_bank",
+      "file": "e000013_prior_conflict.py",
+      "invariant_in": [
+        "bank"
+      ],
+      "line": 400,
+      "loop_line": 377
+    },
+    {
+      "assigned_to": [
+        "gk"
+      ],
+      "callee": "GPT2Knowledge",
+      "file": "e000017_paraphrase_gap.py",
+      "invariant_in": [
+        "AdapterConfig"
+      ],
+      "line": 404,
+      "loop_line": 403
+    },
+    {
+      "assigned_to": [
+        "gk"
+      ],
+      "callee": "GPT2Knowledge",
+      "file": "e000017_paraphrase_gap.py",
+      "invariant_in": [
+        "AdapterConfig"
+      ],
+      "line": 369,
+      "loop_line": 368
+    },
+    {
+      "assigned_to": [
+        "gk"
+      ],
+      "callee": "GPT2Knowledge",
+      "file": "e000018_no_key_no_injection.py",
+      "invariant_in": [
+        "AdapterConfig",
+        "match_gate"
+      ],
+      "line": 195,
+      "loop_line": 194
+    },
+    {
+      "assigned_to": [
+        "gk"
+      ],
+      "callee": "GPT2Knowledge",
+      "file": "e000020_symlink_gpt2.py",
+      "invariant_in": [
+        "cfg"
+      ],
+      "line": 324,
+      "loop_line": 323
+    },
+    {
+      "assigned_to": [
+        "gk"
+      ],
+      "callee": "GPT2Knowledge",
+      "file": "e000022_two_channel_null.py",
+      "invariant_in": [
+        "cfg"
+      ],
+      "line": 87,
+      "loop_line": 86
+    },
+    {
+      "assigned_to": [
+        "gk"
+      ],
+      "callee": "GPT2Knowledge",
+      "file": "e000023_alias_curriculum.py",
+      "invariant_in": [
+        "cfg"
+      ],
+      "line": 162,
+      "loop_line": 161
+    },
+    {
+      "assigned_to": [
+        "after"
+      ],
+      "callee": "lora_state",
+      "file": "e000024_weights_vs_cells.py",
+      "invariant_in": [
+        "gk"
+      ],
+      "line": 649,
+      "loop_line": 638
+    },
+    {
+      "assigned_to": [
+        "cfg"
+      ],
+      "callee": "AdapterConfig",
+      "file": "e000027_untied_model.py",
+      "invariant_in": [
+        "READ_LAYERS",
+        "args"
+      ],
+      "line": 104,
+      "loop_line": 103
+    },
+    {
+      "assigned_to": [
+        "loss"
+      ],
+      "callee": "binary_cross_entropy_with_logits",
+      "file": "e000034_pointer_separability.py",
+      "invariant_in": [
+        "b",
+        "tr",
+        "w",
+        "xb",
+        "yb"
+      ],
+      "line": 91,
+      "loop_line": 89
+    },
+    {
+      "assigned_to": [
+        "text"
+      ],
+      "callee": "format",
+      "file": "e000039_address_tying.py",
+      "invariant_in": [
+        "name"
+      ],
+      "line": 101,
+      "loop_line": 100
+    },
+    {
+      "assigned_to": [
+        "gk"
+      ],
+      "callee": "GPT2Knowledge",
+      "file": "e000039_address_tying.py",
+      "invariant_in": [
+        "AdapterConfig"
+      ],
+      "line": 432,
+      "loop_line": 431
+    },
+    {
+      "assigned_to": [
+        "gk"
+      ],
+      "callee": "GPT2Knowledge",
+      "file": "e000039_address_tying.py",
+      "invariant_in": [
+        "AdapterConfig"
+      ],
+      "line": 402,
+      "loop_line": 401
+    },
+    {
+      "assigned_to": [
+        "got"
+      ],
+      "callee": "restricted",
+      "file": "e000040_dangling_readers.py",
+      "invariant_in": [
+        "caps",
+        "prompts"
+      ],
+      "line": 316,
+      "loop_line": 314
+    },
+    {
+      "assigned_to": [
+        "w"
+      ],
+      "callee": "zeros",
+      "file": "e000042_certified_closure.py",
+      "invariant_in": [
+        "n_class",
+        "x"
+      ],
+      "line": 166,
+      "loop_line": 164
+    },
+    {
+      "assigned_to": [
+        "b"
+      ],
+      "callee": "zeros",
+      "file": "e000042_certified_closure.py",
+      "invariant_in": [
+        "n_class"
+      ],
+      "line": 167,
+      "loop_line": 164
+    },
+    {
+      "assigned_to": [
+        "got"
+      ],
+      "callee": "restricted",
+      "file": "e000042_certified_closure.py",
+      "invariant_in": [
+        "bys_prompts",
+        "caps",
+        "list",
+        "prompts"
+      ],
+      "line": 253,
+      "loop_line": 251
+    },
+    {
+      "assigned_to": [
+        "order"
+      ],
+      "callee": "permutation",
+      "file": "e000043_allocation.py",
+      "invariant_in": [
+        "held",
+        "len"
+      ],
+      "line": 209,
+      "loop_line": 205
+    },
+    {
+      "assigned_to": [
+        "got"
+      ],
+      "callee": "restricted",
+      "file": "e000043_allocation.py",
+      "invariant_in": [
+        "caps",
+        "prompts"
+      ],
+      "line": 164,
+      "loop_line": 159
+    },
+    {
+      "assigned_to": [
+        "order"
+      ],
+      "callee": "permutation",
+      "file": "e000043_allocation.py",
+      "invariant_in": [
+        "held",
+        "len"
+      ],
+      "line": 209,
+      "loop_line": 208
+    },
+    {
+      "assigned_to": [
+        "V"
+      ],
+      "callee": "stack",
+      "file": "e000045_fanout.py",
+      "invariant_in": [
+        "a",
+        "carrier"
+      ],
+      "line": 221,
+      "loop_line": 216
+    },
+    {
+      "assigned_to": [
+        "V"
+      ],
+      "callee": "stack",
+      "file": "e000045_fanout.py",
+      "invariant_in": [
+        "a",
+        "b",
+        "carrier"
+      ],
+      "line": 219,
+      "loop_line": 217
+    },
+    {
+      "assigned_to": [
+        "V"
+      ],
+      "callee": "stack",
+      "file": "e000045_fanout.py",
+      "invariant_in": [
+        "a",
+        "carrier"
+      ],
+      "line": 221,
+      "loop_line": 217
+    },
+    {
+      "assigned_to": [
+        "meas"
+      ],
+      "callee": "measure",
+      "file": "e000049_template_nullspace_addressing.py",
+      "invariant_in": [
+        "N_T",
+        "batch",
+        "cstar",
+        "gk",
+        "range",
+        "targets",
+        "tensors"
+      ],
+      "line": 578,
+      "loop_line": 575
+    },
+    {
+      "assigned_to": [
+        "pref"
+      ],
+      "callee": "measure",
+      "file": "e000049_template_nullspace_addressing.py",
+      "invariant_in": [
+        "HELD_INITIAL",
+        "PREFIX",
+        "batch",
+        "cstar",
+        "gk",
+        "targets",
+        "tensors"
+      ],
+      "line": 579,
+      "loop_line": 575
+    },
+    {
+      "assigned_to": [
+        "m"
+      ],
+      "callee": "e13_override_revert",
+      "file": "e000050_bos_artefact.py",
+      "invariant_in": [
+        "centre",
+        "gk",
+        "seed"
+      ],
+      "line": 463,
+      "loop_line": 460
+    },
+    {
+      "assigned_to": [
+        "gk"
+      ],
+      "callee": "GPT2Knowledge",
+      "file": "e000054_two_token_subjects.py",
+      "invariant_in": [
+        "AdapterConfig"
+      ],
+      "line": 171,
+      "loop_line": 170
+    },
+    {
+      "assigned_to": [
+        "a"
+      ],
+      "callee": "astype",
+      "file": "e000056_epoch_capacity.py",
+      "invariant_in": [
+        "float"
+      ],
+      "line": 179,
+      "loop_line": 170
+    },
+    {
+      "assigned_to": [
+        "mask"
+      ],
+      "callee": "ones",
+      "file": "e000057_dependency_closure.py",
+      "invariant_in": [
+        "bank",
+        "bool"
+      ],
+      "line": 183,
+      "loop_line": 162
+    },
+    {
+      "assigned_to": [
+        "mask"
+      ],
+      "callee": "ones",
+      "file": "e000057_dependency_closure.py",
+      "invariant_in": [
+        "bank",
+        "bool"
+      ],
+      "line": 183,
+      "loop_line": 182
+    },
+    {
+      "assigned_to": [
+        "m"
+      ],
+      "callee": "evaluate",
+      "file": "e000057_three_state_router.py",
+      "invariant_in": [
+        "centre",
+        "gk",
+        "seed"
+      ],
+      "line": 132,
+      "loop_line": 129
+    },
+    {
+      "assigned_to": [
+        "m"
+      ],
+      "callee": "evaluate",
+      "file": "e000057_three_state_router.py",
+      "invariant_in": [
+        "centre",
+        "gk",
+        "seed"
+      ],
+      "line": 132,
+      "loop_line": 130
+    },
+    {
+      "assigned_to": [
+        "m"
+      ],
+      "callee": "evaluate_templates",
+      "file": "e000058_single_read_three_state.py",
+      "invariant_in": [
+        "E18",
+        "centre",
+        "gk",
+        "layer",
+        "seed"
+      ],
+      "line": 47,
+      "loop_line": 44
+    },
+    {
+      "assigned_to": [
+        "m"
+      ],
+      "callee": "evaluate_templates",
+      "file": "e000058_single_read_three_state.py",
+      "invariant_in": [
+        "E18",
+        "centre",
+        "gk",
+        "layer",
+        "seed"
+      ],
+      "line": 47,
+      "loop_line": 45
+    },
+    {
+      "assigned_to": [
+        "perm"
+      ],
+      "callee": "permutation",
+      "file": "e000062_jspace_address_abi.py",
+      "invariant_in": [
+        "len",
+        "subjects"
+      ],
+      "line": 230,
+      "loop_line": 228
+    },
+    {
+      "assigned_to": [
+        "gt"
+      ],
+      "callee": "fn",
+      "file": "e000062_jspace_address_abi.py",
+      "invariant_in": [
+        "gen_test_h"
+      ],
+      "line": 245,
+      "loop_line": 228
+    },
+    {
+      "assigned_to": [
+        "gt"
+      ],
+      "callee": "fn",
+      "file": "e000062_jspace_address_abi.py",
+      "invariant_in": [
+        "gen_test_h"
+      ],
+      "line": 245,
+      "loop_line": 238
+    },
+    {
+      "assigned_to": [
+        "b"
+      ],
+      "callee": "zeros",
+      "file": "e000063_workspace_pod_certificate.py",
+      "invariant_in": [
+        "n_class"
+      ],
+      "line": 119,
+      "loop_line": 114
+    },
+    {
+      "assigned_to": [
+        "h"
+      ],
+      "callee": "_hidden",
+      "file": "e000079_generation_kv_lineage_race.py",
+      "invariant_in": [
+        "output"
+      ],
+      "line": 125,
+      "loop_line": 120
+    },
+    {
+      "assigned_to": [
+        "h"
+      ],
+      "callee": "_hidden",
+      "file": "e000080_object_scoped_kv_lineage.py",
+      "invariant_in": [
+        "output"
+      ],
+      "line": 78,
+      "loop_line": 76
+    },
+    {
+      "assigned_to": [
+        "lhs"
+      ],
+      "callee": "_equivariant_deep",
+      "file": "e000084_revocation_equivariance_screen.py",
+      "invariant_in": [
+        "_rotate",
+        "alpha",
+        "bias",
+        "total_theta",
+        "z0"
+      ],
+      "line": 113,
+      "loop_line": 109
+    },
+    {
+      "assigned_to": [
+        "rhs"
+      ],
+      "callee": "_rotate",
+      "file": "e000084_revocation_equivariance_screen.py",
+      "invariant_in": [
+        "_equivariant_deep",
+        "alpha",
+        "bias",
+        "total_theta",
+        "z0"
+      ],
+      "line": 114,
+      "loop_line": 109
+    },
+    {
+      "assigned_to": [
+        "tmp"
+      ],
+      "callee": "_rotate",
+      "file": "e000084_revocation_equivariance_screen.py",
+      "invariant_in": [
+        "p",
+        "pod_theta",
+        "z_all_out"
+      ],
+      "line": 153,
+      "loop_line": 152
+    },
+    {
+      "assigned_to": [
+        "tmp2"
+      ],
+      "callee": "_equivariant_deep",
+      "file": "e000084_revocation_equivariance_screen.py",
+      "invariant_in": [
+        "_rotate",
+        "alpha",
+        "bias",
+        "p",
+        "pod_theta",
+        "total_theta",
+        "z0"
+      ],
+      "line": 159,
+      "loop_line": 158
+    },
+    {
+      "assigned_to": [
+        "unrelated_current"
+      ],
+      "callee": "reusable",
+      "file": "e000089_cross_model_generation_attestation.py",
+      "invariant_in": [
+        "auth"
+      ],
+      "line": 123,
+      "loop_line": 121
+    },
+    {
+      "assigned_to": [
+        "h"
+      ],
+      "callee": "_hidden",
+      "file": "e000089_cross_model_generation_attestation.py",
+      "invariant_in": [
+        "output"
+      ],
+      "line": 74,
+      "loop_line": 72
+    },
+    {
+      "assigned_to": [
+        "h"
+      ],
+      "callee": "_hidden",
+      "file": "e000090_inband_generation_signature.py",
+      "invariant_in": [
+        "output"
+      ],
+      "line": 87,
+      "loop_line": 85
+    },
+    {
+      "assigned_to": [
+        "sig"
+      ],
+      "callee": "_signature",
+      "file": "e000090_inband_generation_signature.py",
+      "invariant_in": [
+        "basis",
+        "g",
+        "sig_rms"
+      ],
+      "line": 166,
+      "loop_line": 165
+    },
+    {
+      "assigned_to": [
+        "sig"
+      ],
+      "callee": "_signature",
+      "file": "e000090_inband_generation_signature.py",
+      "invariant_in": [
+        "basis",
+        "g",
+        "sig_rms"
+      ],
+      "line": 173,
+      "loop_line": 172
+    },
+    {
+      "assigned_to": [
+        "t"
+      ],
+      "callee": "_tensor_output",
+      "file": "e000099_dense_influence_sparse_repair.py",
+      "invariant_in": [
+        "output"
+      ],
+      "line": 89,
+      "loop_line": 84
+    },
+    {
+      "assigned_to": [
+        "h"
+      ],
+      "callee": "_hidden",
+      "file": "e000099_dense_influence_sparse_repair.py",
+      "invariant_in": [
+        "output"
+      ],
+      "line": 95,
+      "loop_line": 84
+    },
+    {
+      "assigned_to": [
+        "t"
+      ],
+      "callee": "_tensor_output",
+      "file": "e000100_oracle_sparse_flop_ceiling.py",
+      "invariant_in": [
+        "output"
+      ],
+      "line": 86,
+      "loop_line": 80
+    },
+    {
+      "assigned_to": [
+        "t"
+      ],
+      "callee": "_tensor_output",
+      "file": "e000100_oracle_sparse_flop_ceiling.py",
+      "invariant_in": [
+        "output"
+      ],
+      "line": 86,
+      "loop_line": 81
+    },
+    {
+      "assigned_to": [
+        "generic"
+      ],
+      "callee": "GenericDependencyProduct",
+      "file": "e000102_symbolic_pod_algebra_reduction.py",
+      "invariant_in": [
+        "factors"
+      ],
+      "line": 296,
+      "loop_line": 289
+    },
+    {
+      "assigned_to": [
+        "old_symbolic"
+      ],
+      "callee": "_eval",
+      "file": "e000102_symbolic_pod_algebra_reduction.py",
+      "invariant_in": [
+        "candidate",
+        "old_values"
+      ],
+      "line": 247,
+      "loop_line": 243
+    },
+    {
+      "assigned_to": [
+        "old_fresh"
+      ],
+      "callee": "fresh_numeric",
+      "file": "e000102_symbolic_pod_algebra_reduction.py",
+      "invariant_in": [
+        "coeffs",
+        "family",
+        "old_values"
+      ],
+      "line": 250,
+      "loop_line": 243
+    },
+    {
+      "assigned_to": [
+        "mid"
+      ],
+      "callee": "candidate_local_update",
+      "file": "e000104_tensor_train_lifecycle_quotient_reduction.py",
+      "invariant_in": [
+        "left_env",
+        "right_env",
+        "states",
+        "target"
+      ],
+      "line": 271,
+      "loop_line": 248
+    },
+    {
+      "assigned_to": [
+        "back"
+      ],
+      "callee": "candidate_local_update",
+      "file": "e000104_tensor_train_lifecycle_quotient_reduction.py",
+      "invariant_in": [
+        "left_env",
+        "right_env",
+        "states",
+        "target"
+      ],
+      "line": 272,
+      "loop_line": 248
+    },
+    {
+      "assigned_to": [
+        "update_delta"
+      ],
+      "callee": "vsub",
+      "file": "e000105_stable_gate_cohort_transport_reduction.py",
+      "invariant_in": [
+        "new",
+        "old"
+      ],
+      "line": 168,
+      "loop_line": 159
+    },
+    {
+      "assigned_to": [
+        "update_delta"
+      ],
+      "callee": "vsub",
+      "file": "e000105_stable_gate_cohort_transport_reduction.py",
+      "invariant_in": [
+        "new",
+        "old"
+      ],
+      "line": 168,
+      "loop_line": 160
+    },
+    {
+      "assigned_to": [
+        "update_delta"
+      ],
+      "callee": "vsub",
+      "file": "e000105_stable_gate_cohort_transport_reduction.py",
+      "invariant_in": [
+        "new",
+        "old"
+      ],
+      "line": 168,
+      "loop_line": 161
+    },
+    {
+      "assigned_to": [
+        "d1"
+      ],
+      "callee": "projected_vector_state",
+      "file": "e000107_state_only_causal_lineage_identifiability.py",
+      "invariant_in": [
+        "delete_target",
+        "h1",
+        "target",
+        "values"
+      ],
+      "line": 133,
+      "loop_line": 130
+    }
+  ],
+  "class_b_count": 69,
+  "class_b_files": [
+    "e000008_gpt2_adapter.py",
+    "e000011_gpt2_v2.py",
+    "e000012_status_gated_revoke.py",
+    "e000013_prior_conflict.py",
+    "e000017_paraphrase_gap.py",
+    "e000018_no_key_no_injection.py",
+    "e000020_symlink_gpt2.py",
+    "e000022_two_channel_null.py",
+    "e000023_alias_curriculum.py",
+    "e000024_weights_vs_cells.py",
+    "e000027_untied_model.py",
+    "e000034_pointer_separability.py",
+    "e000039_address_tying.py",
+    "e000040_dangling_readers.py",
+    "e000042_certified_closure.py",
+    "e000043_allocation.py",
+    "e000045_fanout.py",
+    "e000049_template_nullspace_addressing.py",
+    "e000050_bos_artefact.py",
+    "e000054_two_token_subjects.py",
+    "e000056_epoch_capacity.py",
+    "e000057_dependency_closure.py",
+    "e000057_three_state_router.py",
+    "e000058_single_read_three_state.py",
+    "e000062_jspace_address_abi.py",
+    "e000063_workspace_pod_certificate.py",
+    "e000079_generation_kv_lineage_race.py",
+    "e000080_object_scoped_kv_lineage.py",
+    "e000084_revocation_equivariance_screen.py",
+    "e000089_cross_model_generation_attestation.py",
+    "e000090_inband_generation_signature.py",
+    "e000099_dense_influence_sparse_repair.py",
+    "e000100_oracle_sparse_flop_ceiling.py",
+    "e000102_symbolic_pod_algebra_reduction.py",
+    "e000104_tensor_train_lifecycle_quotient_reduction.py",
+    "e000105_stable_gate_cohort_transport_reduction.py",
+    "e000107_state_only_causal_lineage_identifiability.py"
+  ],
+  "decision": "SCANNER_VALID",
+  "experiment": "NOV-004",
+  "files_scanned": 124,
+  "how_to_read_this": "Class A is decidable from the syntax: two names in one scope bound to identical call expressions, so any predicate comparing them cannot fail. Each is a finding. Class B is a heuristic and each entry is a candidate for review, never a verdict \u2014 a call can be loop-invariant and still necessary, and an invariant call in the *candidate* arm is not a defect at all. It becomes one only when it sits on the baseline, where it inflates the candidate's margin for free, which is what NOV-003 found in E-000103. Reading Class B as a list of defects would be \u00a731.46's error repeated: scoring something the instrument cannot resolve.",
+  "known_sites_found": [
+    "e000104_tensor_train_lifecycle_quotient_reduction.py:local_update_multiplies",
+    "e000105_stable_gate_cohort_transport_reduction.py:mutation_multiplies"
+  ],
+  "known_sites_required": [
+    "e000104_tensor_train_lifecycle_quotient_reduction.py:local_update_multiplies",
+    "e000105_stable_gate_cohort_transport_reduction.py:mutation_multiplies"
+  ],
+  "not_claimed": "Two patterns, chosen because each was demonstrated by hand first. This is not a general audit of these experiments and finds nothing about arms that are simply mismatched, domains that hide a crossover (\u00a731.46), or cost coordinates nobody counted. A file absent from both lists has not been cleared; it has been checked for two things.",
+  "scope": "numbered E-series experiment modules matching eNNNNNN[a]_<name>.py, scanned for the two defect classes already demonstrated",
+  "validity_floor_met": true
+}

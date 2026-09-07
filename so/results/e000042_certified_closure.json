@@ -1,0 +1,162 @@
+{
+  "aggregate": {
+    "control_bound_can_exceed_one": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 1
+    },
+    "held/answer_before": {
+      "max": 0.9338235294117647,
+      "mean": 0.9338235294117647,
+      "min": 0.9338235294117647,
+      "n": 1
+    },
+    "n_attempted": {
+      "max": 3.0,
+      "mean": 3.0,
+      "min": 3.0,
+      "n": 1
+    },
+    "n_held": {
+      "max": 17.0,
+      "mean": 17.0,
+      "min": 17.0,
+      "n": 1
+    },
+    "n_measured": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 1
+    },
+    "silenceable_rate": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 1
+    }
+  },
+  "criteria": {
+    "claim_supported": true,
+    "criteria": {
+      "control_bound_can_exceed_one": {
+        "observed": 1.0,
+        "op": ">=",
+        "pass": true,
+        "threshold": 1.0
+      },
+      "held/answer_before": {
+        "observed": 0.9338235294117647,
+        "op": ">=",
+        "pass": true,
+        "threshold": 0.75
+      }
+    }
+  },
+  "decision_rule": "The bound is reported as CERTIFIED only where every support in the disjoint family passed an exhaustive, non-vacuous must-hit test. Where the pool cannot silence a fact there is no closure to bound, and that is reported as the finding rather than as a void experiment.",
+  "environment": {
+    "device": "cpu",
+    "numpy": "2.4.6",
+    "platform": "Linux-6.18.44-fc-v24-x86_64-with-glibc2.39",
+    "python": "3.11.15",
+    "threads": "2",
+    "torch": "2.14.0+cpu"
+  },
+  "evidence_level": "E5",
+  "evidence_level_meaning": "Transformer evidence",
+  "experiment": "E-000042",
+  "finding": "the paper-faithful J-lens ablation, with the paper's own guard against touching tokens in the clean output, does not silence these facts at this pool size -- so there is no closure to bound, and that is the result",
+  "layer": 7,
+  "model": "gpt2",
+  "pool_size": 10,
+  "recorded_at": "2026-09-04T21:32:40+00:00",
+  "result": {
+    "control_bound_can_exceed_one": 1.0,
+    "finding": "the paper-faithful J-lens ablation, with the paper's own guard against touching tokens in the clean output, does not silence these facts at this pool size -- so there is no closure to bound, and that is the result",
+    "held/answer_before": 0.9338235294117647,
+    "layer": 7,
+    "n_attempted": 3,
+    "n_held": 17,
+    "n_measured": 0,
+    "per_fact": [
+      {
+        "answer_before": 0.875,
+        "excluded": "no subset of the J-lens pool silences every phrasing",
+        "guard_tokens": 35,
+        "n_answering": 7,
+        "pool": [
+          11,
+          13,
+          355,
+          290,
+          326,
+          286,
+          284,
+          379,
+          428,
+          645
+        ],
+        "silenceable": 0.0,
+        "subject": "France"
+      },
+      {
+        "answer_before": 1.0,
+        "excluded": "no subset of the J-lens pool silences every phrasing",
+        "guard_tokens": 34,
+        "n_answering": 8,
+        "pool": [
+          11,
+          355,
+          13,
+          290,
+          326,
+          379,
+          286,
+          284,
+          523,
+          477
+        ],
+        "silenceable": 0.0,
+        "subject": "Japan"
+      },
+      {
+        "answer_before": 1.0,
+        "excluded": "no subset of the J-lens pool silences every phrasing",
+        "guard_tokens": 33,
+        "n_answering": 8,
+        "pool": [
+          11,
+          366,
+          13,
+          355,
+          326,
+          290,
+          286,
+          379,
+          284,
+          523
+        ],
+        "silenceable": 0.0,
+        "subject": "Italy"
+      }
+    ],
+    "pool_size": 10,
+    "positive_control": {
+      "bound": 3,
+      "certified": 1.0,
+      "expected": 3,
+      "ok": 1.0
+    },
+    "seconds": 3658.619158744812,
+    "silenceable_rate": 0.0
+  },
+  "seeds": [
+    0,
+    1,
+    2
+  ],
+  "seeds_vary": "the random-support controls only; the ablation table is exhaustive and the model is frozen, so the optimum, the supports and the bound are deterministic",
+  "title": "a certified lower bound for deletion in a representation, from the J-lens support",
+  "trains_nothing": true
+}

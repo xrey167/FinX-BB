@@ -1,0 +1,128 @@
+name: PR integrity
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: pr-integrity-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  python-offline:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.11", "3.12"]
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      - uses: actions/setup-python@42375524e23c412d93fb67b49958b491fce71c38 # v5.4.0
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: pip
+          cache-dependency-path: so/requirements.txt
+      - name: Install declared Python environment
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install torch --index-url https://download.pytorch.org/whl/cpu
+          python -m pip install -r so/requirements.txt
+          python -m pip check
+      - name: Offline tests
+        run: make test PY=python
+      - name: Research integrity checks
+        run: |
+          make papernums novelty auditinstr PY=python
+          git diff --exit-code
+      - name: Parse source and records
+        run: |
+          python - <<'PY'
+          import ast
+          import json
+          from pathlib import Path
+
+          excluded = {".git", ".venv", "node_modules", "dist"}
+          for path in Path(".").rglob("*.py"):
+              if excluded.intersection(path.parts):
+                  continue
+              ast.parse(path.read_text(encoding="utf-8"), filename=str(path))
+          for path in Path(".").rglob("*.json"):
+              if excluded.intersection(path.parts):
+                  continue
+              json.loads(path.read_text(encoding="utf-8"))
+          PY
+          bash -n setup.sh run.sh run-moda.sh
+          ./run-moda.sh --help >/dev/null
+
+  node-apps:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        app: [apps/moda-web, apps/moda-api]
+    defaults:
+      run:
+        working-directory: ${{ matrix.app }}
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      - uses: actions/setup-node@1e60f620b9541d16bece96c5465dc8ee9832be0b # v4.0.3
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: ${{ matrix.app }}/package-lock.json
+      - run: npm ci
+      - run: npm test
+      - run: npm run build
+      - run: npm audit --audit-level=high
+
+  postgres-migration:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    services:
+      postgres:
+        image: pgvector/pgvector:0.8.6-pg16-bookworm@sha256:ccc6e83d6e35e931dc7c5def2022729d5a6c370318d099181995567ff1fb4d6b
+        env:
+          POSTGRES_DB: finx
+          POSTGRES_USER: finx
+          POSTGRES_PASSWORD: finx-ci
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U finx -d finx"
+          --health-interval 2s
+          --health-timeout 5s
+          --health-retries 20
+    env:
+      PGHOST: localhost
+      PGPORT: 5432
+      PGDATABASE: finx
+      PGUSER: finx
+      PGPASSWORD: finx-ci
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      - name: Apply PostgreSQL 16 migration
+        run: psql -v ON_ERROR_STOP=1 -f db/migrations/0001_moda.sql
+      - name: Commit lifecycle state before restart
+        run: psql -v ON_ERROR_STOP=1 -f db/tests/lifecycle_smoke.sql
+      - name: Restart PostgreSQL service container
+        env:
+          POSTGRES_CONTAINER_ID: ${{ job.services.postgres.id }}
+        run: |
+          test -n "$POSTGRES_CONTAINER_ID"
+          docker restart "$POSTGRES_CONTAINER_ID"
+          for attempt in {1..30}; do
+            if pg_isready -h "$PGHOST" -p "$PGPORT" -U "$PGUSER" -d "$PGDATABASE"; then
+              exit 0
+            fi
+            sleep 1
+          done
+          echo "PostgreSQL did not become ready after restart" >&2
+          exit 1
+      - name: Replay and suppress delayed delivery after restart
+        run: psql -v ON_ERROR_STOP=1 -f db/tests/lifecycle_replay.sql

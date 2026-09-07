@@ -1,0 +1,39 @@
+name: E000084 revocation equivariance
+
+on:
+  push:
+    branches:
+      - research/e000084-revocation-equivariance
+    paths:
+      - 'so/experiments/e000084_revocation_equivariance_screen.py'
+      - '.github/workflows/e000084-revocation-equivariance.yml'
+      - 'docs/novelty/e000084-revocation-equivariance.md'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  structural-screen:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install numerical dependency
+        run: python -m pip install 'numpy>=1.26,<3'
+      - name: Run five-seed revocation-equivariance falsification screen
+        run: |
+          mkdir -p ci-e84
+          python -m so.experiments.e000084_revocation_equivariance_screen \
+            --seeds 0 1 2 3 4 \
+            --channels 64 --depth 24 --pods 32 --delete-trials 16 \
+            --results-dir ci-e84
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: e000084-revocation-equivariance
+          path: ci-e84/
+          if-no-files-found: warn

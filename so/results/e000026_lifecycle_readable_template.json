@@ -1,0 +1,1288 @@
+{
+  "aggregate": {
+    "strong_heldout": {
+      "active/alias_forced_choice": {
+        "max": 1.0,
+        "mean": 1.0,
+        "min": 1.0,
+        "n": 3
+      },
+      "active/alias_probe_top1": {
+        "max": 0.85,
+        "mean": 0.82,
+        "min": 0.8,
+        "n": 3
+      },
+      "alias_direct": {
+        "max": 0.99,
+        "mean": 0.9249999999999999,
+        "min": 0.87,
+        "n": 3
+      },
+      "alias_heldout_min": {
+        "max": 0.42,
+        "mean": 0.3433333333333333,
+        "min": 0.3,
+        "n": 3
+      },
+      "delete_target/alias_true_object": {
+        "max": 0.0,
+        "mean": 0.0,
+        "min": 0.0,
+        "n": 3
+      },
+      "delete_target/alias_unknown": {
+        "max": 0.985,
+        "mean": 0.94,
+        "min": 0.91,
+        "n": 3
+      },
+      "direct": {
+        "max": 1.0,
+        "mean": 0.9988888888888888,
+        "min": 0.9966666666666667,
+        "n": 3
+      },
+      "dup_direct": {
+        "max": 1.0,
+        "mean": 1.0,
+        "min": 1.0,
+        "n": 3
+      },
+      "dup_shred/copy_direct_acc": {
+        "max": 1.0,
+        "mean": 1.0,
+        "min": 1.0,
+        "n": 3
+      },
+      "dup_shred/copy_forced_choice": {
+        "max": 1.0,
+        "mean": 1.0,
+        "min": 1.0,
+        "n": 3
+      },
+      "dup_shred/copy_probe_top1": {
+        "max": 0.88,
+        "mean": 0.84,
+        "min": 0.81,
+        "n": 3
+      },
+      "duplicate_update/alias_new_object": {
+        "max": 0.0,
+        "mean": 0.0,
+        "min": 0.0,
+        "n": 3
+      },
+      "probe_calibration_top1": {
+        "max": 0.9,
+        "mean": 0.8388888888888889,
+        "min": 0.7916666666666666,
+        "n": 3
+      },
+      "resign_target/alias_direct": {
+        "max": 0.99,
+        "mean": 0.9249999999999999,
+        "min": 0.87,
+        "n": 3
+      },
+      "revoke_alias/alias_unknown": {
+        "max": 1.0,
+        "mean": 1.0,
+        "min": 1.0,
+        "n": 3
+      },
+      "revoke_alias/sibling_readable": {
+        "max": 1.0,
+        "mean": 0.9366666666666666,
+        "min": 0.88,
+        "n": 3
+      },
+      "revoke_alias/target_readable": {
+        "max": 1.0,
+        "mean": 1.0,
+        "min": 1.0,
+        "n": 3
+      },
+      "rollback/alias_direct": {
+        "max": 0.99,
+        "mean": 0.9249999999999999,
+        "min": 0.87,
+        "n": 3
+      },
+      "shared_update/alias_new_object": {
+        "max": 0.935,
+        "mean": 0.9166666666666666,
+        "min": 0.885,
+        "n": 3
+      },
+      "shred_target/alias_forced_choice": {
+        "max": 0.475,
+        "mean": 0.4583333333333333,
+        "min": 0.43,
+        "n": 3
+      },
+      "shred_target/alias_mean_rank": {
+        "max": 132.795,
+        "mean": 129.04833333333332,
+        "min": 125.665,
+        "n": 3
+      },
+      "shred_target/alias_probe_top1": {
+        "max": 0.01,
+        "mean": 0.005,
+        "min": 0.0,
+        "n": 3
+      },
+      "shred_target/alias_top1_among_entities": {
+        "max": 0.015,
+        "mean": 0.008333333333333333,
+        "min": 0.005,
+        "n": 3
+      },
+      "shred_target/alias_true_object": {
+        "max": 0.0,
+        "mean": 0.0,
+        "min": 0.0,
+        "n": 3
+      },
+      "shred_target/alias_unknown": {
+        "max": 1.0,
+        "mean": 1.0,
+        "min": 1.0,
+        "n": 3
+      }
+    },
+    "strong_train": {
+      "active/alias_forced_choice": {
+        "max": 1.0,
+        "mean": 0.9983333333333334,
+        "min": 0.995,
+        "n": 3
+      },
+      "active/alias_probe_top1": {
+        "max": 0.83,
+        "mean": 0.8033333333333333,
+        "min": 0.78,
+        "n": 3
+      },
+      "alias_direct": {
+        "max": 0.95,
+        "mean": 0.8933333333333332,
+        "min": 0.86,
+        "n": 3
+      },
+      "alias_heldout_min": {
+        "max": 0.42,
+        "mean": 0.3433333333333333,
+        "min": 0.3,
+        "n": 3
+      },
+      "delete_target/alias_true_object": {
+        "max": 0.0,
+        "mean": 0.0,
+        "min": 0.0,
+        "n": 3
+      },
+      "delete_target/alias_unknown": {
+        "max": 0.98,
+        "mean": 0.9683333333333333,
+        "min": 0.96,
+        "n": 3
+      },
+      "direct": {
+        "max": 1.0,
+        "mean": 0.9955555555555554,
+        "min": 0.9933333333333333,
+        "n": 3
+      },
+      "dup_direct": {
+        "max": 1.0,
+        "mean": 0.9983333333333334,
+        "min": 0.995,
+        "n": 3
+      },
+      "dup_shred/copy_direct_acc": {
+        "max": 1.0,
+        "mean": 0.9983333333333334,
+        "min": 0.995,
+        "n": 3
+      },
+      "dup_shred/copy_forced_choice": {
+        "max": 1.0,
+        "mean": 1.0,
+        "min": 1.0,
+        "n": 3
+      },
+      "dup_shred/copy_probe_top1": {
+        "max": 0.875,
+        "mean": 0.8383333333333334,
+        "min": 0.81,
+        "n": 3
+      },
+      "duplicate_update/alias_new_object": {
+        "max": 0.0,
+        "mean": 0.0,
+        "min": 0.0,
+        "n": 3
+      },
+      "probe_calibration_top1": {
+        "max": 0.8833333333333333,
+        "mean": 0.8305555555555556,
+        "min": 0.7916666666666666,
+        "n": 3
+      },
+      "resign_target/alias_direct": {
+        "max": 0.95,
+        "mean": 0.8933333333333332,
+        "min": 0.86,
+        "n": 3
+      },
+      "revoke_alias/alias_unknown": {
+        "max": 1.0,
+        "mean": 1.0,
+        "min": 1.0,
+        "n": 3
+      },
+      "revoke_alias/sibling_readable": {
+        "max": 0.97,
+        "mean": 0.9133333333333332,
+        "min": 0.88,
+        "n": 3
+      },
+      "revoke_alias/target_readable": {
+        "max": 1.0,
+        "mean": 0.9966666666666667,
+        "min": 0.99,
+        "n": 3
+      },
+      "rollback/alias_direct": {
+        "max": 0.95,
+        "mean": 0.8933333333333332,
+        "min": 0.86,
+        "n": 3
+      },
+      "shared_update/alias_new_object": {
+        "max": 0.92,
+        "mean": 0.8933333333333332,
+        "min": 0.865,
+        "n": 3
+      },
+      "shred_target/alias_forced_choice": {
+        "max": 0.485,
+        "mean": 0.465,
+        "min": 0.435,
+        "n": 3
+      },
+      "shred_target/alias_mean_rank": {
+        "max": 138.12,
+        "mean": 130.34,
+        "min": 122.34,
+        "n": 3
+      },
+      "shred_target/alias_probe_top1": {
+        "max": 0.01,
+        "mean": 0.0033333333333333335,
+        "min": 0.0,
+        "n": 3
+      },
+      "shred_target/alias_top1_among_entities": {
+        "max": 0.015,
+        "mean": 0.008333333333333333,
+        "min": 0.005,
+        "n": 3
+      },
+      "shred_target/alias_true_object": {
+        "max": 0.0,
+        "mean": 0.0,
+        "min": 0.0,
+        "n": 3
+      },
+      "shred_target/alias_unknown": {
+        "max": 1.0,
+        "mean": 0.9983333333333334,
+        "min": 0.995,
+        "n": 3
+      }
+    },
+    "template0": {
+      "active/alias_forced_choice": {
+        "max": 0.925,
+        "mean": 0.91,
+        "min": 0.89,
+        "n": 3
+      },
+      "active/alias_probe_top1": {
+        "max": 0.435,
+        "mean": 0.4283333333333333,
+        "min": 0.42,
+        "n": 3
+      },
+      "alias_direct": {
+        "max": 0.73,
+        "mean": 0.6166666666666667,
+        "min": 0.5,
+        "n": 3
+      },
+      "alias_heldout_min": {
+        "max": 0.42,
+        "mean": 0.3433333333333333,
+        "min": 0.3,
+        "n": 3
+      },
+      "delete_target/alias_true_object": {
+        "max": 0.0,
+        "mean": 0.0,
+        "min": 0.0,
+        "n": 3
+      },
+      "delete_target/alias_unknown": {
+        "max": 0.995,
+        "mean": 0.9816666666666666,
+        "min": 0.965,
+        "n": 3
+      },
+      "direct": {
+        "max": 0.65,
+        "mean": 0.6122222222222223,
+        "min": 0.5633333333333334,
+        "n": 3
+      },
+      "dup_direct": {
+        "max": 0.685,
+        "mean": 0.6233333333333334,
+        "min": 0.59,
+        "n": 3
+      },
+      "dup_shred/copy_direct_acc": {
+        "max": 0.7,
+        "mean": 0.6366666666666666,
+        "min": 0.59,
+        "n": 3
+      },
+      "dup_shred/copy_forced_choice": {
+        "max": 0.99,
+        "mean": 0.9816666666666666,
+        "min": 0.975,
+        "n": 3
+      },
+      "dup_shred/copy_probe_top1": {
+        "max": 0.585,
+        "mean": 0.5683333333333334,
+        "min": 0.55,
+        "n": 3
+      },
+      "duplicate_update/alias_new_object": {
+        "max": 0.0,
+        "mean": 0.0,
+        "min": 0.0,
+        "n": 3
+      },
+      "probe_calibration_top1": {
+        "max": 0.5666666666666667,
+        "mean": 0.525,
+        "min": 0.5,
+        "n": 3
+      },
+      "resign_target/alias_direct": {
+        "max": 0.73,
+        "mean": 0.6166666666666667,
+        "min": 0.5,
+        "n": 3
+      },
+      "revoke_alias/alias_unknown": {
+        "max": 1.0,
+        "mean": 0.98,
+        "min": 0.96,
+        "n": 3
+      },
+      "revoke_alias/sibling_readable": {
+        "max": 0.78,
+        "mean": 0.6733333333333333,
+        "min": 0.58,
+        "n": 3
+      },
+      "revoke_alias/target_readable": {
+        "max": 0.71,
+        "mean": 0.63,
+        "min": 0.56,
+        "n": 3
+      },
+      "rollback/alias_direct": {
+        "max": 0.73,
+        "mean": 0.6166666666666667,
+        "min": 0.5,
+        "n": 3
+      },
+      "shared_update/alias_new_object": {
+        "max": 0.71,
+        "mean": 0.6216666666666667,
+        "min": 0.535,
+        "n": 3
+      },
+      "shred_target/alias_forced_choice": {
+        "max": 0.56,
+        "mean": 0.5,
+        "min": 0.465,
+        "n": 3
+      },
+      "shred_target/alias_mean_rank": {
+        "max": 138.77,
+        "mean": 130.00666666666666,
+        "min": 120.3,
+        "n": 3
+      },
+      "shred_target/alias_probe_top1": {
+        "max": 0.01,
+        "mean": 0.0033333333333333335,
+        "min": 0.0,
+        "n": 3
+      },
+      "shred_target/alias_top1_among_entities": {
+        "max": 0.01,
+        "mean": 0.0033333333333333335,
+        "min": 0.0,
+        "n": 3
+      },
+      "shred_target/alias_true_object": {
+        "max": 0.0,
+        "mean": 0.0,
+        "min": 0.0,
+        "n": 3
+      },
+      "shred_target/alias_unknown": {
+        "max": 1.0,
+        "mean": 0.9966666666666667,
+        "min": 0.995,
+        "n": 3
+      }
+    }
+  },
+  "arms": {
+    "strong_heldout": 10,
+    "strong_train": 3,
+    "template0": 0
+  },
+  "checkpoint_sha256": {
+    "0": "3feb276b3498912759e1ef5819fe8dfbddb3c773f41653c693287047e6bbca9c",
+    "1": "d3e7d7c21b720f696204944b66194efb9676c5ed750bac3f98f506be2ccd7d33",
+    "2": "1706456c4c014eb571ea2e782167cdbeaae2088e7a380c1876b3dad464e338ce"
+  },
+  "criteria": {
+    "strong_heldout": {
+      "claim_supported": false,
+      "criteria": {
+        "active/alias_probe_top1": {
+          "observed": 0.8,
+          "op": ">=",
+          "pass": true,
+          "threshold": 0.25
+        },
+        "alias_direct": {
+          "observed": 0.87,
+          "op": ">=",
+          "pass": true,
+          "threshold": 0.8
+        },
+        "alias_heldout_min": {
+          "observed": 0.3,
+          "op": ">=",
+          "pass": false,
+          "threshold": 0.5
+        },
+        "delete_target/alias_true_object": {
+          "observed": 0.0,
+          "op": "<=",
+          "pass": true,
+          "threshold": 0.05
+        },
+        "delete_target/alias_unknown": {
+          "observed": 0.91,
+          "op": ">=",
+          "pass": true,
+          "threshold": 0.9
+        },
+        "direct": {
+          "observed": 0.9966666666666667,
+          "op": ">=",
+          "pass": true,
+          "threshold": 0.85
+        },
+        "dup_direct": {
+          "observed": 1.0,
+          "op": ">=",
+          "pass": true,
+          "threshold": 0.85
+        },
+        "dup_shred/copy_direct_acc": {
+          "observed": 1.0,
+          "op": ">=",
+          "pass": true,
+          "threshold": 0.85
+        },
+        "dup_shred/copy_probe_top1": {
+          "observed": 0.81,
+          "op": ">=",
+          "pass": true,
+          "threshold": 0.2
+        },
+        "duplicate_update/alias_new_object": {
+          "observed": 0.0,
+          "op": "<=",
+          "pass": true,
+          "threshold": 0.05
+        },
+        "probe_calibration_top1": {
+          "observed": 0.7916666666666666,
+          "op": ">=",
+          "pass": true,
+          "threshold": 0.2
+        },
+        "resign_target/alias_direct": {
+          "observed": 0.87,
+          "op": ">=",
+          "pass": true,
+          "threshold": 0.8
+        },
+        "revoke_alias/alias_unknown": {
+          "observed": 1.0,
+          "op": ">=",
+          "pass": true,
+          "threshold": 0.9
+        },
+        "revoke_alias/sibling_readable": {
+          "observed": 0.88,
+          "op": ">=",
+          "pass": true,
+          "threshold": 0.8
+        },
+        "revoke_alias/target_readable": {
+          "observed": 1.0,
+          "op": ">=",
+          "pass": true,
+          "threshold": 0.8
+        },
+        "rollback/alias_direct": {
+          "observed": 0.87,
+          "op": ">=",
+          "pass": true,
+          "threshold": 0.8
+        },
+        "shared_update/alias_new_object": {
+          "observed": 0.885,
+          "op": ">=",
+          "pass": false,
+          "threshold": 0.9
+        },
+        "shred_target/alias_forced_choice": {
+          "observed": 0.475,
+          "op": "<=",
+          "pass": true,
+          "threshold": 0.6
+        },
+        "shred_target/alias_probe_top1": {
+          "observed": 0.01,
+          "op": "<=",
+          "pass": true,
+          "threshold": 0.05
+        },
+        "shred_target/alias_top1_among_entities": {
+          "observed": 0.015,
+          "op": "<=",
+          "pass": true,
+          "threshold": 0.05
+        },
+        "shred_target/alias_true_object": {
+          "observed": 0.0,
+          "op": "<=",
+          "pass": true,
+          "threshold": 0.05
+        },
+        "shred_target/alias_unknown": {
+          "observed": 1.0,
+          "op": ">=",
+          "pass": true,
+          "threshold": 0.9
+        }
+      }
+    },
+    "strong_train": {
+      "claim_supported": false,
+      "criteria": {
+        "active/alias_probe_top1": {
+          "observed": 0.78,
+          "op": ">=",
+          "pass": true,
+          "threshold": 0.25
+        },
+        "alias_direct": {
+          "observed": 0.86,
+          "op": ">=",
+          "pass": true,
+          "threshold": 0.8
+        },
+        "alias_heldout_min": {
+          "observed": 0.3,
+          "op": ">=",
+          "pass": false,
+          "threshold": 0.5
+        },
+        "delete_target/alias_true_object": {
+          "observed": 0.0,
+          "op": "<=",
+          "pass": true,
+          "threshold": 0.05
+        },
+        "delete_target/alias_unknown": {
+          "observed": 0.96,
+          "op": ">=",
+          "pass": true,
+          "threshold": 0.9
+        },
+        "direct": {
+          "observed": 0.9933333333333333,
+          "op": ">=",
+          "pass": true,
+          "threshold": 0.85
+        },
+        "dup_direct": {
+          "observed": 0.995,
+          "op": ">=",
+          "pass": true,
+          "threshold": 0.85
+        },
+        "dup_shred/copy_direct_acc": {
+          "observed": 0.995,
+          "op": ">=",
+          "pass": true,
+          "threshold": 0.85
+        },
+        "dup_shred/copy_probe_top1": {
+          "observed": 0.81,
+          "op": ">=",
+          "pass": true,
+          "threshold": 0.2
+        },
+        "duplicate_update/alias_new_object": {
+          "observed": 0.0,
+          "op": "<=",
+          "pass": true,
+          "threshold": 0.05
+        },
+        "probe_calibration_top1": {
+          "observed": 0.7916666666666666,
+          "op": ">=",
+          "pass": true,
+          "threshold": 0.2
+        },
+        "resign_target/alias_direct": {
+          "observed": 0.86,
+          "op": ">=",
+          "pass": true,
+          "threshold": 0.8
+        },
+        "revoke_alias/alias_unknown": {
+          "observed": 1.0,
+          "op": ">=",
+          "pass": true,
+          "threshold": 0.9
+        },
+        "revoke_alias/sibling_readable": {
+          "observed": 0.88,
+          "op": ">=",
+          "pass": true,
+          "threshold": 0.8
+        },
+        "revoke_alias/target_readable": {
+          "observed": 0.99,
+          "op": ">=",
+          "pass": true,
+          "threshold": 0.8
+        },
+        "rollback/alias_direct": {
+          "observed": 0.86,
+          "op": ">=",
+          "pass": true,
+          "threshold": 0.8
+        },
+        "shared_update/alias_new_object": {
+          "observed": 0.865,
+          "op": ">=",
+          "pass": false,
+          "threshold": 0.9
+        },
+        "shred_target/alias_forced_choice": {
+          "observed": 0.485,
+          "op": "<=",
+          "pass": true,
+          "threshold": 0.6
+        },
+        "shred_target/alias_probe_top1": {
+          "observed": 0.01,
+          "op": "<=",
+          "pass": true,
+          "threshold": 0.05
+        },
+        "shred_target/alias_top1_among_entities": {
+          "observed": 0.015,
+          "op": "<=",
+          "pass": true,
+          "threshold": 0.05
+        },
+        "shred_target/alias_true_object": {
+          "observed": 0.0,
+          "op": "<=",
+          "pass": true,
+          "threshold": 0.05
+        },
+        "shred_target/alias_unknown": {
+          "observed": 0.995,
+          "op": ">=",
+          "pass": true,
+          "threshold": 0.9
+        }
+      }
+    },
+    "template0": {
+      "claim_supported": false,
+      "criteria": {
+        "active/alias_probe_top1": {
+          "observed": 0.42,
+          "op": ">=",
+          "pass": true,
+          "threshold": 0.25
+        },
+        "alias_direct": {
+          "observed": 0.5,
+          "op": ">=",
+          "pass": false,
+          "threshold": 0.8
+        },
+        "alias_heldout_min": {
+          "observed": 0.3,
+          "op": ">=",
+          "pass": false,
+          "threshold": 0.5
+        },
+        "delete_target/alias_true_object": {
+          "observed": 0.0,
+          "op": "<=",
+          "pass": true,
+          "threshold": 0.05
+        },
+        "delete_target/alias_unknown": {
+          "observed": 0.965,
+          "op": ">=",
+          "pass": true,
+          "threshold": 0.9
+        },
+        "direct": {
+          "observed": 0.5633333333333334,
+          "op": ">=",
+          "pass": false,
+          "threshold": 0.85
+        },
+        "dup_direct": {
+          "observed": 0.59,
+          "op": ">=",
+          "pass": false,
+          "threshold": 0.85
+        },
+        "dup_shred/copy_direct_acc": {
+          "observed": 0.59,
+          "op": ">=",
+          "pass": false,
+          "threshold": 0.85
+        },
+        "dup_shred/copy_probe_top1": {
+          "observed": 0.55,
+          "op": ">=",
+          "pass": true,
+          "threshold": 0.2
+        },
+        "duplicate_update/alias_new_object": {
+          "observed": 0.0,
+          "op": "<=",
+          "pass": true,
+          "threshold": 0.05
+        },
+        "probe_calibration_top1": {
+          "observed": 0.5,
+          "op": ">=",
+          "pass": true,
+          "threshold": 0.2
+        },
+        "resign_target/alias_direct": {
+          "observed": 0.5,
+          "op": ">=",
+          "pass": false,
+          "threshold": 0.8
+        },
+        "revoke_alias/alias_unknown": {
+          "observed": 0.96,
+          "op": ">=",
+          "pass": true,
+          "threshold": 0.9
+        },
+        "revoke_alias/sibling_readable": {
+          "observed": 0.58,
+          "op": ">=",
+          "pass": false,
+          "threshold": 0.8
+        },
+        "revoke_alias/target_readable": {
+          "observed": 0.56,
+          "op": ">=",
+          "pass": false,
+          "threshold": 0.8
+        },
+        "rollback/alias_direct": {
+          "observed": 0.5,
+          "op": ">=",
+          "pass": false,
+          "threshold": 0.8
+        },
+        "shared_update/alias_new_object": {
+          "observed": 0.535,
+          "op": ">=",
+          "pass": false,
+          "threshold": 0.9
+        },
+        "shred_target/alias_forced_choice": {
+          "observed": 0.56,
+          "op": "<=",
+          "pass": true,
+          "threshold": 0.6
+        },
+        "shred_target/alias_probe_top1": {
+          "observed": 0.01,
+          "op": "<=",
+          "pass": true,
+          "threshold": 0.05
+        },
+        "shred_target/alias_top1_among_entities": {
+          "observed": 0.01,
+          "op": "<=",
+          "pass": true,
+          "threshold": 0.05
+        },
+        "shred_target/alias_true_object": {
+          "observed": 0.0,
+          "op": "<=",
+          "pass": true,
+          "threshold": 0.05
+        },
+        "shred_target/alias_unknown": {
+          "observed": 0.995,
+          "op": ">=",
+          "pass": true,
+          "threshold": 0.9
+        }
+      }
+    }
+  },
+  "criteria_groups_passed": {
+    "strong_heldout": [
+      "one_shred_deletes_every_path",
+      "attacks_through_every_alias",
+      "attack_validity",
+      "alias_lifecycle"
+    ],
+    "strong_train": [
+      "one_shred_deletes_every_path",
+      "attacks_through_every_alias",
+      "attack_validity",
+      "alias_lifecycle"
+    ],
+    "template0": [
+      "attacks_through_every_alias",
+      "attack_validity"
+    ]
+  },
+  "environment": {
+    "device": "cpu",
+    "numpy": "2.2.6",
+    "platform": "Linux-6.18.44-fc-v24-x86_64-with-glibc2.39",
+    "python": "3.11.15",
+    "threads": "1",
+    "torch": "2.14.0+cpu"
+  },
+  "experiment": "E-000026",
+  "per_arm": {
+    "strong_heldout": [
+      {
+        "active/alias_forced_choice": 1.0,
+        "active/alias_probe_top1": 0.8,
+        "alias_direct": 0.99,
+        "alias_heldout_mean": 0.72125,
+        "alias_heldout_min": 0.42,
+        "alias_template10_heldout": 0.99,
+        "alias_template11_heldout": 0.42,
+        "alias_template1_train": 0.87,
+        "alias_template8_heldout": 0.525,
+        "alias_template9_heldout": 0.95,
+        "checkpoint_sha256": "3feb276b3498912759e1ef5819fe8dfbddb3c773f41653c693287047e6bbca9c",
+        "delete_target/alias_true_object": 0.0,
+        "delete_target/alias_unknown": 0.91,
+        "direct": 0.9966666666666667,
+        "dup_direct": 1.0,
+        "dup_shred/copy_direct_acc": 1.0,
+        "dup_shred/copy_forced_choice": 1.0,
+        "dup_shred/copy_probe_top1": 0.81,
+        "duplicate_update/alias_new_object": 0.0,
+        "duplicate_update/alias_old_object": 1.0,
+        "probe_calibration_top1": 0.825,
+        "resign_target/alias_direct": 0.99,
+        "revoke_alias/alias_unknown": 1.0,
+        "revoke_alias/sibling_readable": 1.0,
+        "revoke_alias/target_readable": 1.0,
+        "rollback/alias_direct": 0.99,
+        "seed": 2000,
+        "shared_update/alias_new_object": 0.93,
+        "shared_update/alias_old_object": 0.0,
+        "shred_target/alias_forced_choice": 0.475,
+        "shred_target/alias_mean_rank": 125.665,
+        "shred_target/alias_probe_top1": 0.01,
+        "shred_target/alias_top1_among_entities": 0.015,
+        "shred_target/alias_true_object": 0.0,
+        "shred_target/alias_unknown": 1.0,
+        "template": 10
+      },
+      {
+        "active/alias_forced_choice": 1.0,
+        "active/alias_probe_top1": 0.81,
+        "alias_direct": 0.915,
+        "alias_heldout_mean": 0.6275,
+        "alias_heldout_min": 0.3,
+        "alias_template10_heldout": 0.915,
+        "alias_template11_heldout": 0.3,
+        "alias_template1_train": 0.855,
+        "alias_template8_heldout": 0.405,
+        "alias_template9_heldout": 0.89,
+        "checkpoint_sha256": "d3e7d7c21b720f696204944b66194efb9676c5ed750bac3f98f506be2ccd7d33",
+        "delete_target/alias_true_object": 0.0,
+        "delete_target/alias_unknown": 0.925,
+        "direct": 1.0,
+        "dup_direct": 1.0,
+        "dup_shred/copy_direct_acc": 1.0,
+        "dup_shred/copy_forced_choice": 1.0,
+        "dup_shred/copy_probe_top1": 0.83,
+        "duplicate_update/alias_new_object": 0.0,
+        "duplicate_update/alias_old_object": 1.0,
+        "probe_calibration_top1": 0.9,
+        "resign_target/alias_direct": 0.915,
+        "revoke_alias/alias_unknown": 1.0,
+        "revoke_alias/sibling_readable": 0.93,
+        "revoke_alias/target_readable": 1.0,
+        "rollback/alias_direct": 0.915,
+        "seed": 2001,
+        "shared_update/alias_new_object": 0.935,
+        "shared_update/alias_old_object": 0.0,
+        "shred_target/alias_forced_choice": 0.43,
+        "shred_target/alias_mean_rank": 132.795,
+        "shred_target/alias_probe_top1": 0.005,
+        "shred_target/alias_top1_among_entities": 0.005,
+        "shred_target/alias_true_object": 0.0,
+        "shred_target/alias_unknown": 1.0,
+        "template": 10
+      },
+      {
+        "active/alias_forced_choice": 1.0,
+        "active/alias_probe_top1": 0.85,
+        "alias_direct": 0.87,
+        "alias_heldout_mean": 0.6012500000000001,
+        "alias_heldout_min": 0.31,
+        "alias_template10_heldout": 0.87,
+        "alias_template11_heldout": 0.31,
+        "alias_template1_train": 0.785,
+        "alias_template8_heldout": 0.355,
+        "alias_template9_heldout": 0.87,
+        "checkpoint_sha256": "1706456c4c014eb571ea2e782167cdbeaae2088e7a380c1876b3dad464e338ce",
+        "delete_target/alias_true_object": 0.0,
+        "delete_target/alias_unknown": 0.985,
+        "direct": 1.0,
+        "dup_direct": 1.0,
+        "dup_shred/copy_direct_acc": 1.0,
+        "dup_shred/copy_forced_choice": 1.0,
+        "dup_shred/copy_probe_top1": 0.88,
+        "duplicate_update/alias_new_object": 0.0,
+        "duplicate_update/alias_old_object": 1.0,
+        "probe_calibration_top1": 0.7916666666666666,
+        "resign_target/alias_direct": 0.87,
+        "revoke_alias/alias_unknown": 1.0,
+        "revoke_alias/sibling_readable": 0.88,
+        "revoke_alias/target_readable": 1.0,
+        "rollback/alias_direct": 0.87,
+        "seed": 2002,
+        "shared_update/alias_new_object": 0.885,
+        "shared_update/alias_old_object": 0.0,
+        "shred_target/alias_forced_choice": 0.47,
+        "shred_target/alias_mean_rank": 128.685,
+        "shred_target/alias_probe_top1": 0.0,
+        "shred_target/alias_top1_among_entities": 0.005,
+        "shred_target/alias_true_object": 0.0,
+        "shred_target/alias_unknown": 1.0,
+        "template": 10
+      }
+    ],
+    "strong_train": [
+      {
+        "active/alias_forced_choice": 1.0,
+        "active/alias_probe_top1": 0.8,
+        "alias_direct": 0.95,
+        "alias_heldout_mean": 0.72125,
+        "alias_heldout_min": 0.42,
+        "alias_template10_heldout": 0.99,
+        "alias_template11_heldout": 0.42,
+        "alias_template1_train": 0.87,
+        "alias_template8_heldout": 0.525,
+        "alias_template9_heldout": 0.95,
+        "checkpoint_sha256": "3feb276b3498912759e1ef5819fe8dfbddb3c773f41653c693287047e6bbca9c",
+        "delete_target/alias_true_object": 0.0,
+        "delete_target/alias_unknown": 0.96,
+        "direct": 0.9933333333333333,
+        "dup_direct": 1.0,
+        "dup_shred/copy_direct_acc": 1.0,
+        "dup_shred/copy_forced_choice": 1.0,
+        "dup_shred/copy_probe_top1": 0.81,
+        "duplicate_update/alias_new_object": 0.0,
+        "duplicate_update/alias_old_object": 1.0,
+        "probe_calibration_top1": 0.8166666666666667,
+        "resign_target/alias_direct": 0.95,
+        "revoke_alias/alias_unknown": 1.0,
+        "revoke_alias/sibling_readable": 0.97,
+        "revoke_alias/target_readable": 1.0,
+        "rollback/alias_direct": 0.95,
+        "seed": 2000,
+        "shared_update/alias_new_object": 0.92,
+        "shared_update/alias_old_object": 0.0,
+        "shred_target/alias_forced_choice": 0.475,
+        "shred_target/alias_mean_rank": 130.56,
+        "shred_target/alias_probe_top1": 0.01,
+        "shred_target/alias_top1_among_entities": 0.015,
+        "shred_target/alias_true_object": 0.0,
+        "shred_target/alias_unknown": 1.0,
+        "template": 3
+      },
+      {
+        "active/alias_forced_choice": 1.0,
+        "active/alias_probe_top1": 0.78,
+        "alias_direct": 0.87,
+        "alias_heldout_mean": 0.6275,
+        "alias_heldout_min": 0.3,
+        "alias_template10_heldout": 0.915,
+        "alias_template11_heldout": 0.3,
+        "alias_template1_train": 0.855,
+        "alias_template8_heldout": 0.405,
+        "alias_template9_heldout": 0.89,
+        "checkpoint_sha256": "d3e7d7c21b720f696204944b66194efb9676c5ed750bac3f98f506be2ccd7d33",
+        "delete_target/alias_true_object": 0.0,
+        "delete_target/alias_unknown": 0.965,
+        "direct": 1.0,
+        "dup_direct": 1.0,
+        "dup_shred/copy_direct_acc": 1.0,
+        "dup_shred/copy_forced_choice": 1.0,
+        "dup_shred/copy_probe_top1": 0.83,
+        "duplicate_update/alias_new_object": 0.0,
+        "duplicate_update/alias_old_object": 1.0,
+        "probe_calibration_top1": 0.8833333333333333,
+        "resign_target/alias_direct": 0.87,
+        "revoke_alias/alias_unknown": 1.0,
+        "revoke_alias/sibling_readable": 0.89,
+        "revoke_alias/target_readable": 1.0,
+        "rollback/alias_direct": 0.87,
+        "seed": 2001,
+        "shared_update/alias_new_object": 0.895,
+        "shared_update/alias_old_object": 0.0,
+        "shred_target/alias_forced_choice": 0.435,
+        "shred_target/alias_mean_rank": 138.12,
+        "shred_target/alias_probe_top1": 0.0,
+        "shred_target/alias_top1_among_entities": 0.005,
+        "shred_target/alias_true_object": 0.0,
+        "shred_target/alias_unknown": 0.995,
+        "template": 3
+      },
+      {
+        "active/alias_forced_choice": 0.995,
+        "active/alias_probe_top1": 0.83,
+        "alias_direct": 0.86,
+        "alias_heldout_mean": 0.6012500000000001,
+        "alias_heldout_min": 0.31,
+        "alias_template10_heldout": 0.87,
+        "alias_template11_heldout": 0.31,
+        "alias_template1_train": 0.785,
+        "alias_template8_heldout": 0.355,
+        "alias_template9_heldout": 0.87,
+        "checkpoint_sha256": "1706456c4c014eb571ea2e782167cdbeaae2088e7a380c1876b3dad464e338ce",
+        "delete_target/alias_true_object": 0.0,
+        "delete_target/alias_unknown": 0.98,
+        "direct": 0.9933333333333333,
+        "dup_direct": 0.995,
+        "dup_shred/copy_direct_acc": 0.995,
+        "dup_shred/copy_forced_choice": 1.0,
+        "dup_shred/copy_probe_top1": 0.875,
+        "duplicate_update/alias_new_object": 0.0,
+        "duplicate_update/alias_old_object": 0.995,
+        "probe_calibration_top1": 0.7916666666666666,
+        "resign_target/alias_direct": 0.86,
+        "revoke_alias/alias_unknown": 1.0,
+        "revoke_alias/sibling_readable": 0.88,
+        "revoke_alias/target_readable": 0.99,
+        "rollback/alias_direct": 0.86,
+        "seed": 2002,
+        "shared_update/alias_new_object": 0.865,
+        "shared_update/alias_old_object": 0.0,
+        "shred_target/alias_forced_choice": 0.485,
+        "shred_target/alias_mean_rank": 122.34,
+        "shred_target/alias_probe_top1": 0.0,
+        "shred_target/alias_top1_among_entities": 0.005,
+        "shred_target/alias_true_object": 0.0,
+        "shred_target/alias_unknown": 1.0,
+        "template": 3
+      }
+    ],
+    "template0": [
+      {
+        "active/alias_forced_choice": 0.925,
+        "active/alias_probe_top1": 0.43,
+        "alias_direct": 0.73,
+        "alias_heldout_mean": 0.72125,
+        "alias_heldout_min": 0.42,
+        "alias_template10_heldout": 0.99,
+        "alias_template11_heldout": 0.42,
+        "alias_template1_train": 0.87,
+        "alias_template8_heldout": 0.525,
+        "alias_template9_heldout": 0.95,
+        "checkpoint_sha256": "3feb276b3498912759e1ef5819fe8dfbddb3c773f41653c693287047e6bbca9c",
+        "delete_target/alias_true_object": 0.0,
+        "delete_target/alias_unknown": 0.985,
+        "direct": 0.6233333333333333,
+        "dup_direct": 0.685,
+        "dup_shred/copy_direct_acc": 0.7,
+        "dup_shred/copy_forced_choice": 0.99,
+        "dup_shred/copy_probe_top1": 0.57,
+        "duplicate_update/alias_new_object": 0.0,
+        "duplicate_update/alias_old_object": 0.69,
+        "probe_calibration_top1": 0.5,
+        "resign_target/alias_direct": 0.73,
+        "revoke_alias/alias_unknown": 0.96,
+        "revoke_alias/sibling_readable": 0.78,
+        "revoke_alias/target_readable": 0.62,
+        "rollback/alias_direct": 0.73,
+        "seed": 2000,
+        "shared_update/alias_new_object": 0.71,
+        "shared_update/alias_old_object": 0.0,
+        "shred_target/alias_forced_choice": 0.56,
+        "shred_target/alias_mean_rank": 120.3,
+        "shred_target/alias_probe_top1": 0.0,
+        "shred_target/alias_top1_among_entities": 0.01,
+        "shred_target/alias_true_object": 0.0,
+        "shred_target/alias_unknown": 0.995,
+        "template": 0
+      },
+      {
+        "active/alias_forced_choice": 0.89,
+        "active/alias_probe_top1": 0.435,
+        "alias_direct": 0.62,
+        "alias_heldout_mean": 0.6275,
+        "alias_heldout_min": 0.3,
+        "alias_template10_heldout": 0.915,
+        "alias_template11_heldout": 0.3,
+        "alias_template1_train": 0.855,
+        "alias_template8_heldout": 0.405,
+        "alias_template9_heldout": 0.89,
+        "checkpoint_sha256": "d3e7d7c21b720f696204944b66194efb9676c5ed750bac3f98f506be2ccd7d33",
+        "delete_target/alias_true_object": 0.0,
+        "delete_target/alias_unknown": 0.965,
+        "direct": 0.65,
+        "dup_direct": 0.595,
+        "dup_shred/copy_direct_acc": 0.62,
+        "dup_shred/copy_forced_choice": 0.98,
+        "dup_shred/copy_probe_top1": 0.55,
+        "duplicate_update/alias_new_object": 0.0,
+        "duplicate_update/alias_old_object": 0.6,
+        "probe_calibration_top1": 0.5666666666666667,
+        "resign_target/alias_direct": 0.62,
+        "revoke_alias/alias_unknown": 0.98,
+        "revoke_alias/sibling_readable": 0.66,
+        "revoke_alias/target_readable": 0.71,
+        "rollback/alias_direct": 0.62,
+        "seed": 2001,
+        "shared_update/alias_new_object": 0.62,
+        "shared_update/alias_old_object": 0.0,
+        "shred_target/alias_forced_choice": 0.465,
+        "shred_target/alias_mean_rank": 138.77,
+        "shred_target/alias_probe_top1": 0.0,
+        "shred_target/alias_top1_among_entities": 0.0,
+        "shred_target/alias_true_object": 0.0,
+        "shred_target/alias_unknown": 0.995,
+        "template": 0
+      },
+      {
+        "active/alias_forced_choice": 0.915,
+        "active/alias_probe_top1": 0.42,
+        "alias_direct": 0.5,
+        "alias_heldout_mean": 0.6012500000000001,
+        "alias_heldout_min": 0.31,
+        "alias_template10_heldout": 0.87,
+        "alias_template11_heldout": 0.31,
+        "alias_template1_train": 0.785,
+        "alias_template8_heldout": 0.355,
+        "alias_template9_heldout": 0.87,
+        "checkpoint_sha256": "1706456c4c014eb571ea2e782167cdbeaae2088e7a380c1876b3dad464e338ce",
+        "delete_target/alias_true_object": 0.0,
+        "delete_target/alias_unknown": 0.995,
+        "direct": 0.5633333333333334,
+        "dup_direct": 0.59,
+        "dup_shred/copy_direct_acc": 0.59,
+        "dup_shred/copy_forced_choice": 0.975,
+        "dup_shred/copy_probe_top1": 0.585,
+        "duplicate_update/alias_new_object": 0.0,
+        "duplicate_update/alias_old_object": 0.585,
+        "probe_calibration_top1": 0.5083333333333333,
+        "resign_target/alias_direct": 0.5,
+        "revoke_alias/alias_unknown": 1.0,
+        "revoke_alias/sibling_readable": 0.58,
+        "revoke_alias/target_readable": 0.56,
+        "rollback/alias_direct": 0.5,
+        "seed": 2002,
+        "shared_update/alias_new_object": 0.535,
+        "shared_update/alias_old_object": 0.0,
+        "shred_target/alias_forced_choice": 0.475,
+        "shred_target/alias_mean_rank": 130.95,
+        "shred_target/alias_probe_top1": 0.01,
+        "shred_target/alias_top1_among_entities": 0.0,
+        "shred_target/alias_true_object": 0.0,
+        "shred_target/alias_unknown": 1.0,
+        "template": 0
+      }
+    ]
+  },
+  "recorded_at": "2026-09-04T14:43:35+00:00",
+  "seeds": [
+    0,
+    1,
+    2
+  ],
+  "template_choice": {
+    "linkfree_reading_heldout": {
+      "10": 1.0,
+      "11": 0.4266666666666667,
+      "8": 0.565,
+      "9": 0.9683333333333333
+    },
+    "linkfree_reading_trained": {
+      "0": 0.7949999999999999,
+      "1": 0.9916666666666667,
+      "2": 0.7916666666666666,
+      "3": 1.0,
+      "4": 1.0,
+      "5": 0.9983333333333334,
+      "6": 0.785,
+      "7": 0.9966666666666667
+    },
+    "strong_heldout": 10,
+    "strong_train": 3
+  },
+  "title": "the symlink lifecycle battery, measured where reading works",
+  "trains_nothing": true
+}

@@ -1,0 +1,45 @@
+name: E000082 strict 3-seed symlink capability
+
+on:
+  push:
+    branches: [research/e000051-clean-bystanders]
+    paths:
+      - 'so/experiments/e000081_symlink_consistency_reader.py'
+      - '.github/workflows/e000082-symlink-capability-3seed.yml'
+  workflow_dispatch:
+
+jobs:
+  capability:
+    strategy:
+      fail-fast: false
+      matrix:
+        seed: [0, 1, 2]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 120
+    env:
+      SO_BOS: '1'
+      SO_THREADS: '2'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+          cache-dependency-path: so/requirements.txt
+      - name: Install CPU dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install torch --index-url https://download.pytorch.org/whl/cpu
+          python -m pip install -r so/requirements.txt
+      - name: Strict real-symlink capability
+        run: |
+          mkdir -p ci-e82
+          python -m so.experiments.e000081_symlink_consistency_reader \
+            --seeds ${{ matrix.seed }} --steps 3000 --groups 100 \
+            --consistency 0.15 --alt-supervision 0.5 \
+            --threads 2 --results-dir ci-e82
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: e000082-symlink-capability-s${{ matrix.seed }}
+          path: ci-e82/

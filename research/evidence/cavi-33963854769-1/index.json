@@ -1,0 +1,490 @@
+{
+  "collected_at": "2026-09-05T11:38:04.982111+00:00",
+  "breakthrough": false,
+  "runs": [
+    {
+      "id": 33961782977,
+      "name": "E000079 retained-checkpoint joint contract",
+      "head_sha": "30315e7d3e76a32952b82dc79141f74d4f0fa512",
+      "status": "completed",
+      "conclusion": "failure",
+      "run_attempt": 1,
+      "artifacts": [
+        {
+          "id": 9968710109,
+          "name": "e000079-joint-s0",
+          "size_in_bytes": 11006385,
+          "digest": "sha256:02c66e848274f33d2a0cbdbd092928a28ddebb0dce183786ae16fcf0a8f25815",
+          "expired": false,
+          "archive_sha256_verified": "sha256:02c66e848274f33d2a0cbdbd092928a28ddebb0dce183786ae16fcf0a8f25815",
+          "files": [
+            {
+              "path": "ci-e79/e000079-s0.json",
+              "sha256": "08efc98bdc448ca7a3e1e12f71927829ee82b65e23dff80f30ec5e85181127d1",
+              "size": 12326,
+              "retained_path": "33961782977/9968710109/1-e000079-s0.json",
+              "summary": {
+                "seed": 0,
+                "experiment": "E-000079",
+                "screening_pass": false,
+                "metrics": {
+                  "fresh_template_8": 1.0,
+                  "fresh_template_9": 0.975,
+                  "fresh_template_10": 1.0,
+                  "fresh_template_11": 1.0,
+                  "fresh_heldout_min": 0.975,
+                  "generic_memory_enabled_kl_to_base": 3.6471917629241943,
+                  "generic_memory_enabled_maxabs": 127.87840270996094,
+                  "explicit_bypass_repeat_maxabs": 0.0,
+                  "updated_alias_correct": 0.98,
+                  "stale_updated_bank_unknown": 0.88,
+                  "stale_updated_bank_old_answer": 0.0,
+                  "update_bystander_agreement": 1.0,
+                  "update_bystander_kl": 2.5219776944140904e-05,
+                  "relinked_alias_correct": 1.0,
+                  "stale_relinked_bank_unknown": 0.84,
+                  "relink_old_witnesses_rejected": 1.0,
+                  "relink_pod_only_accepts_old": 1.0,
+                  "shred_alias_unknown": 0.975
+                },
+                "criteria": {
+                  "fresh_template_9": true,
+                  "fresh_all_heldout": true,
+                  "updated_alias": true,
+                  "relinked_alias": true,
+                  "stale_updated_unknown": false,
+                  "stale_relinked_unknown": false,
+                  "shred_unknown": true,
+                  "generic_locality": false,
+                  "bystander_agreement": true,
+                  "bystander_kl": true,
+                  "alias_lineage_rejection": true,
+                  "pod_only_differentiation": true
+                }
+              }
+            },
+            {
+              "path": "ci-e79/e000079-s0.pt",
+              "sha256": "4dcdea6890ac3c4381c51ed5d0f3bc6c60b0f8e733d74105b8f743b0262cc012",
+              "size": 11875061
+            },
+            {
+              "path": "environment.txt",
+              "sha256": "02860354809ad135a509e33962a677aeebf3a3f040d182d96b64194cb8e00415",
+              "size": 586
+            }
+          ],
+          "collection": "VERIFIED"
+        },
+        {
+          "id": 9968660966,
+          "name": "e000079-joint-s1",
+          "size_in_bytes": 11007297,
+          "digest": "sha256:5a55bb34d7e2ebe4b467783f601b9f8d4070c07b9a09fde73202f3335b1d3387",
+          "expired": false,
+          "archive_sha256_verified": "sha256:5a55bb34d7e2ebe4b467783f601b9f8d4070c07b9a09fde73202f3335b1d3387",
+          "files": [
+            {
+              "path": "ci-e79/e000079-s1.json",
+              "sha256": "eb4de0c4c0b882c6f1fa06c0c73ffa877861aaafa9b272d919bf3d52402762f5",
+              "size": 12227,
+              "retained_path": "33961782977/9968660966/1-e000079-s1.json",
+              "summary": {
+                "seed": 1,
+                "experiment": "E-000079",
+                "screening_pass": false,
+                "metrics": {
+                  "fresh_template_8": 0.995,
+                  "fresh_template_9": 0.95,
+                  "fresh_template_10": 0.995,
+                  "fresh_template_11": 1.0,
+                  "fresh_heldout_min": 0.95,
+                  "generic_memory_enabled_kl_to_base": 4.037354946136475,
+                  "generic_memory_enabled_maxabs": 124.941650390625,
+                  "explicit_bypass_repeat_maxabs": 0.0,
+                  "updated_alias_correct": 0.97,
+                  "stale_updated_bank_unknown": 0.84,
+                  "stale_updated_bank_old_answer": 0.0,
+                  "update_bystander_agreement": 1.0,
+                  "update_bystander_kl": 7.939062197692692e-05,
+                  "relinked_alias_correct": 0.94,
+                  "stale_relinked_bank_unknown": 0.8,
+                  "relink_old_witnesses_rejected": 1.0,
+                  "relink_pod_only_accepts_old": 1.0,
+                  "shred_alias_unknown": 0.95
+                },
+                "criteria": {
+                  "fresh_template_9": true,
+                  "fresh_all_heldout": true,
+                  "updated_alias": true,
+                  "relinked_alias": false,
+                  "stale_updated_unknown": false,
+                  "stale_relinked_unknown": false,
+                  "shred_unknown": true,
+                  "generic_locality": false,
+                  "bystander_agreement": true,
+                  "bystander_kl": true,
+                  "alias_lineage_rejection": true,
+                  "pod_only_differentiation": true
+                }
+              }
+            },
+            {
+              "path": "ci-e79/e000079-s1.pt",
+              "sha256": "14681d5a055024d4701e1edf623b6191149fe4815e370b0c9ffd2daf18d26cd8",
+              "size": 11875061
+            },
+            {
+              "path": "environment.txt",
+              "sha256": "02860354809ad135a509e33962a677aeebf3a3f040d182d96b64194cb8e00415",
+              "size": 586
+            }
+          ],
+          "collection": "VERIFIED"
+        },
+        {
+          "id": 9968422254,
+          "name": "e000079-joint-s2",
+          "size_in_bytes": 11005108,
+          "digest": "sha256:46030b650fa1e2aefc768f4af69af7aa1b47f819fc36afe6c1e2eaac654679b1",
+          "expired": false,
+          "archive_sha256_verified": "sha256:46030b650fa1e2aefc768f4af69af7aa1b47f819fc36afe6c1e2eaac654679b1",
+          "files": [
+            {
+              "path": "ci-e79/e000079-s2.pt",
+              "sha256": "86e8372eeec767619aea3892e8c155e773ddc3ff116e5b7be1951913ddf300b1",
+              "size": 11875061
+            },
+            {
+              "path": "ci-e79/e000079-s2.json",
+              "sha256": "ee809596be9f17d84701d5fd3dafe0e04025e0fa8bc6a27bb8f03da4ad9f301f",
+              "size": 12321,
+              "retained_path": "33961782977/9968422254/2-e000079-s2.json",
+              "summary": {
+                "seed": 2,
+                "experiment": "E-000079",
+                "screening_pass": false,
+                "metrics": {
+                  "fresh_template_8": 0.985,
+                  "fresh_template_9": 0.945,
+                  "fresh_template_10": 0.985,
+                  "fresh_template_11": 0.985,
+                  "fresh_heldout_min": 0.945,
+                  "generic_memory_enabled_kl_to_base": 5.226874828338623,
+                  "generic_memory_enabled_maxabs": 134.66104125976562,
+                  "explicit_bypass_repeat_maxabs": 0.0,
+                  "updated_alias_correct": 0.94,
+                  "stale_updated_bank_unknown": 0.77,
+                  "stale_updated_bank_old_answer": 0.0,
+                  "update_bystander_agreement": 1.0,
+                  "update_bystander_kl": 2.659155688888859e-05,
+                  "relinked_alias_correct": 0.94,
+                  "stale_relinked_bank_unknown": 0.8,
+                  "relink_old_witnesses_rejected": 1.0,
+                  "relink_pod_only_accepts_old": 1.0,
+                  "shred_alias_unknown": 0.965
+                },
+                "criteria": {
+                  "fresh_template_9": false,
+                  "fresh_all_heldout": false,
+                  "updated_alias": false,
+                  "relinked_alias": false,
+                  "stale_updated_unknown": false,
+                  "stale_relinked_unknown": false,
+                  "shred_unknown": true,
+                  "generic_locality": false,
+                  "bystander_agreement": true,
+                  "bystander_kl": true,
+                  "alias_lineage_rejection": true,
+                  "pod_only_differentiation": true
+                }
+              }
+            },
+            {
+              "path": "environment.txt",
+              "sha256": "02860354809ad135a509e33962a677aeebf3a3f040d182d96b64194cb8e00415",
+              "size": 586
+            }
+          ],
+          "collection": "VERIFIED"
+        }
+      ]
+    },
+    {
+      "id": 33963051896,
+      "name": "CAVI fixed-budget capability continuation",
+      "head_sha": "59afe5aead6b9e8b961bc9fdfdf1d10114abbbbc",
+      "status": "in_progress",
+      "conclusion": null,
+      "run_attempt": 1,
+      "artifacts": [
+        {
+          "id": 9968723826,
+          "name": "cavi-capability-pythia-s0",
+          "size_in_bytes": 5889036,
+          "digest": "sha256:9debee46b8f4cc6f49b60571c470a48e29e012cc0d2e9cecc25978121eadfd41",
+          "expired": false,
+          "archive_sha256_verified": "sha256:9debee46b8f4cc6f49b60571c470a48e29e012cc0d2e9cecc25978121eadfd41",
+          "files": [
+            {
+              "path": "results/result.json",
+              "sha256": "43a08c9ef3c74a72d0433c07c422458edb15d7f32ccdc71fa0f530645c9a32ee",
+              "size": 3869,
+              "retained_path": "33963051896/9968723826/1-result.json",
+              "summary": {
+                "seed": 0,
+                "model_name": "EleutherAI/pythia-70m",
+                "experiment": "CAVI-CAPABILITY-CONTINUATION",
+                "fresh": {
+                  "minimum_candidate_accuracy": 0.72,
+                  "minimum_full_vocab_accuracy": 0.49,
+                  "valid_reader": false,
+                  "scope": "candidate read gate; full-vocabulary performance reported separately"
+                }
+              }
+            },
+            {
+              "path": "results/reader.pt",
+              "sha256": "cba6a0fcd022695d2afd47eea3012eb5c39956e51c99784375108c379c3a425e",
+              "size": 6352205
+            },
+            {
+              "path": "environment.txt",
+              "sha256": "02860354809ad135a509e33962a677aeebf3a3f040d182d96b64194cb8e00415",
+              "size": 586
+            }
+          ],
+          "collection": "VERIFIED"
+        },
+        {
+          "id": 9968710079,
+          "name": "cavi-capability-pythia-s1",
+          "size_in_bytes": 5888168,
+          "digest": "sha256:b6f0d22f7e55b3a330db9da6dd1aa36786b1da315796b7391b2ea392923477f0",
+          "expired": false,
+          "archive_sha256_verified": "sha256:b6f0d22f7e55b3a330db9da6dd1aa36786b1da315796b7391b2ea392923477f0",
+          "files": [
+            {
+              "path": "results/reader.pt",
+              "sha256": "6e2e70c9a141f339faec84c5bd28ba9572769118d35058cb1bbaaee56e8aa910",
+              "size": 6352205
+            },
+            {
+              "path": "results/result.json",
+              "sha256": "2ec746fa8924091688b4f6654cccd88ab295c5cd4ec6537c87812466db349007",
+              "size": 3872,
+              "retained_path": "33963051896/9968710079/2-result.json",
+              "summary": {
+                "seed": 1,
+                "model_name": "EleutherAI/pythia-70m",
+                "experiment": "CAVI-CAPABILITY-CONTINUATION",
+                "fresh": {
+                  "minimum_candidate_accuracy": 0.68,
+                  "minimum_full_vocab_accuracy": 0.485,
+                  "valid_reader": false,
+                  "scope": "candidate read gate; full-vocabulary performance reported separately"
+                }
+              }
+            },
+            {
+              "path": "environment.txt",
+              "sha256": "02860354809ad135a509e33962a677aeebf3a3f040d182d96b64194cb8e00415",
+              "size": 586
+            }
+          ],
+          "collection": "VERIFIED"
+        },
+        {
+          "id": 9968690741,
+          "name": "cavi-capability-gpt2-s0",
+          "size_in_bytes": 518,
+          "digest": "sha256:fe97b15906fa183cd0a02acfd320107609853b6ba8721c84e716685877893c34",
+          "expired": false,
+          "archive_sha256_verified": "sha256:fe97b15906fa183cd0a02acfd320107609853b6ba8721c84e716685877893c34",
+          "files": [
+            {
+              "path": "environment.txt",
+              "sha256": "02860354809ad135a509e33962a677aeebf3a3f040d182d96b64194cb8e00415",
+              "size": 586
+            }
+          ],
+          "collection": "VERIFIED"
+        },
+        {
+          "id": 9968555419,
+          "name": "cavi-capability-pythia-s2",
+          "size_in_bytes": 518,
+          "digest": "sha256:70a7935fdb43eadf37fb92320faf55d21b9f66fafd50d641f75841c2a6c6c5b5",
+          "expired": false,
+          "archive_sha256_verified": "sha256:70a7935fdb43eadf37fb92320faf55d21b9f66fafd50d641f75841c2a6c6c5b5",
+          "files": [
+            {
+              "path": "environment.txt",
+              "sha256": "02860354809ad135a509e33962a677aeebf3a3f040d182d96b64194cb8e00415",
+              "size": 586
+            }
+          ],
+          "collection": "VERIFIED"
+        }
+      ]
+    },
+    {
+      "id": 33963272140,
+      "name": "CAVI Pythia reference-head capability",
+      "head_sha": "74185464056305593380cccd6e5a6fe5324552e4",
+      "status": "in_progress",
+      "conclusion": null,
+      "run_attempt": 1,
+      "artifacts": []
+    },
+    {
+      "id": 33963491759,
+      "name": "CAVI qualified-reader provenance attacks",
+      "head_sha": "6f902bd7e0bef05e1e32dbe2c67bf44e7b4eaf85",
+      "status": "in_progress",
+      "conclusion": null,
+      "run_attempt": 1,
+      "artifacts": [
+        {
+          "id": 9968724608,
+          "name": "cavi-provenance-e79-s0",
+          "size_in_bytes": 1402,
+          "digest": "sha256:3b7ee2af0ed25478d01a347e051f8a7b60dc107903c8b867c2a120f2b9668e3f",
+          "expired": false,
+          "archive_sha256_verified": "sha256:3b7ee2af0ed25478d01a347e051f8a7b60dc107903c8b867c2a120f2b9668e3f",
+          "files": [
+            {
+              "path": "results/result.json",
+              "sha256": "574c6112315fadcc987f5e232c4b09eea39431a51961d77b6750ffee71a2c835",
+              "size": 2967,
+              "retained_path": "33963491759/9968724608/1-result.json",
+              "summary": {
+                "seed": 0,
+                "model_name": "openai-community/gpt2",
+                "experiment": "CAVI-PROVENANCE-FALSIFICATION",
+                "attacks": {
+                  "status": "SKIPPED_INVALID_READER"
+                },
+                "reader": {
+                  "minimum_candidate_accuracy": 0.945,
+                  "minimum_full_vocab_accuracy": 0.945,
+                  "valid_reader": false,
+                  "scope": "candidate read gate; full-vocabulary performance reported separately"
+                }
+              }
+            },
+            {
+              "path": "environment.txt",
+              "sha256": "74e87451428fa1518af3ec1082ec1d8efe863d01f8f3f2299e5d710bf705ffb3",
+              "size": 541
+            },
+            {
+              "path": "parent.sha256",
+              "sha256": "edd4884a9f8ed0fa751e40fbeaf0408534d229ee82aca044f63d1b1abf0f8208",
+              "size": 94
+            }
+          ],
+          "collection": "VERIFIED"
+        },
+        {
+          "id": 9968699148,
+          "name": "cavi-provenance-e79-s1",
+          "size_in_bytes": 1419,
+          "digest": "sha256:814a24ea1152e996974457da9de65587c8a562c478fa6669f4e1f889bb1bd948",
+          "expired": false,
+          "archive_sha256_verified": "sha256:814a24ea1152e996974457da9de65587c8a562c478fa6669f4e1f889bb1bd948",
+          "files": [
+            {
+              "path": "results/result.json",
+              "sha256": "92b644a187afc0d26c7ae6b19b54dbe24bf86f61560cc5b246a936fa5244c163",
+              "size": 2961,
+              "retained_path": "33963491759/9968699148/1-result.json",
+              "summary": {
+                "seed": 1,
+                "model_name": "openai-community/gpt2",
+                "experiment": "CAVI-PROVENANCE-FALSIFICATION",
+                "attacks": {
+                  "status": "SKIPPED_INVALID_READER"
+                },
+                "reader": {
+                  "minimum_candidate_accuracy": 0.935,
+                  "minimum_full_vocab_accuracy": 0.935,
+                  "valid_reader": false,
+                  "scope": "candidate read gate; full-vocabulary performance reported separately"
+                }
+              }
+            },
+            {
+              "path": "environment.txt",
+              "sha256": "74e87451428fa1518af3ec1082ec1d8efe863d01f8f3f2299e5d710bf705ffb3",
+              "size": 541
+            },
+            {
+              "path": "parent.sha256",
+              "sha256": "3c6ba300fefa647b9e32d96166043728aba5b6f0ca1af3c8c57fa19242f04e8e",
+              "size": 94
+            }
+          ],
+          "collection": "VERIFIED"
+        },
+        {
+          "id": 9968698351,
+          "name": "cavi-provenance-e79-s2",
+          "size_in_bytes": 1413,
+          "digest": "sha256:9ab37cbb6efc4a4f7abbf8a6cbfa8e99b53cb54b82ba0fc5d5692ca3fae2e6db",
+          "expired": false,
+          "archive_sha256_verified": "sha256:9ab37cbb6efc4a4f7abbf8a6cbfa8e99b53cb54b82ba0fc5d5692ca3fae2e6db",
+          "files": [
+            {
+              "path": "results/result.json",
+              "sha256": "4090f58c9174b7d35e200294d4240e5a8e3e9d85f21b2ee33da948489af7455a",
+              "size": 2974,
+              "retained_path": "33963491759/9968698351/1-result.json",
+              "summary": {
+                "seed": 2,
+                "model_name": "openai-community/gpt2",
+                "experiment": "CAVI-PROVENANCE-FALSIFICATION",
+                "attacks": {
+                  "status": "SKIPPED_INVALID_READER"
+                },
+                "reader": {
+                  "minimum_candidate_accuracy": 0.915,
+                  "minimum_full_vocab_accuracy": 0.91,
+                  "valid_reader": false,
+                  "scope": "candidate read gate; full-vocabulary performance reported separately"
+                }
+              }
+            },
+            {
+              "path": "environment.txt",
+              "sha256": "74e87451428fa1518af3ec1082ec1d8efe863d01f8f3f2299e5d710bf705ffb3",
+              "size": 541
+            },
+            {
+              "path": "parent.sha256",
+              "sha256": "f0fd8369b4fb5d0cd4f994701c8fe223f09f3bc09679a8e03a71d558c5a16441",
+              "size": 94
+            }
+          ],
+          "collection": "VERIFIED"
+        },
+        {
+          "id": 9968692243,
+          "name": "cavi-provenance-continuation-s0",
+          "size_in_bytes": 491,
+          "digest": "sha256:904b1f5f5c89c5a190399a569b690ecb3413d2abb5c9791da4690c04dfe86842",
+          "expired": false,
+          "archive_sha256_verified": "sha256:904b1f5f5c89c5a190399a569b690ecb3413d2abb5c9791da4690c04dfe86842",
+          "files": [
+            {
+              "path": "environment.txt",
+              "sha256": "74e87451428fa1518af3ec1082ec1d8efe863d01f8f3f2299e5d710bf705ffb3",
+              "size": 541
+            }
+          ],
+          "collection": "VERIFIED"
+        }
+      ]
+    }
+  ]
+}

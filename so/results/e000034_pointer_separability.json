@@ -1,0 +1,133 @@
+{
+  "aggregate": {
+    "recorded/alias_direct": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "recorded/direct": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "recorded/fact_norm_mean": {
+      "max": 12.076167106628418,
+      "mean": 11.917048772176107,
+      "min": 11.768416404724121,
+      "n": 3
+    },
+    "recorded/linear_probe_accuracy": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "recorded/link_norm_mean": {
+      "max": 18.77362632751465,
+      "mean": 18.55691083272298,
+      "min": 18.418846130371094,
+      "n": 3
+    },
+    "recorded/norm_gap_in_sd": {
+      "max": 8.343777656555176,
+      "mean": 7.612125714619954,
+      "min": 6.863748550415039,
+      "n": 3
+    },
+    "recorded/norm_ranges_overlap": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 3
+    },
+    "recorded/norm_threshold_accuracy": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    }
+  },
+  "criteria": {
+    "claim_supported": true,
+    "criteria": {
+      "recorded/norm_threshold_accuracy": {
+        "observed": 1.0,
+        "op": ">=",
+        "pass": true,
+        "threshold": 0.99
+      }
+    }
+  },
+  "environment": {
+    "device": "cpu",
+    "numpy": "2.2.6",
+    "platform": "Linux-6.18.44-fc-v24-x86_64-with-glibc2.39",
+    "python": "3.11.15",
+    "threads": "4",
+    "torch": "2.14.0+cpu"
+  },
+  "experiment": "E-000034",
+  "phase": "diagnose",
+  "recorded": [
+    {
+      "alias_direct": 1.0,
+      "arm": "recorded (separate v_link)",
+      "direct": 1.0,
+      "fact_norm_mean": 12.076167106628418,
+      "fact_norm_std": 0.5844165682792664,
+      "linear_probe_accuracy": 1.0,
+      "link_norm_mean": 18.478260040283203,
+      "link_norm_std": 1.1825672388076782,
+      "n_fact": 850,
+      "n_link": 200,
+      "norm_gap_in_sd": 6.863748550415039,
+      "norm_ranges_overlap": 0.0,
+      "norm_threshold_accuracy": 1.0,
+      "seed": 0
+    },
+    {
+      "alias_direct": 1.0,
+      "arm": "recorded (separate v_link)",
+      "direct": 1.0,
+      "fact_norm_mean": 11.768416404724121,
+      "fact_norm_std": 0.5038997530937195,
+      "linear_probe_accuracy": 1.0,
+      "link_norm_mean": 18.418846130371094,
+      "link_norm_std": 1.0083009004592896,
+      "n_fact": 850,
+      "n_link": 200,
+      "norm_gap_in_sd": 8.343777656555176,
+      "norm_ranges_overlap": 0.0,
+      "norm_threshold_accuracy": 1.0,
+      "seed": 1
+    },
+    {
+      "alias_direct": 1.0,
+      "arm": "recorded (separate v_link)",
+      "direct": 1.0,
+      "fact_norm_mean": 11.906562805175781,
+      "fact_norm_std": 0.5100820660591125,
+      "linear_probe_accuracy": 1.0,
+      "link_norm_mean": 18.77362632751465,
+      "link_norm_std": 1.1663336753845215,
+      "n_fact": 850,
+      "n_link": 200,
+      "norm_gap_in_sd": 7.628850936889648,
+      "norm_ranges_overlap": 0.0,
+      "norm_threshold_accuracy": 1.0,
+      "seed": 2
+    }
+  ],
+  "recorded_at": "2026-09-04T16:33:55+00:00",
+  "seconds": 178.7385983467102,
+  "seeds": [
+    0,
+    1,
+    2
+  ],
+  "shared": [],
+  "steps": 4000,
+  "title": "a pointer is separable from an object by its norm alone"
+}

@@ -1,0 +1,49 @@
+name: E000086 generic dependency reduction
+
+on:
+  push:
+    branches: [research/e000051-clean-bystanders]
+    paths:
+      - 'so/experiments/e000086_generic_dependency_reduction.py'
+      - 'so/tests/test_e000086_generic_dependency_reduction.py'
+      - '.github/workflows/e000086-generic-dependency-reduction.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  reduction:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    env:
+      SO_THREADS: '1'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+          cache-dependency-path: so/requirements.txt
+      - name: Install CPU dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install torch --index-url https://download.pytorch.org/whl/cpu
+          python -m pip install -r so/requirements.txt
+          python -m pip install pytest
+      - name: Execute reduction and preserved tests
+        run: |
+          set -euo pipefail
+          mkdir -p ci-e86r
+          python -m so.experiments.e000086_generic_dependency_reduction --results-dir ci-e86r | tee ci-e86r/run.txt
+          python -m pytest so/tests/test_e000086_generic_dependency_reduction.py -q -ra | tee ci-e86r/pytest.txt
+          python -m pip freeze > ci-e86r/environment.txt
+          sha256sum so/experiments/e000086_generic_dependency_reduction.py \
+                    so/tests/test_e000086_generic_dependency_reduction.py \
+                    ci-e86r/e000086_generic_dependency_reduction.json > ci-e86r/sha256.txt
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: e000086-generic-dependency-reduction
+          path: ci-e86r/
+          if-no-files-found: warn

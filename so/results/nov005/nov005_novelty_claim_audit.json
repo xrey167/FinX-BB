@@ -1,0 +1,213 @@
+{
+  "claims": [
+    {
+      "asserted_in": "docs/so-novelty-2026-09-04.md",
+      "assertion_located": true,
+      "evidence": [
+        {
+          "authors": "Chao Yao et al.",
+          "date": "2026-09-04",
+          "id": "arXiv:2609.04875",
+          "quote": "deployed stacks offer only a forgetting affordance that operates on plaintext at a single layer: delete the memory record, edit the Markdown file, drop the message from retrieval",
+          "read": "FULL TEXT",
+          "title": "Forgetting Without Restarting: Execution-State Unlearning for Stateful LLM Agents"
+        }
+      ],
+      "id": "N1-payload-derived-index-channel",
+      "proposition": "A deletion primitive that gates the value channel to chance while a term of the computation derived from the same payload still recovers it is uncovered by prior work.",
+      "queries": [
+        "unlearning leaves auxiliary index metadata derived from deleted value residual key recovers content after successful forgetting",
+        "recover deleted record through derived index term while value channel gated at chance"
+      ],
+      "record": "so/results/e000028_key_channel.json",
+      "uncorrected_paragraphs": 0,
+      "verdict": "NARROWED",
+      "what_survives": "The general shape \u2014 deletion at the plaintext layer leaving payload-derived artifacts intact \u2014 is published, three days before this audit, at agent scale, with behavioural extraction at 80-100% of episodes against zero string matches. Two things it does not reach. (i) Its artifacts CARRY the content: summaries and plans paraphrase the target and KV tensors encode it, so the finding is that a copy survived. E-000028's reverse key k_rev(LN(o + r)) contains no payload and names none; it discriminates without holding anything, which is why every value-channel attack is at chance while recovery is exact. (ii) It measures presence and behaviour, not a candidate-set posterior; PDX-001's tombstone row is invisible to exactly the binary reading it uses (top-1 0.0000, search space cut 88x). The transferable rule is no longer ours. The measurement that catches the case the rule misses still is."
+    },
+    {
+      "asserted_in": "docs/so-novelty-2026-09-04.md",
+      "assertion_located": true,
+      "evidence": [],
+      "id": "N2-swept-geometry-of-a-learned-gate",
+      "proposition": "No work demonstrates the specification-versus-learned-boundary gap as a swept geometry on a deletion mechanism, with the sampled-distribution rate and the predicate-region rate reported side by side.",
+      "queries": [
+        "learned gate declared threshold versus operational decision boundary swept geometry deletion mechanism false accept rate distribution"
+      ],
+      "record": "so/results/e000029_marker_geometry.json",
+      "uncorrected_paragraphs": 1,
+      "verdict": "SURVIVES",
+      "what_survives": ""
+    },
+    {
+      "asserted_in": "docs/so-novelty-2026-09-04.md",
+      "assertion_located": true,
+      "evidence": [
+        {
+          "authors": "Sen Yang, Yuen-Hei Yeung",
+          "date": "2026-07-21",
+          "id": "arXiv:2607.19442",
+          "quote": "only 28.0% of survivors (CI [22.6%,34.0%]) are TOST-equivalent to never-learned at that tolerance",
+          "read": "FULL TEXT",
+          "title": "Unlearning as Distribution Restoration: A Controlled Counterfactual Study, a Validated Selective Screen, and the Limits of Oracle-Free Certification"
+        },
+        {
+          "authors": "Sen Yang, Yuen-Hei Yeung",
+          "date": "2026-07-21",
+          "id": "arXiv:2607.19442#floor",
+          "quote": "The screen rejects Minj in 45/45 cells and accepts the reference in 44/45",
+          "read": "FULL TEXT",
+          "title": "the same paper's sealed challenge panel, which is the calibrated floor"
+        }
+      ],
+      "id": "N3-equivalence-margin-floor-heldout",
+      "proposition": "The combination of a pre-registered equivalence margin, a calibrated attack floor, and seeds held out from configuration selection is unclaimed.",
+      "queries": [
+        "unlearning evaluation equivalence testing pre-registered margin calibrated attack floor held-out seeds accept null"
+      ],
+      "record": "so/results/e000019_fresh_seed_chance.json",
+      "uncorrected_paragraphs": 0,
+      "verdict": "SUPERSEDED",
+      "what_survives": ""
+    },
+    {
+      "asserted_in": "docs/so-novelty-2026-09-04.md",
+      "assertion_located": true,
+      "evidence": [],
+      "id": "N5-paired-sharing-and-duplication-arms",
+      "proposition": "One reader, one ground truth, one calibrated probe, applied to a canonicalised arm and a duplicated arm after the same lifecycle operation, is unclaimed.",
+      "queries": [
+        "duplicated versus shared canonical facts same reader paired arms deletion one operation reaches all copies experiment language model"
+      ],
+      "record": "so/results/e000032_deletion_closure.json",
+      "uncorrected_paragraphs": 1,
+      "verdict": "SURVIVES",
+      "what_survives": "The nearest hit pairs states on a different axis: Raeesi and Roed run alias-closure deletions with retrieval enabled against disabled, not canonicalised against duplicated, and their canonicalisation proposal is in Future Work and unimplemented (references.md, cluster 4, read in full). The pairing axis here is still unclaimed."
+    },
+    {
+      "asserted_in": "docs/so-novelty-2026-09-04.md",
+      "assertion_located": true,
+      "evidence": [],
+      "id": "N6-erasure-disclosure-duality",
+      "proposition": "That canonicalisation makes erasure a single certifiable operation AND turns every surviving access path into an oracle naming the deleted key \u2014 the closure inverting with the guarantee \u2014 is unclaimed.",
+      "queries": [
+        "canonicalization single canonical record makes deletion cheap but identifiable duplication hides which record removed tradeoff unlinkability",
+        "deletion itself leaks which item was deleted surviving pointers identify removed record"
+      ],
+      "record": "so/results/e000035_deletion_disclosure.json",
+      "uncorrected_paragraphs": 1,
+      "verdict": "SURVIVES",
+      "what_survives": "Adjacent work exists and does not reach it. MERIT (arXiv:2607.29173) treats the stale incoming edges of a deleted node in a proximity graph purely as a cost \u2014 'stale incoming edges consume search capacity' \u2014 and makes no disclosure claim at all. The dedup and differential-privacy literatures have deletion patterns leaking in aggregate. Neither states the inversion: that the design decision which minimises the contingency set is the same one that makes the removed key uniquely nameable, so no configuration is both cheapest to certify and quietest to observe."
+    },
+    {
+      "asserted_in": "docs/paper/deletion-certificates-draft-2026-09-06.md",
+      "assertion_located": true,
+      "evidence": [
+        {
+          "authors": "Sanjam Garg, Shafi Goldwasser, Prashant Nalini Vasudevan",
+          "date": "Eurocrypt 2020",
+          "id": "eprint:2020/254",
+          "quote": "The data collector M maintains a dataset as a history-independent dictionary Dict. [\u2026] it updates model to be the output of delete(Dict, model, key).",
+          "read": "FULL TEXT",
+          "title": "Formalizing Data Deletion in the Context of the Right to be Forgotten"
+        },
+        {
+          "authors": "Garg, Goldwasser and Vasudevan",
+          "date": "Eurocrypt 2020",
+          "id": "eprint:2020/254#thm34",
+          "quote": "The data collector (M, pi, piD) as described in Fig. 5 has 1-representative deletion-compliance error at most (1/lambda + poly(lambda)/2^lambda).",
+          "read": "FULL TEXT",
+          "title": "Theorem 3.4, the composition stated as a bound"
+        },
+        {
+          "authors": "Aloni Cohen, Adam D. Smith, Marika Swanberg, Prashant Nalini Vasudevan",
+          "date": "CCS 2023",
+          "id": "arXiv:2210.07876",
+          "quote": "builds a unified formalism for deletion that encompasses previous approaches as special cases",
+          "read": "SEARCH METADATA",
+          "title": "Control, Confidentiality, and the Right to be Forgotten"
+        }
+      ],
+      "id": "N7-composition-with-a-record-level-certificate",
+      "proposition": "Composing a store-side closure guarantee with a record-level deletion certificate over a learned reader is ours.",
+      "queries": [
+        "Garg Goldwasser Vasudevan Formalizing Data Deletion Right to be Forgotten Eurocrypt 2020",
+        "Cohen Smith Swanberg Vasudevan Control Confidentiality Right to be Forgotten CCS 2023"
+      ],
+      "record": "so/results/e000030_deletion_certificate.json",
+      "uncorrected_paragraphs": 0,
+      "verdict": "SUPERSEDED",
+      "what_survives": ""
+    },
+    {
+      "asserted_in": "docs/paper/deletion-certificates-draft-2026-09-06.md",
+      "assertion_located": true,
+      "evidence": [
+        {
+          "authors": "Sen Yang, Yuen-Hei Yeung",
+          "date": "2026-07-21",
+          "id": "arXiv:2607.19442#forward-only",
+          "quote": "in 12/45 cells the fixed-magnitude penalty lands the forget-answer NLL within family tolerance, and the entire forward battery accepts a suppressed model. Forward-only certification is not sound",
+          "read": "FULL TEXT",
+          "title": "the same paper's adversarial boundary section"
+        }
+      ],
+      "id": "N8-attack-based-standard-is-not-a-guarantee",
+      "proposition": "That 'no attack recovered it' is not an adequate deletion guarantee is this paper's F1, argued here.",
+      "queries": [
+        "Yang Yeung unlearning distribution restoration oracle-free certification limits 2026"
+      ],
+      "record": "so/results/e000030_deletion_certificate.json",
+      "uncorrected_paragraphs": 0,
+      "verdict": "NARROWED",
+      "what_survives": "The thesis is not ours and is not new: an independent paper reached it two months earlier, at 45 model-seed cells over five architecture families, and demonstrated it with a suppression attack that defeats a whole forward battery on a model whose knowledge is intact. It is corroboration, and it is stronger evidence for F1 than anything in this repository. What is left to F1 here is the specific mechanism \u2014 a recovery channel through a term that never holds the payload \u2014 and the constructive half, which that paper explicitly declines: it calls its own result 'an empirical selective test for methods-as-produced, not an adversarially sound certificate'."
+    }
+  ],
+  "claims_examined": 7,
+  "contradiction_count": 0,
+  "contradictions": [],
+  "decision": "AUDIT_CLEAN",
+  "experiment": "NOV-005",
+  "how_to_read_this": "The verdicts are only as good as the calibration above them. Three propositions of known standing were run through the same instrument and it returned their prior art; a fabricated construct was run through it and it returned nothing. That is what makes a null here worth more than the nulls it replaces, which were produced by a workflow whose own citations were disclaimed and whose environment was wrongly believed to have no network. It is still not a systematic review. SURVIVES means 'these queries did not find it', and the queries are recorded so the next reader can beat them.",
+  "negative_control": {
+    "found": "Topically adjacent noise only \u2014 certificate-revocation patents. No work on the construct, which does not exist. The searcher did not manufacture a hit.",
+    "id": "NC-FABRICATED",
+    "proposition": "Deletion certificates for memory stores addressed by prime-indexed Goedel numbering with tri-symplectic revocation manifolds are unclaimed.",
+    "query": "deletion certificates for memory stores addressed by prime-indexed Goedel numbering with tri-symplectic revocation manifolds",
+    "returned_nothing": true
+  },
+  "not_claimed": "No cited result has been reproduced. Every verdict rests on reading the source, and a source read correctly can still be applied wrongly. In particular SUPERSEDED is a claim about priority, not about quality: N3 and N7 are better done elsewhere, which is the finding, and nothing here says the work behind them was not worth doing.",
+  "positive_controls": [
+    {
+      "found": "E. F. Codd, 'A Relational Model of Data for Large Shared Data Banks', CACM 13(6), 1970. Normalization beyond 1NF stated by Codd as freeing relations from undesirable insertion, update and deletion dependencies.",
+      "id": "PC-CODD",
+      "must_find": "Codd",
+      "prior_art_found": true,
+      "proposition": "That one operation on a shared record reaches every access path, while duplicated records need one operation each, is unclaimed.",
+      "query": "Codd 1970 relational model update anomaly normalization shared record single operation"
+    },
+    {
+      "found": "Carlini and Wagner, arXiv:1608.04644, IEEE S&P 2017. Already cluster 6 of references.md.",
+      "id": "PC-CW",
+      "must_find": "1608.04644",
+      "prior_art_found": true,
+      "proposition": "That a learned predicate can be made to fail adversarially is unclaimed.",
+      "query": "Carlini Wagner evaluating robustness neural networks detector bypass"
+    },
+    {
+      "found": "Resilience / minimum contingency set, with the self-join-free dichotomy and the triad hardness structure; arXiv:1907.01129 and the ILP/LP-relaxation solver line.",
+      "id": "PC-RESILIENCE",
+      "must_find": "1907.01129",
+      "prior_art_found": true,
+      "proposition": "That the minimum number of tuples whose removal falsifies a Boolean query is a named quantity with a complexity dichotomy is unclaimed.",
+      "query": "resilience minimum contingency set conjunctive query dichotomy database deletion"
+    }
+  ],
+  "searched_on": "2026-09-07",
+  "title": "The novelty search, calibrated and then run",
+  "validity_floor_met": true,
+  "verdict_counts": {
+    "NARROWED": 2,
+    "SUPERSEDED": 2,
+    "SURVIVES": 3
+  }
+}

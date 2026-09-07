@@ -1,0 +1,46 @@
+name: E000074 CAVI router-payload replay
+
+on:
+  push:
+    branches: [research/e000051-clean-bystanders]
+    paths:
+      - 'so/experiments/e000074_cavi_cached_router_payload_replay.py'
+      - 'so/cavi.py'
+      - 'so/llm_adapter.py'
+      - '.github/workflows/e000074-router-payload-replay.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  router-payload-replay:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+          cache-dependency-path: so/requirements.txt
+      - name: Install CPU dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install torch --index-url https://download.pytorch.org/whl/cpu
+          python -m pip install -r so/requirements.txt
+      - name: CAVI unit semantics
+        run: python -m pytest so/tests/test_cavi.py -q
+      - name: E-000074 cached router and resolved payload replay
+        env:
+          SO_THREADS: '2'
+        run: |
+          mkdir -p ci-e74
+          python -m so.experiments.e000074_cavi_cached_router_payload_replay \
+            --seeds 0 --steps 1200 --groups 16 --threads 2 --results-dir ci-e74
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: e000074-seed-0
+          path: ci-e74/
+          if-no-files-found: warn

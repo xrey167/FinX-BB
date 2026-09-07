@@ -1,0 +1,219 @@
+name: NOV001 calibration, NOV002 charged re-screen, PDX001 index audit
+
+on:
+  push:
+    branches:
+      - claude/depression-creative-novelty-f3ntev
+    paths:
+      - "docs/novelty/nov001-screen-calibration.md"
+      - "docs/novelty/nov001-screen-calibration-result.md"
+      - "docs/novelty/pdx001-payload-derived-index-audit.md"
+      - "docs/novelty/pdx001-payload-derived-index-audit-result.md"
+      - "docs/novelty/nov002-charged-rerun-e104-e105-result.md"
+      - "docs/novelty/screen-v2-2026-09-06.md"
+      - "so/screen.py"
+      - "docs/novelty/nov003-unread-coordinates-e103-result.md"
+      - "so/experiments/nov003_unread_coordinates_e103.py"
+      - "docs/novelty/nov004-instrument-audit-result.md"
+      - "docs/paper/deletion-certificates-draft-2026-09-06.md"
+      - "docs/paper/references.md"
+      - "docs/paper/figures/fig1-top1-false-negative.svg"
+      - "docs/paper/figures/fig2-swept-geometry.svg"
+      - "docs/paper/figures/fig3-closure-inversion.svg"
+      - "so/experiments/nov004_instrument_audit.py"
+      - "so/tests/test_nov004_instrument_audit.py"
+      - "so/paper_numbers.py"
+      - "so/tests/test_paper_numbers.py"
+      - "so/tests/test_nov003_unread_coordinates_e103.py"
+      - "so/tests/test_screen.py"
+      - "so/experiments/nov001_screen_calibration.py"
+      - "so/experiments/nov002_charged_rerun_e104_e105.py"
+      - "so/experiments/pdx001_payload_derived_index_audit.py"
+      - "so/tests/test_nov001_screen_calibration.py"
+      - "so/tests/test_nov002_charged_rerun_e104_e105.py"
+      - "so/tests/test_pdx001_payload_derived_index_audit.py"
+      - ".github/workflows/nov001-pdx001-screen-calibration-and-index-audit.yml"
+      # the records the paper's figures are bound to: editing one must re-run the check
+      - "so/results/e000019_fresh_seed_chance.json"
+      - "so/results/e000021_gate_error_rates.json"
+      - "so/results/e000024_weights_vs_cells-seed0.json"
+      - "so/results/e000025_template_rescoring.json"
+      - "so/results/e000028_key_channel.json"
+      - "so/results/e000029_marker_geometry.json"
+      - "so/results/e000030_deletion_certificate.json"
+      - "so/results/e000032_deletion_closure.json"
+      - "so/results/e000035_deletion_disclosure.json"
+      - "so/results/e000033_retrieval_closure.json"
+      - "so/results/pdx001/pdx001_payload_derived_index_audit.json"
+      - "so/results/nov004/nov004_instrument_audit.json"
+      - "so/results/pdx002/pdx002_real_index_deletion_audit.json"
+      - "so/experiments/pdx002_real_index_deletion_audit.py"
+      - "so/tests/test_pdx002_real_index_deletion_audit.py"
+      - "docs/novelty/pdx002-real-index-deletion-audit-result.md"
+      - "so/results/pdx003/pdx003_retrieval_closure_real_embedder.json"
+      - "so/experiments/pdx003_retrieval_closure_real_embedder.py"
+      - "so/tests/test_pdx003_retrieval_closure_real_embedder.py"
+      - "docs/novelty/pdx003-retrieval-closure-real-embedder-result.md"
+      - "so/experiments/nov005_novelty_claim_audit.py"
+      - "so/tests/test_nov005_novelty_claim_audit.py"
+      - "so/results/nov005/nov005_novelty_claim_audit.json"
+      - "docs/novelty/nov005-novelty-claim-audit-result.md"
+      - "docs/so-novelty-2026-09-04.md"
+  workflow_dispatch:
+
+jobs:
+  calibration-and-audit:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install test dependency
+        run: python -m pip install pytest
+      - name: Install the system under test for PDX-002
+        # PDX-002 audits the real hnswlib. Without it the test skips, and a skipped headline
+        # result is not a checked one.
+        run: python -m pip install "hnswlib==0.8.0" numpy
+      - name: Compile
+        run: |
+          python -m py_compile so/experiments/nov001_screen_calibration.py
+          python -m py_compile so/experiments/pdx001_payload_derived_index_audit.py
+          python -m py_compile so/experiments/nov002_charged_rerun_e104_e105.py
+          python -m py_compile so/screen.py
+          python -m py_compile so/experiments/nov003_unread_coordinates_e103.py
+          python -m py_compile so/experiments/nov004_instrument_audit.py
+          python -m py_compile so/paper_numbers.py
+          python -m py_compile so/experiments/pdx002_real_index_deletion_audit.py
+          python -m py_compile so/experiments/nov005_novelty_claim_audit.py
+      - name: Focused regressions
+        run: |
+          python -m pytest -q \
+            so/tests/test_nov001_screen_calibration.py \
+            so/tests/test_pdx001_payload_derived_index_audit.py \
+            so/tests/test_nov002_charged_rerun_e104_e105.py \
+            so/tests/test_screen.py \
+            so/tests/test_nov003_unread_coordinates_e103.py \
+            so/tests/test_nov004_instrument_audit.py \
+            so/tests/test_paper_numbers.py \
+            so/tests/test_pdx002_real_index_deletion_audit.py \
+            so/tests/test_pdx003_retrieval_closure_real_embedder.py \
+            so/tests/test_nov005_novelty_claim_audit.py
+      - name: Paper figures agree with the records
+        run: |
+          mkdir -p ci-paper
+          python -m so.paper_numbers | tee ci-paper/stdout.txt
+          python - <<'PY' > ci-paper/paper_numbers.json
+          import json
+          from so.paper_numbers import check, coverage
+          print(json.dumps({"check": check(), "coverage": coverage()}, indent=2))
+          PY
+      - name: NOV001 registered screen calibration
+        run: |
+          mkdir -p ci-nov001
+          python -m so.experiments.nov001_screen_calibration \
+            --results-dir ci-nov001 | tee ci-nov001/stdout.txt
+      - name: PDX001 registered exhaustive index audit
+        run: |
+          mkdir -p ci-pdx001
+          python -m so.experiments.pdx001_payload_derived_index_audit \
+            --results-dir ci-pdx001 | tee ci-pdx001/stdout.txt
+      - name: PDX002 audit against the real hnswlib index
+        run: |
+          mkdir -p ci-pdx002
+          python -m so.experiments.pdx002_real_index_deletion_audit \
+            --results-dir ci-pdx002 | tee ci-pdx002/stdout.txt
+      - name: NOV005 novelty-claim audit
+        # Exits non-zero if a claim this audit withdrew is still asserted in the paper or the
+        # novelty statement. That is the check, not the document.
+        run: |
+          mkdir -p ci-nov005
+          python -m so.experiments.nov005_novelty_claim_audit \
+            --results-dir ci-nov005 | tee ci-nov005/stdout.txt
+      - name: NOV002 charged re-screen of E-000104 and E-000105
+        run: |
+          mkdir -p ci-nov002
+          python -m so.experiments.nov002_charged_rerun_e104_e105 \
+            --results-dir ci-nov002 | tee ci-nov002/stdout.txt
+      - name: NOV003 unread-coordinate re-screen of E-000103
+        run: |
+          mkdir -p ci-nov003
+          python -m so.experiments.nov003_unread_coordinates_e103 \
+            --results-dir ci-nov003 | tee ci-nov003/stdout.txt
+      - name: NOV004 repo-wide instrument audit
+        run: |
+          mkdir -p ci-nov004
+          python -m so.experiments.nov004_instrument_audit \
+            --results-dir ci-nov004 | tee ci-nov004/stdout.txt
+      - name: Hash evidence
+        run: |
+          sha256sum docs/novelty/nov001-screen-calibration.md \
+            docs/novelty/nov001-screen-calibration-result.md \
+            docs/novelty/pdx001-payload-derived-index-audit.md \
+            docs/novelty/pdx001-payload-derived-index-audit-result.md \
+            so/experiments/nov001_screen_calibration.py \
+            so/experiments/pdx001_payload_derived_index_audit.py \
+            so/tests/test_nov001_screen_calibration.py \
+            so/tests/test_pdx001_payload_derived_index_audit.py \
+            docs/novelty/nov002-charged-rerun-e104-e105-result.md \
+            so/experiments/nov002_charged_rerun_e104_e105.py \
+            so/tests/test_nov002_charged_rerun_e104_e105.py \
+            docs/novelty/screen-v2-2026-09-06.md \
+            so/screen.py \
+            so/tests/test_screen.py \
+            docs/novelty/nov003-unread-coordinates-e103-result.md \
+            so/experiments/nov003_unread_coordinates_e103.py \
+            so/tests/test_nov003_unread_coordinates_e103.py \
+            docs/novelty/nov004-instrument-audit-result.md \
+            so/experiments/nov004_instrument_audit.py \
+            so/tests/test_nov004_instrument_audit.py \
+            docs/paper/deletion-certificates-draft-2026-09-06.md \
+            docs/paper/references.md \
+            docs/paper/figures/fig1-top1-false-negative.svg \
+            docs/paper/figures/fig2-swept-geometry.svg \
+            docs/paper/figures/fig3-closure-inversion.svg \
+            so/paper_numbers.py \
+            so/tests/test_paper_numbers.py \
+            so/results/e000019_fresh_seed_chance.json \
+            so/results/e000021_gate_error_rates.json \
+            so/results/e000024_weights_vs_cells-seed0.json \
+            so/results/e000025_template_rescoring.json \
+            so/results/e000028_key_channel.json \
+            so/results/e000029_marker_geometry.json \
+            so/results/e000030_deletion_certificate.json \
+            so/results/e000032_deletion_closure.json \
+            so/results/e000035_deletion_disclosure.json \
+            so/results/e000033_retrieval_closure.json \
+            so/results/pdx001/pdx001_payload_derived_index_audit.json \
+            so/results/nov004/nov004_instrument_audit.json \
+            so/results/pdx002/pdx002_real_index_deletion_audit.json \
+            so/experiments/pdx002_real_index_deletion_audit.py \
+            so/tests/test_pdx002_real_index_deletion_audit.py \
+            docs/novelty/pdx002-real-index-deletion-audit-result.md \
+            so/results/pdx003/pdx003_retrieval_closure_real_embedder.json \
+            so/experiments/pdx003_retrieval_closure_real_embedder.py \
+            so/tests/test_pdx003_retrieval_closure_real_embedder.py \
+            so/tests/test_nov005_novelty_claim_audit.py \
+            docs/novelty/pdx003-retrieval-closure-real-embedder-result.md \
+            so/experiments/nov005_novelty_claim_audit.py \
+            so/tests/test_nov005_novelty_claim_audit.py \
+            so/results/nov005/nov005_novelty_claim_audit.json \
+            docs/novelty/nov005-novelty-claim-audit-result.md \
+            docs/so-novelty-2026-09-04.md \
+            > ci-nov001/source-sha256.txt
+          find ci-nov001 ci-pdx001 ci-pdx002 ci-nov002 ci-nov003 ci-nov004 ci-nov005 ci-paper -maxdepth 1 -name '*.json' -print0 | sort -z \
+            | xargs -0 -r sha256sum > ci-nov001/result-sha256.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: nov001-pdx001-screen-calibration-and-index-audit
+          path: |
+            ci-nov001/
+            ci-pdx001/
+            ci-pdx002/
+            ci-nov002/
+            ci-nov003/
+            ci-nov004/
+            ci-nov005/
+            ci-paper/
+          if-no-files-found: error

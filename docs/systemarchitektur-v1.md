@@ -1,5 +1,12 @@
 # FinX-Moda Systemarchitektur v1.0
 
+> **Historisches Zielbild (30.08.2026):** Dieses Dokument enthält noch nicht ausführbare
+> Schema-Skizzen. Insbesondere waren die ursprünglichen partitionierten Primary Keys unvollständig.
+> Die aktuelle ausführbare Referenz ist
+> [`db/migrations/0001_moda.sql`](../db/migrations/0001_moda.sql); der aktuelle Authority-Vertrag
+> steht in [`docs/architecture/lifecycle-integrity-v1.md`](architecture/lifecycle-integrity-v1.md).
+> Der HTTP-Prototyp nutzt noch In-Memory-State und ist nicht produktionsreif.
+
 **Projekt:** FinX-BB · FinX-Moda  
 **Stand:** 30.08.2026 · Agent + finx-memory  
 **Stack:** TypeScript + Python  

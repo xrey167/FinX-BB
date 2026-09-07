@@ -1,0 +1,47 @@
+name: E000054 hard-gate frontier
+on:
+  push:
+    branches: [research/e000051-clean-bystanders]
+    paths:
+      - 'so/experiments/e000054_hard_gate_frontier.py'
+      - '.github/workflows/e000054-hard-gates.yml'
+permissions:
+  contents: read
+jobs:
+  hard-frontier:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - {m: 0.35, r: 0.30, seed: 0}
+          - {m: 0.40, r: 0.30, seed: 0}
+          - {m: 0.45, r: 0.30, seed: 0}
+          - {m: 0.35, r: 0.50, seed: 0}
+          - {m: 0.40, r: 0.50, seed: 0}
+          - {m: 0.45, r: 0.50, seed: 0}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+          cache-dependency-path: so/requirements.txt
+      - name: Install CPU dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install torch --index-url https://download.pytorch.org/whl/cpu
+          python -m pip install -r so/requirements.txt
+      - name: Hard-gate arm
+        env:
+          SO_THREADS: '2'
+        run: |
+          mkdir -p ci-e54
+          python -m so.experiments.e000054_hard_gate_frontier \
+            --match-tau '${{ matrix.m }}' --rel-prob-tau '${{ matrix.r }}' \
+            --seed '${{ matrix.seed }}' --steps 1200 --threads 2 --results-dir ci-e54
+      - uses: actions/upload-artifact@v4
+        with:
+          name: e54-m${{ matrix.m }}-r${{ matrix.r }}-s${{ matrix.seed }}
+          path: ci-e54/

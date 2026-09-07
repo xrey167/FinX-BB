@@ -1,0 +1,21 @@
+[project]
+name = "so-research"
+version = "0.1.0"
+description = "SO — Modular Neural Operating System: experimental research code (synthetic worlds, mutable knowledge layer, Mini-Transformer, validation families)"
+requires-python = ">=3.11"
+dependencies = [
+  "numpy>=1.26,<3",
+  "torch>=2.2",
+  "transformers>=4.40",
+  "safetensors>=0.4",
+  "scipy>=1.11",
+]
+
+[project.optional-dependencies]
+test = ["pytest>=8"]
+
+[tool.pytest.ini_options]
+testpaths = ["so/tests"]
+markers = [
+  "network: requires downloading or loading external model artifacts",
+]

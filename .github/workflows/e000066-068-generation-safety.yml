@@ -1,0 +1,45 @@
+name: E000066-068 generation safety
+
+on:
+  push:
+    branches: [research/e000051-clean-bystanders]
+    paths:
+      - 'so/experiments/e000066_stale_snapshot_replay.py'
+      - 'so/experiments/e000068_incarnation_capability.py'
+      - 'so/incarnation.py'
+      - 'so/data.py'
+      - 'so/mvcc.py'
+      - '.github/workflows/e000066-068-generation-safety.yml'
+  workflow_dispatch:
+
+jobs:
+  generation-safety:
+    strategy:
+      fail-fast: false
+      matrix:
+        experiment: [e66, e68]
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+          cache-dependency-path: so/requirements.txt
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install torch --index-url https://download.pytorch.org/whl/cpu
+          python -m pip install numpy
+      - name: Run generation-safety experiment
+        run: |
+          mkdir -p ci-generation
+          if [ '${{ matrix.experiment }}' = 'e66' ]; then
+            python -m so.experiments.e000066_stale_snapshot_replay --results-dir ci-generation
+          else
+            python -m so.experiments.e000068_incarnation_capability --results-dir ci-generation
+          fi
+      - uses: actions/upload-artifact@v4
+        with:
+          name: generation-${{ matrix.experiment }}
+          path: ci-generation/

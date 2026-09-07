@@ -1,0 +1,36 @@
+name: CAT001 compiled transform state
+on:
+  push:
+    branches: [research/cat001-compiled-transform-state]
+    paths:
+      - so/experiments/cat001_compiled_transform_state.py
+      - so/tests/test_cat001_compiled_transform_state.py
+      - .github/workflows/cat001-compiled-transform-state.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  screen:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - name: Install test dependency
+        run: python -m pip install pytest==9.0.2
+      - name: Execute exact transform screen and tests
+        run: |
+          set -euo pipefail
+          mkdir -p ci-cat001
+          python -m so.experiments.cat001_compiled_transform_state --output ci-cat001/results.json | tee ci-cat001/run.txt
+          python -m pytest so/tests/test_cat001_compiled_transform_state.py -q -ra | tee ci-cat001/pytest.txt
+          python -m pip freeze > ci-cat001/environment.txt
+          sha256sum so/experiments/cat001_compiled_transform_state.py so/tests/test_cat001_compiled_transform_state.py ci-cat001/results.json > ci-cat001/sha256.txt
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: cat001-compiled-transform-state
+          path: ci-cat001/
+          if-no-files-found: error

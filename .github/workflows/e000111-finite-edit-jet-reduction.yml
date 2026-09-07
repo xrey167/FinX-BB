@@ -1,0 +1,45 @@
+name: E000111 finite edit jet reduction
+
+on:
+  push:
+    branches:
+      - research/e000051-clean-bystanders
+    paths:
+      - "docs/novelty/e000111-finite-edit-jet-reduction.md"
+      - "so/experiments/e000111_finite_edit_jet_reduction.py"
+      - "so/tests/test_e000111_finite_edit_jet_reduction.py"
+      - ".github/workflows/e000111-finite-edit-jet-reduction.yml"
+  workflow_dispatch:
+
+jobs:
+  reduction:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install test dependency
+        run: python -m pip install pytest
+      - name: Compile
+        run: python -m py_compile so/experiments/e000111_finite_edit_jet_reduction.py
+      - name: Focused regressions
+        run: python -m pytest -q so/tests/test_e000111_finite_edit_jet_reduction.py
+      - name: Registered exact reduction
+        run: |
+          mkdir -p ci-e111
+          python -m so.experiments.e000111_finite_edit_jet_reduction \
+            --results-dir ci-e111 | tee ci-e111/stdout.txt
+      - name: Hash evidence
+        run: |
+          sha256sum docs/novelty/e000111-finite-edit-jet-reduction.md \
+            so/experiments/e000111_finite_edit_jet_reduction.py \
+            so/tests/test_e000111_finite_edit_jet_reduction.py \
+            > ci-e111/source-sha256.txt
+          find ci-e111 -maxdepth 1 -name '*.json' -print0 | sort -z | xargs -0 -r sha256sum > ci-e111/result-sha256.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: e000111-finite-edit-jet-reduction
+          path: ci-e111/
+          if-no-files-found: error

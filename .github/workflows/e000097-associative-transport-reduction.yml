@@ -1,0 +1,36 @@
+name: E000097 associative transport reduction
+
+on:
+  push:
+    branches:
+      - research/e000051-clean-bystanders
+    paths:
+      - 'docs/novelty/e000097-associative-transport-reduction.md'
+      - 'so/experiments/e000097_associative_transport_reduction.py'
+      - '.github/workflows/e000097-associative-transport-reduction.yml'
+  workflow_dispatch:
+
+jobs:
+  reduction:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Compile
+        run: python -m py_compile so/experiments/e000097_associative_transport_reduction.py
+      - name: Run registered reduction
+        run: |
+          mkdir -p ci-e97
+          python -m so.experiments.e000097_associative_transport_reduction --seed-count 32 --mutations 24 --results-dir ci-e97 | tee ci-e97/stdout.txt
+      - name: Hash evidence
+        run: |
+          sha256sum docs/novelty/e000097-associative-transport-reduction.md \
+            so/experiments/e000097_associative_transport_reduction.py > ci-e97/source-sha256.txt
+          find ci-e97 -maxdepth 1 -name '*.json' -print0 | sort -z | xargs -0 -r sha256sum > ci-e97/result-sha256.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: e000097-associative-transport-reduction
+          path: ci-e97/
+          if-no-files-found: error
