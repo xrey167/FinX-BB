@@ -80,6 +80,8 @@ class Claim:
     rule: str
     reduce: str = ""       # set when the path uses '*' and the paper quotes an aggregate
     appears_as: str = ""   # set when the paper spells the figure some other way ("eleven" for 11)
+    near: str = ""         # a phrase the figure's line must contain, when several quantities
+                           # render identically -- see the note on `100` below
 
     @property
     def sought(self) -> str:
@@ -212,6 +214,8 @@ CLAIMS: tuple[Claim, ...] = (
     Claim("E28 shred mean rank", "e000028_key_channel.json", "aggregate/shred/object_mean_rank/mean", "0.0", "dp1"),
     Claim("E28 chance top-1", "e000028_key_channel.json", "pooled_vs_chance/chance", "0.0039", "dp4"),
     Claim("E28 pooled targets", "e000028_key_channel.json", "pooled_vs_chance/n", "500", "int"),
+    Claim("E28 targets per seed", "e000028_key_channel.json", "n_targets",
+          "100", "int", "", "", "targets each"),
     # §2's exact intervals: the point estimates alone asked the reader to take the finding on trust
     Claim("E28 active interval lower", "e000028_key_channel.json", "pooled_vs_chance/active/lower", "0.9926", "dp4"),
     Claim("E28 shred interval lower", "e000028_key_channel.json", "pooled_vs_chance/shred/lower", "0.9926", "dp4"),
@@ -265,6 +269,14 @@ CLAIMS: tuple[Claim, ...] = (
     Claim("E29 band 0.80 max", "e000029_marker_geometry.json", "per_checkpoint/*/band_accept/7", "0.4014", "dp4", "max"),
     Claim("E29 band 0.90 mean", "e000029_marker_geometry.json", "per_checkpoint/*/band_accept/8", "0.0000", "dp4", "mean"),
 
+    # NOV-004 — the sweep's own coverage. This went stale the moment the base branch grew by six
+    # experiments, and nothing caught it: the paper's "100" was passing its presence test on
+    # E-000035's pod count, a different quantity that renders the same way.
+    Claim("NOV004 experiments scanned", "nov004/nov004_instrument_audit.json", "files_scanned",
+          "106", "int", "", "", "mechanical sweep"),
+    Claim("NOV004 class A confirmed", "nov004/nov004_instrument_audit.json",
+          "class_a_confirmed_count", "3", "int", "", "three", "mechanical sweep"),
+
     # E-000021 — the published false-accept rate the paper contrasts against
     Claim("E21 false-accept rate", "e000021_gate_error_rates.json", "totals/false_accept_rate", "8.49e-04", "exp2"),
     Claim("E21 n", "e000021_gate_error_rates.json", "totals/ci_false_accept/n", "2,200,000", "thousands"),
@@ -305,7 +317,9 @@ CLAIMS: tuple[Claim, ...] = (
     Claim("E35 canonical trace closure", "e000035_deletion_disclosure.json", "aggregate/canonical/trace_closure_mean/mean", "3.00", "dp2"),
     Claim("E35 duplicated trace closure", "e000035_deletion_disclosure.json", "aggregate/duplicated/trace_closure_mean/mean", "1.00", "dp2"),
     Claim("E35 canonical false positives", "e000035_deletion_disclosure.json", "aggregate/canonical/false_positive_keys/mean", "0.00", "dp2"),
-    Claim("E35 pods per seed", "e000035_deletion_disclosure.json", "aggregate/n_groups/mean", "100", "int"),
+    # pinned with `near`: five different quantities in this paper render as "100"
+    Claim("E35 pods per seed", "e000035_deletion_disclosure.json", "aggregate/n_groups/mean",
+          "100", "int", "", "", "pod"),
     Claim("E35 blanking closes it", "e000035_deletion_disclosure.json", "aggregate/blanked/channel_closed/mean", "1.0000", "dp4"),
 
     # E-000024 — rows versus weights. The whole head-to-head table is bound, because leaving it
@@ -610,10 +624,24 @@ def _check_value_claim(c, doc, where: str, text: str) -> dict:
         return {**row, "status": "MISMATCH",
                 "detail": f"record {value!r} renders {rendered!r} under {c.rule}, "
                           f"{where} prints {c.printed!r}"}
+    near = getattr(c, "near", "")
+    if near:
+        # Several distinct quantities can render to the same string. `100` is five different
+        # numbers in this paper -- targets per seed, pods per seed, and the count of experiments
+        # swept -- and binding one of them let another go stale unnoticed while the check stayed
+        # green. A claim that names its context is checked against the lines carrying it.
+        # scope to the paragraph, not the line: prose wraps, and "found three" routinely lands on
+        # the line after the phrase that identifies which sweep is meant
+        scoped = "\n\n".join(b for b in re.split(r"\n\s*\n", text) if near in b)
+        if not scoped:
+            return {**row, "status": "ABSENT", "occurrences": 0,
+                    "detail": f"no paragraph in {where} contains the context {near!r}"}
+        text = scoped
     hits = occurrences(c.sought, text)
     if hits == 0:
         return {**row, "status": "ABSENT", "occurrences": 0,
-                "detail": f"{c.sought!r} matches the record but does not appear in {where}"}
+                "detail": f"{c.sought!r} matches the record but does not appear in {where}"
+                          + (f" near {near!r}" if near else "")}
     weak = hits > _PRESENCE_NOISE_FLOOR
     spelled = "" if not getattr(c, "appears_as", "") else f" (spelled {c.appears_as!r})"
     return {**row, "status": "OK", "occurrences": hits, "presence_discriminating": not weak,
@@ -913,14 +941,30 @@ def unregistered(paper_text: str | None = None,
         stripped = re.sub(pattern, " ", stripped)
     # a trailing comma or full stop is punctuation, not part of the number
     token = re.compile(r"(?<![\w.])\d(?:[\d,]*\d)?(?:\.\d+)?(?:e[-+]?\d+)?(?![\w])")
+
+    # Coverage is computed per paragraph, because a *pinned* claim only checks the paragraph it
+    # names. Treating it as covering every occurrence of its figure is the same concealment it was
+    # introduced to stop, one level up: `100` would read as bound everywhere on the strength of a
+    # claim that only ever looks at the pods-per-seed sentence.
+    unpinned = {c.sought for c in claims if not c.near} | {c.printed for c in claims if not c.near}
+    pinned = [c for c in claims if c.near]
+
     counts: dict[str, int] = {}
     where: dict[str, str] = {}
-    for m in token.finditer(stripped):
-        tok = m.group(0)
-        counts[tok] = counts.get(tok, 0) + 1
-        where.setdefault(tok, stripped[max(0, m.start() - 40):m.end() + 25].replace("\n", " "))
-    bound = {c.sought for c in claims} | {c.printed for c in claims}
-    unbound = {tok: n for tok, n in counts.items() if tok not in bound}
+    unbound_counts: dict[str, int] = {}
+    for block in re.split(r"\n\s*\n", stripped):
+        here = set(unpinned)
+        for c in pinned:
+            if c.near in block:
+                here.add(c.sought)
+                here.add(c.printed)
+        for m in token.finditer(block):
+            tok = m.group(0)
+            counts[tok] = counts.get(tok, 0) + 1
+            where.setdefault(tok, block[max(0, m.start() - 40):m.end() + 25].replace("\n", " "))
+            if tok not in here:
+                unbound_counts[tok] = unbound_counts.get(tok, 0) + 1
+    unbound = unbound_counts
     return {
         "distinct_numeric_tokens": len(counts),
         "unbound": dict(sorted(unbound.items(), key=lambda kv: (-kv[1], kv[0]))),

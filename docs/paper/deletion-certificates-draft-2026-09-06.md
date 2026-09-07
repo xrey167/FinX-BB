@@ -412,7 +412,7 @@ the evaluation literature this paper joins is built almost entirely from instrum
 
 Every measurement in this paper carries one. §2's probe reads live cells at 0.893–0.927. §3's attack
 recovers a live payload at 1.0000 and refuses to report if it does not. §4's certificate has two
-guards that can void it. A mechanical sweep of all 100 recorded experiments for comparisons whose two
+guards that can void it. A mechanical sweep of all 106 recorded experiments for comparisons whose two
 sides share a source found three — and the sweep's own first run failed its floor and had to be fixed
 before its silence anywhere else meant anything.
 
@@ -423,7 +423,7 @@ is cheap.
 and `so/results/`, and each was caught by a person opening a JSON file: a mean rank written 128.0
 where the record says 128.02; an accept rate written 1.0000 where the sweep says 0.9999; and §7's
 table presented with no seed count where the record is one seed. Three for three is the absence of
-an instrument, so there is now a registry (`make papernums`) binding 91 figures printed in this text
+an instrument, so there is now a registry (`make papernums`) binding 94 figures printed in this text
 and 31 more printed inside the three drawn figures to the record paths they came from, re-rendered
 under the rounding rule used, plus 19 **verdicts** — categorical cells like `CERTIFIED`, each
 bound to the record boolean behind it and checked against its own table row — and 10 **scope
@@ -465,6 +465,16 @@ another's evidence. Sweeping for verdict rows also found one that cannot be boun
 be — §7's "a certificate is even available", which follows from a LoRA having no finite payload
 domain rather than from any measurement, and which had been sitting among six measured rows looking
 identical to them.
+
+**And one that went stale without anyone touching the paper.** The base branch gained six
+experiments overnight, so a sweep of all `100` recorded experiments became one of `106` — a claim invalidated
+by the *repository* growing, not by an edit. The check stayed green through it for an instructive
+reason: `100` is five different quantities in this text (targets per seed, pods per seed, the swept
+count), only one was bound, and its presence test found some occurrence and passed. A figure "round
+enough to recur" was not merely undiscriminating, it was actively concealing. Claims that render
+identically are now pinned to the paragraph naming which quantity they are, and the swept count is
+bound to the sweep's own record so it tracks the repository rather than the prose. (The six new
+experiments were themselves clean: no new instance of either defect class.)
 
 And finally: **do the pointers point at anything?** §0 promises every number is reproducible by the
 `make` target named beside it, and a target that does not exist makes that promise false in a way no
@@ -583,5 +593,5 @@ are what a practitioner will act on.
 
 Every number above: `make keychannel certify closure retrieval disclosure compare pdxaudit`. Records
 in `so/results/`. Instrument audits: `make calibrate charged unread auditinstr`. To check this text
-against those records: `make papernums` (91 figures in the prose, 31 in the drawn figures, 19 verdicts, 10 scope
+against those records: `make papernums` (94 figures in the prose, 31 in the drawn figures, 19 verdicts, 10 scope
 claims; non-zero exit when any of them parts from its record).

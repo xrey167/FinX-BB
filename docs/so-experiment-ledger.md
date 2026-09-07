@@ -3413,6 +3413,39 @@ Five kinds of claim now, five instruments, each built after the previous one's s
 for evidence. The pattern has not yet stopped producing findings, which is the only reason to expect
 a sixth.
 
+### 31.54 A claim that went stale because the repository grew (2026-09-06, merge from base)
+
+§31.53 said the pattern "has not yet stopped producing findings, which is the only reason to expect
+a sixth". The sixth arrived without anyone editing the paper.
+
+The base branch gained **six experiments overnight** -- E-000109 through E-000114, all reduction
+experiments of exactly the family NOV-004 audits. Merging them turned `A mechanical sweep of all 100
+recorded experiments` into a false statement: it is **106** now. **No edit to the paper caused it.**
+Every previous finding came from prose and record disagreeing after one of them changed; this one
+came from the world the claim describes getting bigger.
+
+**Why five passes stayed green through it, which is the useful part.** `100` is *five different
+quantities* in that paper: E-000028's targets per seed, E-000035's pods per seed (three times), and
+NOV-004's count of scanned files. Exactly one was bound -- E-000035's -- and its presence test found
+*some* standalone `100` and passed. §31.51 had already labelled such figures "round enough to recur,
+presence test does not discriminate" and treated that as a disclosure. It was not merely a weak
+check; it was **actively concealing a different quantity that had gone wrong.**
+
+`near` fixes the mechanism rather than the number: a claim may name the paragraph that identifies
+which quantity it is, and is then sought only there. Paragraph, not line, because prose wraps and
+"found three" lands after the phrase that disambiguates it. The swept count is now bound to
+NOV-004's own record, so it tracks the repository instead of the prose.
+
+**The audit re-run is itself the reassuring result.** 106 files scanned, validity floor still met,
+still exactly three Class A sites, and **none of the six new experiments appears in either class** --
+the first evidence that the vacuity pattern is not recurring in work written after it was published.
+With the standing caveat that absence from both lists is not clearance: they were checked for two
+things.
+
+Six kinds of staleness now. The fifth was "the pointers might not point"; the sixth is "the claim may
+be about a world that moved". A registry cannot anticipate the seventh, and saying so is not modesty,
+it is the only accurate description of what a green run means.
+
 ### 31.8 Boundary
 
 CPU only, no GPU, no LLM above 124M parameters, synthetic worlds, single-token entities, two surface forms per relation, one session. Nothing here shows unlearning of facts already encoded in pretrained weights. Evidence levels recorded: E3–E4 for the synthetic system (F4 for SHRED with the verified gate, E-000010 — **on the value channel only**: E-000028 recovers the shredded object at 1.0000 through the ungated reverse key, where REVOKE and DELETE are at chance, so F4 for SHRED is a claim about answers, logits, hidden states and probes and not about routing); E5 as substrate for the frozen-GPT-2 experiment, with reading, composition, update and the copy bound supported and behavioural deletion not yet supported at the pre-registered thresholds.

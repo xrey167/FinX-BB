@@ -1146,7 +1146,7 @@
   ],
   "decision": "SCANNER_VALID",
   "experiment": "NOV-004",
-  "files_scanned": 100,
+  "files_scanned": 106,
   "how_to_read_this": "Class A is decidable from the syntax: two names in one scope bound to identical call expressions, so any predicate comparing them cannot fail. Each is a finding. Class B is a heuristic and each entry is a candidate for review, never a verdict \u2014 a call can be loop-invariant and still necessary, and an invariant call in the *candidate* arm is not a defect at all. It becomes one only when it sits on the baseline, where it inflates the candidate's margin for free, which is what NOV-003 found in E-000103. Reading Class B as a list of defects would be \u00a731.46's error repeated: scoring something the instrument cannot resolve.",
   "known_sites_found": [
     "e000104_tensor_train_lifecycle_quotient_reduction.py:local_update_multiplies",

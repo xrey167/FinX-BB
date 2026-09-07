@@ -492,6 +492,54 @@ def test_a_figure_the_paper_spells_in_words_is_sought_in_words():
     assert occurrences("eleven", "elevenths") == 0
 
 
+def test_a_pinned_claim_only_matches_in_its_own_context():
+    """`100` is five different quantities here, and binding one let another go stale.
+
+    E-000035's pod count and NOV-004's count of scanned experiments both rendered "100". The pod
+    claim's presence test found *some* occurrence and passed, so when the repository grew to 106
+    experiments the paper's sweep count went stale behind a green check. `near` pins a claim to the
+    paragraph that identifies which quantity it is.
+    """
+    pinned = [c for c in CLAIMS if c.near]
+    assert pinned, "nothing is pinned; this test is checking nothing"
+    for c in pinned:
+        rows = check(_PAPER_TEXT, claims=(c,), scope_claims=(), figure_claims=(),
+                     verdict_claims=())["figures"]
+        assert rows[0]["status"] == "OK", rows
+
+    # the pin has to bite: point one at a context it does not occur in
+    c = next(c for c in CLAIMS if c.label == "NOV004 experiments scanned")
+    misplaced = Claim(c.label, c.record, c.path, c.printed, c.rule, c.reduce, c.appears_as,
+                      "pods each")
+    rows = check(_PAPER_TEXT, claims=(misplaced,), scope_claims=(), figure_claims=(),
+                 verdict_claims=())["figures"]
+    assert rows[0]["status"] == "ABSENT", rows
+
+
+def test_a_pin_naming_no_paragraph_is_reported_not_ignored():
+    c = CLAIMS[0]
+    nowhere = Claim(c.label, c.record, c.path, c.printed, c.rule, c.reduce, c.appears_as,
+                    "a phrase this paper does not contain")
+    rows = check(_PAPER_TEXT, claims=(nowhere,), scope_claims=(), figure_claims=(),
+                 verdict_claims=())["figures"]
+    assert rows[0]["status"] == "ABSENT"
+    assert "no paragraph" in rows[0]["detail"]
+
+
+def test_the_sweep_count_tracks_the_repository_rather_than_the_prose():
+    """It went stale when the base branch grew by six experiments, not when anyone edited the paper."""
+    import json
+    from pathlib import Path
+    rec = json.loads(Path("so/results/nov004/nov004_instrument_audit.json").read_text())
+    assert rec["files_scanned"] == 106
+    assert "sweep of all 106 recorded experiments" in _PAPER_TEXT
+    # the old count survives only inside backticks, where §9 quotes it as the claim that went stale
+    # -- the same convention that lets the coverage pass ignore it
+    for m in re.finditer(r"100 recorded experiments", _PAPER_TEXT):
+        line = _PAPER_TEXT[:m.start()].rsplit("\n", 1)[-1] + _PAPER_TEXT[m.start():].split("\n", 1)[0]
+        assert "`" in line, f"un-quoted stale count: {line}"
+
+
 def test_round_recurring_figures_are_reported_as_weak_not_counted_as_checks():
     """1.0000 appears all over the paper; its presence test proves nothing and says so."""
     weak = set(_REPORT["weak_presence_tests"])
