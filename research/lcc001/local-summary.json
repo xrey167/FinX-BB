@@ -1,0 +1,35 @@
+{
+  "experiment": "LCC-001",
+  "preregistration_commit": "b0d25b651ff02c5b847f30c30778e51febd8ce90",
+  "classification": "two restricted-family structural falsifications; NOT a technical novelty",
+  "breakthrough": false,
+  "arithmetic": "exact fractions; no tolerances",
+  "python": "3.13.5",
+  "source_sha256": "8f6ba1186c24a9e464725c3dd953c0f3a5edd374476ac83841b0cf7e10eb1698",
+  "tests_run": 9,
+  "tests_successful": true,
+  "collision": {
+    "indistinguishable_history_pairs": 48,
+    "different_validity_pairs": 48,
+    "explicit_provenance_control_decisions_correct": 96
+  },
+  "totals": {
+    "output_equalities": 1008,
+    "shared_trace_equalities": 1008,
+    "mixed_derivative_equalities_through_order4": 15120,
+    "audited_revocations_with_zero_effect": 504,
+    "interval_certificate_comparisons": 1890,
+    "intervals_certified": 949
+  },
+  "unprobed_counterexamples": 9,
+  "scope": "state-only historical provenance and finite-oracle whole-domain support; NOT white-box or scoped proof impossibility",
+  "real_reader_capability": "NOT MEASURED",
+  "trained_reader_seeds": 0,
+  "backbones_evaluated": 0,
+  "actual_J_lens_executed": false,
+  "full_system_lifecycle_and_utility_gates": "NOT MEASURED; unchanged",
+  "executed_source_git_blob_verified": "59286683dde19dced0bd2cc15991a36ebf4f9aed",
+  "execution_kind": "local CPU; Actions replication not yet claimed",
+  "source_commit": "4c3275c0e7d19217a573f17eba7782f47f82d2a8",
+  "result_sha256": "d60693ab500a71b22b84ca7d78ba5c00e766fee12e54b9ac76a3237ee082a813"
+}
