@@ -1,0 +1,161 @@
+{
+  "experiment": "CAVI-CAPABILITY-CONTINUATION",
+  "seed": 0,
+  "model_name": "EleutherAI/pythia-70m",
+  "model_revision": "a39f36b100fe8a5377810d56c3f4789b9c53ac42",
+  "config": {
+    "n_relations": 4,
+    "read_layers": [
+      3,
+      5
+    ],
+    "d_key": 256,
+    "marker_dim": 16,
+    "use_marker_gate": true,
+    "hard_gate": false,
+    "status_gated": true,
+    "use_links": true,
+    "n_deref": 1,
+    "two_channel_null": false,
+    "match_gate": false,
+    "payload_from": "output",
+    "fallback": "unknown"
+  },
+  "source_commit": "74185464056305593380cccd6e5a6fe5324552e4",
+  "python": "3.11.16",
+  "torch": "2.14.0+cpu",
+  "breakthrough": false,
+  "threshold": 0.95,
+  "preflight": {
+    "candidate_maxabs": 0.0,
+    "full_vocab_maxabs": 0.0,
+    "routing_maxabs": 0.0,
+    "hidden_maxabs": 0.0,
+    "adapter_gradient_maxabs": 0.0,
+    "execution": "original KnowledgeAdapterLM full-vocabulary full-sequence head",
+    "optimized_head_accepted": false,
+    "rejected_optimization_run": 33963051896
+  },
+  "training": {
+    "steps": 3000,
+    "rng_seed": 0,
+    "lr": 0.002,
+    "route_only_steps": 400
+  },
+  "checkpoint_sha256": "b78a67e03f35c3f854102c267db7a80b167fa7edd065a9dfd9d24f6f2f692214",
+  "fresh": {
+    "rows": [
+      {
+        "world_seed": 70000,
+        "template": 8,
+        "n": 200,
+        "candidate_correct": 184,
+        "candidate_accuracy": 0.92,
+        "full_vocab_accuracy": 0.79
+      },
+      {
+        "world_seed": 70000,
+        "template": 9,
+        "n": 200,
+        "candidate_correct": 136,
+        "candidate_accuracy": 0.68,
+        "full_vocab_accuracy": 0.505
+      },
+      {
+        "world_seed": 70000,
+        "template": 10,
+        "n": 200,
+        "candidate_correct": 187,
+        "candidate_accuracy": 0.935,
+        "full_vocab_accuracy": 0.84
+      },
+      {
+        "world_seed": 70000,
+        "template": 11,
+        "n": 200,
+        "candidate_correct": 170,
+        "candidate_accuracy": 0.85,
+        "full_vocab_accuracy": 0.735
+      },
+      {
+        "world_seed": 91000,
+        "template": 8,
+        "n": 200,
+        "candidate_correct": 174,
+        "candidate_accuracy": 0.87,
+        "full_vocab_accuracy": 0.69
+      },
+      {
+        "world_seed": 91000,
+        "template": 9,
+        "n": 200,
+        "candidate_correct": 129,
+        "candidate_accuracy": 0.645,
+        "full_vocab_accuracy": 0.405
+      },
+      {
+        "world_seed": 91000,
+        "template": 10,
+        "n": 200,
+        "candidate_correct": 184,
+        "candidate_accuracy": 0.92,
+        "full_vocab_accuracy": 0.685
+      },
+      {
+        "world_seed": 91000,
+        "template": 11,
+        "n": 200,
+        "candidate_correct": 159,
+        "candidate_accuracy": 0.795,
+        "full_vocab_accuracy": 0.64
+      },
+      {
+        "world_seed": 92000,
+        "template": 8,
+        "n": 200,
+        "candidate_correct": 185,
+        "candidate_accuracy": 0.925,
+        "full_vocab_accuracy": 0.77
+      },
+      {
+        "world_seed": 92000,
+        "template": 9,
+        "n": 200,
+        "candidate_correct": 131,
+        "candidate_accuracy": 0.655,
+        "full_vocab_accuracy": 0.48
+      },
+      {
+        "world_seed": 92000,
+        "template": 10,
+        "n": 200,
+        "candidate_correct": 183,
+        "candidate_accuracy": 0.915,
+        "full_vocab_accuracy": 0.765
+      },
+      {
+        "world_seed": 92000,
+        "template": 11,
+        "n": 200,
+        "candidate_correct": 169,
+        "candidate_accuracy": 0.845,
+        "full_vocab_accuracy": 0.72
+      }
+    ],
+    "minimum_candidate_accuracy": 0.645,
+    "minimum_full_vocab_accuracy": 0.405,
+    "valid_reader": false,
+    "scope": "candidate read gate; full-vocabulary performance reported separately"
+  },
+  "joint_screen": {
+    "status": "SKIPPED_INVALID_READER"
+  },
+  "seconds": 1106.4514589309692,
+  "not_established": [
+    "full adversarial battery",
+    "independent J-space audit",
+    "universal linguistic coverage",
+    "novelty",
+    "latency bound"
+  ]
+}

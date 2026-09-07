@@ -1,0 +1,32 @@
+name: CAVI continuation evidence snapshot
+on:
+  push:
+    branches: [research/cavi-continuation-audit]
+    paths: ['.github/workflows/cavi-continuation-evidence.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  evidence:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Capture pinned source and all Actions metadata
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          mkdir evidence
+          git rev-parse HEAD > evidence/source-commit.txt
+          git archive HEAD > evidence/source.tar
+          gh api --paginate 'repos/xrey167/FinX-BB/actions/runs?per_page=100' --jq '.workflow_runs[] | {id,name,head_branch,head_sha,status,conclusion,created_at,updated_at,run_attempt}' > evidence/all-runs.jsonl
+          gh api --paginate 'repos/xrey167/FinX-BB/actions/artifacts?per_page=100' --jq '.artifacts[] | {id,name,digest,size_in_bytes,expired,workflow_run}' > evidence/all-artifacts.jsonl
+          sha256sum evidence/source.tar > evidence/source.sha256
+      - uses: actions/upload-artifact@v4
+        with:
+          name: cavi-continuation-source-and-actions
+          path: evidence/
+          retention-days: 7
+          if-no-files-found: error
