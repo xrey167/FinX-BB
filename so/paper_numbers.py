@@ -790,6 +790,8 @@ _NOT_A_MEASUREMENT: tuple[tuple[str, str], ...] = (
     (r"\bseeds \d\s?[–-]\s?\d\b",  "seed range, carried by a scope claim"),
     (r"\bseed-\d\b|\bseed \d\b", "seed name"),
     (r"\(Figure \d\)",        "inline figure reference"),
+    (r"arXiv:\d{4}\.\d{4,5}", "arXiv identifier — must precede the bare-year rule, which would "
+                              "otherwise eat its first half"),
     (r"\d{4}-\d{2}-\d{2}",    "ISO date — must precede the bare-year rule"),
     (r"\b(?:19|20)\d{2}\b",   "calendar year"),
     (r"(?m)^\d+\. ",          "numbered list item in §11"),

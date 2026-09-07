@@ -10,13 +10,17 @@ a list of seven findings, which is a record, not a paper. No number changed in t
 
 ## 0. Two things a reader must know before the abstract
 
-**External citations are unverified.** The literature positions in this draft descend from a 41-agent
-literature workflow recorded in `docs/so-novelty-2026-09-04.md`, whose own provenance note says: its
-claims about this repository were checked against `so/results/*.json` and match; its claims about the
-external literature — titles, authors, venues, arXiv identifiers, dates, reported numbers — were
-**not** independently verified, and several cited works postdate the model's training data. Nothing
-in the environment this draft was written in has network access. **Every citation must be checked
-before submission.** Where the sources say "verified", that is the workflow's word.
+**External citations were unverified, and six clusters now are.** The literature positions in this
+draft descend from a 41-agent literature workflow recorded in `docs/so-novelty-2026-09-04.md`, whose
+own provenance note disclaims them: its claims about this repository were checked against
+`so/results/*.json` and match, but titles, authors, venues, identifiers and reported numbers were
+**not** independently checked.
+
+This draft then repeated, for a day, that "nothing in the environment has network access". **That was
+never tested and is false** — search and fetch both work here. The six load-bearing clusters have
+now been verified against the sources, with status and method recorded per entry in
+`docs/paper/references.md`; §12 carries the results. Two clusters remain unchecked and are named
+there. Where a source is quoted below, the quotation has been read in the source's own text.
 
 **Two experiments block honest submission.** They are named in §13 and neither is optional.
 
@@ -547,14 +551,46 @@ irrelevant, by making it the instrument rather than the subject.
 
 ## 12. Related work, in one place
 
-Consolidated here rather than distributed, and **every entry is unverified** (§0): memory-augmented
-architectures with per-entry lifecycle operations and forgetting primitives; masked-value training
-and corpus isolation for the copy bound; attack-based unlearning benchmarks and their published
-critiques; adversarial failure of learned detectors and learned index structures; recovery of
-soft-deleted embeddings from vector indexes; resilience and minimum contingency sets in the database
-literature, with the PTIME/NP-complete dichotomy and an LP-tight solver; and the 2026 audit of
-forgetting in limited-memory language models that proposes write-time canonicalisation as testable
-and does not test it.
+Consolidated here rather than distributed. Six clusters are verified against the sources; the method
+and status of each is in `docs/paper/references.md`. Two remain unchecked and are marked.
+
+**Memory-augmented architectures with per-entry lifecycle operations.** Das et al., *Larimar: Large
+Language Models with Episodic Memory Control*, ICML 2024 (arXiv:2403.11901) — one-shot updates
+without retraining, with selective fact forgetting. This is why §1 concedes the architecture.
+
+**The discrete codebook whose key is derived from the content it indexes.** Hartvigsen et al.,
+*Aging with GRACE: Lifelong Model Editing with Discrete Key-Value Adaptors*, NeurIPS 2023
+(arXiv:2211.11031). GRACE caches edits keyed by the original embedding, which is precisely the shape
+PDX-001's `codebook_key` policy reconstructs — so that row models a real design, not an invented one.
+
+**Recovery of soft-deleted embeddings.** *Ghost Vectors: Soft-Deleted Embeddings Remain
+Reconstructible in HNSW Vector Databases*, 2026 (arXiv:2606.18497). The nearest prior work, and
+**different in kind**: it recovers embeddings a soft delete left physically on disk, read beneath
+the API. §2's payload *was* gated and its value channel *is* at chance; the recovery runs through a
+derived index term. That distinction survived checking.
+
+**The audit that proposes our remedy and does not test it.** Raeesi and Roed, *Auditing Forgetting
+in Limited Memory Language Models*, July 2026 (arXiv:2607.00605). Its §9 proposes storing "aliases
+and paraphrastic forms as pointers into a single canonical record" and calls it "directly testable
+within our framework" — read in the source, in Future Work, unimplemented, with no closure size and
+no closure-finding cost measured. Its own finding, that the unlearning boundary "is drawn primarily
+by the database administrator rather than by the model", is independent support for §6's
+record-versus-fact distinction and is cited here for that as much as for the untested proposal.
+
+**Resilience and minimum contingency sets.** The quantity §6 computes is the database literature's:
+the minimum set of tuples whose removal falsifies a Boolean query, with PTIME/NP-complete dichotomy
+results for self-join-free conjunctive queries and beyond (e.g. arXiv:1907.01129, arXiv:2601.05346).
+The certified lower bound is that literature's disjoint-witness packing.
+
+**Adversarial failure of learned predicates.** Carlini and Wagner, *Towards Evaluating the Robustness
+of Neural Networks*, IEEE S&P 2017 (arXiv:1608.04644); Kraska et al., *The Case for Learned Index
+Structures*, SIGMOD 2018 (arXiv:1712.01208). §5's analogy holds exactly: a learned Bloom filter keeps
+an **exact backup filter** over the keys the model scores below threshold, so that no false negative
+survives.
+
+**Still unverified** (§0): masked-value training and corpus isolation for the copy bound; and
+attack-based unlearning benchmarks with their published critiques. The second is the more important
+gap, because the draft's framing of "the standard" rests on that cluster being real.
 
 ## 13. What must be run before this is honest to send
 
@@ -587,10 +623,13 @@ system people cite, or a null that localises the defect. No training; inference 
 checkpoints. **This is also the answer to the reviewer who objects to the scale of our own setup** —
 it converts that setup from the subject of the paper into its instrument.
 
-**(d) Obtain the citations, then verify them.** §12 currently names *topics*, not works: there is not
-one author, year or title in this draft. "Verify every citation" understates the task — the
-references have to be found first, and only then checked against §0's warning. Until that is done the
-related-work section cannot be assessed by a reviewer at all.
+**(d) Finish the citations. Six of eight clusters are now done.** This item said the references had
+to be found before they could be verified, and that the environment had no network to find them
+with. The second half was false and untested; §12 now carries real works, with per-entry method and
+status in `docs/paper/references.md`. What remains: masked-value training and corpus isolation for
+the copy bound, and attack-based unlearning benchmarks with their critiques — the latter being the
+cluster the draft's framing of "the standard" depends on, so it is the one to do next. Verification
+so far is bibliographic only: **no cited result has been reproduced**.
 
 ## 14. Venue
 

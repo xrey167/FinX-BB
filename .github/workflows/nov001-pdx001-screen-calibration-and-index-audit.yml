@@ -16,6 +16,7 @@ on:
       - "so/experiments/nov003_unread_coordinates_e103.py"
       - "docs/novelty/nov004-instrument-audit-result.md"
       - "docs/paper/deletion-certificates-draft-2026-09-06.md"
+      - "docs/paper/references.md"
       - "docs/paper/figures/fig1-top1-false-negative.svg"
       - "docs/paper/figures/fig2-swept-geometry.svg"
       - "docs/paper/figures/fig3-closure-inversion.svg"
@@ -134,6 +135,7 @@ jobs:
             so/experiments/nov004_instrument_audit.py \
             so/tests/test_nov004_instrument_audit.py \
             docs/paper/deletion-certificates-draft-2026-09-06.md \
+            docs/paper/references.md \
             docs/paper/figures/fig1-top1-false-negative.svg \
             docs/paper/figures/fig2-swept-geometry.svg \
             docs/paper/figures/fig3-closure-inversion.svg \

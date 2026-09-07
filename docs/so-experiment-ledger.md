@@ -3500,6 +3500,49 @@ the world, and every pass stays green. `check_record_freshness` recounts the exp
 sweep's own rule and compares. It is the first check here that looks at something other than two
 documents.
 
+### 31.57 The network was there the whole time, and six citations check out (2026-09-07, §13(d))
+
+§31.55 found that §13(b) was never blocked. The same question, asked of the other three, gives:
+
+| item | claimed blocker | actual |
+|---|---|---|
+| (a) sweep on the symlink arms | torch + checkpoints | **checkpoints only** — none on disk; needs a training run. torch was never the issue |
+| (b) closure in a vector index | torch + network | **neither**; run, and it falsifies itself (§31.55) |
+| (c) instrument vs a published system | network | **not blocked** |
+| (d) the citations | network | **not blocked** |
+
+The draft opened with "Nothing in the environment this draft was written in has network access."
+**Untested, and false.** Search and fetch both work. The sentence was true when written and false
+every time it was repeated, which is the §31.54 shape again: a claim about a world that moved.
+
+**Six of eight clusters verified**, with method and status per entry in `docs/paper/references.md`:
+Larimar (arXiv:2403.11901), GRACE (arXiv:2211.11031), Ghost Vectors (arXiv:2606.18497), the 2026
+audit (arXiv:2607.00605), the resilience literature, and Carlini--Wagner with Kraska et al.
+
+**Three of them were load-bearing, and all three held.**
+
+* **Ghost Vectors is different in kind, as §2 says.** It recovers embeddings a soft delete left
+  physically on disk, read beneath the API — a retention failure. §2's payload *was* gated and its
+  value channel *is* at chance. The distinction survives.
+* **GRACE keys its codebook on the original embedding**, so PDX-001's `codebook_key` policy models
+  a real design rather than an invented one. That row was the weakest link in the "faithful
+  reconstructions" claim and it is now anchored.
+* **The audit's §9 says what the draft says it says**, verified in the source's own text: it
+  proposes canonicalisation, calls it "directly testable within our framework", does not implement
+  it, and measures neither closure size nor closure-finding cost. §6's "what is ours" stands
+  exactly as written. Its own result — the unlearning boundary "drawn primarily by the database
+  administrator rather than by the model" — is independent support for the record/fact distinction,
+  and is now cited for that rather than only as an unrun proposal.
+
+**What is not established.** Verification is bibliographic. No cited result has been reproduced, a
+real citation can still be misread, and two clusters remain unchecked — including attack-based
+unlearning benchmarks, which the draft's whole framing of "the standard" depends on. That is the
+next one to do, and it is now merely work rather than a blocker.
+
+The pattern worth keeping: **"blocked" is a claim, and it had never been given a positive control.**
+Four items carried it, three were wrong, and the wrongness was cheap to detect and expensive to
+leave — one command each.
+
 ### 31.8 Boundary
 
 CPU only, no GPU, no LLM above 124M parameters, synthetic worlds, single-token entities, two surface forms per relation, one session. Nothing here shows unlearning of facts already encoded in pretrained weights. Evidence levels recorded: E3–E4 for the synthetic system (F4 for SHRED with the verified gate, E-000010 — **on the value channel only**: E-000028 recovers the shredded object at 1.0000 through the ungated reverse key, where REVOKE and DELETE are at chance, so F4 for SHRED is a claim about answers, logits, hidden states and probes and not about routing); E5 as substrate for the frozen-GPT-2 experiment, with reading, composition, update and the copy bound supported and behavioural deletion not yet supported at the pre-registered thresholds.
