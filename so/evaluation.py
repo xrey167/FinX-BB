@@ -46,16 +46,19 @@ def predict(model, store: MVCCStore, world: World, queries: Sequence[Query], noi
             cell_mask: Optional[np.ndarray] = None, batch_size: int = 256, seed: int = 0,
             bank: Optional[Bank] = None, confident: float = 0.5) -> Predictions:
     bank = bank_from_store(store) if bank is None else bank
+    bank.require_fresh(store)
     tensors = bank.tensors()
     gen = torch.Generator().manual_seed(seed)
     mask_t = None if cell_mask is None else torch.as_tensor(cell_mask, dtype=torch.bool)
     H = model.cfg.max_hops
     answers, traces, routings, logits_all = [], [], [], []
     for i in range(0, len(queries), batch_size):
+        bank.require_fresh(store)  # reject a mutation between chunks, not merely before materialisation
         chunk = list(queries[i: i + batch_size])
         batch = encode_queries(chunk, bank, world, H)
         logits, routing, _ = model(tensors, batch.mode, batch.start, batch.rels, batch.hop_valid,
                                    noise=noise, generator=gen, cell_mask=mask_t)
+        bank.require_fresh(store)  # a cooperative model callback may mutate the store during forward
         pred = logits.argmax(-1).numpy()
         pred = np.where(pred == world.n_entities, UNKNOWN, pred)
         r = routing.numpy()
@@ -72,6 +75,7 @@ def predict(model, store: MVCCStore, world: World, queries: Sequence[Query], noi
         answers.append(pred)
         routings.append(r)
         logits_all.append(logits.numpy())
+    bank.require_fresh(store)      # close the gap after the final chunk (and the empty-query path)
     return Predictions(np.concatenate(answers), traces, np.concatenate(routings), np.concatenate(logits_all))
 
 

@@ -883,6 +883,20 @@ def test_the_sweep_leaves_the_store_as_it_found_it():
     assert st.state_hash() == before
 
 
+def test_history_independence_includes_exact_link_target_identity():
+    """An evicted dummy shifts later kids; equal target keys must not hide that pointer history."""
+    from so.audit import check_history_independence
+
+    st = MVCCStore(seed=0, content_markers=True)
+    dummy = st.write(99, 9, 99)
+    st.evict(dummy)
+    target = st.write(3, 1, 7)
+    st.link(4, 1, target)
+    result = check_history_independence(st)
+    assert not result.exported_hi
+    assert "link_target_kid" in result.differing_fields
+
+
 def test_the_store_counterfactual_can_void_a_fact_certificate_a_membership_test_would_pass():
     """The composition has to inherit the stronger instrument's verdict, not the weaker one's."""
     from so.audit import Certificate, check_absence, certify_fact

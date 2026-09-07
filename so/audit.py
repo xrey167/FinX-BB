@@ -347,12 +347,13 @@ def _compare(ref: List[Tuple[str, torch.Tensor]], got: List[Tuple[str, torch.Ten
 
 
 # A row's payload is not always one field. A FACT row carries its object in ``obj``; a LINK row's obj
-# is a hardwired placeholder and its payload -- the address it points at -- lives in ``link_subject``
-# and ``link_relation`` (so/mvcc.py bank()). A sweep over ``obj`` alone therefore says nothing about a
+# is a hardwired placeholder and its payload -- the exact identity and address it points at -- lives
+# in ``link_target_kid``, ``link_subject`` and ``link_relation`` (so/mvcc.py bank()). A sweep over
+# ``obj`` alone therefore says nothing about a
 # link row, and a certificate that returned True for such a row would be certifying a payload it never
 # looked at. Both domains are finite, so exhaustiveness survives; what does not survive is guessing.
 FACT_PAYLOAD: Tuple[str, ...] = ("obj",)
-LINK_PAYLOAD: Tuple[str, ...] = ("link_subject", "link_relation")
+LINK_PAYLOAD: Tuple[str, ...] = ("link_target_kid", "link_subject", "link_relation")
 
 
 class UnsweepablePayload(RuntimeError):
@@ -1352,7 +1353,8 @@ def check_history_independence(store: Any) -> HistoryIndependence:
             residue += 1
 
     b, f = store.bank(), fresh.bank()
-    content = ("subject", "relation", "obj", "is_link", "link_subject", "link_relation", "active")
+    content = ("subject", "relation", "obj", "is_link", "link_target_kid",
+               "link_subject", "link_relation", "active")
 
     def order(bank):
         cols = [np.asarray(bank[c]).astype(np.int64) for c in content]

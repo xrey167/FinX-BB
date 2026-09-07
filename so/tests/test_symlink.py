@@ -7,7 +7,7 @@ from so.data import bank_from_store
 from so.experiments.e000015_symlink_cells import (AliasSpec, bank_with_links, encode_slots, load_arm,
                                                   model_config, sample_alias_world)
 from so.mvcc import MVCCStore, Status
-from so.model import MutableKnowledgeTransformer
+from so.model import ModelConfig, MutableKnowledgeTransformer
 from so.reference import ReferenceResolver
 from so.train import make_centre
 from so.world import Query, UNKNOWN
@@ -100,6 +100,76 @@ def test_reference_resolver_follows_aliases_and_traces_both_cells():
     r = ref.resolve(q)
     assert r.answer == world.index[target]
     assert r.trace == (sk[aliases[0]], sk[target])
+
+
+def test_neural_dereference_routes_exact_duplicate_target_kid_across_retirement(monkeypatch):
+    st = MVCCStore(marker_dim=16, seed=0)
+    first = st.write(3, 1, 7)
+    shadow = st.write(3, 1, 9)
+    alias_first = st.link(4, 1, first)
+    alias_shadow = st.link(5, 1, shadow)
+    cfg = ModelConfig(n_entities=16, n_relations=2, n_surface=2, max_hops=1, d_model=16,
+                      n_heads=2, n_core_layers=1, d_ff=32, use_links=True, n_deref=1,
+                      use_marker_gate=False)
+    model = MutableKnowledgeTransformer(cfg).eval()
+
+    def routed_target(bank, alias_kid):
+        tensors = bank.tensors()
+        alias_pos = bank.kid.tolist().index(alias_kid)
+
+        def choose_alias(_h, _rel, _hop, _kf, vf, _kr, _vr, _fwd, _allowed):
+            p = vf.new_zeros((1, vf.shape[0]))
+            p[0, alias_pos] = 1
+            return vf[alias_pos][None], p
+
+        def expose_mask(_read, _state, _keys, values, allowed):
+            p = values.new_zeros((1, values.shape[0]))
+            chosen = allowed[0] if allowed.ndim == 2 else allowed
+            p[0, int(torch.nonzero(chosen, as_tuple=False)[0])] = 1
+            return p @ values, p
+
+        monkeypatch.setattr(model.hop, "read", choose_alias)
+        monkeypatch.setattr(model.deref[0], "forward", expose_mask)
+        _, routing, _ = model(tensors, torch.tensor([0]), torch.tensor([4]), torch.tensor([[1]]),
+                              torch.tensor([[True]]))
+        return int(routing[0, 1].argmax()), bank
+
+    pos, bank = routed_target(bank_from_store(st), alias_shadow)
+    assert pos == bank.kid.tolist().index(shadow)       # shadow is inactive for direct lookup, not dereference
+    pos, bank = routed_target(bank_from_store(st), alias_first)
+    assert pos == bank.kid.tolist().index(first)
+
+    st.revoke(first)
+    pos, bank = routed_target(bank_from_store(st), alias_first)
+    assert pos == bank.size                             # null, never the promoted shadow
+    st.restore(first)
+    st.evict(shadow)
+    pos, bank = routed_target(bank_from_store(st), alias_shadow)
+    assert pos == bank.size
+    st.restore(shadow)
+    st.delete(shadow)
+    pos, bank = routed_target(bank_from_store(st), alias_shadow)
+    assert pos == bank.size
+
+
+def test_unique_key_link_forward_is_bit_identical_without_exact_target_metadata():
+    st = MVCCStore(marker_dim=16, seed=0)
+    target = st.write(3, 1, 7)
+    st.link(4, 1, target)
+    bank = bank_from_store(st).tensors()
+    legacy = {k: v for k, v in bank.items()
+              if k not in {"link_target_pos", "link_target_exact", "deref_routable"}}
+    cfg = ModelConfig(n_entities=16, n_relations=2, n_surface=2, max_hops=1, d_model=16,
+                      n_heads=2, n_core_layers=1, d_ff=32, use_links=True, n_deref=1,
+                      use_marker_gate=False)
+    torch.manual_seed(123)
+    model = MutableKnowledgeTransformer(cfg).eval()
+    args = (torch.tensor([0]), torch.tensor([4]), torch.tensor([[1]]), torch.tensor([[True]]))
+    with torch.no_grad():
+        new = model(bank, *args)
+        old = model(legacy, *args)
+    assert torch.equal(new[0], old[0])
+    assert torch.equal(new[1], old[1])
 
 
 def test_slot_route_targets_name_alias_then_target():

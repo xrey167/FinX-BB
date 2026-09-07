@@ -23,9 +23,11 @@ def test_the_measurement_leaves_the_store_as_it_found_it():
     """A statistic that edits the thing it measures is not a statistic."""
     st = _store()
     st.write(3, 1, 7, provenance="w")
-    before = st.state_hash()
+    # Closure is a counterfactual measurement: event history advances, but retained logical state
+    # must be restored.  Persistent ``state_hash`` intentionally includes that event history.
+    before = st.logical_state_hash()
     deletion_closure(st, (3, 1))
-    assert st.state_hash() == before
+    assert st.logical_state_hash() == before
     assert ReferenceResolver(st).resolve(Query("fwd", 3, (1,), (0,))).answer == 7
 
 
@@ -182,10 +184,10 @@ def test_the_fact_level_measurement_leaves_the_store_as_it_found_it():
     for build in (lambda st: _pod(st, 5), lambda st: _duplicates(st, 5)):
         st = _store()
         build(st)
-        before = st.state_hash()
+        before = st.logical_state_hash()
         keys = duplicate_keys(st, 7)
         fact_closure(st, keys, obj=7)
-        assert st.state_hash() == before
+        assert st.logical_state_hash() == before
         assert len(duplicate_keys(st, 7)) == len(keys)
 
 

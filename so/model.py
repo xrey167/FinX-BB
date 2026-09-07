@@ -32,6 +32,35 @@ import torch.nn as nn
 import torch.nn.functional as F
 
 
+def _exact_deref_allowed(bank: Dict[str, torch.Tensor], routing: torch.Tensor,
+                         allowed: torch.Tensor, deref_routable: torch.Tensor) -> torch.Tensor:
+    """Constrain dereference only where a LINK target key has duplicate physical holders.
+
+    Unique-key links keep the recorded learned-attention path bit-identical.  For an ambiguous key,
+    however, the control plane must preserve pointer identity: the selected LINK may read only its
+    exact target row, or the null row if that kid is not currently dereferenceable.
+    """
+    required = ("is_link", "link_target_pos", "link_target_exact")
+    if not all(name in bank for name in required) or bank["is_link"].numel() == 0:
+        return allowed
+    n_cells = int(bank["is_link"].numel())
+    selected = routing.argmax(dim=-1)
+    in_bank = selected < n_cells
+    safe = selected.clamp(max=n_cells - 1)
+    enforce = in_bank & bank["is_link"][safe] & bank["link_target_exact"][safe]
+    if not bool(enforce.any()):
+        return allowed
+    constrained = allowed[None].expand(routing.shape[0], -1).clone()
+    for batch_index in torch.nonzero(enforce, as_tuple=False).flatten().tolist():
+        constrained[batch_index] = False
+        target = int(bank["link_target_pos"][safe[batch_index]].item())
+        if 0 <= target < n_cells and bool(deref_routable[target]):
+            constrained[batch_index, target] = True
+        else:
+            constrained[batch_index, -1] = True
+    return constrained
+
+
 @dataclass
 class ModelConfig:
     n_entities: int = 256
@@ -83,7 +112,8 @@ class HopBlock(nn.Module):
         q = self.q(self.ln_q(h + rel + hop_emb))
         scores = torch.where(is_fwd[:, None], q @ k_f.t(), q @ k_r.t())     # (B, C)
         scores = scores * (self.scale / k_f.shape[-1] ** 0.5)
-        scores = scores.masked_fill(~allowed[None], float("-inf"))
+        mask = ~allowed if allowed.ndim == 2 else ~allowed[None]
+        scores = scores.masked_fill(mask, float("-inf"))
         p = torch.softmax(scores, dim=-1)
         read = torch.where(is_fwd[:, None], p @ v_f, p @ v_r)               # (B, d)
         return read, p
@@ -275,8 +305,10 @@ class MutableKnowledgeTransformer(nn.Module):
         enc = self.encode_bank(bank, noise=noise, generator=generator)
         k_f, v_f, k_r, v_r = enc["k_f"], enc["v_f"], enc["k_r"], enc["v_r"]
         allowed = enc["active"]
+        deref_routable = bank.get("deref_routable", allowed)
         if cell_mask is not None:
             allowed = allowed & cell_mask
+            deref_routable = deref_routable & cell_mask
         if self.cfg.use_null_cell:
             k_f = torch.cat([k_f, self.null_key[0][None]]); v_f = torch.cat([v_f, self.null_value[0][None]])
             k_r = torch.cat([k_r, self.null_key[1][None]]); v_r = torch.cat([v_r, self.null_value[1][None]])
@@ -295,7 +327,8 @@ class MutableKnowledgeTransformer(nn.Module):
                     p = torch.zeros(B, k_f.shape[0], device=rels.device)
                     p[:, -1] = 1.0                                    # ablation: keep the value, follow nothing
                 else:
-                    read, p = self.deref[dd](read, h, k_f, v_f, allowed)
+                    deref_allowed = _exact_deref_allowed(bank, p, allowed, deref_routable)
+                    read, p = self.deref[dd](read, h, k_f, v_f, deref_allowed)
                 routing[:, t * (1 + D) + 1 + dd] = torch.where(valid[:, None], p, torch.zeros_like(p))
             h_new = self.hop.apply_read(h, read)
             h = torch.where(valid[:, None], h_new, h)

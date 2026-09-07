@@ -39,6 +39,8 @@ import numpy as np
 import torch
 import torch.nn as nn
 
+from .model import _exact_deref_allowed
+
 
 def transformer_blocks(lm) -> nn.ModuleList:
     """The list of decoder blocks, for the several names the libraries use.
@@ -233,7 +235,11 @@ class KnowledgeAdapterLM(nn.Module):
             if bank is not None:
                 enc = self.encode_bank(bank)
                 allowed = enc["active"] if cell_mask is None else enc["active"] & cell_mask
+                deref_routable = bank.get("deref_routable", enc["active"])
+                if cell_mask is not None:
+                    deref_routable = deref_routable & cell_mask
                 self._ctx = {"keys": enc["keys"], "values": enc["values"], "allowed": allowed,
+                             "deref_routable": deref_routable, "bank": bank,
                              "last_idx": last_idx, "routing": []}
             yield self._ctx
         finally:
@@ -514,7 +520,14 @@ class KnowledgeAdapterLM(nn.Module):
                 for _ in range(self.cfg.n_deref):
                     qd = self.q_deref[str(layer)](self.deref_ln[str(layer)](val))
                     sd = (qd @ keys.t()) * (self.deref_scale[read_index] / self.cfg.d_key ** 0.5)
-                    sd = sd.masked_fill(~allowed[None], float("-inf"))
+                    # Some instrumentation calls the frozen core with a legacy, manually seeded
+                    # context rather than through ``_memory_request``.  Preserve that path exactly;
+                    # exact-target enforcement is available only when the new bank metadata exists.
+                    deref_allowed = (_exact_deref_allowed(
+                        ctx["bank"], p, allowed, ctx["deref_routable"]
+                    ) if "bank" in ctx else allowed)
+                    mask = ~deref_allowed if deref_allowed.ndim == 2 else ~deref_allowed[None]
+                    sd = sd.masked_fill(mask, float("-inf"))
                     n_cells = max(int(ctx["allowed"].sum().item()), 1)
                     bias = self.deref_pass_bias[read_index] + float(np.log(n_cells))
                     sd = torch.cat([sd[:, :-1], sd[:, -1:] + bias], dim=-1)
@@ -523,6 +536,7 @@ class KnowledgeAdapterLM(nn.Module):
                     val = pd[:, :-1] @ values[:-1] + pd[:, -1:] * val
                     w_null = w_null * pd[:, -1:]  # the null share survives only through the passthroughs
                     ctx["routing"].append(pd)
+                    p = pd                       # a deeper dereference follows the row just selected
             null_c = w_null * values[-1][None]        # the null column's share of the read
             cell_c = val - null_c                     # everything the cells contributed
             if self.cfg.two_channel_null:

@@ -9,8 +9,10 @@ involved (architecture document section 19).
 
 from __future__ import annotations
 
+import threading
 from dataclasses import dataclass
-from typing import Dict, List, Optional, Tuple
+from types import MappingProxyType
+from typing import Dict, List, Mapping, Optional, Tuple
 
 from .mvcc import MVCCStore
 from .world import Query, UNKNOWN, World
@@ -26,20 +28,36 @@ class ReferenceResolver:
     def __init__(self, store: MVCCStore):
         self.store = store
         self._cache_revision = -1
-        self._cache_view: Dict[Tuple[int, int], Tuple[int, int]] = {}
+        self._cache_token = None
+        self._cache_view: Mapping[Tuple[int, int], Tuple[int, Tuple[int, ...]]] = MappingProxyType({})
+        self._cache_lock = threading.RLock()
 
-    def view(self) -> Dict[Tuple[int, int], Tuple[int, Tuple[int, ...]]]:
+    def view(self) -> Mapping[Tuple[int, int], Tuple[int, Tuple[int, ...]]]:
         """``key -> (object, trace of cells read)``; alias chains are followed (E-000015).
 
         In a store without link cells every trace has exactly one element, so this is the same
         view as before and every earlier record stays reproducible.
         """
-        if self._cache_revision != self.store.revision:
-            self._cache_view = self.store.resolved_view(respect_markers=True)
-            self._cache_revision = self.store.revision
-        return self._cache_view
+        with self._cache_lock:
+            if self._cache_token is not None and self.store.is_current(self._cache_token):
+                return self._cache_view
+            # Revision and resolved rows must come from the same linearizable store snapshot.  Reading
+            # ``store.revision`` around a separate ``resolved_view`` call can label an old view with a
+            # newer revision and keep it cached indefinitely.
+            snapshot = self.store.snapshot()
+            if self._cache_token != snapshot.revision_token:
+                view = {
+                    key: (int(obj), tuple(int(k) for k in trace))
+                    for key, (obj, trace) in snapshot.resolved_view
+                }
+                self._cache_view = MappingProxyType(view)
+                self._cache_revision = snapshot.revision
+                self._cache_token = snapshot.revision_token
+            return self._cache_view
 
-    def resolve(self, q: Query, view: Optional[Dict[Tuple[int, int], Tuple[int, int]]] = None) -> Resolution:
+    def resolve(self, q: Query,
+                view: Optional[Mapping[Tuple[int, int], Tuple[int, Tuple[int, ...]]]] = None
+                ) -> Resolution:
         v = self.view() if view is None else view
         if q.mode == "fwd":
             cur = q.start

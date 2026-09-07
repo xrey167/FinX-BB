@@ -37,13 +37,15 @@ def test_cascade_is_marker_equal_only_under_the_option():
         st, (f, a1, a2) = _pod_store(flag)
         st.evict(f); st.evict(a1); st.evict(a2)
         hi = check_history_independence(st)
-        assert hi.exported_hi and hi.residue_rows == 0          # E-000046: content is HI either way
+        # Exact LINK kid identity is now exported and consumed.  Content-derived markers remove the
+        # marker-stream channel, but cannot erase the stable-id history without retargeting aliases.
+        assert not hi.exported_hi and hi.residue_rows == 0
+        assert hi.differing_fields == ("link_target_kid",)
         assert hi.markers_equal is expect, (flag, hi)
 
 
-def test_a_never_wrote_store_and_a_cascaded_store_export_identical_banks():
-    """Bit-identical ``bank()`` arrays, markers included, in the same row order: this is what makes
-    E-000051's CASCADE-vs-NEVER cell a bank identity under the option, and the test that says so."""
+def test_content_markers_remove_marker_history_but_preserve_exact_link_identity():
+    """All content columns and markers match; stable exact LINK ids still expose write history."""
     st, (f, a1, a2) = _pod_store(True)
     st.evict(f); st.evict(a1); st.evict(a2)
     never = MVCCStore(marker_dim=16, seed=0, content_markers=True)
@@ -54,7 +56,8 @@ def test_a_never_wrote_store_and_a_cascaded_store_export_identical_banks():
     b, n = st.bank(), never.bank()
     for col in ("subject", "relation", "obj", "is_link", "link_subject", "link_relation", "active", "marker"):
         assert np.array_equal(b[col], n[col]), col
-    assert not np.array_equal(b["kid"], n["kid"])                # the cell ids still carry the history; the reader never sees them
+    assert not np.array_equal(b["kid"], n["kid"])
+    assert not np.array_equal(b["link_target_kid"], n["link_target_kid"])
 
 
 def test_the_generator_scheme_is_untouched_by_default():
