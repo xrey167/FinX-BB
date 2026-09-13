@@ -1,0 +1,40 @@
+name: Knowledge VM R301 Formal Coherence
+
+on:
+  push:
+    branches:
+      - research/knowledge-vm-formal-coherence-r301-20260913
+    paths:
+      - research/r301_ckca_finite_state_model.py
+      - .github/workflows/knowledge-vm-r301-formal-coherence.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  SO_R301_REPORT: ci-r301/report.json
+
+jobs:
+  r301-formal-coherence:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Run bounded CKCA finite-state model
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p ci-r301
+          python -m research.r301_ckca_finite_state_model 2>&1 | tee ci-r301/stdout.log
+      - name: Upload R301 evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: knowledge-vm-r301-formal-coherence
+          path: ci-r301/
+          retention-days: 30
+          if-no-files-found: warn
