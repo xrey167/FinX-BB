@@ -1,0 +1,40 @@
+name: Knowledge VM R311 Lifetime Domains
+
+on:
+  push:
+    branches:
+      - research/knowledge-vm-lifetime-domains-r311-20260913
+    paths:
+      - research/r311_phase_separated_lifetimes.py
+      - .github/workflows/knowledge-vm-r311-lifetime-domains.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  SO_R311_REPORT: ci-r311/report.json
+
+jobs:
+  r311-lifetime-domains:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Run R311 lifetime-domain gate
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p ci-r311
+          python -m research.r311_phase_separated_lifetimes 2>&1 | tee ci-r311/stdout.log
+      - name: Upload R311 evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: knowledge-vm-r311-lifetime-domains
+          path: ci-r311/
+          retention-days: 30
+          if-no-files-found: warn
