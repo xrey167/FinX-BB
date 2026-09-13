@@ -1,0 +1,54 @@
+name: Knowledge VM Qwen2.5 R296 MultiPod JSpace
+
+on:
+  push:
+    branches:
+      - research/knowledge-vm-multipod-jspace-r296-20260913
+    paths:
+      - research/qwen25_3b_knowledge_vm_r284_factored_ports.py
+      - research/qwen25_05b_r296_multipod_jspace.py
+      - .github/workflows/knowledge-vm-qwen25-r296-multipod-jspace.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  HF_HUB_DISABLE_XET: "1"
+  HF_HUB_DISABLE_TELEMETRY: "1"
+  TOKENIZERS_PARALLELISM: "false"
+  SO_R296_REPORT: ci-qwen-r296/report.json
+  OMP_NUM_THREADS: "2"
+  MKL_NUM_THREADS: "2"
+  OPENBLAS_NUM_THREADS: "1"
+
+jobs:
+  qwen25-r296-multipod-jspace:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+      - name: Install pinned runtime
+        run: |
+          set -euo pipefail
+          python -m pip install --upgrade pip
+          python -m pip install torch==2.4.1 --index-url https://download.pytorch.org/whl/cpu
+          python -m pip install transformers==4.45.2 tokenizers==0.20.3 huggingface_hub==0.25.2 safetensors==0.4.5
+      - name: Run R296 multi-Pod J-Space gate
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p ci-qwen-r296
+          python -m research.qwen25_05b_r296_multipod_jspace 2>&1 | tee ci-qwen-r296/stdout.log
+      - name: Upload R296 evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: knowledge-vm-qwen25-r296-multipod-jspace
+          path: ci-qwen-r296/
+          retention-days: 30
+          if-no-files-found: warn
