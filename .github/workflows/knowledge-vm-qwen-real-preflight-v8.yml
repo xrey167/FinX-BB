@@ -1,0 +1,51 @@
+name: Knowledge VM Qwen real preflight V8
+
+on:
+  push:
+    branches: [research/knowledge-vm-real-gate-20260913]
+    paths:
+      - 'so/experiments/knowledge_vm_qwen_preflight_v8.py'
+      - '.github/workflows/knowledge-vm-qwen-real-preflight-v8.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  qwen-real-preflight:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    env:
+      HF_HUB_DISABLE_XET: '1'
+      HF_HOME: ${{ github.workspace }}/.hf-cache
+      TOKENIZERS_PARALLELISM: 'false'
+      OMP_NUM_THREADS: '2'
+      MKL_NUM_THREADS: '2'
+      OPENBLAS_NUM_THREADS: '1'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install frozen real-model runtime
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install 'torch==2.14.0+cpu' --index-url https://download.pytorch.org/whl/cpu
+          python -m pip install 'transformers==5.16.1' huggingface_hub safetensors numpy
+          python -m pip freeze > environment.txt
+          python -m py_compile so/experiments/knowledge_vm_qwen_preflight_v8.py
+      - name: Run pinned Qwen2.5-0.5B frozen preflight
+        run: |
+          mkdir -p results
+          python so/experiments/knowledge_vm_qwen_preflight_v8.py \
+            --output results/qwen_preflight_v8.json \
+            --model-dir .cache/qwen2.5-0.5b-pinned
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: knowledge-vm-qwen-real-preflight-v8
+          path: |
+            results/
+            environment.txt
+          retention-days: 30
+          if-no-files-found: warn
