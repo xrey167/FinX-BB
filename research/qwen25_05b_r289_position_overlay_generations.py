@@ -44,13 +44,21 @@ def query_logits_at(model, query_ids, cache, past_mask, logical_start: int):
     qmask = torch.ones((1, len(query_ids)), dtype=torch.long)
     mask = torch.cat([past_mask, qmask], dim=1)
     pos = torch.arange(logical_start, logical_start + len(query_ids), dtype=torch.long).unsqueeze(0)
+    # cache_position is deliberately PHYSICAL while position_ids are LOGICAL.
+    # This lets the causal-mask machinery see all materialized cache entries while
+    # RoPE keeps every revision of one Port at the same semantic coordinates.
+    physical_start = cache_len(cache)
+    cache_position = torch.arange(
+        physical_start, physical_start + len(query_ids), dtype=torch.long
+    )
     with torch.inference_mode():
         out = model(
             input_ids=q,
             attention_mask=mask,
             position_ids=pos,
-            past_key_values=cache,
-            use_cache=False,
+            cache_position=cache_position,
+            past_key_values=copy.deepcopy(cache),
+            use_cache=True,
             return_dict=True,
         )
     return out.logits[0, -1, :].float()
