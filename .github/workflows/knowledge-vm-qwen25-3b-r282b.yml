@@ -1,0 +1,48 @@
+name: Knowledge VM Qwen2.5-3B R282b runtime-fixed
+
+on:
+  push:
+    branches:
+      - research/knowledge-vm-real-gate-20260913
+    paths:
+      - 'research/qwen25_3b_knowledge_vm_r282b_runtime_compat.py'
+      - '.github/workflows/knowledge-vm-qwen25-3b-r282b.yml'
+  workflow_dispatch:
+
+jobs:
+  qwen25-3b-r282b:
+    runs-on: ubuntu-latest
+    timeout-minutes: 80
+    permissions:
+      contents: read
+    env:
+      HF_HUB_DISABLE_XET: '1'
+      TOKENIZERS_PARALLELISM: 'false'
+      SO_R282_REPORT: ci-qwen-r282b/report.json
+      OMP_NUM_THREADS: '2'
+      MKL_NUM_THREADS: '2'
+      OPENBLAS_NUM_THREADS: '1'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+      - name: Install runtime
+        run: |
+          set -euo pipefail
+          python -m pip install --upgrade pip
+          python -m pip install torch==2.6.0 --index-url https://download.pytorch.org/whl/cpu
+          python -m pip install transformers==4.51.3 tokenizers==0.21.4 safetensors huggingface_hub
+      - name: Run frozen R282 through compatibility shim
+        run: |
+          set -euo pipefail
+          mkdir -p ci-qwen-r282b
+          python -m research.qwen25_3b_knowledge_vm_r282b_runtime_compat 2>&1 | tee ci-qwen-r282b/stdout.log
+      - name: Upload evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: knowledge-vm-qwen25-3b-r282b-causal-register
+          path: ci-qwen-r282b/
+          retention-days: 30
