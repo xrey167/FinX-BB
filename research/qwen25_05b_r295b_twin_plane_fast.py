@@ -68,7 +68,6 @@ def main() -> int:
     ).eval()
     model.requires_grad_(False)
 
-    # Cheap immutable-backbone witness: checkpoint hash + exact sampled parameter scalars.
     param_list = list(model.named_parameters())
     sample_ids = (0, len(param_list) // 2, len(param_list) - 1)
     param_witness_before = {
@@ -79,8 +78,15 @@ def main() -> int:
     heldout_entities = [f"NEW-{i:03d}-ZP" for i in range(12)]
     late_aliases = [f"ALIAS-{i:03d}-LATE" for i in range(12)]
     pairs = [(op, ent) for ent in train_entities + heldout_entities + late_aliases for op in OPS]
+    probe_key = ("read", heldout_entities[0])
+
+    # Critical integrity control: both measurements use exactly the same standalone
+    # tokenization/padding shape. The previous gate compared a batch-of-32 probe with
+    # a batch-of-1 repeat and measured a padding/numerical path difference, not mutation.
+    standalone_before, standalone_logits_before = extract_features(model, tok, [probe_key], batch_size=1)
+
     started = time.perf_counter()
-    features, baseline_logits = extract_features(model, tok, pairs, batch_size=32)
+    features, _baseline_logits = extract_features(model, tok, pairs, batch_size=32)
 
     emb = model.get_input_embeddings().weight.detach().float().cpu()
     port_codes = []
@@ -104,7 +110,6 @@ def main() -> int:
 
     bridge = FastBridge(d_model)
     opt = torch.optim.AdamW(bridge.parameters(), lr=4e-3, weight_decay=1e-4)
-    # Explicit ownership proof: optimizer contains bridge parameters only.
     model_param_ids = {id(p) for p in model.parameters()}
     optimizer_param_ids = {id(p) for g in opt.param_groups for p in g["params"]}
     optimizer_owns_base = bool(model_param_ids & optimizer_param_ids)
@@ -135,7 +140,6 @@ def main() -> int:
     heldout_acc, heldout_n = batch_eval(heldout_entities)
     alias_acc, alias_n = batch_eval(late_aliases)
 
-    # 10k post-training world writes, evaluated in one vectorized neural call.
     rng = random.Random(seed + 9)
     qrows, prows, lrows, labels = [], [], [], []
     for _ in range(10000):
@@ -152,13 +156,11 @@ def main() -> int:
     update_y = torch.tensor(labels)
     update_acc = float((preds == update_y).float().mean().item())
 
-    # Exact B-plane repeatability: changing Port inputs never enters the frozen transformer.
-    probe_key = ("read", heldout_entities[0])
-    q_before = features[probe_key].clone()
-    l_before = baseline_logits[probe_key].clone()
-    features_after, logits_after = extract_features(model, tok, [probe_key], batch_size=1)
-    base_hidden_delta = float(torch.max(torch.abs(q_before - features_after[probe_key])).item())
-    base_logit_delta = float(torch.max(torch.abs(l_before - logits_after[probe_key])).item())
+    standalone_after, standalone_logits_after = extract_features(model, tok, [probe_key], batch_size=1)
+    q_before = standalone_before[probe_key]
+    l_before = standalone_logits_before[probe_key]
+    base_hidden_delta = float(torch.max(torch.abs(q_before - standalone_after[probe_key])).item())
+    base_logit_delta = float(torch.max(torch.abs(l_before - standalone_logits_after[probe_key])).item())
 
     param_witness_after = {
         param_list[i][0]: float(param_list[i][1].detach().reshape(-1)[0].float()) for i in sample_ids
@@ -189,6 +191,7 @@ def main() -> int:
         "optimizer_steps_after_world_updates": 0,
         "base_hidden_max_delta_after_port_world_changes": base_hidden_delta,
         "base_logits_max_delta_after_port_world_changes": base_logit_delta,
+        "base_repeatability_probe_shape": "standalone batch=1 before and after",
         "sampled_base_parameter_witness_unchanged": witness_unchanged,
         "sampled_base_parameter_witness": param_witness_before,
         "port_code_source": "frozen Qwen token-embedding vectors; entity/value binding is runtime state, not a learned pair",
