@@ -87,10 +87,11 @@ def extract_features(model, tok, pairs, batch_size: int = 16):
                 output_hidden_states=True,
                 return_dict=True,
             )
-        last = enc.attention_mask.sum(dim=1) - 1
+        # Decoder prompts are left padded; the final semantic token is therefore always
+        # at the physical last sequence position, not at attention_mask.sum()-1.
+        idx = out.hidden_states[-1].shape[1] - 1
         h = out.hidden_states[-1]
         for i, key in enumerate(batch):
-            idx = int(last[i])
             feats[key] = h[i, idx].float().cpu()
             baseline_logits[key] = out.logits[i, idx].float().cpu()
     return feats, baseline_logits
@@ -118,10 +119,11 @@ def model_weight_digest(model) -> str:
     h = hashlib.sha256()
     for name, p in model.named_parameters():
         h.update(name.encode())
-        # Sampling all bytes is acceptable for 0.5B but slow; use deterministic tensor summaries
-        # plus the already cryptographically pinned checkpoint hash as the immutable model identity.
         t = p.detach().float()
-        vals = torch.tensor([float(t.sum()), float((t * t).sum()), float(t.reshape(-1)[0])], dtype=torch.float64)
+        vals = torch.tensor(
+            [float(t.sum()), float((t * t).sum()), float(t.reshape(-1)[0])],
+            dtype=torch.float64,
+        )
         h.update(vals.numpy().tobytes())
     return h.hexdigest()
 
@@ -164,7 +166,6 @@ def main() -> int:
     started = time.perf_counter()
     features, baseline_logits_before = extract_features(model, tok, pairs, batch_size=16)
 
-    # Frozen model-native Port codes: token-embedding vectors for the semantic value word.
     emb = model.get_input_embeddings().weight.detach().float().cpu()
     port_codes = []
     for color in COLORS:
@@ -194,10 +195,10 @@ def main() -> int:
     opt = torch.optim.AdamW(bridge.parameters(), lr=2.5e-3, weight_decay=1e-4)
     gen = torch.Generator().manual_seed(seed + 1)
     bridge.train()
-    for step in range(900):
-        idx = torch.randint(0, len(Y), (256,), generator=gen)
-        logits = bridge(Xq[idx], Xp[idx], Xlive[idx])
-        loss = nn.functional.cross_entropy(logits, Y[idx])
+    for _ in range(900):
+        idxs = torch.randint(0, len(Y), (256,), generator=gen)
+        logits = bridge(Xq[idxs], Xp[idxs], Xlive[idxs])
+        loss = nn.functional.cross_entropy(logits, Y[idxs])
         opt.zero_grad(set_to_none=True)
         loss.backward()
         opt.step()
@@ -210,8 +211,8 @@ def main() -> int:
         else:
             pc = port_codes[value].unsqueeze(0); live = torch.tensor([1.0])
         with torch.inference_mode():
-            idx = int(bridge(qh, pc, live).argmax(dim=-1).item())
-        return LABELS[idx]
+            pred_idx = int(bridge(qh, pc, live).argmax(dim=-1).item())
+        return LABELS[pred_idx]
 
     heldout_checks = []
     for ent in heldout_entities:
@@ -227,7 +228,6 @@ def main() -> int:
                 alias_checks.append(predict(op, ent, v) == expected(op, v))
             alias_checks.append(predict(op, ent, None) == "NULL")
 
-    # World updates after all neural training. No model/bridge optimizer step is allowed here.
     update_checks = []
     rng = random.Random(seed + 3)
     update_trace = []
@@ -242,18 +242,14 @@ def main() -> int:
         if i < 64:
             update_trace.append({"entity": ent, "op": op, "value": value, "pred": pred, "expected": exp})
 
-    # Independent base-plane integrity: Port changes cannot alter B-plane hidden/logit state
-    # because no Port payload is passed to the frozen transformer.
     probe_key = ("read", heldout_entities[0])
     q_before = features[probe_key].clone()
     l_before = baseline_logits_before[probe_key].clone()
-    # Run the exact base query again after bridge training and after world-update simulation.
     features_after, logits_after = extract_features(model, tok, [probe_key], batch_size=1)
     base_hidden_delta = float(torch.max(torch.abs(q_before - features_after[probe_key])).item())
     base_logit_delta = float(torch.max(torch.abs(l_before - logits_after[probe_key])).item())
     after_digest = model_weight_digest(model)
 
-    # Explicitly assert optimizer ownership: base model was never in any optimizer.
     bridge_params = sum(p.numel() for p in bridge.parameters())
     elapsed = time.perf_counter() - started
     report = {
