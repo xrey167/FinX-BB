@@ -1,0 +1,153 @@
+name: knowledge-vm-qwen-real-gate
+
+on:
+  push:
+    branches:
+      - research/knowledge-vm-real-gate-20260913
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  HF_HUB_DISABLE_TELEMETRY: "1"
+  TOKENIZERS_PARALLELISM: "false"
+
+jobs:
+  qwen-real-preflight:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install pinned CPU runtime
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install --index-url https://download.pytorch.org/whl/cpu torch==2.4.1
+          python -m pip install transformers==4.45.2 huggingface_hub==0.25.2 safetensors==0.4.5
+      - name: Execute sealed Qwen real-model preflight
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import hashlib, json, os, pathlib, time
+          import torch
+          from huggingface_hub import snapshot_download
+          from transformers import AutoModelForCausalLM, AutoTokenizer
+
+          REPO = "Qwen/Qwen2.5-0.5B"
+          REV = "060db6499f32faf8b98477b0a26969ef7d8b9987"
+          EXPECTED_WEIGHT_SHA256 = "88c142557820ccad55bb59756bfcfcf891de9cc6202816bd346445188a0ed342"
+          OUT = pathlib.Path("artifacts/knowledge_vm_qwen_real_gate")
+          OUT.mkdir(parents=True, exist_ok=True)
+
+          t0 = time.time()
+          local = pathlib.Path(snapshot_download(
+              repo_id=REPO,
+              revision=REV,
+              allow_patterns=["*.json", "*.safetensors", "tokenizer*", "merges.txt", "vocab.json"],
+          ))
+          download_s = time.time() - t0
+
+          weight_files = sorted(local.glob("*.safetensors"))
+          assert weight_files, "no safetensors weights downloaded"
+          weight_hashes = {}
+          for p in weight_files:
+              h = hashlib.sha256()
+              with p.open("rb") as f:
+                  for chunk in iter(lambda: f.read(8 * 1024 * 1024), b""):
+                      h.update(chunk)
+              weight_hashes[p.name] = h.hexdigest()
+          if len(weight_files) == 1:
+              assert next(iter(weight_hashes.values())) == EXPECTED_WEIGHT_SHA256, (
+                  "frozen model weight hash mismatch", weight_hashes
+              )
+
+          tok = AutoTokenizer.from_pretrained(local, local_files_only=True, trust_remote_code=False)
+          t1 = time.time()
+          model = AutoModelForCausalLM.from_pretrained(
+              local,
+              local_files_only=True,
+              trust_remote_code=False,
+              torch_dtype=torch.float32,
+              use_safetensors=True,
+          )
+          load_s = time.time() - t1
+          model.eval()
+          for p in model.parameters():
+              p.requires_grad_(False)
+
+          cfg = model.config
+          parameter_count = sum(p.numel() for p in model.parameters())
+          trainable_count = sum(p.numel() for p in model.parameters() if p.requires_grad)
+          layers = getattr(model.model, "layers")
+          assert len(layers) == int(cfg.num_hidden_layers)
+          assert int(cfg.hidden_size) == 896, cfg.hidden_size
+          assert int(cfg.num_hidden_layers) == 24, cfg.num_hidden_layers
+          assert trainable_count == 0
+
+          prompts = [
+              "The capital of France is",
+              "Two plus two equals",
+              "Luma Harbor's registry code is",
+          ]
+          observations = []
+          hook_seen = {"count": 0, "shape": None}
+          def pre_hook(_module, args):
+              hook_seen["count"] += 1
+              x = args[0]
+              hook_seen["shape"] = list(x.shape)
+          handle = layers[12].register_forward_pre_hook(pre_hook)
+          with torch.no_grad():
+              for prompt in prompts:
+                  inputs = tok(prompt, return_tensors="pt")
+                  out = model(**inputs, use_cache=True, output_hidden_states=True)
+                  logits = out.logits[:, -1, :].contiguous()
+                  top = int(logits.argmax(-1).item())
+                  observations.append({
+                      "prompt": prompt,
+                      "input_ids": inputs["input_ids"][0].tolist(),
+                      "top_token_id": top,
+                      "top_token_text": tok.decode([top]),
+                      "logits_sha256": hashlib.sha256(logits.numpy().tobytes()).hexdigest(),
+                      "hidden_state_count": len(out.hidden_states),
+                      "past_layer_count": len(out.past_key_values),
+                      "past0_key_shape": list(out.past_key_values[0][0].shape),
+                      "past0_value_shape": list(out.past_key_values[0][1].shape),
+                  })
+          handle.remove()
+          assert hook_seen["count"] == len(prompts), hook_seen
+          assert all(o["hidden_state_count"] == 25 for o in observations)
+          assert all(o["past_layer_count"] == 24 for o in observations)
+
+          report = {
+              "scientific_result": "real_pretrained_forward_preflight_pass",
+              "knowledge_claim": "none_preflight_only",
+              "repo_id": REPO,
+              "revision": REV,
+              "expected_single_weight_sha256": EXPECTED_WEIGHT_SHA256,
+              "weight_hashes": weight_hashes,
+              "download_seconds": download_s,
+              "load_seconds": load_s,
+              "torch_version": torch.__version__,
+              "parameter_count": parameter_count,
+              "trainable_parameter_count": trainable_count,
+              "hidden_size": int(cfg.hidden_size),
+              "num_hidden_layers": int(cfg.num_hidden_layers),
+              "layer12_pre_hook": hook_seen,
+              "observations": observations,
+          }
+          canonical = json.dumps(report, sort_keys=True, separators=(",", ":")).encode()
+          report["report_sha256"] = hashlib.sha256(canonical).hexdigest()
+          (OUT / "report.json").write_text(json.dumps(report, indent=2, sort_keys=True) + "\n")
+          print(json.dumps(report, indent=2, sort_keys=True))
+          PY
+      - name: Upload sealed preflight evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: knowledge-vm-qwen-real-gate
+          path: artifacts/knowledge_vm_qwen_real_gate/
+          if-no-files-found: warn
