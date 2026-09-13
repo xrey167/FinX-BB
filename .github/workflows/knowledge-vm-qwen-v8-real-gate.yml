@@ -1,0 +1,51 @@
+name: knowledge-vm-qwen-v8-real-gate
+
+on:
+  push:
+    branches:
+      - research/knowledge-vm-real-gate-20260913
+    paths:
+      - 'research/knowledge_vm/qwen_v8_real_gate.py'
+      - '.github/workflows/knowledge-vm-qwen-v8-real-gate.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  qwen-real-gate:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    env:
+      HF_HUB_DISABLE_TELEMETRY: '1'
+      TOKENIZERS_PARALLELISM: 'false'
+      PYTHONUNBUFFERED: '1'
+    steps:
+      - name: Checkout research branch
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install CPU runtime
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install --index-url https://download.pytorch.org/whl/cpu 'torch==2.7.1'
+          python -m pip install 'transformers>=4.48,<5' 'huggingface_hub>=0.28,<1' 'safetensors>=0.4,<1' 'accelerate>=1.0,<2'
+
+      - name: Run frozen Qwen2.5-0.5B bridge gate
+        run: |
+          mkdir -p artifacts/qwen_v8_gate
+          python research/knowledge_vm/qwen_v8_real_gate.py --out artifacts/qwen_v8_gate/report.json | tee artifacts/qwen_v8_gate/stdout.log
+
+      - name: Upload sealed gate evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: qwen-v8-real-gate-${{ github.sha }}
+          path: artifacts/qwen_v8_gate/
+          if-no-files-found: warn
+          retention-days: 14
