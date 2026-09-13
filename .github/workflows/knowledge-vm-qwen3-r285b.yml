@@ -1,0 +1,49 @@
+name: Knowledge VM Qwen3 R285b kernel moment capsule
+
+on:
+  push:
+    branches:
+      - research/knowledge-vm-real-gate-20260913
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  HF_HUB_DISABLE_XET: "1"
+  TOKENIZERS_PARALLELISM: "false"
+  SO_R285_REPORT: ci-qwen-r285b/report.json
+  OMP_NUM_THREADS: "2"
+  MKL_NUM_THREADS: "2"
+  OPENBLAS_NUM_THREADS: "1"
+
+jobs:
+  qwen3-r285b:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+      - name: Install pinned Qwen3 CPU runtime
+        run: |
+          set -euo pipefail
+          python -m pip install --upgrade pip
+          python -m pip install torch==2.6.0 --index-url https://download.pytorch.org/whl/cpu
+          python -m pip install transformers==4.51.3 tokenizers==0.21.4 safetensors huggingface_hub
+      - name: Run R285b kernel-moment capsule gate
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p ci-qwen-r285b
+          python -m research.qwen3_knowledge_vm_r285b_kernel_moment_capsule 2>&1 | tee ci-qwen-r285b/stdout.log
+      - name: Upload evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: knowledge-vm-qwen3-r285b-kernel-moment-capsule
+          path: ci-qwen-r285b/
+          retention-days: 30
+          if-no-files-found: warn
