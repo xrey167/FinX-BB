@@ -1,0 +1,49 @@
+name: Knowledge VM Qwen3 R280 cotangent ABI atlas
+
+on:
+  push:
+    branches: [research/knowledge-vm-real-gate-20260913]
+    paths:
+      - 'research/qwen3_knowledge_vm_r280_cotangent_atlas.py'
+      - '.github/workflows/knowledge-vm-qwen3-r280.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  qwen3-r280:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 120
+    env:
+      HF_HUB_DISABLE_XET: '1'
+      TOKENIZERS_PARALLELISM: 'false'
+      SO_R280_REPORT: ci-qwen-r280/report.json
+      OMP_NUM_THREADS: '2'
+      MKL_NUM_THREADS: '2'
+      OPENBLAS_NUM_THREADS: '1'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+      - name: Install pinned Qwen3 runtime
+        run: |
+          set -euo pipefail
+          python -m pip install --upgrade pip
+          python -m pip install torch==2.6.0 --index-url https://download.pytorch.org/whl/cpu
+          python -m pip install transformers==4.51.3 tokenizers==0.21.4 safetensors huggingface_hub
+      - name: Run R280 cotangent ABI atlas gate
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p ci-qwen-r280
+          python research/qwen3_knowledge_vm_r280_cotangent_atlas.py 2>&1 | tee ci-qwen-r280/stdout.log
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: knowledge-vm-qwen3-r280-cotangent-atlas
+          path: ci-qwen-r280/
+          retention-days: 30
+          if-no-files-found: warn
