@@ -39,7 +39,7 @@ jobs:
         run: |
           set -euo pipefail
           mkdir -p ci-qwen-r274
-          python research/qwen3_knowledge_vm_r274_capability_proof_graph.py 2>&1 | tee ci-qwen-r274/stdout.log
+          python -m research.qwen3_knowledge_vm_r274_capability_proof_graph 2>&1 | tee ci-qwen-r274/stdout.log
       - uses: actions/upload-artifact@v4
         if: always()
         with:
@@ -47,5 +47,3 @@ jobs:
           path: ci-qwen-r274/
           retention-days: 30
           if-no-files-found: warn
-
-# Retry marker: prior run ended with GitHub startup_failure before any job existed.
