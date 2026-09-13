@@ -1,0 +1,40 @@
+name: Knowledge VM R306 Persistent Coherence
+
+on:
+  push:
+    branches:
+      - research/knowledge-vm-persistent-coherence-r306-20260913
+    paths:
+      - research/r306_persistent_coherence_recovery.py
+      - .github/workflows/knowledge-vm-r306-persistent-coherence.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  SO_R306_REPORT: ci-r306/report.json
+
+jobs:
+  r306-persistent-coherence:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Run R306 persistent coherence recovery gate
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p ci-r306
+          python -m research.r306_persistent_coherence_recovery 2>&1 | tee ci-r306/stdout.log
+      - name: Upload R306 evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: knowledge-vm-r306-persistent-coherence
+          path: ci-r306/
+          retention-days: 30
+          if-no-files-found: warn
