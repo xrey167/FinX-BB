@@ -4,7 +4,9 @@ import copy
 import hashlib
 import json
 import os
+import random
 from pathlib import Path
+from typing import Iterable
 
 import torch
 from huggingface_hub import snapshot_download
@@ -122,27 +124,45 @@ def render(tok, value: int, spec: str):
     if stem_idx < 0 or stem_idx >= q_idx:
         raise RuntimeError("port stem missing or misplaced")
     static_end = stem_idx + len(PORT_STEM)
-    static_text = full_text[:static_end]
-    prefix_text = full_text[:q_idx]
 
-    full_ids = tok(full_text, add_special_tokens=False).input_ids
-    static_ids = tok(static_text, add_special_tokens=False).input_ids
-    prefix_ids = tok(prefix_text, add_special_tokens=False).input_ids
-    if full_ids[: len(prefix_ids)] != prefix_ids:
-        raise RuntimeError("query boundary is not token-prefix stable")
-    if prefix_ids[: len(static_ids)] != static_ids:
-        raise RuntimeError("static/dynamic boundary is not token-prefix stable")
-    dynamic_ids = prefix_ids[len(static_ids):]
-    query_ids = full_ids[len(prefix_ids):]
+    enc = tok(
+        full_text,
+        add_special_tokens=False,
+        return_offsets_mapping=True,
+    )
+    full_ids = list(enc.input_ids)
+    offsets = list(enc.offset_mapping)
+
+    def boundary_at_or_after(char_pos: int) -> int:
+        for i, (start, end) in enumerate(offsets):
+            if start >= char_pos:
+                return i
+            if start < char_pos < end:
+                return i
+        return len(full_ids)
+
+    static_tok = boundary_at_or_after(static_end)
+    query_tok = boundary_at_or_after(q_idx)
+    if not (0 < static_tok < query_tok < len(full_ids)):
+        raise RuntimeError(
+            f"invalid token boundaries static={static_tok} query={query_tok} total={len(full_ids)}"
+        )
+
+    static_ids = full_ids[:static_tok]
+    prefix_ids = full_ids[:query_tok]
+    dynamic_ids = full_ids[static_tok:query_tok]
+    query_ids = full_ids[query_tok:]
     return {
         "full_text": full_text,
-        "static_text": static_text,
-        "prefix_text": prefix_text,
+        "static_text": full_text[:static_end],
+        "prefix_text": full_text[:q_idx],
         "full_ids": full_ids,
         "static_ids": static_ids,
         "dynamic_ids": dynamic_ids,
         "query_ids": query_ids,
-        "dynamic_text": prefix_text[static_end:],
+        "dynamic_text": full_text[static_end:q_idx],
+        "static_token_boundary": static_tok,
+        "query_token_boundary": query_tok,
     }
 
 
