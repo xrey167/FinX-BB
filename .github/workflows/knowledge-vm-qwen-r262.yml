@@ -1,0 +1,46 @@
+name: Knowledge VM Qwen R262 reasoning over novel facts
+
+on:
+  push:
+    branches: [research/knowledge-vm-real-gate-20260913]
+    paths:
+      - 'research/qwen_knowledge_vm_r262.py'
+      - '.github/workflows/knowledge-vm-qwen-r262.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  qwen-r262:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    env:
+      HF_HUB_DISABLE_XET: '1'
+      TOKENIZERS_PARALLELISM: 'false'
+      SO_R262_REPORT: ci-qwen-r262/report.json
+      OMP_NUM_THREADS: '2'
+      MKL_NUM_THREADS: '2'
+      OPENBLAS_NUM_THREADS: '1'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+      - name: Install pinned CPU runtime
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install torch==2.6.0 --index-url https://download.pytorch.org/whl/cpu
+          python -m pip install transformers==4.48.3 tokenizers==0.21.0 safetensors==0.5.2 huggingface_hub==0.28.1
+      - name: Run R262 novel-fact reasoning gate
+        run: |
+          mkdir -p ci-qwen-r262
+          python research/qwen_knowledge_vm_r262.py | tee ci-qwen-r262/stdout.log
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: knowledge-vm-qwen-r262-reasoning
+          path: ci-qwen-r262/
+          retention-days: 30
+          if-no-files-found: warn
