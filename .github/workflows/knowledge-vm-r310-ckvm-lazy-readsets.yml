@@ -1,0 +1,40 @@
+name: Knowledge VM R310 CKVM Lazy Readsets
+
+on:
+  push:
+    branches:
+      - research/knowledge-vm-ckvm-r310-20260913
+    paths:
+      - research/r310_ckvm_lazy_readsets.py
+      - .github/workflows/knowledge-vm-r310-ckvm-lazy-readsets.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  SO_R310_REPORT: ci-r310/report.json
+
+jobs:
+  r310-ckvm-lazy-readsets:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Run R310 CKVM lazy-readset gate
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p ci-r310
+          python -m research.r310_ckvm_lazy_readsets 2>&1 | tee ci-r310/stdout.log
+      - name: Upload R310 evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: knowledge-vm-r310-ckvm-lazy-readsets
+          path: ci-r310/
+          retention-days: 30
+          if-no-files-found: warn
