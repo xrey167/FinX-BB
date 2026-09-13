@@ -47,3 +47,5 @@ jobs:
           path: ci-qwen-r274/
           retention-days: 30
           if-no-files-found: warn
+
+# Retry marker: prior run ended with GitHub startup_failure before any job existed.
