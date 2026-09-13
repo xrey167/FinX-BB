@@ -1,0 +1,40 @@
+name: Knowledge VM R299 Authority Ledger
+
+on:
+  push:
+    branches:
+      - research/knowledge-vm-authority-ledger-r299-20260913
+    paths:
+      - research/r299_authenticated_authority_ledger.py
+      - .github/workflows/knowledge-vm-r299-authority-ledger.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  SO_R299_REPORT: ci-r299/report.json
+
+jobs:
+  r299-authority-ledger:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Run R299 authenticated authority ledger gate
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p ci-r299
+          python -m research.r299_authenticated_authority_ledger 2>&1 | tee ci-r299/stdout.log
+      - name: Upload R299 evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: knowledge-vm-r299-authority-ledger
+          path: ci-r299/
+          retention-days: 30
+          if-no-files-found: warn
