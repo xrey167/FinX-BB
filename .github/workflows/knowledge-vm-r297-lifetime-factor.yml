@@ -1,0 +1,40 @@
+name: Knowledge VM R297 Lifetime Factor DAG
+
+on:
+  push:
+    branches:
+      - research/knowledge-vm-lifetime-factor-r297-20260913
+    paths:
+      - research/r297_causal_lifetime_factor_dag.py
+      - .github/workflows/knowledge-vm-r297-lifetime-factor.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  SO_R297_REPORT: ci-r297/report.json
+
+jobs:
+  r297-lifetime-factor:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Run R297 lifetime factor DAG scalability gate
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p ci-r297
+          python -m research.r297_causal_lifetime_factor_dag 2>&1 | tee ci-r297/stdout.log
+      - name: Upload R297 evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: knowledge-vm-r297-lifetime-factor
+          path: ci-r297/
+          retention-days: 30
+          if-no-files-found: warn
