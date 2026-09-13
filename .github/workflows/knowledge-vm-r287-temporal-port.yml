@@ -1,0 +1,49 @@
+name: Knowledge VM R287 Temporal Port
+
+on:
+  push:
+    branches:
+      - research/knowledge-vm-temporal-port-r287-20260913
+    paths:
+      - research/r287_temporal_capability_port.py
+      - .github/workflows/knowledge-vm-r287-temporal-port.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  SO_R287_REPORT: ci-r287/report.json
+  OMP_NUM_THREADS: "2"
+  MKL_NUM_THREADS: "2"
+  OPENBLAS_NUM_THREADS: "1"
+
+jobs:
+  r287-temporal-port:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+      - name: Install pinned runtime
+        run: |
+          set -euo pipefail
+          python -m pip install --upgrade pip
+          python -m pip install torch==2.4.1 --index-url https://download.pytorch.org/whl/cpu
+      - name: Run R287 temporal capability port gate
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p ci-r287
+          python -m research.r287_temporal_capability_port 2>&1 | tee ci-r287/stdout.log
+      - name: Upload R287 evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: knowledge-vm-r287-temporal-port
+          path: ci-r287/
+          retention-days: 30
+          if-no-files-found: warn
