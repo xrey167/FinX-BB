@@ -1,0 +1,65 @@
+name: Knowledge VM Qwen R257-R260 fail-closed audit
+
+on:
+  push:
+    branches: [research/knowledge-vm-real-gate-20260913]
+    paths:
+      - '.github/workflows/knowledge-vm-qwen-r257-r260-failclosed-audit.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  qwen-r257-r260-audit:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    env:
+      HF_HUB_DISABLE_XET: '1'
+      TOKENIZERS_PARALLELISM: 'false'
+      OMP_NUM_THREADS: '2'
+      MKL_NUM_THREADS: '2'
+      OPENBLAS_NUM_THREADS: '1'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+      - name: Install pinned CPU runtime
+        run: |
+          set -euo pipefail
+          python -m pip install --upgrade pip
+          python -m pip install torch==2.6.0 --index-url https://download.pytorch.org/whl/cpu
+          python -m pip install transformers==4.48.3 tokenizers==0.21.0 safetensors==0.5.2 huggingface_hub==0.28.1
+      - name: Run R257 fail-closed
+        run: |
+          set -euo pipefail
+          mkdir -p audit/r257
+          SO_R257_REPORT=audit/r257/report.json python research/qwen_knowledge_vm_r257.py > audit/r257/stdout.log 2>&1
+          cat audit/r257/stdout.log
+      - name: Run R258 fail-closed
+        run: |
+          set -euo pipefail
+          mkdir -p audit/r258
+          SO_R258_REPORT=audit/r258/report.json python research/qwen_knowledge_vm_r258.py > audit/r258/stdout.log 2>&1
+          cat audit/r258/stdout.log
+      - name: Run R259 fail-closed
+        run: |
+          set -euo pipefail
+          mkdir -p audit/r259
+          SO_R259_REPORT=audit/r259/report.json python research/qwen_knowledge_vm_r259.py > audit/r259/stdout.log 2>&1
+          cat audit/r259/stdout.log
+      - name: Run R260 fail-closed
+        run: |
+          set -euo pipefail
+          mkdir -p audit/r260
+          SO_R260_REPORT=audit/r260/report.json python research/qwen_knowledge_vm_r260.py > audit/r260/stdout.log 2>&1
+          cat audit/r260/stdout.log
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: knowledge-vm-qwen-r257-r260-failclosed-audit
+          path: audit/
+          retention-days: 30
+          if-no-files-found: warn
