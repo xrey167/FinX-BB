@@ -39,7 +39,7 @@ jobs:
         run: |
           set -euo pipefail
           mkdir -p ci-qwen-r276
-          python research/qwen3_knowledge_vm_r276_pareto.py 2>&1 | tee ci-qwen-r276/stdout.log
+          python -m research.qwen3_knowledge_vm_r276_pareto 2>&1 | tee ci-qwen-r276/stdout.log
       - uses: actions/upload-artifact@v4
         if: always()
         with:
