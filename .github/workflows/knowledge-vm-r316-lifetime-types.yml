@@ -1,0 +1,32 @@
+name: Knowledge VM R316 Neural Lifetime Types
+
+on:
+  push:
+    branches:
+      - research/knowledge-vm-lifetime-types-r316-20260914
+  workflow_dispatch:
+
+jobs:
+  r316-lifetime-types:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    env:
+      SO_R316_REPORT: ci-r316/report.json
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Run R316 neural lifetime type-system gate
+        shell: bash --noprofile --norc -e -o pipefail {0}
+        run: |
+          set -euo pipefail
+          mkdir -p ci-r316
+          python -m research.r316_neural_lifetime_type_system 2>&1 | tee ci-r316/stdout.log
+      - name: Upload R316 evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: knowledge-vm-r316-lifetime-types
+          path: ci-r316/
+          retention-days: 30
