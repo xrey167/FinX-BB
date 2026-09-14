@@ -1,0 +1,36 @@
+name: Knowledge VM R326 Causal Live Semantic Views
+
+on:
+  push:
+    branches:
+      - research/ckca-live-views-r326-20260914
+  workflow_dispatch:
+
+jobs:
+  r326-live-semantic-views:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    env:
+      SO_R326_REPORT: ci-r326/report.json
+      SO_R326_PODS: 10000
+      SO_R326_VIEWS: 50000
+      SO_R326_UPDATES: 12000
+      SO_R326_READS: 180000
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Run R326 causal live semantic-view gate
+        shell: bash --noprofile --norc -e -o pipefail {0}
+        run: |
+          set -euo pipefail
+          mkdir -p ci-r326
+          python -m research.r326_causal_live_semantic_views 2>&1 | tee ci-r326/stdout.log
+      - name: Upload R326 evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: knowledge-vm-r326-live-semantic-views
+          path: ci-r326/
+          retention-days: 30
