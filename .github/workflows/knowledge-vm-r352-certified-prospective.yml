@@ -1,0 +1,35 @@
+name: Knowledge VM R352 Certified Prospective Circuit
+
+on:
+  push:
+    branches:
+      - research/ckca-certified-prospective-subspace-r352-20260914
+  workflow_dispatch:
+
+jobs:
+  r352-certified-prospective:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    env:
+      SO_R352_REPORT: ci-r352/report.json
+      SO_R352_QUERIES: 120
+      SO_R352_FUTURE_WORLDS: 256
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install runtime
+        run: python -m pip install numpy==2.3.3
+      - name: Run R352 certified prospective circuit gate
+        shell: bash --noprofile --norc -e -o pipefail {0}
+        run: |
+          mkdir -p ci-r352
+          python -m research.r352b_certified_prospective_subspace 2>&1 | tee ci-r352/stdout.log
+      - name: Upload evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: knowledge-vm-r352-certified-prospective
+          path: ci-r352/
+          retention-days: 30
