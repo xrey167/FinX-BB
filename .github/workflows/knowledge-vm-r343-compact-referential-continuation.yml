@@ -1,0 +1,49 @@
+name: Knowledge VM R343 Compact Referential Continuation
+
+on:
+  push:
+    branches:
+      - research/ckca-compact-referential-continuation-r343-20260914
+  workflow_dispatch:
+
+jobs:
+  r343-compact-referential-continuation:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    env:
+      SO_R343_REPORT: ci-r343/report.json
+      SO_R343_PODS: 4096
+      SO_R343_QUERIES: 3000
+      SO_R343_WORLD_DIM: 16
+      SO_R343_HIDDEN: 64
+      SO_R343_HEADS: 4
+      SO_R343_TOPK: 3
+      SO_R343_B_CODE: 8
+      SO_R343_BLOCKS: 8
+      SO_R343_UPDATES: 50000
+      SO_R343_SERVES: 80000
+      SO_R343_RACE_PROB: 0.08
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+      - name: Install runtime
+        run: |
+          set -euo pipefail
+          python -m pip install --upgrade pip
+          python -m pip install numpy==2.3.3
+      - name: Run R343 compact referential continuation gate
+        shell: bash --noprofile --norc -e -o pipefail {0}
+        run: |
+          set -euo pipefail
+          mkdir -p ci-r343
+          python -m research.r343_compact_referential_continuation 2>&1 | tee ci-r343/stdout.log
+      - name: Upload R343 evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: knowledge-vm-r343-compact-referential-continuation
+          path: ci-r343/
+          retention-days: 30
