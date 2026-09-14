@@ -1,0 +1,49 @@
+name: Knowledge VM R347 Prospective Transformer
+
+on:
+  push:
+    branches:
+      - research/ckca-prospective-transformer-r347-20260914
+  workflow_dispatch:
+
+jobs:
+  r347-prospective-transformer:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    env:
+      SO_R347_REPORT: ci-r347/report.json
+      SO_R347_PODS: 128
+      SO_R347_TRAIN_STEPS: 1200
+      SO_R347_BATCH: 384
+      SO_R347_DESCRIPTORS: 3000
+      SO_R347_FUTURE_WORLDS: 32
+      SO_R347_UPDATES: 20000
+      SO_R347_SERVES: 12000
+      OMP_NUM_THREADS: 2
+      MKL_NUM_THREADS: 2
+      OPENBLAS_NUM_THREADS: 1
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+      - name: Install runtime
+        run: |
+          set -euo pipefail
+          python -m pip install --upgrade pip
+          python -m pip install torch==2.4.1 --index-url https://download.pytorch.org/whl/cpu
+          python -m pip install numpy==2.3.3
+      - name: Run R347 prospective transformer gate
+        shell: bash --noprofile --norc -e -o pipefail {0}
+        run: |
+          set -euo pipefail
+          mkdir -p ci-r347
+          python -m research.r347_prospective_transformer_residual 2>&1 | tee ci-r347/stdout.log
+      - name: Upload R347 evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: knowledge-vm-r347-prospective-transformer
+          path: ci-r347/
+          retention-days: 30
