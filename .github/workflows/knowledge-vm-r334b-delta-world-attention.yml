@@ -1,0 +1,49 @@
+name: Knowledge VM R334b Delta World Attention
+
+on:
+  push:
+    branches:
+      - research/ckca-delta-world-attention-r334b-20260914
+  workflow_dispatch:
+
+jobs:
+  r334b-delta-world-attention:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    env:
+      SO_R334B_REPORT: ci-r334b/report.json
+      SO_R334B_PODS: 2048
+      SO_R334B_QUERIES: 1024
+      SO_R334B_DK: 32
+      SO_R334B_DV: 48
+      SO_R334B_TOPK: 8
+      SO_R334B_UPDATES: 5000
+      SO_R334B_CONTROL_PROBES: 4
+      SO_R334B_ALPHA: 3.0
+      OMP_NUM_THREADS: 2
+      MKL_NUM_THREADS: 2
+      OPENBLAS_NUM_THREADS: 1
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+      - name: Install pinned runtime
+        run: |
+          set -euo pipefail
+          python -m pip install --upgrade pip
+          python -m pip install torch==2.4.1 --index-url https://download.pytorch.org/whl/cpu
+      - name: Run R334b corrected Delta World Attention gate
+        shell: bash --noprofile --norc -e -o pipefail {0}
+        run: |
+          set -euo pipefail
+          mkdir -p ci-r334b
+          python -m research.r334b_delta_world_attention 2>&1 | tee ci-r334b/stdout.log
+      - name: Upload R334b evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: knowledge-vm-r334b-delta-world-attention
+          path: ci-r334b/
+          retention-days: 30
