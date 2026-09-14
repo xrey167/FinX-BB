@@ -1,0 +1,38 @@
+name: Knowledge VM R328 Versioned Symlink Capabilities
+
+on:
+  push:
+    branches:
+      - research/ckca-versioned-symlinks-r328-20260914
+  workflow_dispatch:
+
+jobs:
+  r328-versioned-symlinks:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    env:
+      SO_R328_REPORT: ci-r328/report.json
+      SO_R328_ALIASES: 200000
+      SO_R328_PODS: 50000
+      SO_R328_PLANS: 250000
+      SO_R328_ALIASES_PER_PLAN: 3
+      SO_R328_REBINDS: 20000
+      SO_R328_PROBES: 1000000
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Run R328 versioned Symlink capability gate
+        shell: bash --noprofile --norc -e -o pipefail {0}
+        run: |
+          set -euo pipefail
+          mkdir -p ci-r328
+          python -m research.r328_versioned_symlink_capabilities 2>&1 | tee ci-r328/stdout.log
+      - name: Upload R328 evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: knowledge-vm-r328-versioned-symlinks
+          path: ci-r328/
+          retention-days: 30
