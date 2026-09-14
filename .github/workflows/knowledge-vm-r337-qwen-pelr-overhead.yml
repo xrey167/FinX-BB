@@ -1,0 +1,47 @@
+name: Knowledge VM R337 Qwen PELR Overhead
+
+on:
+  push:
+    branches:
+      - research/ckca-qwen-pelr-overhead-r337-20260914
+  workflow_dispatch:
+
+jobs:
+  r337-qwen-pelr-overhead:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    env:
+      HF_HUB_DISABLE_XET: 1
+      HF_HUB_DISABLE_TELEMETRY: 1
+      TOKENIZERS_PARALLELISM: false
+      SO_R337_REPORT: ci-r337/report.json
+      SO_R337_PAIRED_RUNS: 8
+      SO_R337_STRESS: 200000
+      OMP_NUM_THREADS: 2
+      MKL_NUM_THREADS: 2
+      OPENBLAS_NUM_THREADS: 1
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+      - name: Install pinned runtime
+        run: |
+          set -euo pipefail
+          python -m pip install --upgrade pip
+          python -m pip install torch==2.4.1 --index-url https://download.pytorch.org/whl/cpu
+          python -m pip install transformers==4.45.2 tokenizers==0.20.3 huggingface_hub==0.25.2 safetensors==0.4.5
+      - name: Run R337 real-Qwen PELR overhead gate
+        shell: bash --noprofile --norc -e -o pipefail {0}
+        run: |
+          set -euo pipefail
+          mkdir -p ci-r337
+          python -m research.qwen25_05b_r337_pelr_serving_overhead 2>&1 | tee ci-r337/stdout.log
+      - name: Upload R337 evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: knowledge-vm-r337-qwen-pelr-overhead
+          path: ci-r337/
+          retention-days: 30
