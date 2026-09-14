@@ -37,8 +37,6 @@ def main() -> None:
         authority.bind(f"pod-{pid}", pid)
         authority.bind(f"late-alias-{pid}", pid)
 
-    # Freeze alias generation after setup. The two aliases must collapse to one
-    # canonical address; ordinary value changes do not touch this generation.
     alias_identity_errors = sum(
         authority.resolve(f"pod-{pid}") != authority.resolve(f"late-alias-{pid}")
         for pid in range(PODS)
@@ -68,23 +66,22 @@ def main() -> None:
     invalidation_nodes_touched = 0
 
     t0 = time.perf_counter()
-    for i in range(TRANSACTIONS):
+    for _ in range(TRANSACTIONS):
         op, left, right = plan_specs[rng.randrange(PLANS)]
         plan = cache.get_or_compile(op, left, right, authority)
         tx = abi.transaction(plan)
         borrowed = tx.execute()
 
-        # Concurrent world transition between execution and publication.
         conflict_injected = rng.random() < 0.18
         if conflict_injected:
             pid = left if rng.random() < 0.5 else right
             p = authority.pods[pid]
-            old_dep = authority.update(pid, p.value if rng.random() < 0.50 else rng.randrange(256))
+            old_value = p.value
+            same_value = rng.random() < 0.50
+            new_value = old_value if same_value else rng.randrange(256)
+            old_dep = authority.update(pid, new_value)
             authority_updates += 1
-            if authority.pods[pid].value == p.value:
-                # Note: p is the same mutable object, so compare via old borrowed
-                # generations rather than object identity. The metric is only a
-                # lower-bound witness count and not used for correctness.
+            if same_value:
                 same_value_conflicts += 1
             invalidation_nodes_touched += abi.expire_generation(old_dep)
             commit_conflicts_expected += 1
@@ -95,7 +92,6 @@ def main() -> None:
                 commit_conflicts_escaped += 1
         except Conflict:
             commit_conflicts_detected += 1
-            # The B plan is reused. Only current world/J execution retries.
             tx = abi.transaction(plan)
             borrowed = tx.execute()
             tx.commit()
@@ -103,12 +99,13 @@ def main() -> None:
 
         sealed = tx.seal(borrowed)
 
-        # Either mutate a causal source after commit or mutate an unrelated Pod.
         r = rng.random()
         if r < 0.12:
             dep_pid = rng.choice(tuple(tx.readset.keys()))
             p = authority.pods[dep_pid]
-            old_dep = authority.update(dep_pid, p.value if rng.random() < 0.45 else rng.randrange(256))
+            old_value = p.value
+            new_value = old_value if rng.random() < 0.45 else rng.randrange(256)
+            old_dep = authority.update(dep_pid, new_value)
             authority_updates += 1
             invalidation_nodes_touched += abi.expire_generation(old_dep)
             post_commit_expirations += 1
@@ -123,7 +120,9 @@ def main() -> None:
             while pid in deps:
                 pid = rng.randrange(PODS)
             p = authority.pods[pid]
-            old_dep = authority.update(pid, p.value if rng.random() < 0.45 else rng.randrange(256))
+            old_value = p.value
+            new_value = old_value if rng.random() < 0.45 else rng.randrange(256)
+            old_dep = authority.update(pid, new_value)
             authority_updates += 1
             invalidation_nodes_touched += abi.expire_generation(old_dep)
             unrelated_updates += 1
@@ -141,7 +140,6 @@ def main() -> None:
 
     elapsed = time.perf_counter() - t0
 
-    # Value updates must not trigger B-plan recompilation.
     final_plan_compiles = cache.compiles
     plan_recompiles_due_to_value_updates = final_plan_compiles - initial_plan_compiles
 
@@ -162,7 +160,7 @@ def main() -> None:
         "commit_conflicts_detected": commit_conflicts_detected,
         "commit_conflicts_escaped": commit_conflicts_escaped,
         "retries_succeeded": retries_succeeded,
-        "same_value_conflict_witnesses_lower_bound": same_value_conflicts,
+        "same_value_conflict_witnesses": same_value_conflicts,
         "post_commit_expirations": post_commit_expirations,
         "stale_serves_rejected": stale_serves_rejected,
         "stale_serves_escaped": stale_serves_escaped,
