@@ -1,0 +1,49 @@
+name: Knowledge VM R349 Qwen Internal PNS
+
+on:
+  push:
+    branches:
+      - research/ckca-qwen-internal-pns-r349-20260914
+  workflow_dispatch:
+
+jobs:
+  r349-qwen-internal-pns:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    env:
+      HF_HUB_DISABLE_XET: 1
+      HF_HUB_DISABLE_TELEMETRY: 1
+      TOKENIZERS_PARALLELISM: false
+      SO_R349_REPORT: ci-r349/report.json
+      SO_R349_FUTURE_WORLDS: 8
+      SO_R349_BENCH_LOOPS: 4
+      SO_R349_RACE_TRIALS: 256
+      SO_R349_PORT_ALPHA: 0.85
+      OMP_NUM_THREADS: 2
+      MKL_NUM_THREADS: 2
+      OPENBLAS_NUM_THREADS: 1
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+      - name: Install pinned runtime
+        run: |
+          set -euo pipefail
+          python -m pip install --upgrade pip
+          python -m pip install torch==2.4.1 --index-url https://download.pytorch.org/whl/cpu
+          python -m pip install transformers==4.45.2 tokenizers==0.20.3 huggingface_hub==0.25.2 safetensors==0.4.5 numpy==2.3.3
+      - name: Run R349 internal PNS intervention
+        shell: bash --noprofile --norc -e -o pipefail {0}
+        run: |
+          set -euo pipefail
+          mkdir -p ci-r349
+          python -m research.r349_qwen_internal_prospective_state 2>&1 | tee ci-r349/stdout.log
+      - name: Upload R349 evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: knowledge-vm-r349-qwen-internal-pns
+          path: ci-r349/
+          retention-days: 30
