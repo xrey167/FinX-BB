@@ -6,6 +6,10 @@ on:
       - research/ckca-qwen-pns-r348-20260914
   workflow_dispatch:
 
+concurrency:
+  group: r348-qwen-pns-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   r348-qwen-pns:
     runs-on: ubuntu-24.04
@@ -16,7 +20,7 @@ jobs:
       TOKENIZERS_PARALLELISM: false
       SO_R348_REPORT: ci-r348/report.json
       SO_R348_COMPILER_STEPS: 900
-      SO_R348_J_STEPS: 900
+      SO_R348_J_STEPS: 1400
       SO_R348_ENCODE_BATCH: 8
       SO_R348_FUTURE_WORLDS: 24
       SO_R348_SERVES: 8000
@@ -36,12 +40,12 @@ jobs:
           python -m pip install --upgrade pip
           python -m pip install torch==2.4.1 --index-url https://download.pytorch.org/whl/cpu
           python -m pip install transformers==4.45.2 tokenizers==0.20.3 huggingface_hub==0.25.2 safetensors==0.4.5 numpy==2.3.3
-      - name: Run R348 frozen-Qwen PNS bridge
+      - name: Run R348c frozen-Qwen PNS bridge
         shell: bash --noprofile --norc -e -o pipefail {0}
         run: |
           set -euo pipefail
           mkdir -p ci-r348
-          python -m research.r348b_qwen_fast_pns_bridge 2>&1 | tee ci-r348/stdout.log
+          python -m research.r348c_qwen_expert_pns_bridge 2>&1 | tee ci-r348/stdout.log
       - name: Upload R348 evidence
         if: always()
         uses: actions/upload-artifact@v4
