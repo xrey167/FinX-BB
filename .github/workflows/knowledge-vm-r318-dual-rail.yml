@@ -1,0 +1,41 @@
+name: Knowledge VM R318 Causal Dual Rail
+
+on:
+  push:
+    branches:
+      - research/knowledge-vm-dual-rail-r318-20260914
+  workflow_dispatch:
+
+jobs:
+  r318-dual-rail:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    env:
+      SO_R318_REPORT: ci-r318/report.json
+      OMP_NUM_THREADS: 2
+      MKL_NUM_THREADS: 2
+      OPENBLAS_NUM_THREADS: 1
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+      - name: Install pinned runtime
+        run: |
+          set -euo pipefail
+          python -m pip install --upgrade pip
+          python -m pip install torch==2.4.1 --index-url https://download.pytorch.org/whl/cpu
+      - name: Run R318 causal dual-rail gate
+        shell: bash --noprofile --norc -e -o pipefail {0}
+        run: |
+          set -euo pipefail
+          mkdir -p ci-r318
+          python -m research.r318_causal_dual_rail_execution 2>&1 | tee ci-r318/stdout.log
+      - name: Upload R318 evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: knowledge-vm-r318-dual-rail
+          path: ci-r318/
+          retention-days: 30
