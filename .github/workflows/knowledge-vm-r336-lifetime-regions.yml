@@ -1,0 +1,37 @@
+name: Knowledge VM R336 Epistemic Lifetime Regions
+
+on:
+  push:
+    branches:
+      - research/ckca-epistemic-lifetime-regions-r336-20260914
+  workflow_dispatch:
+
+jobs:
+  r336-lifetime-regions:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    env:
+      SO_R336_REPORT: ci-r336/report.json
+      SO_R336_PODS: 50000
+      SO_R336_TRANSACTIONS: 120000
+      SO_R336_OPS_PER_TX: 48
+      SO_R336_MAX_READS: 8
+      SO_R336_RACE_PROB: 0.10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Run R336 epistemic lifetime-region gate
+        shell: bash --noprofile --norc -e -o pipefail {0}
+        run: |
+          set -euo pipefail
+          mkdir -p ci-r336
+          python -m research.r336_epistemic_lifetime_regions 2>&1 | tee ci-r336/stdout.log
+      - name: Upload R336 evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: knowledge-vm-r336-lifetime-regions
+          path: ci-r336/
+          retention-days: 30
