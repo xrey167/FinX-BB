@@ -1,0 +1,38 @@
+name: Knowledge VM R327 Causal Predicate Generations
+
+on:
+  push:
+    branches:
+      - research/ckca-predicate-generations-r327-20260914
+  workflow_dispatch:
+
+jobs:
+  r327-predicate-generations:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    env:
+      SO_R327_REPORT: ci-r327/report.json
+      SO_R327_COMPANIES: 2500
+      SO_R327_SUPPLIERS: 12000
+      SO_R327_EDGES: 12
+      SO_R327_CACHES: 80000
+      SO_R327_MUTATIONS: 30000
+      SO_R327_SERVES: 240000
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Run R327 predicate-generation graph gate
+        shell: bash --noprofile --norc -e -o pipefail {0}
+        run: |
+          set -euo pipefail
+          mkdir -p ci-r327
+          python -m research.r327_causal_predicate_generations 2>&1 | tee ci-r327/stdout.log
+      - name: Upload R327 evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: knowledge-vm-r327-predicate-generations
+          path: ci-r327/
+          retention-days: 30
