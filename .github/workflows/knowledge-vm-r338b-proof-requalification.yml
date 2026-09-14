@@ -1,0 +1,36 @@
+name: Knowledge VM R338b Proof-Carrying Requalification
+
+on:
+  push:
+    branches:
+      - research/ckca-proof-requalification-r338b-20260914
+  workflow_dispatch:
+
+jobs:
+  r338b-proof-requalification:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    env:
+      SO_R338B_REPORT: ci-r338b/report.json
+      SO_R338B_INPUTS: 2000
+      SO_R338B_DERIVED: 18000
+      SO_R338B_UPDATES: 12000
+      SO_R338B_ORACLE_EVERY: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Run optimized R338b proof-carrying requalification gate
+        shell: bash --noprofile --norc -e -o pipefail {0}
+        run: |
+          set -euo pipefail
+          mkdir -p ci-r338b
+          python -m research.r338b_proof_carrying_requalification 2>&1 | tee ci-r338b/stdout.log
+      - name: Upload R338b evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: knowledge-vm-r338b-proof-requalification
+          path: ci-r338b/
+          retention-days: 30
