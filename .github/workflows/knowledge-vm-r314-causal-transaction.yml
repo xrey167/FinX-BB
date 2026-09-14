@@ -1,0 +1,40 @@
+name: Knowledge VM R314 Causal Transaction
+
+on:
+  push:
+    branches:
+      - research/knowledge-vm-causal-transaction-r314-20260914
+    paths:
+      - research/r314_causal_knowledge_transaction_model.py
+      - .github/workflows/knowledge-vm-r314-causal-transaction.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  SO_R314_REPORT: ci-r314/report.json
+
+jobs:
+  r314-causal-transaction:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Run R314 bounded CKT model
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p ci-r314
+          python -m research.r314_causal_knowledge_transaction_model 2>&1 | tee ci-r314/stdout.log
+      - name: Upload R314 evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: knowledge-vm-r314-causal-transaction
+          path: ci-r314/
+          retention-days: 30
+          if-no-files-found: warn
