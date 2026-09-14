@@ -1,0 +1,55 @@
+name: Knowledge VM R350 Qwen Learned World Port
+
+on:
+  push:
+    branches:
+      - research/ckca-qwen-learned-world-port-r350-20260914
+  workflow_dispatch:
+
+concurrency:
+  group: r350-qwen-world-port-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  r350-qwen-learned-world-port:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    env:
+      HF_HUB_DISABLE_XET: 1
+      HF_HUB_DISABLE_TELEMETRY: 1
+      TOKENIZERS_PARALLELISM: false
+      SO_R350_REPORT: ci-r350/report.json
+      SO_R350_OP_STEPS: 700
+      SO_R350_REASON_STEPS: 1200
+      SO_R350_STEER_STEPS: 320
+      SO_R350_FUTURE_WORLDS: 6
+      SO_R350_RAG_WORLDS: 3
+      SO_R350_RACE_TRIALS: 192
+      OMP_NUM_THREADS: 2
+      MKL_NUM_THREADS: 2
+      OPENBLAS_NUM_THREADS: 1
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+      - name: Install pinned runtime
+        run: |
+          set -euo pipefail
+          python -m pip install --upgrade pip
+          python -m pip install torch==2.4.1 --index-url https://download.pytorch.org/whl/cpu
+          python -m pip install transformers==4.45.2 tokenizers==0.20.3 huggingface_hub==0.25.2 safetensors==0.4.5 numpy==2.3.3
+      - name: Run R350 learned internal World Port gate
+        shell: bash --noprofile --norc -e -o pipefail {0}
+        run: |
+          set -euo pipefail
+          mkdir -p ci-r350
+          python -m research.r350_qwen_learned_internal_world_port 2>&1 | tee ci-r350/stdout.log
+      - name: Upload R350 evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: knowledge-vm-r350-qwen-learned-world-port
+          path: ci-r350/
+          retention-days: 30
