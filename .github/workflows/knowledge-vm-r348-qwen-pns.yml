@@ -1,24 +1,24 @@
-name: Knowledge VM R348 Qwen PNS Bridge
+name: Knowledge VM R348d Fast Qwen PNS Bridge
 
 on:
   push:
     branches:
-      - research/ckca-qwen-pns-r348-20260914
+      - research/ckca-qwen-pns-r348c-fast-20260914
   workflow_dispatch:
 
 concurrency:
-  group: r348-qwen-pns-${{ github.ref }}
+  group: r348d-qwen-pns-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
-  r348-qwen-pns:
+  r348d-qwen-pns:
     runs-on: ubuntu-24.04
-    timeout-minutes: 25
+    timeout-minutes: 20
     env:
       HF_HUB_DISABLE_XET: 1
       HF_HUB_DISABLE_TELEMETRY: 1
       TOKENIZERS_PARALLELISM: false
-      SO_R348_REPORT: ci-r348/report.json
+      SO_R348_REPORT: ci-r348d/report.json
       SO_R348_COMPILER_STEPS: 900
       SO_R348_J_STEPS: 1400
       SO_R348_ENCODE_BATCH: 8
@@ -40,16 +40,16 @@ jobs:
           python -m pip install --upgrade pip
           python -m pip install torch==2.4.1 --index-url https://download.pytorch.org/whl/cpu
           python -m pip install transformers==4.45.2 tokenizers==0.20.3 huggingface_hub==0.25.2 safetensors==0.4.5 numpy==2.3.3
-      - name: Run R348c frozen-Qwen PNS bridge
+      - name: Run R348d six-layer frozen-Qwen PNS bridge
         shell: bash --noprofile --norc -e -o pipefail {0}
         run: |
           set -euo pipefail
-          mkdir -p ci-r348
-          python -m research.r348c_qwen_expert_pns_bridge 2>&1 | tee ci-r348/stdout.log
-      - name: Upload R348 evidence
+          mkdir -p ci-r348d
+          python -m research.r348d_qwen_expert_pns_partial_layers 2>&1 | tee ci-r348d/stdout.log
+      - name: Upload R348d evidence
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: knowledge-vm-r348-qwen-pns
-          path: ci-r348/
+          name: knowledge-vm-r348d-qwen6-pns
+          path: ci-r348d/
           retention-days: 30
