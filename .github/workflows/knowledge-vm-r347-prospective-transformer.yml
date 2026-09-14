@@ -13,7 +13,7 @@ jobs:
     env:
       SO_R347_REPORT: ci-r347/report.json
       SO_R347_PODS: 128
-      SO_R347_TRAIN_STEPS: 1200
+      SO_R347_TRAIN_STEPS: 1800
       SO_R347_BATCH: 384
       SO_R347_DESCRIPTORS: 3000
       SO_R347_FUTURE_WORLDS: 32
