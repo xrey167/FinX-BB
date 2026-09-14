@@ -1,0 +1,45 @@
+name: Knowledge VM Qwen2.5 R323 Semantic Airlock
+
+on:
+  push:
+    branches:
+      - research/ckca-semantic-airlock-r323-20260914
+  workflow_dispatch:
+
+jobs:
+  qwen25-r323-semantic-airlock:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    env:
+      HF_HUB_DISABLE_XET: 1
+      HF_HUB_DISABLE_TELEMETRY: 1
+      TOKENIZERS_PARALLELISM: false
+      SO_R323_REPORT: ci-r323/report.json
+      OMP_NUM_THREADS: 2
+      MKL_NUM_THREADS: 2
+      OPENBLAS_NUM_THREADS: 1
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+      - name: Install pinned runtime
+        run: |
+          set -euo pipefail
+          python -m pip install --upgrade pip
+          python -m pip install torch==2.4.1 --index-url https://download.pytorch.org/whl/cpu
+          python -m pip install transformers==4.45.2 tokenizers==0.20.3 huggingface_hub==0.25.2 safetensors==0.4.5
+      - name: Run R323 causal semantic airlock gate
+        shell: bash --noprofile --norc -e -o pipefail {0}
+        run: |
+          set -euo pipefail
+          mkdir -p ci-r323
+          python -m research.qwen25_05b_r323_causal_semantic_airlock 2>&1 | tee ci-r323/stdout.log
+      - name: Upload R323 evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: knowledge-vm-qwen25-r323-semantic-airlock
+          path: ci-r323/
+          retention-days: 30
