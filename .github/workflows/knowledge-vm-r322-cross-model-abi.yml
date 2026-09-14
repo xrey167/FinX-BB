@@ -1,0 +1,45 @@
+name: Knowledge VM R322 Cross-Model World ABI
+
+on:
+  push:
+    branches:
+      - research/ckca-cross-model-abi-r322-20260914
+  workflow_dispatch:
+
+jobs:
+  r322-cross-model-abi:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    env:
+      HF_HUB_DISABLE_XET: 1
+      HF_HUB_DISABLE_TELEMETRY: 1
+      TOKENIZERS_PARALLELISM: false
+      SO_R322_REPORT: ci-r322/report.json
+      OMP_NUM_THREADS: 2
+      MKL_NUM_THREADS: 2
+      OPENBLAS_NUM_THREADS: 1
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+      - name: Install pinned runtime
+        run: |
+          set -euo pipefail
+          python -m pip install --upgrade pip
+          python -m pip install torch==2.4.1 --index-url https://download.pytorch.org/whl/cpu
+          python -m pip install transformers==4.45.2 tokenizers==0.20.3 huggingface_hub==0.25.2 safetensors==0.4.5
+      - name: Run R322 cross-model World ABI gate
+        shell: bash --noprofile --norc -e -o pipefail {0}
+        run: |
+          set -euo pipefail
+          mkdir -p ci-r322
+          python -m research.r322_cross_model_world_abi 2>&1 | tee ci-r322/stdout.log
+      - name: Upload R322 evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: knowledge-vm-r322-cross-model-abi
+          path: ci-r322/
+          retention-days: 30
