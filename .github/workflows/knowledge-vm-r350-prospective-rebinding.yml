@@ -1,0 +1,48 @@
+name: Knowledge VM R350 Prospective Rebinding Loss
+
+on:
+  push:
+    branches:
+      - research/ckca-prospective-rebinding-r350-20260914
+  workflow_dispatch:
+
+concurrency:
+  group: r350-prl-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  r350-prl:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    env:
+      SO_R350_REPORT: ci-r350/report.json
+      SO_R350_STEPS: 1400
+      SO_R350_BATCH: 512
+      SO_R350_CODE: 12
+      OMP_NUM_THREADS: 2
+      MKL_NUM_THREADS: 2
+      OPENBLAS_NUM_THREADS: 1
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+      - name: Install runtime
+        run: |
+          set -euo pipefail
+          python -m pip install --upgrade pip
+          python -m pip install torch==2.4.1 --index-url https://download.pytorch.org/whl/cpu
+      - name: Run R350 PRL gate
+        shell: bash --noprofile --norc -e -o pipefail {0}
+        run: |
+          set -euo pipefail
+          mkdir -p ci-r350
+          python -m research.r350_prospective_rebinding_loss 2>&1 | tee ci-r350/stdout.log
+      - name: Upload R350 evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: knowledge-vm-r350-prospective-rebinding
+          path: ci-r350/
+          retention-days: 30
