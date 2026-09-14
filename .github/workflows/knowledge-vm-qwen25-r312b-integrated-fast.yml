@@ -1,0 +1,45 @@
+name: Knowledge VM Qwen2.5 R312b Integrated CKVM Fast
+
+on:
+  push:
+    branches:
+      - research/knowledge-vm-integrated-r312b-20260914
+  workflow_dispatch:
+
+jobs:
+  qwen25-r312b-integrated-fast:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    env:
+      HF_HUB_DISABLE_XET: 1
+      HF_HUB_DISABLE_TELEMETRY: 1
+      TOKENIZERS_PARALLELISM: false
+      SO_R312B_REPORT: ci-qwen-r312b/report.json
+      OMP_NUM_THREADS: 2
+      MKL_NUM_THREADS: 2
+      OPENBLAS_NUM_THREADS: 1
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+      - name: Install pinned runtime
+        run: |
+          set -euo pipefail
+          python -m pip install --upgrade pip
+          python -m pip install torch==2.4.1 --index-url https://download.pytorch.org/whl/cpu
+          python -m pip install transformers==4.45.2 tokenizers==0.20.3 huggingface_hub==0.25.2 safetensors==0.4.5
+      - name: Run optimized R312b integration gate
+        shell: bash --noprofile --norc -e -o pipefail {0}
+        run: |
+          set -euo pipefail
+          mkdir -p ci-qwen-r312b
+          python -m research.qwen25_05b_r312b_integrated_ckvm_fast 2>&1 | tee ci-qwen-r312b/stdout.log
+      - name: Upload R312b evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: knowledge-vm-qwen25-r312b-integrated-fast
+          path: ci-qwen-r312b/
+          retention-days: 30
