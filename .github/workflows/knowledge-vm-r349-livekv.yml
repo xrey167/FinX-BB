@@ -1,0 +1,52 @@
+name: Knowledge VM R349 LiveKV Page Table
+
+on:
+  push:
+    branches:
+      - research/ckca-livekv-r349-20260914
+  workflow_dispatch:
+
+concurrency:
+  group: r349-livekv-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  r349-livekv:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    env:
+      SO_R349_REPORT: ci-r349/report.json
+      SO_R349_PODS: 4096
+      SO_R349_QUERIES: 4000
+      SO_R349_DK: 32
+      SO_R349_DV: 32
+      SO_R349_TOPK: 8
+      SO_R349_UPDATES: 50000
+      SO_R349_SERVES: 50000
+      SO_R349_FUTURE_WORLDS: 24
+      OPENBLAS_NUM_THREADS: 2
+      OMP_NUM_THREADS: 2
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+      - name: Install runtime
+        run: |
+          set -euo pipefail
+          python -m pip install --upgrade pip
+          python -m pip install numpy==2.3.3
+      - name: Run R349 LiveKV gate
+        shell: bash --noprofile --norc -e -o pipefail {0}
+        run: |
+          set -euo pipefail
+          mkdir -p ci-r349
+          python -m research.r349_livekv_page_table_attention 2>&1 | tee ci-r349/stdout.log
+      - name: Upload R349 evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: knowledge-vm-r349-livekv
+          path: ci-r349/
+          retention-days: 30
