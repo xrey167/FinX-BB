@@ -1,0 +1,40 @@
+name: Knowledge VM R313 Neural Commit Barrier
+
+on:
+  push:
+    branches:
+      - research/knowledge-vm-commit-barrier-r313-20260914
+    paths:
+      - research/r313_neural_commit_barrier.py
+      - .github/workflows/knowledge-vm-r313-neural-commit-barrier.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  SO_R313_REPORT: ci-r313/report.json
+
+jobs:
+  r313-neural-commit-barrier:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Run R313 neural commit-barrier gate
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p ci-r313
+          python -m research.r313_neural_commit_barrier 2>&1 | tee ci-r313/stdout.log
+      - name: Upload R313 evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: knowledge-vm-r313-neural-commit-barrier
+          path: ci-r313/
+          retention-days: 30
+          if-no-files-found: warn
