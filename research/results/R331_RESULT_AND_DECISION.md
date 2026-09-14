@@ -32,7 +32,7 @@ Invalidation/repair surface:
 - median Python causal repair: **46.6 µs/update**
 
 Report SHA256: `0647e4e61fe9ba7d0255676e35468457808869167c88279e13d3d67b128061ed`.
-Artifact ZIP SHA256: `8623584814485299dbd91d09780d145289179d5636c89cba3ab4ed6a700a4f75`.
+Artifact ZIP SHA256: `b825eaa3c7c8b00bfd4bc9fe3b863cc461fcf05e0163c6b7aa88dbaf3c3686ee`.
 
 ## Architectural decision
 
