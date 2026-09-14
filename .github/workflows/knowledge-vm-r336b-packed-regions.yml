@@ -1,0 +1,36 @@
+name: Knowledge VM R336b Packed Epistemic Regions
+
+on:
+  push:
+    branches:
+      - research/ckca-packed-lifetime-regions-r336b-20260914
+  workflow_dispatch:
+
+jobs:
+  r336b-packed-regions:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    env:
+      SO_R336B_REPORT: ci-r336b/report.json
+      SO_R336B_PODS: 50000
+      SO_R336B_PROGRAMS: 12000
+      SO_R336B_MAX_READS: 8
+      SO_R336B_DEPTHS: 8,32,128,512
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Run R336b packed epistemic region gate
+        shell: bash --noprofile --norc -e -o pipefail {0}
+        run: |
+          set -euo pipefail
+          mkdir -p ci-r336b
+          python -m research.r336b_packed_epistemic_regions 2>&1 | tee ci-r336b/stdout.log
+      - name: Upload R336b evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: knowledge-vm-r336b-packed-regions
+          path: ci-r336b/
+          retention-days: 30
