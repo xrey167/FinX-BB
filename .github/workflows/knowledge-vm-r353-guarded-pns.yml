@@ -1,0 +1,36 @@
+name: Knowledge VM R353 Guarded PNS
+
+on:
+  push:
+    branches:
+      - research/ckca-guarded-pns-r353-20260914
+  workflow_dispatch:
+
+jobs:
+  r353-guarded-pns:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    env:
+      SO_R353_REPORT: ci-r353/report.json
+      SO_R353_TREES: 4000
+      SO_R353_DEPTH: 4
+      SO_R353_PODS: 4096
+      SO_R353_UPDATES: 50000
+      SO_R353_SERVES: 160000
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Run R353 guarded prospective-state gate
+        shell: bash --noprofile --norc -e -o pipefail {0}
+        run: |
+          mkdir -p ci-r353
+          python -m research.r353_guarded_prospective_control_flow 2>&1 | tee ci-r353/stdout.log
+      - name: Upload evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: knowledge-vm-r353-guarded-pns
+          path: ci-r353/
+          retention-days: 30
