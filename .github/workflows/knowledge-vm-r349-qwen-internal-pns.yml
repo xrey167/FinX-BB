@@ -38,12 +38,12 @@ jobs:
           python -m pip install --upgrade pip
           python -m pip install torch==2.4.1 --index-url https://download.pytorch.org/whl/cpu
           python -m pip install transformers==4.45.2 tokenizers==0.20.3 huggingface_hub==0.25.2 safetensors==0.4.5 numpy==2.3.3
-      - name: Run R349 internal PNS intervention
+      - name: Run R349b exact-mask internal PNS intervention
         shell: bash --noprofile --norc -e -o pipefail {0}
         run: |
           set -euo pipefail
           mkdir -p ci-r349
-          python -m research.r349_qwen_internal_prospective_state 2>&1 | tee ci-r349/stdout.log
+          python -m research.r349b_qwen_internal_pns_exact_mask 2>&1 | tee ci-r349/stdout.log
       - name: Upload R349 evidence
         if: always()
         uses: actions/upload-artifact@v4
