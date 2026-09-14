@@ -1,0 +1,35 @@
+name: Knowledge VM R355 World-Natural Layers
+
+on:
+  push:
+    branches:
+      - research/ckca-world-natural-layers-r355-20260914
+  workflow_dispatch:
+
+jobs:
+  r355-world-natural-layers:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    env:
+      SO_R355_REPORT: ci-r355/report.json
+      SO_R355_PROGRAMS: 1200
+      SO_R355_WORLDS: 128
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install runtime
+        run: python -m pip install numpy==2.3.3
+      - name: Run R355 world-natural layer algebra gate
+        shell: bash --noprofile --norc -e -o pipefail {0}
+        run: |
+          mkdir -p ci-r355
+          python -m research.r355_world_natural_layer_algebra 2>&1 | tee ci-r355/stdout.log
+      - name: Upload evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: knowledge-vm-r355-world-natural-layers
+          path: ci-r355/
+          retention-days: 30
