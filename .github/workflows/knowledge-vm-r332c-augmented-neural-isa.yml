@@ -1,0 +1,50 @@
+name: Knowledge VM R332c Augmented Neural ISA
+
+on:
+  push:
+    branches:
+      - research/ckca-neural-isa-r332c-20260914
+  workflow_dispatch:
+
+jobs:
+  r332c-augmented-neural-isa:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    env:
+      HF_HUB_DISABLE_XET: 1
+      HF_HUB_DISABLE_TELEMETRY: 1
+      TOKENIZERS_PARALLELISM: false
+      SO_R332C_REPORT: ci-r332c/report.json
+      SO_R332C_TRAIN_PER_OP: 192
+      SO_R332C_EVAL_PER_OP: 96
+      SO_R332C_ENCODE_BATCH: 32
+      SO_R332C_PROBE_STEPS: 900
+      SO_R332C_PROBE_BATCH: 256
+      OMP_NUM_THREADS: 2
+      MKL_NUM_THREADS: 2
+      OPENBLAS_NUM_THREADS: 1
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+      - name: Install pinned runtime
+        run: |
+          set -euo pipefail
+          python -m pip install --upgrade pip
+          python -m pip install torch==2.4.1 --index-url https://download.pytorch.org/whl/cpu
+          python -m pip install transformers==4.45.2 tokenizers==0.20.3 huggingface_hub==0.25.2 safetensors==0.4.5
+      - name: Run R332c augmented Neural ISA repair gate
+        shell: bash --noprofile --norc -e -o pipefail {0}
+        run: |
+          set -euo pipefail
+          mkdir -p ci-r332c
+          python -m research.qwen25_05b_r332c_augmented_neural_isa 2>&1 | tee ci-r332c/stdout.log
+      - name: Upload R332c evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: knowledge-vm-r332c-augmented-neural-isa
+          path: ci-r332c/
+          retention-days: 30
