@@ -1,0 +1,47 @@
+name: Knowledge VM R342 Referential Polynomial Tensor
+
+on:
+  push:
+    branches:
+      - research/ckca-referential-polynomial-r342-20260914
+  workflow_dispatch:
+
+jobs:
+  r342-referential-polynomial:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    env:
+      SO_R342_REPORT: ci-r342/report.json
+      SO_R342_PODS: 4096
+      SO_R342_QUERIES: 2500
+      SO_R342_REFS: 6
+      SO_R342_HIDDEN: 10
+      SO_R342_OUT: 8
+      SO_R342_QUAD_TERMS: 6
+      SO_R342_UPDATES: 50000
+      SO_R342_SERVES: 100000
+      SO_R342_RACE_PROB: 0.08
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+      - name: Install runtime
+        run: |
+          set -euo pipefail
+          python -m pip install --upgrade pip
+          python -m pip install numpy==2.3.3
+      - name: Run R342 nonlinear referential tensor gate
+        shell: bash --noprofile --norc -e -o pipefail {0}
+        run: |
+          set -euo pipefail
+          mkdir -p ci-r342
+          python -m research.r342_causal_referential_polynomial_tensor 2>&1 | tee ci-r342/stdout.log
+      - name: Upload R342 evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: knowledge-vm-r342-referential-polynomial
+          path: ci-r342/
+          retention-days: 30
