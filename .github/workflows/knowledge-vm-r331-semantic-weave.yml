@@ -1,0 +1,36 @@
+name: Knowledge VM R331 Lifetime Semantic Weave
+
+on:
+  push:
+    branches:
+      - research/ckca-semantic-weave-r331-20260914
+  workflow_dispatch:
+
+jobs:
+  r331-semantic-weave:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    env:
+      SO_R331_REPORT: ci-r331/report.json
+      SO_R331_PODS: 10000
+      SO_R331_DOCUMENTS: 20000
+      SO_R331_CLAUSES: 8
+      SO_R331_UPDATES: 12000
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Run R331 lifetime semantic-weave gate
+        shell: bash --noprofile --norc -e -o pipefail {0}
+        run: |
+          set -euo pipefail
+          mkdir -p ci-r331
+          python -m research.r331_lifetime_carrying_semantic_weave 2>&1 | tee ci-r331/stdout.log
+      - name: Upload R331 evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: knowledge-vm-r331-semantic-weave
+          path: ci-r331/
+          retention-days: 30
