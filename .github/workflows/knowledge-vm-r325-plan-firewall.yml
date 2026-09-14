@@ -1,0 +1,34 @@
+name: Knowledge VM R325 Epistemic Plan Firewall
+
+on:
+  push:
+    branches:
+      - research/ckca-plan-firewall-r325-20260914
+  workflow_dispatch:
+
+jobs:
+  r325-plan-firewall:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    env:
+      SO_R325_REPORT: ci-r325/report.json
+      SO_R325_VALID: 250000
+      SO_R325_MUTANTS: 250000
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Run R325 epistemic plan-firewall gate
+        shell: bash --noprofile --norc -e -o pipefail {0}
+        run: |
+          set -euo pipefail
+          mkdir -p ci-r325
+          python -m research.r325_epistemic_plan_firewall 2>&1 | tee ci-r325/stdout.log
+      - name: Upload R325 evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: knowledge-vm-r325-plan-firewall
+          path: ci-r325/
+          retention-days: 30
