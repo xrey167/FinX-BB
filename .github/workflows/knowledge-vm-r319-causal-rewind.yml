@@ -1,0 +1,33 @@
+name: Knowledge VM R319 Generational Causal Rewind
+
+on:
+  push:
+    branches:
+      - research/knowledge-vm-causal-rewind-r319-20260914
+  workflow_dispatch:
+
+jobs:
+  r319-causal-rewind:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    env:
+      SO_R319_REPORT: ci-r319/report.json
+      SO_R319_TRIALS: 60000
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Run R319 generational causal rewind gate
+        shell: bash --noprofile --norc -e -o pipefail {0}
+        run: |
+          set -euo pipefail
+          mkdir -p ci-r319
+          python -m research.r319_generational_causal_rewind 2>&1 | tee ci-r319/stdout.log
+      - name: Upload R319 evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: knowledge-vm-r319-causal-rewind
+          path: ci-r319/
+          retention-days: 30
