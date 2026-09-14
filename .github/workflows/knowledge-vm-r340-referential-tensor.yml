@@ -1,0 +1,46 @@
+name: Knowledge VM R340 Causal Referential Tensor
+
+on:
+  push:
+    branches:
+      - research/ckca-referential-tensor-r340-20260914
+  workflow_dispatch:
+
+jobs:
+  r340-referential-tensor:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    env:
+      SO_R340_REPORT: ci-r340/report.json
+      SO_R340_PODS: 4096
+      SO_R340_QUERIES: 8000
+      SO_R340_DIM: 16
+      SO_R340_TOPK: 6
+      SO_R340_LAYERS: 6
+      SO_R340_UPDATES: 50000
+      SO_R340_SERVES: 120000
+      SO_R340_RACE_PROB: 0.08
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+      - name: Install runtime
+        run: |
+          set -euo pipefail
+          python -m pip install --upgrade pip
+          python -m pip install numpy==2.3.3
+      - name: Run R340 CRT gate
+        shell: bash --noprofile --norc -e -o pipefail {0}
+        run: |
+          set -euo pipefail
+          mkdir -p ci-r340
+          python -m research.r340_causal_referential_tensor 2>&1 | tee ci-r340/stdout.log
+      - name: Upload R340 evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: knowledge-vm-r340-referential-tensor
+          path: ci-r340/
+          retention-days: 30
