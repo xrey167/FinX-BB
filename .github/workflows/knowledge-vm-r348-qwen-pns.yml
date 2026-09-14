@@ -41,7 +41,7 @@ jobs:
         run: |
           set -euo pipefail
           mkdir -p ci-r348
-          python -m research.r348_qwen_fast_pns_bridge 2>&1 | tee ci-r348/stdout.log
+          python -m research.r348b_qwen_fast_pns_bridge 2>&1 | tee ci-r348/stdout.log
       - name: Upload R348 evidence
         if: always()
         uses: actions/upload-artifact@v4
