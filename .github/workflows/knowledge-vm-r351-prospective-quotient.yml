@@ -1,0 +1,35 @@
+name: Knowledge VM R351 Prospective Quotient
+
+on:
+  push:
+    branches:
+      - research/ckca-prospective-quotient-r351-20260914
+  workflow_dispatch:
+
+jobs:
+  r351-prospective-quotient:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    env:
+      SO_R351_REPORT: ci-r351/report.json
+      SO_R351_RANDOM_LINEAR: 250000
+      SO_R351_RANDOM_NONLINEAR: 100000
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install runtime
+        run: python -m pip install numpy==2.3.3
+      - name: Run R351 mechanical theorem checks
+        shell: bash --noprofile --norc -e -o pipefail {0}
+        run: |
+          mkdir -p ci-r351
+          python -m research.r351_prospective_quotient_mechanical_check 2>&1 | tee ci-r351/stdout.log
+      - name: Upload evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: knowledge-vm-r351-prospective-quotient
+          path: ci-r351/
+          retention-days: 30
