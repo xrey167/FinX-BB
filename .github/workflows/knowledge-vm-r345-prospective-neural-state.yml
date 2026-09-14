@@ -1,0 +1,32 @@
+name: Knowledge VM R345 Prospective Neural State
+
+on:
+  push:
+    branches:
+      - research/ckca-live-ref-tensor-r345-20260914
+  workflow_dispatch:
+
+jobs:
+  r345-prospective-neural-state:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    env:
+      SO_R345_REPORT: ci-r345/report.json
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Run R345 PNS model check
+        shell: bash --noprofile --norc -e -o pipefail {0}
+        run: |
+          set -euo pipefail
+          mkdir -p ci-r345
+          python -m research.r345_prospective_neural_state_modelcheck 2>&1 | tee ci-r345/stdout.log
+      - name: Upload R345 evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: knowledge-vm-r345-prospective-neural-state
+          path: ci-r345/
+          retention-days: 30
