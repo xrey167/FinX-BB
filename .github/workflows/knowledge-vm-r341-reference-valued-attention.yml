@@ -1,0 +1,48 @@
+name: Knowledge VM R341 Reference-Valued Attention
+
+on:
+  push:
+    branches:
+      - research/ckca-reference-valued-attention-r341-20260914
+  workflow_dispatch:
+
+jobs:
+  r341-reference-valued-attention:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    env:
+      SO_R341_REPORT: ci-r341/report.json
+      SO_R341_PODS: 4096
+      SO_R341_QUERIES: 2400
+      SO_R341_WORLD_DIM: 8
+      SO_R341_HIDDEN: 16
+      SO_R341_HEADS: 4
+      SO_R341_TOPK: 3
+      SO_R341_BLOCKS: 8
+      SO_R341_UPDATES: 50000
+      SO_R341_SERVES: 100000
+      SO_R341_RACE_PROB: 0.08
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+      - name: Install runtime
+        run: |
+          set -euo pipefail
+          python -m pip install --upgrade pip
+          python -m pip install numpy==2.3.3
+      - name: Run R341 Reference-Valued Attention gate
+        shell: bash --noprofile --norc -e -o pipefail {0}
+        run: |
+          set -euo pipefail
+          mkdir -p ci-r341
+          python -m research.r341_reference_valued_attention 2>&1 | tee ci-r341/stdout.log
+      - name: Upload R341 evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: knowledge-vm-r341-reference-valued-attention
+          path: ci-r341/
+          retention-days: 30
