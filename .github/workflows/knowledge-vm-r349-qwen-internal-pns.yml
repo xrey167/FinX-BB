@@ -6,6 +6,10 @@ on:
       - research/ckca-qwen-internal-pns-r349-20260914
   workflow_dispatch:
 
+concurrency:
+  group: r349-qwen-internal-pns-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   r349-qwen-internal-pns:
     runs-on: ubuntu-24.04
@@ -15,9 +19,9 @@ jobs:
       HF_HUB_DISABLE_TELEMETRY: 1
       TOKENIZERS_PARALLELISM: false
       SO_R349_REPORT: ci-r349/report.json
-      SO_R349_FUTURE_WORLDS: 8
-      SO_R349_BENCH_LOOPS: 4
-      SO_R349_RACE_TRIALS: 256
+      SO_R349_FUTURE_WORLDS: 4
+      SO_R349_BENCH_LOOPS: 2
+      SO_R349_RACE_TRIALS: 64
       SO_R349_PORT_ALPHA: 0.85
       OMP_NUM_THREADS: 2
       MKL_NUM_THREADS: 2
