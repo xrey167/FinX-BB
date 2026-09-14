@@ -1,0 +1,50 @@
+name: Knowledge VM R333b Midlayer World Slot
+
+on:
+  push:
+    branches:
+      - research/ckca-midlayer-world-port-r333b-20260914
+  workflow_dispatch:
+
+jobs:
+  r333b-midlayer-world-slot:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    env:
+      HF_HUB_DISABLE_XET: 1
+      HF_HUB_DISABLE_TELEMETRY: 1
+      TOKENIZERS_PARALLELISM: false
+      SO_R333B_REPORT: ci-r333b/report.json
+      SO_R333B_TRAIN_PROMPTS_PER_OP: 32
+      SO_R333B_EVAL_PROMPTS_PER_OP: 48
+      SO_R333B_ENCODE_BATCH: 24
+      SO_R333B_STEPS: 220
+      SO_R333B_BATCH: 32
+      OMP_NUM_THREADS: 2
+      MKL_NUM_THREADS: 2
+      OPENBLAS_NUM_THREADS: 1
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+      - name: Install pinned runtime
+        run: |
+          set -euo pipefail
+          python -m pip install --upgrade pip
+          python -m pip install torch==2.4.1 --index-url https://download.pytorch.org/whl/cpu
+          python -m pip install transformers==4.45.2 tokenizers==0.20.3 huggingface_hub==0.25.2 safetensors==0.4.5
+      - name: Run R333b efficient mid-layer World Slot gate
+        shell: bash --noprofile --norc -e -o pipefail {0}
+        run: |
+          set -euo pipefail
+          mkdir -p ci-r333b
+          python -m research.qwen25_05b_r333b_midlayer_world_slot_materializer 2>&1 | tee ci-r333b/stdout.log
+      - name: Upload R333b evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: knowledge-vm-r333b-midlayer-world-slot
+          path: ci-r333b/
+          retention-days: 30
