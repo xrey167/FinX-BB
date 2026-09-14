@@ -1,0 +1,36 @@
+name: Knowledge VM R354 Reference-Generating PNS
+
+on:
+  push:
+    branches:
+      - research/ckca-reference-generating-pns-r354-20260914
+  workflow_dispatch:
+
+jobs:
+  r354-reference-generating-pns:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    env:
+      SO_R354_REPORT: ci-r354/report.json
+      SO_R354_PODS: 8192
+      SO_R354_PROGRAMS: 6000
+      SO_R354_HOPS: 6
+      SO_R354_UPDATES: 60000
+      SO_R354_SERVES: 180000
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Run R354 reference-generating prospective-state gate
+        shell: bash --noprofile --norc -e -o pipefail {0}
+        run: |
+          mkdir -p ci-r354
+          python -m research.r354_reference_generating_prospective_state 2>&1 | tee ci-r354/stdout.log
+      - name: Upload evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: knowledge-vm-r354-reference-generating-pns
+          path: ci-r354/
+          retention-days: 30
