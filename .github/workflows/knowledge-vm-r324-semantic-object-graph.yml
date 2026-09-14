@@ -1,0 +1,37 @@
+name: Knowledge VM R324 Causal Semantic Object Graph
+
+on:
+  push:
+    branches:
+      - research/ckca-semantic-object-graph-r324-20260914
+  workflow_dispatch:
+
+jobs:
+  r324-semantic-object-graph:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    env:
+      SO_R324_REPORT: ci-r324/report.json
+      SO_R324_PODS: 10000
+      SO_R324_MESSAGES: 50000
+      SO_R324_SLOTS: 4
+      SO_R324_UPDATES: 12000
+      SO_R324_AUDIT_EVERY: 200
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Run R324 transcript virtualization gate
+        shell: bash --noprofile --norc -e -o pipefail {0}
+        run: |
+          set -euo pipefail
+          mkdir -p ci-r324
+          python -m research.r324_causal_semantic_object_graph 2>&1 | tee ci-r324/stdout.log
+      - name: Upload R324 evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: knowledge-vm-r324-semantic-object-graph
+          path: ci-r324/
+          retention-days: 30
