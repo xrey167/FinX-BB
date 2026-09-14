@@ -47,6 +47,7 @@ Query-only monolithic Transformer control:
 The external-world pipeline therefore remained stable under complete world rebinding, but the monolithic control did not fit the home task strongly enough to serve as the final strong parametric baseline.
 
 Report SHA256: `be212f099f16dca428e9c527cfc6cda3206897095bd86c3a2008ab64bbfd6c5c`.
+Artifact ZIP SHA256: `85dc04d7545b7434758721442638031977226a314912708b73871031056fbc6b`.
 
 ## Decision
 
