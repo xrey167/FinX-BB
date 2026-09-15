@@ -1,0 +1,31 @@
+name: LCC001 lineage certificate boundary
+on:
+  push:
+    branches: [research/lcc001-lineage-certificate-boundary]
+    paths:
+      - 'research/lcc001/assay.py'
+      - '.github/workflows/lcc001-lineage-certificate-boundary.yml'
+permissions:
+  contents: read
+jobs:
+  exact-screen:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - name: Execute all exact countermodels and controls
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p ci-lcc001
+          python -u research/lcc001/assay.py --out ci-lcc001/result.json 2>&1 | tee ci-lcc001/stdout.txt
+          sha256sum research/lcc001/assay.py ci-lcc001/result.json > ci-lcc001/sha256.txt
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: lcc001-exact-certificate-boundary
+          path: ci-lcc001/
+          if-no-files-found: error
