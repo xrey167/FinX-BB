@@ -1,0 +1,52 @@
+name: GEN001 token feedback boundary
+on:
+  push:
+    branches: [research/gen001-token-feedback-boundary]
+    paths:
+      - 'so/experiments/gen001_token_feedback_boundary.py'
+      - 'so/tests/test_token_feedback_lineage.py'
+      - '.github/workflows/gen001-token-feedback-boundary.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  feedback-regression:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    env:
+      OMP_NUM_THREADS: '1'
+      OPENBLAS_NUM_THREADS: '1'
+      HF_HUB_OFFLINE: '1'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install CPU dependencies
+        run: |
+          python -m pip install torch --index-url https://download.pytorch.org/whl/cpu
+          python -m pip install -r so/requirements.txt
+      - name: Capture execution environment and source
+        run: |
+          mkdir -p ci-gen001/source/so/experiments ci-gen001/source/so/tests
+          cp so/llm_adapter.py ci-gen001/source/so/
+          cp so/experiments/gen001_token_feedback_boundary.py ci-gen001/source/so/experiments/
+          cp so/tests/test_token_feedback_lineage.py ci-gen001/source/so/tests/
+          git rev-parse HEAD > ci-gen001/commit.txt
+          python -m pip freeze > ci-gen001/environment.txt
+      - name: Run complete diagnostic matrix
+        run: |
+          python -m so.experiments.gen001_token_feedback_boundary \
+            --seeds 101 102 103 104 105 --tokens 6 --results-dir ci-gen001
+      - name: Existing adapter contracts and new lineage regressions
+        if: always()
+        run: |
+          set -o pipefail
+          python -m pytest so/tests/test_write_layer.py so/tests/test_llm_adapter.py \
+            so/tests/test_token_feedback_lineage.py -q | tee ci-gen001/tests.txt
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: gen001-token-feedback-boundary
+          path: ci-gen001/
+          if-no-files-found: error
