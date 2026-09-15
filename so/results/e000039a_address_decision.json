@@ -1,0 +1,766 @@
+{
+  "aggregate": {
+    "address_collision": {
+      "max": 0.1,
+      "mean": 0.08666666666666667,
+      "min": 0.07,
+      "n": 3
+    },
+    "heldout/gap": {
+      "max": 1.19,
+      "mean": 1.11,
+      "min": 1.04,
+      "n": 3
+    },
+    "heldout/residual_gap": {
+      "max": 0.1399999999999999,
+      "mean": 0.12666666666666662,
+      "min": 0.10999999999999999,
+      "n": 3
+    },
+    "heldout/routing_share": {
+      "max": 0.8942307692307693,
+      "mean": 0.8861339640751407,
+      "min": 0.8818181818181818,
+      "n": 3
+    },
+    "n_targets": {
+      "max": 100.0,
+      "mean": 100.0,
+      "min": 100.0,
+      "n": 3
+    },
+    "prefixed/read_min": {
+      "max": 1.0,
+      "mean": 0.9833333333333334,
+      "min": 0.97,
+      "n": 3
+    },
+    "prefixed/route_hit_min": {
+      "max": 0.99,
+      "mean": 0.9866666666666667,
+      "min": 0.98,
+      "n": 3
+    },
+    "query_cos_between_fact/read0": {
+      "max": 0.7267284989356995,
+      "mean": 0.7199731667836508,
+      "min": 0.710198700428009,
+      "n": 3
+    },
+    "query_cos_between_fact/read1": {
+      "max": 0.27197518944740295,
+      "mean": 0.26698548595110577,
+      "min": 0.26315057277679443,
+      "n": 3
+    },
+    "query_cos_within_fact/read0": {
+      "max": 0.8012449741363525,
+      "mean": 0.7959509889284769,
+      "min": 0.7873322367668152,
+      "n": 3
+    },
+    "query_cos_within_fact/read1": {
+      "max": 0.7894266247749329,
+      "mean": 0.7846261858940125,
+      "min": 0.7811701893806458,
+      "n": 3
+    },
+    "t0/prefixed_read": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "t0/prefixed_route_hit": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "t0/train/first_read_null": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "t0/train/oracle_read": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "t0/train/oracle_unknown": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 3
+    },
+    "t0/train/read": {
+      "max": 0.8,
+      "mean": 0.7766666666666667,
+      "min": 0.76,
+      "n": 3
+    },
+    "t0/train/route_hit": {
+      "max": 0.9,
+      "mean": 0.8866666666666667,
+      "min": 0.87,
+      "n": 3
+    },
+    "t1/train/first_read_null": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "t1/train/oracle_read": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "t1/train/oracle_unknown": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 3
+    },
+    "t1/train/read": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "t1/train/route_hit": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "t10/heldout/first_read_null": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "t10/heldout/oracle_read": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "t10/heldout/oracle_unknown": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 3
+    },
+    "t10/heldout/read": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "t10/heldout/route_hit": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "t11/heldout/first_read_null": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "t11/heldout/oracle_read": {
+      "max": 0.93,
+      "mean": 0.92,
+      "min": 0.91,
+      "n": 3
+    },
+    "t11/heldout/oracle_unknown": {
+      "max": 0.09,
+      "mean": 0.08,
+      "min": 0.07,
+      "n": 3
+    },
+    "t11/heldout/read": {
+      "max": 0.45,
+      "mean": 0.4033333333333333,
+      "min": 0.37,
+      "n": 3
+    },
+    "t11/heldout/route_hit": {
+      "max": 0.59,
+      "mean": 0.5633333333333334,
+      "min": 0.54,
+      "n": 3
+    },
+    "t11/prefixed_read": {
+      "max": 1.0,
+      "mean": 0.9933333333333333,
+      "min": 0.99,
+      "n": 3
+    },
+    "t11/prefixed_route_hit": {
+      "max": 1.0,
+      "mean": 0.9966666666666667,
+      "min": 0.99,
+      "n": 3
+    },
+    "t2/prefixed_read": {
+      "max": 1.0,
+      "mean": 0.9833333333333334,
+      "min": 0.97,
+      "n": 3
+    },
+    "t2/prefixed_route_hit": {
+      "max": 0.99,
+      "mean": 0.9866666666666667,
+      "min": 0.98,
+      "n": 3
+    },
+    "t2/train/first_read_null": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "t2/train/oracle_read": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "t2/train/oracle_unknown": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 3
+    },
+    "t2/train/read": {
+      "max": 0.79,
+      "mean": 0.7600000000000001,
+      "min": 0.71,
+      "n": 3
+    },
+    "t2/train/route_hit": {
+      "max": 0.92,
+      "mean": 0.9,
+      "min": 0.89,
+      "n": 3
+    },
+    "t3/train/first_read_null": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "t3/train/oracle_read": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "t3/train/oracle_unknown": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 3
+    },
+    "t3/train/read": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "t3/train/route_hit": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "t4/train/first_read_null": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "t4/train/oracle_read": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "t4/train/oracle_unknown": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 3
+    },
+    "t4/train/read": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "t4/train/route_hit": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "t5/train/first_read_null": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "t5/train/oracle_read": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "t5/train/oracle_unknown": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 3
+    },
+    "t5/train/read": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "t5/train/route_hit": {
+      "max": 1.0,
+      "mean": 0.9966666666666667,
+      "min": 0.99,
+      "n": 3
+    },
+    "t6/prefixed_read": {
+      "max": 1.0,
+      "mean": 0.9933333333333333,
+      "min": 0.99,
+      "n": 3
+    },
+    "t6/prefixed_route_hit": {
+      "max": 1.0,
+      "mean": 0.9966666666666667,
+      "min": 0.99,
+      "n": 3
+    },
+    "t6/train/first_read_null": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "t6/train/oracle_read": {
+      "max": 1.0,
+      "mean": 0.9966666666666667,
+      "min": 0.99,
+      "n": 3
+    },
+    "t6/train/oracle_unknown": {
+      "max": 0.01,
+      "mean": 0.0033333333333333335,
+      "min": 0.0,
+      "n": 3
+    },
+    "t6/train/read": {
+      "max": 0.79,
+      "mean": 0.7666666666666666,
+      "min": 0.75,
+      "n": 3
+    },
+    "t6/train/route_hit": {
+      "max": 0.92,
+      "mean": 0.9033333333333333,
+      "min": 0.87,
+      "n": 3
+    },
+    "t7/train/first_read_null": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "t7/train/oracle_read": {
+      "max": 1.0,
+      "mean": 0.9966666666666667,
+      "min": 0.99,
+      "n": 3
+    },
+    "t7/train/oracle_unknown": {
+      "max": 0.01,
+      "mean": 0.0033333333333333335,
+      "min": 0.0,
+      "n": 3
+    },
+    "t7/train/read": {
+      "max": 1.0,
+      "mean": 0.9966666666666667,
+      "min": 0.99,
+      "n": 3
+    },
+    "t7/train/route_hit": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "t8/heldout/first_read_null": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "t8/heldout/oracle_read": {
+      "max": 0.98,
+      "mean": 0.96,
+      "min": 0.93,
+      "n": 3
+    },
+    "t8/heldout/oracle_unknown": {
+      "max": 0.07,
+      "mean": 0.04,
+      "min": 0.02,
+      "n": 3
+    },
+    "t8/heldout/read": {
+      "max": 0.61,
+      "mean": 0.5333333333333333,
+      "min": 0.49,
+      "n": 3
+    },
+    "t8/heldout/route_hit": {
+      "max": 0.77,
+      "mean": 0.7133333333333334,
+      "min": 0.66,
+      "n": 3
+    },
+    "t8/prefixed_read": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "t8/prefixed_route_hit": {
+      "max": 1.0,
+      "mean": 0.9966666666666667,
+      "min": 0.99,
+      "n": 3
+    },
+    "t9/heldout/first_read_null": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "t9/heldout/oracle_read": {
+      "max": 1.0,
+      "mean": 0.9933333333333333,
+      "min": 0.99,
+      "n": 3
+    },
+    "t9/heldout/oracle_unknown": {
+      "max": 0.01,
+      "mean": 0.006666666666666667,
+      "min": 0.0,
+      "n": 3
+    },
+    "t9/heldout/read": {
+      "max": 0.96,
+      "mean": 0.9533333333333333,
+      "min": 0.95,
+      "n": 3
+    },
+    "t9/heldout/route_hit": {
+      "max": 0.97,
+      "mean": 0.9499999999999998,
+      "min": 0.94,
+      "n": 3
+    }
+  },
+  "decision_rule": "routing_share >= 0.7 -> train the address arm alone; <= 0.3 -> train the read arm alone; in between -> train both. Fixed before either arm was trained.",
+  "deletion_level": null,
+  "environment": {
+    "device": "cpu",
+    "numpy": "2.4.6",
+    "platform": "Linux-6.18.44-fc-v24-x86_64-with-glibc2.39",
+    "python": "3.11.15",
+    "threads": "2",
+    "torch": "2.14.0+cpu"
+  },
+  "evidence_level": "E5",
+  "evidence_level_meaning": "Transformer evidence",
+  "experiment": "E-000039-A",
+  "no_training": "E-000017-B's three checkpoints are evaluated as recorded; nothing is trained.",
+  "per_seed": [
+    {
+      "address_collision": 0.09,
+      "best_template": 1,
+      "checkpoint_sha256": "be5ab40d2a95822ae69bf698660ca41031bc627923d81e9dc6af22eeb48cf125",
+      "heldout/gap": 1.04,
+      "heldout/residual_gap": 0.10999999999999999,
+      "heldout/routing_share": 0.8942307692307693,
+      "n_targets": 100,
+      "prefixed/read_min": 0.98,
+      "prefixed/route_hit_min": 0.98,
+      "query_cos_between_fact/read0": 0.710198700428009,
+      "query_cos_between_fact/read1": 0.27197518944740295,
+      "query_cos_within_fact/read0": 0.7873322367668152,
+      "query_cos_within_fact/read1": 0.7894266247749329,
+      "seed": 1700,
+      "t0/prefixed_read": 1.0,
+      "t0/prefixed_route_hit": 1.0,
+      "t0/train/first_read_null": 1.0,
+      "t0/train/oracle_read": 1.0,
+      "t0/train/oracle_unknown": 0.0,
+      "t0/train/read": 0.8,
+      "t0/train/route_hit": 0.89,
+      "t1/train/first_read_null": 1.0,
+      "t1/train/oracle_read": 1.0,
+      "t1/train/oracle_unknown": 0.0,
+      "t1/train/read": 1.0,
+      "t1/train/route_hit": 1.0,
+      "t10/heldout/first_read_null": 1.0,
+      "t10/heldout/oracle_read": 1.0,
+      "t10/heldout/oracle_unknown": 0.0,
+      "t10/heldout/read": 1.0,
+      "t10/heldout/route_hit": 1.0,
+      "t11/heldout/first_read_null": 1.0,
+      "t11/heldout/oracle_read": 0.92,
+      "t11/heldout/oracle_unknown": 0.08,
+      "t11/heldout/read": 0.39,
+      "t11/heldout/route_hit": 0.54,
+      "t11/prefixed_read": 0.99,
+      "t11/prefixed_route_hit": 0.99,
+      "t2/prefixed_read": 0.98,
+      "t2/prefixed_route_hit": 0.98,
+      "t2/train/first_read_null": 1.0,
+      "t2/train/oracle_read": 1.0,
+      "t2/train/oracle_unknown": 0.0,
+      "t2/train/read": 0.79,
+      "t2/train/route_hit": 0.89,
+      "t3/train/first_read_null": 1.0,
+      "t3/train/oracle_read": 1.0,
+      "t3/train/oracle_unknown": 0.0,
+      "t3/train/read": 1.0,
+      "t3/train/route_hit": 1.0,
+      "t4/train/first_read_null": 1.0,
+      "t4/train/oracle_read": 1.0,
+      "t4/train/oracle_unknown": 0.0,
+      "t4/train/read": 1.0,
+      "t4/train/route_hit": 1.0,
+      "t5/train/first_read_null": 1.0,
+      "t5/train/oracle_read": 1.0,
+      "t5/train/oracle_unknown": 0.0,
+      "t5/train/read": 1.0,
+      "t5/train/route_hit": 1.0,
+      "t6/prefixed_read": 0.99,
+      "t6/prefixed_route_hit": 0.99,
+      "t6/train/first_read_null": 1.0,
+      "t6/train/oracle_read": 0.99,
+      "t6/train/oracle_unknown": 0.01,
+      "t6/train/read": 0.75,
+      "t6/train/route_hit": 0.87,
+      "t7/train/first_read_null": 1.0,
+      "t7/train/oracle_read": 1.0,
+      "t7/train/oracle_unknown": 0.0,
+      "t7/train/read": 1.0,
+      "t7/train/route_hit": 1.0,
+      "t8/heldout/first_read_null": 1.0,
+      "t8/heldout/oracle_read": 0.98,
+      "t8/heldout/oracle_unknown": 0.02,
+      "t8/heldout/read": 0.61,
+      "t8/heldout/route_hit": 0.77,
+      "t8/prefixed_read": 1.0,
+      "t8/prefixed_route_hit": 1.0,
+      "t9/heldout/first_read_null": 1.0,
+      "t9/heldout/oracle_read": 0.99,
+      "t9/heldout/oracle_unknown": 0.01,
+      "t9/heldout/read": 0.96,
+      "t9/heldout/route_hit": 0.97
+    },
+    {
+      "address_collision": 0.1,
+      "best_template": 1,
+      "checkpoint_sha256": "f340b8ffbe4f234cb9abaca9826462729e836239a9776c5ebf70fcec46ce8162",
+      "heldout/gap": 1.19,
+      "heldout/residual_gap": 0.1399999999999999,
+      "heldout/routing_share": 0.8823529411764707,
+      "n_targets": 100,
+      "prefixed/read_min": 0.97,
+      "prefixed/route_hit_min": 0.99,
+      "query_cos_between_fact/read0": 0.7229923009872437,
+      "query_cos_between_fact/read1": 0.2658306956291199,
+      "query_cos_within_fact/read0": 0.7992757558822632,
+      "query_cos_within_fact/read1": 0.7811701893806458,
+      "seed": 1701,
+      "t0/prefixed_read": 1.0,
+      "t0/prefixed_route_hit": 1.0,
+      "t0/train/first_read_null": 1.0,
+      "t0/train/oracle_read": 1.0,
+      "t0/train/oracle_unknown": 0.0,
+      "t0/train/read": 0.76,
+      "t0/train/route_hit": 0.87,
+      "t1/train/first_read_null": 1.0,
+      "t1/train/oracle_read": 1.0,
+      "t1/train/oracle_unknown": 0.0,
+      "t1/train/read": 1.0,
+      "t1/train/route_hit": 1.0,
+      "t10/heldout/first_read_null": 1.0,
+      "t10/heldout/oracle_read": 1.0,
+      "t10/heldout/oracle_unknown": 0.0,
+      "t10/heldout/read": 1.0,
+      "t10/heldout/route_hit": 1.0,
+      "t11/heldout/first_read_null": 1.0,
+      "t11/heldout/oracle_read": 0.93,
+      "t11/heldout/oracle_unknown": 0.07,
+      "t11/heldout/read": 0.37,
+      "t11/heldout/route_hit": 0.56,
+      "t11/prefixed_read": 0.99,
+      "t11/prefixed_route_hit": 1.0,
+      "t2/prefixed_read": 0.97,
+      "t2/prefixed_route_hit": 0.99,
+      "t2/train/first_read_null": 1.0,
+      "t2/train/oracle_read": 1.0,
+      "t2/train/oracle_unknown": 0.0,
+      "t2/train/read": 0.71,
+      "t2/train/route_hit": 0.89,
+      "t3/train/first_read_null": 1.0,
+      "t3/train/oracle_read": 1.0,
+      "t3/train/oracle_unknown": 0.0,
+      "t3/train/read": 1.0,
+      "t3/train/route_hit": 1.0,
+      "t4/train/first_read_null": 1.0,
+      "t4/train/oracle_read": 1.0,
+      "t4/train/oracle_unknown": 0.0,
+      "t4/train/read": 1.0,
+      "t4/train/route_hit": 1.0,
+      "t5/train/first_read_null": 1.0,
+      "t5/train/oracle_read": 1.0,
+      "t5/train/oracle_unknown": 0.0,
+      "t5/train/read": 1.0,
+      "t5/train/route_hit": 0.99,
+      "t6/prefixed_read": 0.99,
+      "t6/prefixed_route_hit": 1.0,
+      "t6/train/first_read_null": 1.0,
+      "t6/train/oracle_read": 1.0,
+      "t6/train/oracle_unknown": 0.0,
+      "t6/train/read": 0.76,
+      "t6/train/route_hit": 0.92,
+      "t7/train/first_read_null": 1.0,
+      "t7/train/oracle_read": 0.99,
+      "t7/train/oracle_unknown": 0.01,
+      "t7/train/read": 0.99,
+      "t7/train/route_hit": 1.0,
+      "t8/heldout/first_read_null": 1.0,
+      "t8/heldout/oracle_read": 0.93,
+      "t8/heldout/oracle_unknown": 0.07,
+      "t8/heldout/read": 0.49,
+      "t8/heldout/route_hit": 0.66,
+      "t8/prefixed_read": 1.0,
+      "t8/prefixed_route_hit": 0.99,
+      "t9/heldout/first_read_null": 1.0,
+      "t9/heldout/oracle_read": 1.0,
+      "t9/heldout/oracle_unknown": 0.0,
+      "t9/heldout/read": 0.95,
+      "t9/heldout/route_hit": 0.94
+    },
+    {
+      "address_collision": 0.07,
+      "best_template": 1,
+      "checkpoint_sha256": "8ee69539a52995caa9293cdd2a6364dbf57996f5eb8829e9869aeeae2c457e30",
+      "heldout/gap": 1.1,
+      "heldout/residual_gap": 0.13,
+      "heldout/routing_share": 0.8818181818181818,
+      "n_targets": 100,
+      "prefixed/read_min": 1.0,
+      "prefixed/route_hit_min": 0.99,
+      "query_cos_between_fact/read0": 0.7267284989356995,
+      "query_cos_between_fact/read1": 0.26315057277679443,
+      "query_cos_within_fact/read0": 0.8012449741363525,
+      "query_cos_within_fact/read1": 0.7832817435264587,
+      "seed": 1702,
+      "t0/prefixed_read": 1.0,
+      "t0/prefixed_route_hit": 1.0,
+      "t0/train/first_read_null": 1.0,
+      "t0/train/oracle_read": 1.0,
+      "t0/train/oracle_unknown": 0.0,
+      "t0/train/read": 0.77,
+      "t0/train/route_hit": 0.9,
+      "t1/train/first_read_null": 1.0,
+      "t1/train/oracle_read": 1.0,
+      "t1/train/oracle_unknown": 0.0,
+      "t1/train/read": 1.0,
+      "t1/train/route_hit": 1.0,
+      "t10/heldout/first_read_null": 1.0,
+      "t10/heldout/oracle_read": 1.0,
+      "t10/heldout/oracle_unknown": 0.0,
+      "t10/heldout/read": 1.0,
+      "t10/heldout/route_hit": 1.0,
+      "t11/heldout/first_read_null": 1.0,
+      "t11/heldout/oracle_read": 0.91,
+      "t11/heldout/oracle_unknown": 0.09,
+      "t11/heldout/read": 0.45,
+      "t11/heldout/route_hit": 0.59,
+      "t11/prefixed_read": 1.0,
+      "t11/prefixed_route_hit": 1.0,
+      "t2/prefixed_read": 1.0,
+      "t2/prefixed_route_hit": 0.99,
+      "t2/train/first_read_null": 1.0,
+      "t2/train/oracle_read": 1.0,
+      "t2/train/oracle_unknown": 0.0,
+      "t2/train/read": 0.78,
+      "t2/train/route_hit": 0.92,
+      "t3/train/first_read_null": 1.0,
+      "t3/train/oracle_read": 1.0,
+      "t3/train/oracle_unknown": 0.0,
+      "t3/train/read": 1.0,
+      "t3/train/route_hit": 1.0,
+      "t4/train/first_read_null": 1.0,
+      "t4/train/oracle_read": 1.0,
+      "t4/train/oracle_unknown": 0.0,
+      "t4/train/read": 1.0,
+      "t4/train/route_hit": 1.0,
+      "t5/train/first_read_null": 1.0,
+      "t5/train/oracle_read": 1.0,
+      "t5/train/oracle_unknown": 0.0,
+      "t5/train/read": 1.0,
+      "t5/train/route_hit": 1.0,
+      "t6/prefixed_read": 1.0,
+      "t6/prefixed_route_hit": 1.0,
+      "t6/train/first_read_null": 1.0,
+      "t6/train/oracle_read": 1.0,
+      "t6/train/oracle_unknown": 0.0,
+      "t6/train/read": 0.79,
+      "t6/train/route_hit": 0.92,
+      "t7/train/first_read_null": 1.0,
+      "t7/train/oracle_read": 1.0,
+      "t7/train/oracle_unknown": 0.0,
+      "t7/train/read": 1.0,
+      "t7/train/route_hit": 1.0,
+      "t8/heldout/first_read_null": 1.0,
+      "t8/heldout/oracle_read": 0.97,
+      "t8/heldout/oracle_unknown": 0.03,
+      "t8/heldout/read": 0.5,
+      "t8/heldout/route_hit": 0.71,
+      "t8/prefixed_read": 1.0,
+      "t8/prefixed_route_hit": 1.0,
+      "t9/heldout/first_read_null": 1.0,
+      "t9/heldout/oracle_read": 0.99,
+      "t9/heldout/oracle_unknown": 0.01,
+      "t9/heldout/read": 0.95,
+      "t9/heldout/route_hit": 0.94
+    }
+  ],
+  "recorded_at": "2026-09-04T19:46:40+00:00",
+  "title": "Addressing versus transport in the paraphrase gap"
+}

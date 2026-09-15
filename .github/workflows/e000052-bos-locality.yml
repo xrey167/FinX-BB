@@ -1,0 +1,45 @@
+name: E000052 BOS locality pilot
+on:
+  push:
+    branches: [research/e000051-clean-bystanders]
+    paths:
+      - '.github/workflows/e000052-bos-locality.yml'
+      - 'so/experiments/e000052_bos_locality.py'
+      - 'so/experiments/e000008_gpt2_adapter.py'
+      - 'so/experiments/e000017_paraphrase_gap.py'
+      - 'so/experiments/e000018_no_key_no_injection.py'
+      - 'so/llm_adapter.py'
+      - 'so/train.py'
+      - 'so/data.py'
+      - 'so/world.py'
+      - 'so/tests/**'
+  workflow_dispatch:
+jobs:
+  pilot:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+          cache-dependency-path: so/requirements.txt
+      - name: Install CPU dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install torch --index-url https://download.pytorch.org/whl/cpu
+          python -m pip install -r so/requirements.txt
+      - name: Unit tests
+        run: python -m pytest so/tests -q
+      - name: E-000052 pilot
+        env:
+          SO_THREADS: '2'
+        run: |
+          mkdir -p ci-e52
+          python -m so.experiments.e000052_bos_locality --seed 0 --steps 1200 --threads 2 --results-dir ci-e52
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: e000052-results
+          path: ci-e52/

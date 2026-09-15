@@ -1,0 +1,46 @@
+name: E000075 neural snapshot isolation
+
+on:
+  push:
+    branches: [research/e000051-clean-bystanders]
+    paths:
+      - 'so/cavi.py'
+      - 'so/experiments/e000075_neural_snapshot_isolation.py'
+      - 'so/experiments/e000070_cavi_live_symlink_boundary.py'
+      - 'so/llm_adapter.py'
+      - '.github/workflows/e000075-neural-snapshot-isolation.yml'
+  workflow_dispatch:
+
+jobs:
+  neural-snapshot-isolation:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    strategy:
+      fail-fast: false
+      matrix:
+        seed: [0, 1]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+          cache-dependency-path: so/requirements.txt
+      - name: Install CPU dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install torch --index-url https://download.pytorch.org/whl/cpu
+          python -m pip install -r so/requirements.txt
+      - name: CAVI unit semantics
+        run: python -m pytest so/tests/test_cavi.py -q
+      - name: E-000075 torn-read attack
+        env:
+          SO_THREADS: '2'
+        run: |
+          mkdir -p ci-e75-${{ matrix.seed }}
+          python -m so.experiments.e000075_neural_snapshot_isolation --seeds ${{ matrix.seed }} --steps 1200 --groups 16 --template 9 --threads 2 --results-dir ci-e75-${{ matrix.seed }}
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: e000075-neural-snapshot-isolation-${{ matrix.seed }}
+          path: ci-e75-${{ matrix.seed }}/

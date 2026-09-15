@@ -1,0 +1,47 @@
+name: E000057 three-state router
+on:
+  push:
+    branches: [research/e000051-clean-bystanders]
+    paths:
+      - '.github/workflows/e000057-three-state.yml'
+      - 'so/experiments/e000057_three_state_router.py'
+      - 'so/experiments/e000008_gpt2_adapter.py'
+      - 'so/experiments/e000017_paraphrase_gap.py'
+      - 'so/experiments/e000018_no_key_no_injection.py'
+      - 'so/llm_adapter.py'
+      - 'so/train.py'
+      - 'so/data.py'
+      - 'so/world.py'
+      - 'so/reference.py'
+  workflow_dispatch:
+jobs:
+  tri-state:
+    strategy:
+      fail-fast: false
+      matrix:
+        arm: [eval_only, soft_train]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 240
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+          cache-dependency-path: so/requirements.txt
+      - name: Install CPU dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install torch --index-url https://download.pytorch.org/whl/cpu
+          python -m pip install -r so/requirements.txt
+      - name: E-000057 arm
+        env:
+          SO_THREADS: '2'
+        run: |
+          mkdir -p ci-e57
+          python -m so.experiments.e000057_three_state_router --arm ${{ matrix.arm }} --seed 0 --steps 1200 --threads 2 --results-dir ci-e57
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: e57-${{ matrix.arm }}
+          path: ci-e57/
