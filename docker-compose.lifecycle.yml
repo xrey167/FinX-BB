@@ -1,0 +1,20 @@
+services:
+  lifecycle-postgres:
+    image: pgvector/pgvector:0.8.6-pg16-bookworm@sha256:ccc6e83d6e35e931dc7c5def2022729d5a6c370318d099181995567ff1fb4d6b
+    environment:
+      POSTGRES_DB: finx
+      POSTGRES_USER: finx
+      POSTGRES_PASSWORD: finx-local-only
+    ports:
+      - "127.0.0.1:5432:5432"
+    volumes:
+      - lifecycle-postgres-data:/var/lib/postgresql/data
+      - ./db/migrations:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U finx -d finx"]
+      interval: 2s
+      timeout: 5s
+      retries: 20
+
+volumes:
+  lifecycle-postgres-data:

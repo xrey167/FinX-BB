@@ -1,0 +1,61 @@
+name: Research offline audit bundle
+on:
+  push:
+    branches: [research/e000079-joint-contract]
+    paths: ['.github/workflows/research-audit-bundle.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  bundle:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    env:
+      HF_HUB_DISABLE_XET: '1'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - name: Export immutable source and public offline dependencies
+        run: |
+          mkdir -p audit-bundle/wheels model-parts
+          git archive --format=tar.gz -o audit-bundle/source.tar.gz HEAD
+          git rev-parse HEAD > audit-bundle/source-commit.txt
+          python -m pip download --only-binary=:all: --dest audit-bundle/wheels 'transformers==5.16.1'
+          python -m pip install 'huggingface_hub==1.30.0'
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          from huggingface_hub import HfApi, snapshot_download
+          info = HfApi().model_info('openai-community/gpt2')
+          snapshot_download(info.id, revision=info.sha, local_dir='audit-bundle/gpt2',
+              allow_patterns=['config.json','model.safetensors','tokenizer.json','tokenizer_config.json','vocab.json','merges.txt'])
+          Path('audit-bundle/model-provenance.json').write_text(json.dumps({'model':info.id,'revision':info.sha}, indent=2))
+          PY
+          find audit-bundle -type f ! -path '*/.cache/*' -print0 | sort -z | xargs -0 sha256sum > audit-bundle-sha256.txt
+          cp audit-bundle-sha256.txt audit-bundle/SHA256SUMS
+          split -b 300M -d audit-bundle/gpt2/model.safetensors model-parts/model.safetensors.part-
+          rm audit-bundle/gpt2/model.safetensors
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: research-offline-source-wheels
+          path: audit-bundle/
+          compression-level: 0
+          retention-days: 3
+          if-no-files-found: error
+      - uses: actions/upload-artifact@v4
+        with:
+          name: research-offline-model-part-00
+          path: model-parts/model.safetensors.part-00
+          compression-level: 0
+          retention-days: 3
+          if-no-files-found: error
+      - uses: actions/upload-artifact@v4
+        with:
+          name: research-offline-model-part-01
+          path: model-parts/model.safetensors.part-01
+          compression-level: 0
+          retention-days: 3
+          if-no-files-found: error

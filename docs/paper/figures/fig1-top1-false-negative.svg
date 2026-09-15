@@ -1,0 +1,125 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="720" height="500" viewBox="0 0 720 500"
+     role="img" aria-labelledby="f3title f3desc" font-family="Helvetica Neue, Helvetica, Arial, sans-serif">
+  <title id="f3title">Top-1 recovery returns a false negative on the tombstoned index</title>
+  <desc id="f3desc">Posterior on the true payload for five deletion policies over a 256-value domain.
+    A gated value beside an ungated derived key and a cleared value beside a retained codebook key
+    both sit at 1.000000. A tombstoned index node that keeps its edges sits at 0.391667, a hundred
+    times the chance floor, while top-1 recovery on that same policy reads 0.0000 — the same reading
+    it gives the two certified policies. Removing the row from the addressable set, and gating every
+    derived quantity, both sit exactly at the chance floor of 0.003906.</desc>
+
+  <style>
+    .surface { fill: #fcfcfb; }
+    .ink     { fill: #0b0b0b; }
+    .ink2    { fill: #52514e; }
+    .title   { font-size: 15px; font-weight: 600; }
+    .sub     { font-size: 11.5px; }
+    .axis    { font-size: 11px; }
+    .cat     { font-size: 9.5px; }
+    .lab     { font-size: 11px; font-weight: 600; }
+    .note    { font-size: 10.5px; }
+    .grid    { stroke: #e3e2de; stroke-width: 1; }
+    .axisln  { stroke: #b8b6b0; stroke-width: 1; }
+    .cert    { fill: #2a78d6; }
+    .chance  { stroke: #0b0b0b; stroke-width: 1.25; fill: none; stroke-dasharray: 5 4; }
+    .leader  { stroke: #52514e; stroke-width: 1; }
+  </style>
+
+  <defs>
+    <pattern id="leakhatch" width="6" height="6" patternTransform="rotate(45)" patternUnits="userSpaceOnUse">
+      <rect width="6" height="6" fill="#eb6834"/>
+      <line x1="0" y1="0" x2="0" y2="6" stroke="#fcfcfb" stroke-width="1.6" opacity="0.75"/>
+    </pattern>
+  </defs>
+
+  <rect class="surface" width="720" height="500"/>
+
+  <text class="ink title" x="24" y="30">Top-1 gives a leaking policy the same reading it gives the two certified ones</text>
+  <text class="ink2 sub" x="24" y="49">Posterior on the true payload · exhaustive over a 256-value domain · log scale</text>
+
+  <!-- the column the argument turns on -->
+  <rect x="218" y="82" width="118" height="342" fill="#0b0b0b" opacity="0.045"/>
+
+  <!-- gridlines -->
+  <g class="grid">
+    <line x1="100" y1="90"  x2="690" y2="90"/>
+    <line x1="100" y1="170" x2="690" y2="170"/>
+    <line x1="100" y1="250" x2="690" y2="250"/>
+  </g>
+  <line class="axisln" x1="100" y1="330" x2="690" y2="330"/>
+
+  <g class="ink2 axis" text-anchor="end">
+    <text x="90" y="94">1</text>
+    <text x="90" y="174">0.1</text>
+    <text x="90" y="254">0.01</text>
+    <text x="90" y="334">0.001</text>
+  </g>
+  <text class="ink2 axis" x="34" y="210" transform="rotate(-90 34 210)" text-anchor="middle">posterior on the true payload</text>
+
+  <!-- bars: value_gated_shred, hnsw_tombstone, codebook_key, revoke_unindex, gate_all_derived -->
+  <rect fill="url(#leakhatch)" x="126" y="90"    width="66" height="240"/>
+  <rect fill="url(#leakhatch)" x="244" y="122.5" width="66" height="207.5"/>
+  <rect fill="url(#leakhatch)" x="362" y="90"    width="66" height="240"/>
+  <rect class="cert"           x="480" y="282.7" width="66" height="47.3"/>
+  <rect class="cert"           x="598" y="282.7" width="66" height="47.3"/>
+
+  <!-- chance floor, labelled in the empty upper right with a leader down to the line -->
+  <line class="chance" x1="100" y1="282.7" x2="690" y2="282.7"/>
+  <line class="leader" x1="686" y1="216" x2="686" y2="280"/>
+  <g class="ink2 note" text-anchor="end">
+    <text x="686" y="192">chance floor</text>
+    <text x="686" y="206">0.003906 = 1 of 256</text>
+  </g>
+
+  <!-- value labels -->
+  <g class="ink lab" text-anchor="middle">
+    <text x="159" y="83">1.000000</text>
+    <text x="277" y="115.5">0.391667</text>
+    <text x="395" y="83">1.000000</text>
+    <text x="513" y="275.7">0.003906</text>
+    <text x="631" y="275.7">0.003906</text>
+  </g>
+
+  <!-- in-bar verdicts, so hue is never load-bearing -->
+  <g class="axis" text-anchor="middle" fill="#0b0b0b">
+    <text x="159" y="200">leaks</text>
+    <text x="277" y="215">leaks</text>
+    <text x="395" y="200">leaks</text>
+  </g>
+  <g class="axis" text-anchor="middle" fill="#fcfcfb">
+    <text x="513" y="312">certified</text>
+    <text x="631" y="312">certified</text>
+  </g>
+
+  <!-- x categories -->
+  <g class="ink cat" text-anchor="middle">
+    <text x="159" y="350">gated value,</text>
+    <text x="159" y="363">ungated derived key</text>
+    <text x="277" y="350">tombstoned index node,</text>
+    <text x="277" y="363">edges kept</text>
+    <text x="395" y="350">cleared value,</text>
+    <text x="395" y="363">codebook key kept</text>
+    <text x="513" y="350">row removed from</text>
+    <text x="513" y="363">the addressable set</text>
+    <text x="631" y="350">every derived</text>
+    <text x="631" y="363">quantity gated</text>
+  </g>
+
+  <!-- the strip that makes the false negative visible -->
+  <line class="axisln" x1="100" y1="378" x2="690" y2="378"/>
+  <text class="ink2 note" x="100" y="394">what an audit reporting top-1 alone would publish:</text>
+  <g class="ink lab" text-anchor="middle">
+    <text x="159" y="414">1.0000</text>
+    <text x="277" y="414">0.0000</text>
+    <text x="395" y="414">1.0000</text>
+    <text x="513" y="414">0.0000</text>
+    <text x="631" y="414">0.0000</text>
+  </g>
+
+  <!-- the callout -->
+  <text class="ink lab" x="277" y="442" text-anchor="middle">the same reading as a certified deletion</text>
+  <text class="ink2 note" x="277" y="456" text-anchor="middle">retained edges cut 256 candidates to 2.92 — a search space 88× smaller</text>
+
+  <text class="ink2 note" x="24" y="480">Validity floor: the same attack reads a live payload at top-1 1.0000, so the at-chance readings are readings.</text>
+  <text class="ink2 note" x="24" y="494">PDX-001 · `make pdxaudit` · so/results/pdx001/pdx001_payload_derived_index_audit.json</text>
+</svg>

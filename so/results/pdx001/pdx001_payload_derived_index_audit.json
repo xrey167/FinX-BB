@@ -1,0 +1,127 @@
+{
+  "attack_validity_floor_met": true,
+  "controls_behaved_as_registered": true,
+  "decision": "PAYLOAD_DERIVED_INDEX_CHANNEL_CONFIRMED_ACROSS_STORE_SHAPES",
+  "experiment": "PDX-001",
+  "finding": "The E-000028 defect is not a property of `so/model.py`. Restated over an abstract store it reproduces in three unrelated shapes. A gated value beside an ungated reverse key, and a cleared value beside a codebook key derived from it, both name the payload outright: top-1 1.0000 and 1.0000 against a chance of 1/256. The tombstoned vector-index node behaves differently and the difference is worth the distinction: it never names the payload (top-1 0.0000), but the adjacency list it keeps \u2014 built from the embedding of the vector it is hiding \u2014 narrows the domain from 256 to 2.9 candidates, a posterior of 0.3917 against chance 0.0039 and a 88x cut in the adversary's search space. Reporting only top-1 would have called that deletion clean. Taking the row out of the addressable set, and gating every derived quantity, both reach chance and are certified independent over the whole payload domain. The rule transfers: enumerate every quantity derived from a payload and gate all of them, or take the row out of the addressable set. Gating the value alone is not deletion.",
+  "instrument_self_consistent": true,
+  "not_claimed": "This is the pattern, not a named system. No published implementation has been run here: the store shapes are faithful reconstructions written from their published descriptions, and PDX-001 has no checkpoints, no torch and no network. Running the instrument against GRACE's codebook, Larimar's memory or a real HNSW index with its own reported deletion metric remains the experiment \u00a75 of the novelty statement asks for; what has changed is that the instrument is now separable from this repository and takes a store as an argument. No claim about any specific published system's actual deletion behaviour.",
+  "policies": [
+    {
+      "certificate_matches_attack": true,
+      "certified": false,
+      "chance_top1": 0.00390625,
+      "leaks_above_chance": true,
+      "mean_candidates_remaining": 1.0,
+      "mean_posterior_on_true_payload": 1.0,
+      "payload_derived_channels": [
+        "key_rev"
+      ],
+      "payload_domain": 256,
+      "policy": "value_gated_shred",
+      "rows_certified_independent": 0,
+      "search_space_reduction_factor": 256.0,
+      "targets": 12,
+      "top1_recovery": 1.0,
+      "unique_identification_rate": 1.0
+    },
+    {
+      "certificate_matches_attack": true,
+      "certified": false,
+      "chance_top1": 0.00390625,
+      "leaks_above_chance": true,
+      "mean_candidates_remaining": 2.9166666666666665,
+      "mean_posterior_on_true_payload": 0.39166666666666666,
+      "payload_derived_channels": [
+        "adjacency"
+      ],
+      "payload_domain": 256,
+      "policy": "hnsw_tombstone",
+      "rows_certified_independent": 0,
+      "search_space_reduction_factor": 87.77142857142857,
+      "targets": 12,
+      "top1_recovery": 0.0,
+      "unique_identification_rate": 0.0
+    },
+    {
+      "certificate_matches_attack": true,
+      "certified": false,
+      "chance_top1": 0.00390625,
+      "leaks_above_chance": true,
+      "mean_candidates_remaining": 1.0,
+      "mean_posterior_on_true_payload": 1.0,
+      "payload_derived_channels": [
+        "codebook_key"
+      ],
+      "payload_domain": 256,
+      "policy": "codebook_key",
+      "rows_certified_independent": 0,
+      "search_space_reduction_factor": 256.0,
+      "targets": 12,
+      "top1_recovery": 1.0,
+      "unique_identification_rate": 1.0
+    },
+    {
+      "certificate_matches_attack": true,
+      "certified": true,
+      "chance_top1": 0.00390625,
+      "leaks_above_chance": false,
+      "mean_candidates_remaining": 256.0,
+      "mean_posterior_on_true_payload": 0.00390625,
+      "payload_derived_channels": [],
+      "payload_domain": 256,
+      "policy": "revoke_unindex",
+      "rows_certified_independent": 12,
+      "search_space_reduction_factor": 1.0,
+      "targets": 12,
+      "top1_recovery": 0.0,
+      "unique_identification_rate": 0.0
+    },
+    {
+      "certificate_matches_attack": true,
+      "certified": true,
+      "chance_top1": 0.00390625,
+      "leaks_above_chance": false,
+      "mean_candidates_remaining": 256.0,
+      "mean_posterior_on_true_payload": 0.00390625,
+      "payload_derived_channels": [],
+      "payload_domain": 256,
+      "policy": "gate_all_derived",
+      "rows_certified_independent": 12,
+      "search_space_reduction_factor": 1.0,
+      "targets": 12,
+      "top1_recovery": 0.0,
+      "unique_identification_rate": 0.0
+    }
+  ],
+  "policies_certified_independent": [
+    "revoke_unindex",
+    "gate_all_derived"
+  ],
+  "policies_leaking_above_chance": [
+    "value_gated_shred",
+    "hnsw_tombstone",
+    "codebook_key"
+  ],
+  "scope": "E-000028 restated as a store-independent payload-derived-index audit",
+  "validity_control": {
+    "certificate_matches_attack": true,
+    "certified": false,
+    "chance_top1": 0.00390625,
+    "leaks_above_chance": true,
+    "mean_candidates_remaining": 1.0,
+    "mean_posterior_on_true_payload": 1.0,
+    "payload_derived_channels": [
+      "adjacency",
+      "key_rev",
+      "value"
+    ],
+    "payload_domain": 256,
+    "policy": "live",
+    "rows_certified_independent": 0,
+    "search_space_reduction_factor": 256.0,
+    "targets": 12,
+    "top1_recovery": 1.0,
+    "unique_identification_rate": 1.0
+  }
+}

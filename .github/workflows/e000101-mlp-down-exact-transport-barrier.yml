@@ -1,0 +1,52 @@
+name: E000101 first-MLP exact-transport barrier
+on:
+  push:
+    branches: [research/e000051-clean-bystanders]
+    paths:
+      - 'so/experiments/e000101_mlp_down_exact_transport_barrier.py'
+      - 'docs/novelty/e000101-mlp-down-exact-transport-barrier-preregister.md'
+      - '.github/workflows/e000101-mlp-down-exact-transport-barrier.yml'
+  workflow_dispatch:
+jobs:
+  barrier:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 90
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - label: distilgpt2
+            model: distilgpt2
+          - label: pythia70m
+            model: EleutherAI/pythia-70m
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+          cache-dependency-path: so/requirements.txt
+      - name: Install CPU dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install torch --index-url https://download.pytorch.org/whl/cpu
+          python -m pip install -r so/requirements.txt
+      - name: Compile registered source
+        run: python -m py_compile so/experiments/e000101_mlp_down_exact_transport_barrier.py
+      - name: E-000101 first-MLP barrier
+        run: |
+          mkdir -p ci-e101
+          python -m so.experiments.e000101_mlp_down_exact_transport_barrier \
+            --model '${{ matrix.model }}' --seeds 20 21 22 --n-contexts 128 \
+            --seq-len 16 --payload-rms 2.0 --results-dir ci-e101 \
+            | tee ci-e101/stdout.txt
+      - name: Hash evidence
+        run: |
+          sha256sum docs/novelty/e000101-mlp-down-exact-transport-barrier-preregister.md \
+            so/experiments/e000101_mlp_down_exact_transport_barrier.py \
+            > ci-e101/source-sha256.txt
+          find ci-e101 -maxdepth 1 -name '*.json' -print0 | sort -z | xargs -0 -r sha256sum > ci-e101/result-sha256.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: e000101-${{ matrix.label }}
+          path: ci-e101/

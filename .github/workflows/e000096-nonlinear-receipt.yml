@@ -1,0 +1,46 @@
+name: E000096 nonlinear state-dependent receipt
+on:
+  push:
+    branches: [research/e000051-clean-bystanders]
+    paths:
+      - 'so/experiments/e000096_nonlinear_state_dependent_receipt.py'
+      - 'docs/novelty/e000096-nonlinear-state-dependent-receipt.md'
+      - '.github/workflows/e000096-nonlinear-receipt.yml'
+  workflow_dispatch:
+jobs:
+  receipt:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 90
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - label: distilgpt2
+            model: distilgpt2
+          - label: pythia70m
+            model: EleutherAI/pythia-70m
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+          cache-dependency-path: so/requirements.txt
+      - name: Install CPU dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install torch --index-url https://download.pytorch.org/whl/cpu
+          python -m pip install -r so/requirements.txt
+      - name: Compile registered screen
+        run: python -m py_compile so/experiments/e000096_nonlinear_state_dependent_receipt.py
+      - name: E-000096 nonlinear receipt screen
+        run: |
+          mkdir -p ci-e96
+          python -m so.experiments.e000096_nonlinear_state_dependent_receipt \
+            --model '${{ matrix.model }}' --seeds 0 1 2 --n-cal 64 --n-test 64 --seq-len 16 \
+            --payload-rms 2.0 --results-dir ci-e96
+      - uses: actions/upload-artifact@v4
+        with:
+          name: e000096-${{ matrix.label }}
+          path: ci-e96/
+          if-no-files-found: error

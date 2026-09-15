@@ -1,0 +1,72 @@
+{
+  "attack_validity_floor_met": true,
+  "control_behaved_as_registered": true,
+  "decision": "REAL_INDEX_TOMBSTONE_IS_NOT_AN_ERASURE",
+  "experiment": "PDX-002",
+  "finding": "Run against the reference HNSW implementation rather than a reconstruction of it, the audit reports what the library documents: `mark_deleted` is a tombstone, not an erasure. The payload is recovered at top-1 1.0000 through `unmark_deleted`, a documented public call -- no file parsing and no exploit -- and its exact bytes are still present in the serialised index at top-1 1.0000, which is the arrangement an adversary with disk access meets. Rebuilding the index without the row leaves the whole 256-value domain open at a posterior of 0.003906. PDX-001's reconstruction modelled the tombstone as a partial channel that narrowed the domain; the real library is stronger than the model, because recovery is exact and requires only the public API.",
+  "not_claimed": "This is not a vulnerability in hnswlib and nothing here is undocumented: `mark_deleted` is specified as a reversible tombstone and paired with a public `unmark_deleted`, which is the correct primitive for capacity reuse. The finding is about deployments that serve a deletion *request* with that primitive. No hosted service was touched, no vendor's product was tested, and nothing was reverse-engineered -- the library was installed from PyPI and used as documented.",
+  "policies": [
+    {
+      "certified": false,
+      "chance_top1": 0.00390625,
+      "leaks_above_chance": true,
+      "mean_candidates_remaining": 1.0,
+      "mean_posterior_on_true_payload": 1.0,
+      "payload_domain": 256,
+      "policy": "mark_deleted_api",
+      "search_space_reduction_factor": 256.0,
+      "targets": 16,
+      "top1_recovery": 1.0
+    },
+    {
+      "certified": false,
+      "chance_top1": 0.00390625,
+      "leaks_above_chance": true,
+      "mean_candidates_remaining": 1.0,
+      "mean_posterior_on_true_payload": 1.0,
+      "payload_domain": 256,
+      "policy": "mark_deleted_file",
+      "search_space_reduction_factor": 256.0,
+      "targets": 16,
+      "top1_recovery": 1.0
+    },
+    {
+      "certified": true,
+      "chance_top1": 0.00390625,
+      "leaks_above_chance": false,
+      "mean_candidates_remaining": 256.0,
+      "mean_posterior_on_true_payload": 0.00390625,
+      "payload_domain": 256,
+      "policy": "rebuild_without_row",
+      "search_space_reduction_factor": 1.0,
+      "targets": 16,
+      "top1_recovery": 0.0
+    }
+  ],
+  "policies_leaking_above_chance": [
+    "mark_deleted_api",
+    "mark_deleted_file"
+  ],
+  "scope": "PDX-001's instrument run against hnswlib, unmodified, as \u00a713(c) specifies",
+  "system_under_test": {
+    "M": 16,
+    "dims": 8,
+    "ef_construction": 200,
+    "library": "hnswlib",
+    "rows": 64,
+    "space": "l2",
+    "version": "0.8.0"
+  },
+  "validity_control": {
+    "certified": false,
+    "chance_top1": 0.00390625,
+    "leaks_above_chance": true,
+    "mean_candidates_remaining": 1.0,
+    "mean_posterior_on_true_payload": 1.0,
+    "payload_domain": 256,
+    "policy": "live",
+    "search_space_reduction_factor": 256.0,
+    "targets": 16,
+    "top1_recovery": 1.0
+  }
+}

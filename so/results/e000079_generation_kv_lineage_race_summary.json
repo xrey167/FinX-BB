@@ -1,0 +1,58 @@
+{
+  "experiment": "E-000079",
+  "date": "2026-09-05",
+  "status": "decisive architecture falsification; not a breakthrough",
+  "corrected_workflow_run": 33964913121,
+  "head_commit": "1147f6357f4e8eac3540f7e85e69e1060d21ff0b",
+  "failed_harness_attempt": {
+    "workflow_run": 33964783049,
+    "reason": "mutation trigger also fired during later no-memory controls and overwrote the timing witness",
+    "count_as_evidence": false
+  },
+  "validity_scope": {
+    "uses_trained_symlink_reader": false,
+    "purpose": "contract falsification independent of reader accuracy",
+    "positive_cavi_interpretation_allowed": false,
+    "reader_gate_unchanged": ">=0.95 fresh real-symlink correctness on every one of >=3 seeds"
+  },
+  "backbones": [
+    {
+      "model": "distilgpt2",
+      "seeds": [0, 1, 2],
+      "all_contract_checks_pass": true,
+      "post_revoke_stale_kv_vs_current_maxabs": 14.230518341064453,
+      "post_revoke_stale_kv_vs_current_kl_nats": 1.2593283653259277,
+      "clean_current_kv_vs_full_recompute_maxabs": 0.000091552734375,
+      "stale_top1": 23304,
+      "current_top1": 12,
+      "top1_changed": true,
+      "mutation_to_downstream_us_range": [96.928, 102.933],
+      "mutation_to_prefill_return_us_range": [27301.413, 29714.654]
+    },
+    {
+      "model": "EleutherAI/pythia-70m-deduped",
+      "seeds": [0, 1, 2],
+      "all_contract_checks_pass": true,
+      "post_revoke_stale_kv_vs_current_maxabs": 21.0,
+      "post_revoke_stale_kv_vs_current_kl_nats": 1.600688099861145,
+      "clean_current_kv_vs_full_recompute_maxabs": 0.0,
+      "stale_top1": 282,
+      "current_top1": 282,
+      "top1_changed": false,
+      "mutation_to_downstream_us_range": [60.799, 82.387],
+      "mutation_to_prefill_return_us_range": [14925.832, 16064.824]
+    }
+  ],
+  "falsified_contract": "first-memory-read through last-memory-read snapshot is sufficient for live autoregressive generation",
+  "architecture_change": "all reusable neural-derived state crossing token/forward boundaries must be validated against the current causal authority lineage before reuse; stale state must be rejected and refreshed/recomputed, preferably at object-scoped dependency granularity rather than with a global epoch",
+  "not_novel": [
+    "snapshot isolation",
+    "generations or epochs",
+    "cache invalidation",
+    "cache tags",
+    "KV editing",
+    "recomputation or refresh",
+    "pointers or symlinks",
+    "capabilities"
+  ]
+}

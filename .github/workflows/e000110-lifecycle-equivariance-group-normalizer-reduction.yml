@@ -1,0 +1,45 @@
+name: E000110 lifecycle equivariance group normalizer reduction
+
+on:
+  push:
+    branches:
+      - research/e000051-clean-bystanders
+    paths:
+      - "docs/novelty/e000110-lifecycle-equivariance-group-normalizer-reduction.md"
+      - "so/experiments/e000110_lifecycle_equivariance_group_normalizer_reduction.py"
+      - "so/tests/test_e000110_lifecycle_equivariance_group_normalizer_reduction.py"
+      - ".github/workflows/e000110-lifecycle-equivariance-group-normalizer-reduction.yml"
+  workflow_dispatch:
+
+jobs:
+  reduction:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install test dependency
+        run: python -m pip install pytest
+      - name: Compile
+        run: python -m py_compile so/experiments/e000110_lifecycle_equivariance_group_normalizer_reduction.py
+      - name: Focused regressions
+        run: python -m pytest -q so/tests/test_e000110_lifecycle_equivariance_group_normalizer_reduction.py
+      - name: Registered exact reduction
+        run: |
+          mkdir -p ci-e110
+          python -m so.experiments.e000110_lifecycle_equivariance_group_normalizer_reduction \
+            --results-dir ci-e110 | tee ci-e110/stdout.txt
+      - name: Hash evidence
+        run: |
+          sha256sum docs/novelty/e000110-lifecycle-equivariance-group-normalizer-reduction.md \
+            so/experiments/e000110_lifecycle_equivariance_group_normalizer_reduction.py \
+            so/tests/test_e000110_lifecycle_equivariance_group_normalizer_reduction.py \
+            > ci-e110/source-sha256.txt
+          find ci-e110 -maxdepth 1 -name '*.json' -print0 | sort -z | xargs -0 -r sha256sum > ci-e110/result-sha256.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: e000110-lifecycle-equivariance-group-normalizer-reduction
+          path: ci-e110/
+          if-no-files-found: error

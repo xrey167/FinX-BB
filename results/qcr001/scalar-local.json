@@ -1,0 +1,25 @@
+{
+  "experiment": "QCR-001",
+  "python": "3.13.5",
+  "scalar": {
+    "nonzero_error_exact_rounding_controls": 64,
+    "midpoint_crossings": [
+      {
+        "error": "1/65536",
+        "same_quantized_output": false
+      },
+      {
+        "error": "1/67108864",
+        "same_quantized_output": false
+      },
+      {
+        "error": "1/70368744177664",
+        "same_quantized_output": false
+      }
+    ],
+    "staged_result": "1",
+    "final_only_rounding_result": "129/128",
+    "staged_torch_bfloat16_agrees": true,
+    "theorem_or_certificate_novelty": false
+  }
+}

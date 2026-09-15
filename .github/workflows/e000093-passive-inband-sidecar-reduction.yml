@@ -1,0 +1,33 @@
+name: E000093 passive in-band sidecar reduction
+
+on:
+  push:
+    branches: [research/e000051-clean-bystanders]
+    paths:
+      - 'so/experiments/e000093_passive_inband_sidecar_reduction.py'
+      - 'docs/novelty/e000093-passive-inband-sidecar-reduction.md'
+      - '.github/workflows/e000093-passive-inband-sidecar-reduction.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  reduction:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Compile assay
+        run: python -m py_compile so/experiments/e000093_passive_inband_sidecar_reduction.py
+      - name: Execute registered reduction
+        run: python -m so.experiments.e000093_passive_inband_sidecar_reduction
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: e000093-passive-inband-sidecar-reduction
+          path: so/results/e000093_passive_inband_sidecar_reduction.json
+          if-no-files-found: error

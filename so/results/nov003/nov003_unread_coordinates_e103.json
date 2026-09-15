@@ -1,0 +1,156 @@
+{
+  "aggregate_hides_the_crossover": true,
+  "candidate_cost": {
+    "multiplies": 223872,
+    "representation_multiplies": 0,
+    "sequential_rounds": 9600,
+    "slow_memory_words": 13440
+  },
+  "cells": 192,
+  "crossover_within_the_registered_domain": true,
+  "decision": "CROSSOVER_AGGREGATE_VERDICT_IS_NOT_A_VERDICT",
+  "dimensions_where_candidate_is_killed": [
+    8,
+    10
+  ],
+  "dimensions_where_candidate_promotes": [
+    4,
+    6
+  ],
+  "experiment": "NOV-003",
+  "finding": "Counting the unread coordinates changes what E-000103 says, and not in the direction either NOV-001 or NOV-002 would have predicted. Two things come out. First, the baseline as written is not a baseline: `woodbury_rankk_solution` rebuilds `inv_u` and `middle_inv` on every one of the 24 sessions though neither depends on the session's right-hand side, so the candidate beats it 4x on arithmetic without the mechanism doing anything. That is the mirror of the representation subsidy -- there the baseline is handed the candidate's representation for free, here it is denied an optimisation the candidate is already using by caching z and denom. A screen can be wrong in both directions and this programme had only looked for one. Second, against a fair hoisted baseline there is no single verdict: the candidate wins on arithmetic at n=4 and n=6 and loses at n=8 and n=10, crossing over inside E-000103's own registered domain, because the candidate's cost grows as 8n^2 against the hoisted baseline's 6n^2 while its per-session term is smaller. The aggregate over all four dimensions returns PROMOTE and that number means nothing: it is an artefact of which dimensions the domain happens to contain. E-000103's kill was not wrong so much as underdetermined -- it reported one verdict for a comparison that does not have one.",
+  "generic_as_written_cost": {
+    "multiplies": 885504,
+    "representation_multiplies": 0,
+    "sequential_rounds": 4800,
+    "slow_memory_words": 10368
+  },
+  "generic_hoisted_cost": {
+    "multiplies": 221952,
+    "representation_multiplies": 0,
+    "sequential_rounds": 4800,
+    "slow_memory_words": 13824
+  },
+  "not_claimed": "One of the twenty-one kills NOV-002 did not cover, chosen because its arms differ visibly in depth and resident state. Nothing here licenses a claim about the other twenty, and nothing here promotes a mechanism: a candidate that wins at small n, loses at large n, and costs roughly twice the sequential depth throughout is not an invention. Operation counts are analytic in n and k, derived from the source of each routine in e000103 rather than from instrumented execution, and `working_set_words` counts resident words rather than measured traffic.",
+  "per_dimension": [
+    {
+      "candidate_multiplies": 568,
+      "generic_as_written_multiplies": 1960,
+      "generic_hoisted_multiplies": 616,
+      "improved": {
+        "multiplies": [
+          568,
+          616
+        ]
+      },
+      "n": 4,
+      "regressed": {
+        "sequential_rounds": [
+          50,
+          25
+        ]
+      },
+      "verdict_vs_hoisted": "PROMOTE"
+    },
+    {
+      "candidate_multiplies": 924,
+      "generic_as_written_multiplies": 3440,
+      "generic_hoisted_multiplies": 944,
+      "improved": {
+        "multiplies": [
+          924,
+          944
+        ]
+      },
+      "n": 6,
+      "regressed": {
+        "sequential_rounds": [
+          50,
+          25
+        ]
+      },
+      "verdict_vs_hoisted": "PROMOTE"
+    },
+    {
+      "candidate_multiplies": 1344,
+      "generic_as_written_multiplies": 5352,
+      "generic_hoisted_multiplies": 1320,
+      "improved": {},
+      "n": 8,
+      "regressed": {
+        "multiplies": [
+          1344,
+          1320
+        ],
+        "sequential_rounds": [
+          50,
+          25
+        ]
+      },
+      "verdict_vs_hoisted": "KILL"
+    },
+    {
+      "candidate_multiplies": 1828,
+      "generic_as_written_multiplies": 7696,
+      "generic_hoisted_multiplies": 1744,
+      "improved": {},
+      "n": 10,
+      "regressed": {
+        "multiplies": [
+          1828,
+          1744
+        ],
+        "sequential_rounds": [
+          50,
+          25
+        ]
+      },
+      "verdict_vs_hoisted": "KILL"
+    }
+  ],
+  "scope": "E-000103 re-screened on the coordinates no experiment in this programme counts",
+  "sessions_per_system": 24,
+  "verdict_vs_generic_as_written": {
+    "candidate_label": "nov003:candidate_sequential_rank1_counter",
+    "generic_label": "nov003:generic_woodbury_as_written_counter",
+    "improved_coordinates": {
+      "multiplies": [
+        223872,
+        885504
+      ]
+    },
+    "regressed_coordinates": {
+      "sequential_rounds": [
+        9600,
+        4800
+      ]
+    },
+    "states_equal": true,
+    "unread_coordinates": [
+      "slow_memory_words",
+      "representation_multiplies"
+    ],
+    "verdict": "PROMOTE"
+  },
+  "verdict_vs_generic_hoisted": {
+    "candidate_label": "nov003:candidate_sequential_rank1_counter",
+    "generic_label": "nov003:generic_woodbury_hoisted_counter",
+    "improved_coordinates": {},
+    "regressed_coordinates": {
+      "multiplies": [
+        223872,
+        221952
+      ],
+      "sequential_rounds": [
+        9600,
+        4800
+      ]
+    },
+    "states_equal": true,
+    "unread_coordinates": [
+      "slow_memory_words",
+      "representation_multiplies"
+    ],
+    "verdict": "KILL"
+  }
+}

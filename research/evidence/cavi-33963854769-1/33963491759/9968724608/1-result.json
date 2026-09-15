@@ -1,0 +1,116 @@
+{
+  "experiment": "CAVI-PROVENANCE-FALSIFICATION",
+  "seed": 0,
+  "model_name": "openai-community/gpt2",
+  "checkpoint_sha256": "4dcdea6890ac3c4381c51ed5d0f3bc6c60b0f8e733d74105b8f743b0262cc012",
+  "source_commit": "6f902bd7e0bef05e1e32dbe2c67bf44e7b4eaf85",
+  "parent_source": "30315e7d3e76a32952b82dc79141f74d4f0fa512",
+  "breakthrough": false,
+  "reader": {
+    "rows": [
+      {
+        "world_seed": 70000,
+        "template": 8,
+        "n": 200,
+        "candidate_correct": 200,
+        "candidate_accuracy": 1.0,
+        "full_vocab_accuracy": 1.0
+      },
+      {
+        "world_seed": 70000,
+        "template": 9,
+        "n": 200,
+        "candidate_correct": 195,
+        "candidate_accuracy": 0.975,
+        "full_vocab_accuracy": 0.975
+      },
+      {
+        "world_seed": 70000,
+        "template": 10,
+        "n": 200,
+        "candidate_correct": 200,
+        "candidate_accuracy": 1.0,
+        "full_vocab_accuracy": 1.0
+      },
+      {
+        "world_seed": 70000,
+        "template": 11,
+        "n": 200,
+        "candidate_correct": 200,
+        "candidate_accuracy": 1.0,
+        "full_vocab_accuracy": 1.0
+      },
+      {
+        "world_seed": 91000,
+        "template": 8,
+        "n": 200,
+        "candidate_correct": 196,
+        "candidate_accuracy": 0.98,
+        "full_vocab_accuracy": 0.98
+      },
+      {
+        "world_seed": 91000,
+        "template": 9,
+        "n": 200,
+        "candidate_correct": 189,
+        "candidate_accuracy": 0.945,
+        "full_vocab_accuracy": 0.945
+      },
+      {
+        "world_seed": 91000,
+        "template": 10,
+        "n": 200,
+        "candidate_correct": 195,
+        "candidate_accuracy": 0.975,
+        "full_vocab_accuracy": 0.975
+      },
+      {
+        "world_seed": 91000,
+        "template": 11,
+        "n": 200,
+        "candidate_correct": 195,
+        "candidate_accuracy": 0.975,
+        "full_vocab_accuracy": 0.975
+      },
+      {
+        "world_seed": 92000,
+        "template": 8,
+        "n": 200,
+        "candidate_correct": 194,
+        "candidate_accuracy": 0.97,
+        "full_vocab_accuracy": 0.97
+      },
+      {
+        "world_seed": 92000,
+        "template": 9,
+        "n": 200,
+        "candidate_correct": 189,
+        "candidate_accuracy": 0.945,
+        "full_vocab_accuracy": 0.945
+      },
+      {
+        "world_seed": 92000,
+        "template": 10,
+        "n": 200,
+        "candidate_correct": 194,
+        "candidate_accuracy": 0.97,
+        "full_vocab_accuracy": 0.97
+      },
+      {
+        "world_seed": 92000,
+        "template": 11,
+        "n": 200,
+        "candidate_correct": 195,
+        "candidate_accuracy": 0.975,
+        "full_vocab_accuracy": 0.975
+      }
+    ],
+    "minimum_candidate_accuracy": 0.945,
+    "minimum_full_vocab_accuracy": 0.945,
+    "valid_reader": false,
+    "scope": "candidate read gate; full-vocabulary performance reported separately"
+  },
+  "attacks": {
+    "status": "SKIPPED_INVALID_READER"
+  }
+}

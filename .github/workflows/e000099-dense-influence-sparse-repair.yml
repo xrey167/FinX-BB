@@ -1,0 +1,52 @@
+name: E000099 dense influence sparse repair
+on:
+  push:
+    branches: [research/e000051-clean-bystanders]
+    paths:
+      - 'so/experiments/e000099_dense_influence_sparse_repair.py'
+      - 'docs/novelty/e000099-dense-influence-sparse-repair-preregister.md'
+      - '.github/workflows/e000099-dense-influence-sparse-repair.yml'
+  workflow_dispatch:
+jobs:
+  dense:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 90
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - label: distilgpt2
+            model: distilgpt2
+          - label: pythia70m
+            model: EleutherAI/pythia-70m
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+          cache-dependency-path: so/requirements.txt
+      - name: Install CPU dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install torch --index-url https://download.pytorch.org/whl/cpu
+          python -m pip install -r so/requirements.txt
+      - name: Compile registered source
+        run: python -m py_compile so/experiments/e000099_dense_influence_sparse_repair.py
+      - name: E-000099 dense-influence kill screen
+        run: |
+          mkdir -p ci-e99
+          python -m so.experiments.e000099_dense_influence_sparse_repair \
+            --model '${{ matrix.model }}' --seeds 0 1 2 --n-contexts 64 \
+            --seq-len 16 --payload-rms 2.0 --results-dir ci-e99 \
+            | tee ci-e99/stdout.txt
+      - name: Hash evidence
+        run: |
+          sha256sum docs/novelty/e000099-dense-influence-sparse-repair-preregister.md \
+            so/experiments/e000099_dense_influence_sparse_repair.py \
+            > ci-e99/source-sha256.txt
+          find ci-e99 -maxdepth 1 -name '*.json' -print0 | sort -z | xargs -0 -r sha256sum > ci-e99/result-sha256.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: e000099-${{ matrix.label }}
+          path: ci-e99/

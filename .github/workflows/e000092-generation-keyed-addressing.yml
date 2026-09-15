@@ -1,0 +1,42 @@
+name: E000092 generation-keyed addressing
+on:
+  push:
+    branches: [research/e000051-clean-bystanders]
+    paths:
+      - 'so/experiments/e000092_generation_keyed_addressing.py'
+      - '.github/workflows/e000092-generation-keyed-addressing.yml'
+  workflow_dispatch:
+jobs:
+  screen:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 90
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - slug: distilgpt2
+            model: distilgpt2
+          - slug: pythia70m
+            model: EleutherAI/pythia-70m
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+          cache-dependency-path: so/requirements.txt
+      - name: Install CPU dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install torch --index-url https://download.pytorch.org/whl/cpu
+          python -m pip install -r so/requirements.txt
+      - name: E-000092 stale+current coexistence screen
+        run: |
+          mkdir -p ci-e92
+          python -m so.experiments.e000092_generation_keyed_addressing \
+            --model '${{ matrix.model }}' --seed 0 --n-prompts 32 \
+            --alphas 0.05 0.1 0.2 0.4 --results-dir ci-e92
+      - uses: actions/upload-artifact@v4
+        with:
+          name: e000092-${{ matrix.slug }}
+          path: ci-e92/

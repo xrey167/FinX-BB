@@ -1,0 +1,74 @@
+name: CAVI qualified-reader provenance attacks
+on:
+  push:
+    branches: [research/cavi-continuation-audit]
+    paths: ['.github/workflows/cavi-provenance-audit.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  attack:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        parent: [e79, continuation]
+        seed: [0, 1, 2]
+    env:
+      SO_BOS: '1'
+      SO_THREADS: '2'
+      OMP_NUM_THREADS: '2'
+      MKL_NUM_THREADS: '2'
+      OPENBLAS_NUM_THREADS: '1'
+      HF_HUB_DISABLE_XET: '1'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install recorded CPU dependencies
+        run: |
+          python -m pip install 'torch==2.14.0+cpu' --index-url https://download.pytorch.org/whl/cpu
+          python -m pip install 'transformers==5.16.1' numpy
+          python -m pip freeze > environment.txt
+          python -m py_compile so/experiments/cavi_provenance_audit.py
+      - name: Obtain exact parent, preserving failed scientific results
+        env:
+          GH_TOKEN: ${{ github.token }}
+          SEED: ${{ matrix.seed }}
+          PARENT: ${{ matrix.parent }}
+        run: |
+          set -euo pipefail
+          if [ "$PARENT" = e79 ]; then
+            RUN=33961782977; NAME="e000079-joint-s${SEED}"; FILE="ci-e79/e000079-s${SEED}.pt"
+          else
+            RUN=33963051896; NAME="cavi-capability-gpt2-s${SEED}"; FILE="results/reader.pt"
+          fi
+          for attempt in $(seq 1 80); do
+            if gh run download "$RUN" --repo xrey167/FinX-BB --name "$NAME" --dir parent; then
+              if [ ! -f "parent/$FILE" ]; then
+                echo 'Parent failed before writing a reader checkpoint; not a scientific pass' >&2
+                exit 1
+              fi
+              echo "CHECKPOINT=parent/$FILE" >> "$GITHUB_ENV"
+              sha256sum "parent/$FILE" > parent.sha256
+              exit 0
+            fi
+            sleep 15
+          done
+          echo 'Parent artifact unavailable within bounded wait' >&2
+          exit 1
+      - name: Audit freshness, content binding, and actual dependency closure
+        run: python -m so.experiments.cavi_provenance_audit --checkpoint "$CHECKPOINT" --output results
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: cavi-provenance-${{ matrix.parent }}-s${{ matrix.seed }}
+          path: |
+            results/
+            environment.txt
+            parent.sha256
+          retention-days: 30
+          if-no-files-found: error

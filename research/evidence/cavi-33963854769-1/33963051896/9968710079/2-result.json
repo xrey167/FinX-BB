@@ -1,0 +1,158 @@
+{
+  "experiment": "CAVI-CAPABILITY-CONTINUATION",
+  "seed": 1,
+  "model_name": "EleutherAI/pythia-70m",
+  "model_revision": "a39f36b100fe8a5377810d56c3f4789b9c53ac42",
+  "config": {
+    "n_relations": 4,
+    "read_layers": [
+      3,
+      5
+    ],
+    "d_key": 256,
+    "marker_dim": 16,
+    "use_marker_gate": true,
+    "hard_gate": false,
+    "status_gated": true,
+    "use_links": true,
+    "n_deref": 1,
+    "two_channel_null": false,
+    "match_gate": false,
+    "payload_from": "output",
+    "fallback": "unknown"
+  },
+  "source_commit": "59afe5aead6b9e8b961bc9fdfdf1d10114abbbbc",
+  "python": "3.11.16",
+  "torch": "2.14.0+cpu",
+  "breakthrough": false,
+  "threshold": 0.95,
+  "preflight": {
+    "candidate_maxabs": 0.0,
+    "full_vocab_maxabs": 0.0,
+    "routing_maxabs": 0.0,
+    "hidden_maxabs": 0.0,
+    "adapter_gradient_maxabs": 0.0
+  },
+  "training": {
+    "steps": 3000,
+    "rng_seed": 1,
+    "lr": 0.002,
+    "route_only_steps": 400
+  },
+  "checkpoint_sha256": "6e2e70c9a141f339faec84c5bd28ba9572769118d35058cb1bbaaee56e8aa910",
+  "fresh": {
+    "rows": [
+      {
+        "world_seed": 70001,
+        "template": 8,
+        "n": 200,
+        "candidate_correct": 181,
+        "candidate_accuracy": 0.905,
+        "full_vocab_accuracy": 0.75
+      },
+      {
+        "world_seed": 70001,
+        "template": 9,
+        "n": 200,
+        "candidate_correct": 152,
+        "candidate_accuracy": 0.76,
+        "full_vocab_accuracy": 0.57
+      },
+      {
+        "world_seed": 70001,
+        "template": 10,
+        "n": 200,
+        "candidate_correct": 186,
+        "candidate_accuracy": 0.93,
+        "full_vocab_accuracy": 0.695
+      },
+      {
+        "world_seed": 70001,
+        "template": 11,
+        "n": 200,
+        "candidate_correct": 168,
+        "candidate_accuracy": 0.84,
+        "full_vocab_accuracy": 0.705
+      },
+      {
+        "world_seed": 91001,
+        "template": 8,
+        "n": 200,
+        "candidate_correct": 182,
+        "candidate_accuracy": 0.91,
+        "full_vocab_accuracy": 0.695
+      },
+      {
+        "world_seed": 91001,
+        "template": 9,
+        "n": 200,
+        "candidate_correct": 148,
+        "candidate_accuracy": 0.74,
+        "full_vocab_accuracy": 0.51
+      },
+      {
+        "world_seed": 91001,
+        "template": 10,
+        "n": 200,
+        "candidate_correct": 185,
+        "candidate_accuracy": 0.925,
+        "full_vocab_accuracy": 0.685
+      },
+      {
+        "world_seed": 91001,
+        "template": 11,
+        "n": 200,
+        "candidate_correct": 174,
+        "candidate_accuracy": 0.87,
+        "full_vocab_accuracy": 0.67
+      },
+      {
+        "world_seed": 92001,
+        "template": 8,
+        "n": 200,
+        "candidate_correct": 181,
+        "candidate_accuracy": 0.905,
+        "full_vocab_accuracy": 0.705
+      },
+      {
+        "world_seed": 92001,
+        "template": 9,
+        "n": 200,
+        "candidate_correct": 136,
+        "candidate_accuracy": 0.68,
+        "full_vocab_accuracy": 0.485
+      },
+      {
+        "world_seed": 92001,
+        "template": 10,
+        "n": 200,
+        "candidate_correct": 186,
+        "candidate_accuracy": 0.93,
+        "full_vocab_accuracy": 0.71
+      },
+      {
+        "world_seed": 92001,
+        "template": 11,
+        "n": 200,
+        "candidate_correct": 173,
+        "candidate_accuracy": 0.865,
+        "full_vocab_accuracy": 0.675
+      }
+    ],
+    "minimum_candidate_accuracy": 0.68,
+    "minimum_full_vocab_accuracy": 0.485,
+    "valid_reader": false,
+    "scope": "candidate read gate; full-vocabulary performance reported separately"
+  },
+  "joint_screen": {
+    "status": "SKIPPED_INVALID_READER"
+  },
+  "seconds": 678.1633205413818,
+  "not_established": [
+    "full adversarial battery",
+    "independent J-space audit",
+    "universal linguistic coverage",
+    "novelty",
+    "latency bound"
+  ]
+}

@@ -1,0 +1,233 @@
+{
+  "decision": "SCREEN_UNCALIBRATED",
+  "e000105_work_term_audit": {
+    "cases": 512,
+    "mismatch_is_reachable": false,
+    "note": "candidate_work and generic_work are the same pure function of the same argument, so the work half of the E-000105 kill predicate is satisfied for every input. It is a tautology, not a measurement: the kill rests entirely on exact-state equality.",
+    "observed_mismatches": 0
+  },
+  "experiment": "NOV-001",
+  "false_kills": [
+    "M1"
+  ],
+  "false_promotes": [
+    "M5"
+  ],
+  "finding": "The screen tests cost *equality* on one coordinate, where it should test *improvement* across all of them, and it hands the baseline the candidate's representation for free. Three separate failures follow, each with a witness here. (1) False kill: M1 reaches identical exact states, ties on multiplies, and moves 36 slow-memory words against the baseline's 60 \u2014 refused, because the coordinate it wins on is not read. (2) False promote: M5 computes the identical result with strictly more multiplies and an advantage nowhere \u2014 passed, because the predicate asks whether the counts differ, not whether the candidate is better. (3) Representation subsidy: M4's entire advantage is a precomputed table; handed that table, the baseline ties and M4 is refused, while charging both for building it promotes M4 on the same states and the same queries. So a KILL from this screen means 'no advantage in exact states or multiply count against a baseline holding my own representation'. It does not mean 'not novel'. Separately, in E-000105 both work terms in the kill predicate are the same pure function of the same argument, so that kill rests on exact-state equality alone.",
+  "mechanisms": [
+    {
+      "advantage_lives_in": "slow_memory_words",
+      "candidate_cost": {
+        "multiplies": 72,
+        "representation_multiplies": 0,
+        "sequential_rounds": 1,
+        "slow_memory_words": 36
+      },
+      "complete_screen": {
+        "improved_coordinates": {
+          "slow_memory_words": [
+            36,
+            60
+          ]
+        },
+        "regressed_coordinates": {},
+        "same_exact_state": true,
+        "verdict": "PROMOTE"
+      },
+      "exhaustive_state_mismatches": 0,
+      "generic_cost": {
+        "multiplies": 72,
+        "representation_multiplies": 0,
+        "sequential_rounds": 1,
+        "slow_memory_words": 60
+      },
+      "id": "M1",
+      "mechanism": "tiled_streaming_accumulation",
+      "programme_screen": {
+        "same_exact_state": true,
+        "same_multiplies": true,
+        "verdict": "KILL"
+      },
+      "resembles": "IO-aware / tiled attention kernels",
+      "screens_disagree": true
+    },
+    {
+      "advantage_lives_in": "sequential_rounds",
+      "candidate_cost": {
+        "multiplies": 9564,
+        "representation_multiplies": 0,
+        "sequential_rounds": 1000,
+        "slow_memory_words": 0
+      },
+      "complete_screen": {
+        "improved_coordinates": {
+          "sequential_rounds": [
+            1000,
+            1134
+          ]
+        },
+        "regressed_coordinates": {
+          "multiplies": [
+            9564,
+            4536
+          ]
+        },
+        "same_exact_state": true,
+        "verdict": "PROMOTE"
+      },
+      "domain_size": 189,
+      "exhaustive_state_mismatches": 0,
+      "generic_cost": {
+        "multiplies": 4536,
+        "representation_multiplies": 0,
+        "sequential_rounds": 1134,
+        "slow_memory_words": 0
+      },
+      "id": "M2",
+      "mechanism": "draft_and_verify",
+      "programme_screen": {
+        "same_exact_state": true,
+        "same_multiplies": false,
+        "verdict": "PROMOTE"
+      },
+      "resembles": "speculative execution / speculative decoding",
+      "screens_disagree": false
+    },
+    {
+      "advantage_lives_in": "multiplies",
+      "candidate_cost": {
+        "multiplies": 7,
+        "representation_multiplies": 0,
+        "sequential_rounds": 1,
+        "slow_memory_words": 0
+      },
+      "complete_screen": {
+        "improved_coordinates": {
+          "multiplies": [
+            7,
+            8
+          ]
+        },
+        "regressed_coordinates": {},
+        "same_exact_state": true,
+        "verdict": "PROMOTE"
+      },
+      "exhaustive_state_mismatches": 0,
+      "generic_cost": {
+        "multiplies": 8,
+        "representation_multiplies": 0,
+        "sequential_rounds": 1,
+        "slow_memory_words": 0
+      },
+      "id": "M3",
+      "mechanism": "strassen_2x2",
+      "programme_screen": {
+        "same_exact_state": true,
+        "same_multiplies": false,
+        "verdict": "PROMOTE"
+      },
+      "resembles": "fast matrix multiplication (arithmetic schedule, no representation)",
+      "screens_disagree": false
+    },
+    {
+      "advantage_lives_in": "representation_multiplies",
+      "candidate_cost": {
+        "multiplies": 0,
+        "representation_multiplies": 16,
+        "sequential_rounds": 22,
+        "slow_memory_words": 0
+      },
+      "complete_screen": {
+        "improved_coordinates": {},
+        "regressed_coordinates": {
+          "multiplies": [
+            16,
+            0
+          ]
+        },
+        "same_exact_state": true,
+        "verdict": "KILL"
+      },
+      "complete_screen_vs_unsubsidised_baseline": {
+        "improved_coordinates": {
+          "multiplies": [
+            16,
+            121
+          ]
+        },
+        "regressed_coordinates": {},
+        "same_exact_state": true,
+        "verdict": "PROMOTE"
+      },
+      "exhaustive_state_mismatches": 0,
+      "generic_cost": {
+        "multiplies": 0,
+        "representation_multiplies": 0,
+        "sequential_rounds": 22,
+        "slow_memory_words": 0
+      },
+      "generic_unsubsidised_cost": {
+        "multiplies": 121,
+        "representation_multiplies": 0,
+        "sequential_rounds": 22,
+        "slow_memory_words": 0
+      },
+      "id": "M4",
+      "mechanism": "prefix_index_range_sums",
+      "programme_screen": {
+        "same_exact_state": true,
+        "same_multiplies": true,
+        "verdict": "KILL"
+      },
+      "resembles": "every representation-based mechanism, E-000102 .. E-000105 included",
+      "screens_disagree": false,
+      "subsidy_flips_verdict": true
+    },
+    {
+      "advantage_lives_in": "nothing",
+      "candidate_cost": {
+        "multiplies": 32,
+        "representation_multiplies": 0,
+        "sequential_rounds": 1,
+        "slow_memory_words": 0
+      },
+      "complete_screen": {
+        "improved_coordinates": {},
+        "regressed_coordinates": {
+          "multiplies": [
+            32,
+            16
+          ]
+        },
+        "same_exact_state": true,
+        "verdict": "KILL"
+      },
+      "exhaustive_state_mismatches": 0,
+      "generic_cost": {
+        "multiplies": 16,
+        "representation_multiplies": 0,
+        "sequential_rounds": 1,
+        "slow_memory_words": 0
+      },
+      "id": "M5",
+      "mechanism": "wasteful_recompute",
+      "programme_screen": {
+        "same_exact_state": true,
+        "same_multiplies": false,
+        "verdict": "PROMOTE"
+      },
+      "resembles": "nothing \u2014 the null control",
+      "screens_disagree": true
+    }
+  ],
+  "not_claimed": "No claim that any specific prior kill (E-000086 .. E-000108) would reverse under the complete screen. That requires re-running each with its own cost vector recorded, which NOV-001 does not do. No claim about the standing of the mechanisms M1-M5 resemble; every verdict here is produced from this file's own counters.",
+  "representation_subsidy_flips_verdict": true,
+  "scope": "calibration of the programme's registered novelty/reduction screen",
+  "screen_as_written": "kill iff candidate and generic reach identical exact states with an identical multiply count, the generic baseline having been handed the candidate's representation",
+  "screen_is_calibrated": false,
+  "screens_agree_on": [
+    "M2",
+    "M3",
+    "M4"
+  ]
+}

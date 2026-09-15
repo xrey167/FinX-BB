@@ -1,0 +1,37 @@
+name: E000062 J-space address ABI
+
+on:
+  push:
+    branches: [research/e000051-clean-bystanders]
+    paths:
+      - 'so/experiments/e000062_jspace_address_abi.py'
+      - 'so/jlens.py'
+      - '.github/workflows/e000062-jspace-address-abi.yml'
+  workflow_dispatch:
+
+jobs:
+  jspace-abi:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 55
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+          cache-dependency-path: so/requirements.txt
+      - name: Install CPU dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install torch --index-url https://download.pytorch.org/whl/cpu
+          python -m pip install -r so/requirements.txt
+      - name: E-000062 J-space ABI
+        env:
+          SO_THREADS: '4'
+        run: |
+          mkdir -p ci-e62
+          python -m so.experiments.e000062_jspace_address_abi --seeds 0 1 2 3 4 --threads 4 --results-dir ci-e62
+      - uses: actions/upload-artifact@v4
+        with:
+          name: e000062-jspace-address-abi
+          path: ci-e62/

@@ -1,0 +1,43 @@
+name: E000095 cross-context revision receipt
+on:
+  push:
+    branches: [research/e000051-clean-bystanders]
+    paths:
+      - 'so/experiments/e000095_cross_context_pod_revision_receipt.py'
+      - 'docs/novelty/e000095-cross-context-pod-revision-receipt.md'
+      - '.github/workflows/e000095-cross-context-receipt.yml'
+  workflow_dispatch:
+jobs:
+  receipt:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 90
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - label: distilgpt2
+            model: distilgpt2
+          - label: pythia70m
+            model: EleutherAI/pythia-70m
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+          cache-dependency-path: so/requirements.txt
+      - name: Install CPU dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install torch --index-url https://download.pytorch.org/whl/cpu
+          python -m pip install -r so/requirements.txt
+      - name: E-000095 receipt kill screen
+        run: |
+          mkdir -p ci-e95
+          python -m so.experiments.e000095_cross_context_pod_revision_receipt \
+            --model '${{ matrix.model }}' --seeds 0 1 2 --n-cal 64 --n-test 64 --seq-len 16 \
+            --payload-rms 2.0 --results-dir ci-e95
+      - uses: actions/upload-artifact@v4
+        with:
+          name: e000095-${{ matrix.label }}
+          path: ci-e95/

@@ -1,0 +1,45 @@
+name: E000090B balanced in-band generation signature
+on:
+  push:
+    branches: [research/e000051-clean-bystanders]
+    paths:
+      - 'so/experiments/e000090b_inband_generation_signature_balanced.py'
+      - '.github/workflows/e000090b-inband-generation-signature-balanced.yml'
+  workflow_dispatch:
+jobs:
+  screen:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 120
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - label: distilgpt2
+            model: distilgpt2
+          - label: pythia70m
+            model: EleutherAI/pythia-70m
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+          cache-dependency-path: so/requirements.txt
+      - name: Install CPU dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install torch --index-url https://download.pytorch.org/whl/cpu
+          python -m pip install -r so/requirements.txt
+      - name: E-000090B balanced metadata-stripped neural signature screen
+        env:
+          SO_THREADS: '2'
+        run: |
+          mkdir -p ci-e90b
+          python -m so.experiments.e000090b_inband_generation_signature_balanced \
+            --model '${{ matrix.model }}' --seed 0 --results-dir ci-e90b
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: e000090b-${{ matrix.label }}
+          path: ci-e90b/
+          if-no-files-found: error

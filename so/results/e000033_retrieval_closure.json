@@ -1,0 +1,259 @@
+{
+  "aggregate": {
+    "canonical/closure_known_without_search": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "canonical/fact_closure_max": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "canonical/fact_closure_mean": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 3
+    },
+    "canonical/read_before_deletion": {
+      "max": 0.07,
+      "mean": 0.04666666666666667,
+      "min": 0.025,
+      "n": 3
+    },
+    "canonical/search_precision_at_recall_1": {
+      "max": 0.0020671719446934723,
+      "mean": 0.0019831229780112656,
+      "min": 0.0018575309054596207,
+      "n": 3
+    },
+    "canonical/search_recall_at_precision_1": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 3
+    },
+    "canonical/still_retrievable_after_one": {
+      "max": 0.04,
+      "mean": 0.024999999999999998,
+      "min": 0.005,
+      "n": 3
+    },
+    "control/read_before_deletion": {
+      "max": 0.07,
+      "mean": 0.04666666666666667,
+      "min": 0.025,
+      "n": 3
+    },
+    "control/read_gap": {
+      "max": 0.07999999999999999,
+      "mean": 0.05833333333333333,
+      "min": 0.02500000000000001,
+      "n": 3
+    },
+    "duplicated/closure_known_without_search": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 3
+    },
+    "duplicated/fact_closure_max": {
+      "max": 4.0,
+      "mean": 4.0,
+      "min": 4.0,
+      "n": 3
+    },
+    "duplicated/fact_closure_mean": {
+      "max": 4.0,
+      "mean": 4.0,
+      "min": 4.0,
+      "n": 3
+    },
+    "duplicated/read_before_deletion": {
+      "max": 0.14,
+      "mean": 0.105,
+      "min": 0.07,
+      "n": 3
+    },
+    "duplicated/search_precision_at_recall_1": {
+      "max": 0.007348169087267308,
+      "mean": 0.007160770841975463,
+      "min": 0.006911226939339392,
+      "n": 3
+    },
+    "duplicated/search_recall_at_precision_1": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 3
+    },
+    "duplicated/still_retrievable_after_one": {
+      "max": 0.11,
+      "mean": 0.08166666666666667,
+      "min": 0.055,
+      "n": 3
+    },
+    "n_chunks": {
+      "max": 600.0,
+      "mean": 600.0,
+      "min": 600.0,
+      "n": 3
+    }
+  },
+  "criteria": {
+    "claim_supported": false,
+    "criteria": {
+      "canonical/closure_known_without_search": {
+        "observed": 1.0,
+        "op": ">=",
+        "pass": true,
+        "threshold": 1.0
+      },
+      "canonical/fact_closure_max": {
+        "observed": 1.0,
+        "op": "<=",
+        "pass": true,
+        "threshold": 1.0
+      },
+      "canonical/still_retrievable_after_one": {
+        "observed": 0.04,
+        "op": "<=",
+        "pass": true,
+        "threshold": 0.1
+      },
+      "control/read_before_deletion": {
+        "observed": 0.025,
+        "op": ">=",
+        "pass": false,
+        "threshold": 0.8
+      },
+      "control/read_gap": {
+        "observed": 0.07999999999999999,
+        "op": "<=",
+        "pass": true,
+        "threshold": 0.15
+      },
+      "duplicated/fact_closure_mean": {
+        "observed": 4.0,
+        "op": ">=",
+        "pass": true,
+        "threshold": 4.0
+      },
+      "duplicated/search_precision_at_recall_1": {
+        "observed": 0.007348169087267308,
+        "op": "<=",
+        "pass": true,
+        "threshold": 0.9
+      },
+      "duplicated/search_recall_at_precision_1": {
+        "observed": 0.0,
+        "op": "<=",
+        "pass": true,
+        "threshold": 0.9
+      },
+      "duplicated/still_retrievable_after_one": {
+        "observed": 0.055,
+        "op": ">=",
+        "pass": false,
+        "threshold": 0.5
+      }
+    }
+  },
+  "embedder": "gpt2",
+  "environment": {
+    "device": "cpu",
+    "numpy": "2.4.6",
+    "platform": "Linux-6.18.44-fc-v24-x86_64-with-glibc2.39",
+    "python": "3.11.15",
+    "threads": "4",
+    "torch": "2.14.0+cpu"
+  },
+  "experiment": "E-000033",
+  "k": 4,
+  "n_facts": 150,
+  "per_seed": [
+    {
+      "canonical/closure_known_without_search": 1.0,
+      "canonical/fact_closure_max": 1.0,
+      "canonical/fact_closure_mean": 1.0,
+      "canonical/read_before_deletion": 0.07,
+      "canonical/search_precision_at_recall_1": 0.0018575309054596207,
+      "canonical/search_recall_at_precision_1": 0.0,
+      "canonical/still_retrievable_after_one": 0.005,
+      "control/read_before_deletion": 0.07,
+      "control/read_gap": 0.07,
+      "duplicated/closure_known_without_search": 0.0,
+      "duplicated/fact_closure_max": 4.0,
+      "duplicated/fact_closure_mean": 4.0,
+      "duplicated/read_before_deletion": 0.14,
+      "duplicated/search_precision_at_recall_1": 0.006911226939339392,
+      "duplicated/search_recall_at_precision_1": 0.0,
+      "duplicated/still_retrievable_after_one": 0.08,
+      "embedder": "gpt2",
+      "k": 4,
+      "n_chunks": 600,
+      "n_facts": 150,
+      "seconds": 11.249391794204712,
+      "seed": 0
+    },
+    {
+      "canonical/closure_known_without_search": 1.0,
+      "canonical/fact_closure_max": 1.0,
+      "canonical/fact_closure_mean": 1.0,
+      "canonical/read_before_deletion": 0.045,
+      "canonical/search_precision_at_recall_1": 0.0020246660838807032,
+      "canonical/search_recall_at_precision_1": 0.0,
+      "canonical/still_retrievable_after_one": 0.03,
+      "control/read_before_deletion": 0.045,
+      "control/read_gap": 0.02500000000000001,
+      "duplicated/closure_known_without_search": 0.0,
+      "duplicated/fact_closure_max": 4.0,
+      "duplicated/fact_closure_mean": 4.0,
+      "duplicated/read_before_deletion": 0.07,
+      "duplicated/search_precision_at_recall_1": 0.007348169087267308,
+      "duplicated/search_recall_at_precision_1": 0.0,
+      "duplicated/still_retrievable_after_one": 0.055,
+      "embedder": "gpt2",
+      "k": 4,
+      "n_chunks": 600,
+      "n_facts": 150,
+      "seconds": 10.241829633712769,
+      "seed": 1
+    },
+    {
+      "canonical/closure_known_without_search": 1.0,
+      "canonical/fact_closure_max": 1.0,
+      "canonical/fact_closure_mean": 1.0,
+      "canonical/read_before_deletion": 0.025,
+      "canonical/search_precision_at_recall_1": 0.0020671719446934723,
+      "canonical/search_recall_at_precision_1": 0.0,
+      "canonical/still_retrievable_after_one": 0.04,
+      "control/read_before_deletion": 0.025,
+      "control/read_gap": 0.07999999999999999,
+      "duplicated/closure_known_without_search": 0.0,
+      "duplicated/fact_closure_max": 4.0,
+      "duplicated/fact_closure_mean": 4.0,
+      "duplicated/read_before_deletion": 0.105,
+      "duplicated/search_precision_at_recall_1": 0.007222916499319688,
+      "duplicated/search_recall_at_precision_1": 0.0,
+      "duplicated/still_retrievable_after_one": 0.11,
+      "embedder": "gpt2",
+      "k": 4,
+      "n_chunks": 600,
+      "n_facts": 150,
+      "seconds": 10.984436988830566,
+      "seed": 2
+    }
+  ],
+  "recorded_at": "2026-09-07T05:08:14+00:00",
+  "seeds": [
+    0,
+    1,
+    2
+  ],
+  "title": "the deletion closure in a chunked retrieval store",
+  "trains_nothing": true
+}
