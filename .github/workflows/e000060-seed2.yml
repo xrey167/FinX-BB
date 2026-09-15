@@ -1,0 +1,44 @@
+name: E000060 independent seed2
+on:
+  push:
+    branches: [research/e000051-clean-bystanders]
+    paths:
+      - '.github/workflows/e000060-seed2.yml'
+      - 'so/experiments/e000060_scope_before_routing.py'
+      - 'so/experiments/e000055_relevance_calibration.py'
+      - 'so/experiments/e000008_gpt2_adapter.py'
+      - 'so/experiments/e000017_paraphrase_gap.py'
+      - 'so/experiments/e000018_no_key_no_injection.py'
+      - 'so/llm_adapter.py'
+      - 'so/train.py'
+      - 'so/data.py'
+      - 'so/world.py'
+      - 'so/reference.py'
+  workflow_dispatch:
+jobs:
+  seed2:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 240
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+          cache-dependency-path: so/requirements.txt
+      - name: Install CPU dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install torch --index-url https://download.pytorch.org/whl/cpu
+          python -m pip install -r so/requirements.txt
+      - name: E-000060 seed2
+        env:
+          SO_THREADS: '2'
+        run: |
+          mkdir -p ci-e60
+          python -m so.experiments.e000060_scope_before_routing --seed 2 --steps 1200 --cal-steps 250 --threads 2 --results-dir ci-e60
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: e60-seed2
+          path: ci-e60/

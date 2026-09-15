@@ -1,0 +1,498 @@
+{
+  "aggregate": {
+    "after_all/identical_to_before": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 5
+    },
+    "before/bypass_hop2_acc": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 5
+    },
+    "before/control_para_acc": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 5
+    },
+    "before/general_fresh_world_acc": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 5
+    },
+    "before/target_hop2_ref_agree": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 5
+    },
+    "before/target_hop2_unknown": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 5
+    },
+    "before/target_para_acc": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 5
+    },
+    "before/target_para_unknown": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 5
+    },
+    "before/target_rev_unknown": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 5
+    },
+    "before/unrelated_para_acc": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 5
+    },
+    "revoke/bypass_hop2_acc": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 5
+    },
+    "revoke/control_para_acc": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 5
+    },
+    "revoke/general_fresh_world_acc": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 5
+    },
+    "revoke/target_hop2_ref_agree": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 5
+    },
+    "revoke/target_hop2_unknown": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 5
+    },
+    "revoke/target_para_acc": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 5
+    },
+    "revoke/target_para_unknown": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 5
+    },
+    "revoke/target_rev_unknown": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 5
+    },
+    "revoke/unrelated_para_acc": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 5
+    },
+    "rollback/target_para_acc": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 5
+    },
+    "shred/bypass_hop2_acc": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 5
+    },
+    "shred/control_para_acc": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 5
+    },
+    "shred/general_fresh_world_acc": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 5
+    },
+    "shred/target_hop2_ref_agree": {
+      "max": 1.0,
+      "mean": 0.9960000000000001,
+      "min": 0.98,
+      "n": 5
+    },
+    "shred/target_hop2_unknown": {
+      "max": 1.0,
+      "mean": 0.9960000000000001,
+      "min": 0.98,
+      "n": 5
+    },
+    "shred/target_para_acc": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 5
+    },
+    "shred/target_para_unknown": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 5
+    },
+    "shred/target_rev_unknown": {
+      "max": 1.0,
+      "mean": 0.9580765639589168,
+      "min": 0.9047619047619048,
+      "n": 5
+    },
+    "shred/unrelated_para_acc": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 5
+    },
+    "update/control_para_acc": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 5
+    },
+    "update/target_para_new_obj_acc": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 5
+    },
+    "update/target_para_old_obj_rate": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 5
+    },
+    "update/target_rev_old_obj_ref_agree": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 5
+    }
+  },
+  "by_construction_vs_learned": "REVOKE removes routing by mask (F1), so its effect on every access path (paraphrase, multi-hop, reverse) follows from canonical addressing of one cell; what is learned is that the model answers UNKNOWN instead of using another cell. SHRED leaves the cell routable: refusing it on every path is learned (F3). 'general_fresh_world_acc' uses a separate store and cannot change \u2014 it is a sanity row, not evidence of retention.",
+  "claim": "REVOKE removes the target for every paraphrase, for multi-hop reasoning through the target and for reverse access; SHRED (unsupervised gate) removes it for every paraphrase and multi-hop route and for reverse access in most cases (the measured rate is in the table; the residual is the gate residual treated in E-000004 / E-000010); controls, unrelated cells and bypass paths stay at their previous accuracy; UPDATE replaces the answer for every paraphrase and rollback restores it exactly.",
+  "claim_supported": true,
+  "config": {
+    "n_controls": 50,
+    "n_general": 300,
+    "n_targets": 50,
+    "seeds": [
+      0,
+      1,
+      2,
+      3,
+      4
+    ]
+  },
+  "criteria": {
+    "before/target_para_acc": {
+      "observed": 1.0,
+      "op": ">=",
+      "pass": true,
+      "threshold": 0.98
+    },
+    "revoke/bypass_hop2_acc": {
+      "observed": 1.0,
+      "op": ">=",
+      "pass": true,
+      "threshold": 0.98
+    },
+    "revoke/control_para_acc": {
+      "observed": 1.0,
+      "op": ">=",
+      "pass": true,
+      "threshold": 0.98
+    },
+    "revoke/target_hop2_unknown": {
+      "observed": 1.0,
+      "op": ">=",
+      "pass": true,
+      "threshold": 0.98
+    },
+    "revoke/target_para_unknown": {
+      "observed": 1.0,
+      "op": ">=",
+      "pass": true,
+      "threshold": 0.98
+    },
+    "revoke/unrelated_para_acc": {
+      "observed": 1.0,
+      "op": ">=",
+      "pass": true,
+      "threshold": 0.98
+    },
+    "rollback/target_para_acc": {
+      "observed": 1.0,
+      "op": ">=",
+      "pass": true,
+      "threshold": 0.98
+    },
+    "shred/control_para_acc": {
+      "observed": 1.0,
+      "op": ">=",
+      "pass": true,
+      "threshold": 0.98
+    },
+    "shred/target_para_unknown": {
+      "observed": 1.0,
+      "op": ">=",
+      "pass": true,
+      "threshold": 0.95
+    },
+    "update/target_para_new_obj_acc": {
+      "observed": 1.0,
+      "op": ">=",
+      "pass": true,
+      "threshold": 0.98
+    },
+    "update/target_para_old_obj_rate": {
+      "observed": 0.0,
+      "op": "<=",
+      "pass": true,
+      "threshold": 0.02
+    }
+  },
+  "deletion_level": "F3",
+  "deletion_level_meaning": "Functional forgetting",
+  "environment": {
+    "device": "cpu",
+    "numpy": "2.2.6",
+    "platform": "Linux-6.18.44-fc-v24-x86_64-with-glibc2.39",
+    "python": "3.11.15",
+    "threads": "2",
+    "torch": "2.14.0+cpu"
+  },
+  "evidence_level": "E4",
+  "evidence_level_meaning": "Controlled neural-network evidence",
+  "experiment": "E-000003",
+  "not_claimed": "Reconstruction resistance beyond behaviour (see E-000004) and anything beyond the synthetic system.",
+  "per_seed": [
+    {
+      "after_all/identical_to_before": 1.0,
+      "base_checkpoint_sha256": "49197919faff163b562b048a65b31a555ee9841ecb413e10ff4aab4769d92ba8",
+      "before/bypass_hop2_acc": 1.0,
+      "before/control_para_acc": 1.0,
+      "before/general_fresh_world_acc": 1.0,
+      "before/target_hop2_ref_agree": 1.0,
+      "before/target_hop2_unknown": 0.0,
+      "before/target_para_acc": 1.0,
+      "before/target_para_unknown": 0.0,
+      "before/target_rev_unknown": 0.0,
+      "before/unrelated_para_acc": 1.0,
+      "n_target_hop2": 100,
+      "n_target_rev": 21,
+      "revoke/bypass_hop2_acc": 1.0,
+      "revoke/control_para_acc": 1.0,
+      "revoke/general_fresh_world_acc": 1.0,
+      "revoke/target_hop2_ref_agree": 1.0,
+      "revoke/target_hop2_unknown": 1.0,
+      "revoke/target_para_acc": 0.0,
+      "revoke/target_para_unknown": 1.0,
+      "revoke/target_rev_unknown": 1.0,
+      "revoke/unrelated_para_acc": 1.0,
+      "rollback/target_para_acc": 1.0,
+      "seed": 0,
+      "shred/bypass_hop2_acc": 1.0,
+      "shred/control_para_acc": 1.0,
+      "shred/general_fresh_world_acc": 1.0,
+      "shred/target_hop2_ref_agree": 1.0,
+      "shred/target_hop2_unknown": 1.0,
+      "shred/target_para_acc": 0.0,
+      "shred/target_para_unknown": 1.0,
+      "shred/target_rev_unknown": 0.9047619047619048,
+      "shred/unrelated_para_acc": 1.0,
+      "update/control_para_acc": 1.0,
+      "update/target_para_new_obj_acc": 1.0,
+      "update/target_para_old_obj_rate": 0.0,
+      "update/target_rev_old_obj_ref_agree": 1.0
+    },
+    {
+      "after_all/identical_to_before": 1.0,
+      "base_checkpoint_sha256": "75d83f6bc9156d66e886b4d6865332d694accbd7906b44e5909af10d9076446b",
+      "before/bypass_hop2_acc": 1.0,
+      "before/control_para_acc": 1.0,
+      "before/general_fresh_world_acc": 1.0,
+      "before/target_hop2_ref_agree": 1.0,
+      "before/target_hop2_unknown": 0.0,
+      "before/target_para_acc": 1.0,
+      "before/target_para_unknown": 0.0,
+      "before/target_rev_unknown": 0.0,
+      "before/unrelated_para_acc": 1.0,
+      "n_target_hop2": 100,
+      "n_target_rev": 16,
+      "revoke/bypass_hop2_acc": 1.0,
+      "revoke/control_para_acc": 1.0,
+      "revoke/general_fresh_world_acc": 1.0,
+      "revoke/target_hop2_ref_agree": 1.0,
+      "revoke/target_hop2_unknown": 1.0,
+      "revoke/target_para_acc": 0.0,
+      "revoke/target_para_unknown": 1.0,
+      "revoke/target_rev_unknown": 1.0,
+      "revoke/unrelated_para_acc": 1.0,
+      "rollback/target_para_acc": 1.0,
+      "seed": 1,
+      "shred/bypass_hop2_acc": 1.0,
+      "shred/control_para_acc": 1.0,
+      "shred/general_fresh_world_acc": 1.0,
+      "shred/target_hop2_ref_agree": 1.0,
+      "shred/target_hop2_unknown": 1.0,
+      "shred/target_para_acc": 0.0,
+      "shred/target_para_unknown": 1.0,
+      "shred/target_rev_unknown": 1.0,
+      "shred/unrelated_para_acc": 1.0,
+      "update/control_para_acc": 1.0,
+      "update/target_para_new_obj_acc": 1.0,
+      "update/target_para_old_obj_rate": 0.0,
+      "update/target_rev_old_obj_ref_agree": 1.0
+    },
+    {
+      "after_all/identical_to_before": 1.0,
+      "base_checkpoint_sha256": "dea4462faa19da797f49dda7c50fb7795c485a88ec752ffebedcd52570ab0571",
+      "before/bypass_hop2_acc": 1.0,
+      "before/control_para_acc": 1.0,
+      "before/general_fresh_world_acc": 1.0,
+      "before/target_hop2_ref_agree": 1.0,
+      "before/target_hop2_unknown": 0.0,
+      "before/target_para_acc": 1.0,
+      "before/target_para_unknown": 0.0,
+      "before/target_rev_unknown": 0.0,
+      "before/unrelated_para_acc": 1.0,
+      "n_target_hop2": 100,
+      "n_target_rev": 17,
+      "revoke/bypass_hop2_acc": 1.0,
+      "revoke/control_para_acc": 1.0,
+      "revoke/general_fresh_world_acc": 1.0,
+      "revoke/target_hop2_ref_agree": 1.0,
+      "revoke/target_hop2_unknown": 1.0,
+      "revoke/target_para_acc": 0.0,
+      "revoke/target_para_unknown": 1.0,
+      "revoke/target_rev_unknown": 1.0,
+      "revoke/unrelated_para_acc": 1.0,
+      "rollback/target_para_acc": 1.0,
+      "seed": 2,
+      "shred/bypass_hop2_acc": 1.0,
+      "shred/control_para_acc": 1.0,
+      "shred/general_fresh_world_acc": 1.0,
+      "shred/target_hop2_ref_agree": 1.0,
+      "shred/target_hop2_unknown": 1.0,
+      "shred/target_para_acc": 0.0,
+      "shred/target_para_unknown": 1.0,
+      "shred/target_rev_unknown": 0.9411764705882353,
+      "shred/unrelated_para_acc": 1.0,
+      "update/control_para_acc": 1.0,
+      "update/target_para_new_obj_acc": 1.0,
+      "update/target_para_old_obj_rate": 0.0,
+      "update/target_rev_old_obj_ref_agree": 1.0
+    },
+    {
+      "after_all/identical_to_before": 1.0,
+      "base_checkpoint_sha256": "54ee6d58e114cfff95e0e1926ffba9225fcb954a9ff2e0b0de18fb493d542689",
+      "before/bypass_hop2_acc": 1.0,
+      "before/control_para_acc": 1.0,
+      "before/general_fresh_world_acc": 1.0,
+      "before/target_hop2_ref_agree": 1.0,
+      "before/target_hop2_unknown": 0.0,
+      "before/target_para_acc": 1.0,
+      "before/target_para_unknown": 0.0,
+      "before/target_rev_unknown": 0.0,
+      "before/unrelated_para_acc": 1.0,
+      "n_target_hop2": 100,
+      "n_target_rev": 18,
+      "revoke/bypass_hop2_acc": 1.0,
+      "revoke/control_para_acc": 1.0,
+      "revoke/general_fresh_world_acc": 1.0,
+      "revoke/target_hop2_ref_agree": 1.0,
+      "revoke/target_hop2_unknown": 1.0,
+      "revoke/target_para_acc": 0.0,
+      "revoke/target_para_unknown": 1.0,
+      "revoke/target_rev_unknown": 1.0,
+      "revoke/unrelated_para_acc": 1.0,
+      "rollback/target_para_acc": 1.0,
+      "seed": 3,
+      "shred/bypass_hop2_acc": 1.0,
+      "shred/control_para_acc": 1.0,
+      "shred/general_fresh_world_acc": 1.0,
+      "shred/target_hop2_ref_agree": 1.0,
+      "shred/target_hop2_unknown": 1.0,
+      "shred/target_para_acc": 0.0,
+      "shred/target_para_unknown": 1.0,
+      "shred/target_rev_unknown": 0.9444444444444444,
+      "shred/unrelated_para_acc": 1.0,
+      "update/control_para_acc": 1.0,
+      "update/target_para_new_obj_acc": 1.0,
+      "update/target_para_old_obj_rate": 0.0,
+      "update/target_rev_old_obj_ref_agree": 1.0
+    },
+    {
+      "after_all/identical_to_before": 1.0,
+      "base_checkpoint_sha256": "23098dc16120265f6237b1de1b2d6346347ec5b27eb11488d686cdbd02a072dd",
+      "before/bypass_hop2_acc": 1.0,
+      "before/control_para_acc": 1.0,
+      "before/general_fresh_world_acc": 1.0,
+      "before/target_hop2_ref_agree": 1.0,
+      "before/target_hop2_unknown": 0.0,
+      "before/target_para_acc": 1.0,
+      "before/target_para_unknown": 0.0,
+      "before/target_rev_unknown": 0.0,
+      "before/unrelated_para_acc": 1.0,
+      "n_target_hop2": 100,
+      "n_target_rev": 19,
+      "revoke/bypass_hop2_acc": 1.0,
+      "revoke/control_para_acc": 1.0,
+      "revoke/general_fresh_world_acc": 1.0,
+      "revoke/target_hop2_ref_agree": 1.0,
+      "revoke/target_hop2_unknown": 1.0,
+      "revoke/target_para_acc": 0.0,
+      "revoke/target_para_unknown": 1.0,
+      "revoke/target_rev_unknown": 1.0,
+      "revoke/unrelated_para_acc": 1.0,
+      "rollback/target_para_acc": 1.0,
+      "seed": 4,
+      "shred/bypass_hop2_acc": 1.0,
+      "shred/control_para_acc": 1.0,
+      "shred/general_fresh_world_acc": 1.0,
+      "shred/target_hop2_ref_agree": 0.98,
+      "shred/target_hop2_unknown": 0.98,
+      "shred/target_para_acc": 0.0,
+      "shred/target_para_unknown": 1.0,
+      "shred/target_rev_unknown": 1.0,
+      "shred/unrelated_para_acc": 1.0,
+      "update/control_para_acc": 1.0,
+      "update/target_para_new_obj_acc": 1.0,
+      "update/target_para_old_obj_rate": 0.0,
+      "update/target_rev_old_obj_ref_agree": 1.0
+    }
+  ],
+  "recorded_at": "2026-09-02T23:59:53+00:00",
+  "title": "Retention and generalisation of deletion"
+}

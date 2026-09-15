@@ -1,0 +1,464 @@
+{
+  "aggregate": {
+    "address_over_content": {
+      "max": -0.21699575790290848,
+      "mean": -0.21699575790290848,
+      "min": -0.21699575790290848,
+      "n": 1
+    },
+    "answer_after": {
+      "max": 0.03125,
+      "mean": 0.03125,
+      "min": 0.03125,
+      "n": 1
+    },
+    "answer_after_all": {
+      "max": 0.3088235294117647,
+      "mean": 0.3088235294117647,
+      "min": 0.3088235294117647,
+      "n": 1
+    },
+    "answer_before": {
+      "max": 0.9338235294117647,
+      "mean": 0.9338235294117647,
+      "min": 0.9338235294117647,
+      "n": 1
+    },
+    "capacity_bound": {
+      "max": 158.89655172413794,
+      "mean": 158.89655172413794,
+      "min": 158.89655172413794,
+      "n": 1
+    },
+    "collateral": {
+      "max": 0.3897058823529412,
+      "mean": 0.3897058823529412,
+      "min": 0.3897058823529412,
+      "n": 1
+    },
+    "d": {
+      "max": 768.0,
+      "mean": 768.0,
+      "min": 768.0,
+      "n": 1
+    },
+    "dim_A_mean": {
+      "max": 5.764705882352941,
+      "mean": 5.764705882352941,
+      "min": 5.764705882352941,
+      "n": 1
+    },
+    "excess_address": {
+      "max": -0.18087993028993699,
+      "mean": -0.18087993028993699,
+      "min": -0.18087993028993699,
+      "n": 1
+    },
+    "excess_content": {
+      "max": 0.036115827612971496,
+      "mean": 0.036115827612971496,
+      "min": 0.036115827612971496,
+      "n": 1
+    },
+    "excess_full": {
+      "max": -0.2020902670189446,
+      "mean": -0.2020902670189446,
+      "min": -0.2020902670189446,
+      "n": 1
+    },
+    "excess_overlap": {
+      "max": -0.1306559417885964,
+      "mean": -0.1306559417885964,
+      "min": -0.1306559417885964,
+      "n": 1
+    },
+    "excess_overlap_random": {
+      "max": 0.41180139971953456,
+      "mean": 0.41180139971953456,
+      "min": 0.41180139971953456,
+      "n": 1
+    },
+    "headroom": {
+      "max": 0.9244791666666666,
+      "mean": 0.9244791666666666,
+      "min": 0.9244791666666666,
+      "n": 1
+    },
+    "n_held": {
+      "max": 17.0,
+      "mean": 17.0,
+      "min": 17.0,
+      "n": 1
+    },
+    "n_silenced": {
+      "max": 12.0,
+      "mean": 12.0,
+      "min": 12.0,
+      "n": 1
+    },
+    "null_address": {
+      "max": 0.7762398212855938,
+      "mean": 0.7762398212855938,
+      "min": 0.7762398212855938,
+      "n": 1
+    },
+    "null_address_random": {
+      "max": 0.19295479674987934,
+      "mean": 0.19295479674987934,
+      "min": 0.19295479674987934,
+      "n": 1
+    },
+    "null_content": {
+      "max": 0.1870973422734167,
+      "mean": 0.1870973422734167,
+      "min": 0.1870973422734167,
+      "n": 1
+    },
+    "null_content_random": {
+      "max": 0.06382318191154969,
+      "mean": 0.06382318191154969,
+      "min": 0.06382318191154969,
+      "n": 1
+    },
+    "null_full": {
+      "max": 0.8177888958039237,
+      "mean": 0.8177888958039237,
+      "min": 0.8177888958039237,
+      "n": 1
+    },
+    "null_full_random": {
+      "max": 0.20475593921454513,
+      "mean": 0.20475593921454513,
+      "min": 0.20475593921454513,
+      "n": 1
+    },
+    "null_overlap": {
+      "max": 0.6872237572314764,
+      "mean": 0.6872237572314764,
+      "min": 0.6872237572314764,
+      "n": 1
+    },
+    "null_overlap_random": {
+      "max": 0.1447664157233455,
+      "mean": 0.1447664157233455,
+      "min": 0.1447664157233455,
+      "n": 1
+    },
+    "orthogonality": {
+      "max": 0.23934827744960785,
+      "mean": 0.23934827744960785,
+      "min": 0.23934827744960785,
+      "n": 1
+    },
+    "overlap_AA_max": {
+      "max": 0.8558856248855591,
+      "mean": 0.8558856248855591,
+      "min": 0.8558856248855591,
+      "n": 1
+    },
+    "overlap_AA_mean": {
+      "max": 0.55656781544288,
+      "mean": 0.55656781544288,
+      "min": 0.55656781544288,
+      "n": 1
+    },
+    "overlap_AV_max": {
+      "max": 0.8574918508529663,
+      "mean": 0.8574918508529663,
+      "min": 0.8574918508529663,
+      "n": 1
+    },
+    "overlap_AV_mean": {
+      "max": 0.5841656612077107,
+      "mean": 0.5841656612077107,
+      "min": 0.5841656612077107,
+      "n": 1
+    },
+    "overlap_address": {
+      "max": 0.5953598909956568,
+      "mean": 0.5953598909956568,
+      "min": 0.5953598909956568,
+      "n": 1
+    },
+    "overlap_content": {
+      "max": 0.2232131698863882,
+      "mean": 0.2232131698863882,
+      "min": 0.2232131698863882,
+      "n": 1
+    },
+    "overlap_full": {
+      "max": 0.615698628784979,
+      "mean": 0.615698628784979,
+      "min": 0.615698628784979,
+      "n": 1
+    },
+    "pressure": {
+      "max": 0.07552083333333333,
+      "mean": 0.07552083333333333,
+      "min": 0.07552083333333333,
+      "n": 1
+    },
+    "rank_efficiency": {
+      "max": 1.0,
+      "mean": 1.0,
+      "min": 1.0,
+      "n": 1
+    },
+    "silenced_rate": {
+      "max": 0.7058823529411765,
+      "mean": 0.7058823529411765,
+      "min": 0.7058823529411765,
+      "n": 1
+    },
+    "sum_dims": {
+      "max": 58.0,
+      "mean": 58.0,
+      "min": 58.0,
+      "n": 1
+    },
+    "union_rank": {
+      "max": 58.0,
+      "mean": 58.0,
+      "min": 58.0,
+      "n": 1
+    }
+  },
+  "criteria": {
+    "claim_supported": false,
+    "criteria": {
+      "address_over_content": {
+        "observed": -0.21699575790290848,
+        "op": ">=",
+        "pass": false,
+        "threshold": 0.1
+      },
+      "answer_after": {
+        "observed": 0.03125,
+        "op": "<=",
+        "pass": true,
+        "threshold": 0.25
+      },
+      "answer_before": {
+        "observed": 0.9338235294117647,
+        "op": ">=",
+        "pass": true,
+        "threshold": 0.75
+      },
+      "excess_overlap": {
+        "observed": -0.1306559417885964,
+        "op": ">=",
+        "pass": false,
+        "threshold": 0.1
+      },
+      "pressure": {
+        "observed": 0.07552083333333333,
+        "op": "<=",
+        "pass": true,
+        "threshold": 0.5
+      },
+      "silenced_rate": {
+        "observed": 0.7058823529411765,
+        "op": ">=",
+        "pass": true,
+        "threshold": 0.5
+      }
+    }
+  },
+  "decision_rule": "pressure <= 0.5 and orthogonality <= 0.95 -> ALLOCATION, not capacity: the model had room for private subspaces and did not take it, so a training objective is the remedy. pressure > 0.8 -> the bound is binding and no objective fixes it without more dimensions. orthogonality > 0.95 with collateral still present -> the deletion subspaces are independent and the mechanism runs through A_i against V_j instead, which is measured in the same run. Fixed before the numbers were seen.",
+  "environment": {
+    "device": "cpu",
+    "numpy": "2.4.6",
+    "platform": "Linux-6.18.44-fc-v24-x86_64-with-glibc2.39",
+    "python": "3.11.15",
+    "threads": "2",
+    "torch": "2.14.0+cpu"
+  },
+  "evidence_level": "E5",
+  "evidence_level_meaning": "Transformer evidence",
+  "experiment": "E-000043",
+  "layer": 7,
+  "model": "gpt2",
+  "recorded_at": "2026-09-04T21:32:28+00:00",
+  "result": {
+    "address_over_content": -0.21699575790290848,
+    "answer_after": 0.03125,
+    "answer_after_all": 0.3088235294117647,
+    "answer_before": 0.9338235294117647,
+    "capacity_bound": 158.89655172413794,
+    "collateral": 0.3897058823529412,
+    "d": 768,
+    "dim_A_mean": 5.764705882352941,
+    "excess_address": -0.18087993028993699,
+    "excess_content": 0.036115827612971496,
+    "excess_full": -0.2020902670189446,
+    "excess_overlap": -0.1306559417885964,
+    "excess_overlap_random": 0.41180139971953456,
+    "headroom": 0.9244791666666666,
+    "layer": 7,
+    "n_held": 17,
+    "n_silenced": 12,
+    "null_address": 0.7762398212855938,
+    "null_address_random": 0.19295479674987934,
+    "null_content": 0.1870973422734167,
+    "null_content_random": 0.06382318191154969,
+    "null_full": 0.8177888958039237,
+    "null_full_random": 0.20475593921454513,
+    "null_overlap": 0.6872237572314764,
+    "null_overlap_random": 0.1447664157233455,
+    "orthogonality": 0.23934827744960785,
+    "overlap_AA_max": 0.8558856248855591,
+    "overlap_AA_mean": 0.55656781544288,
+    "overlap_AV_max": 0.8574918508529663,
+    "overlap_AV_mean": 0.5841656612077107,
+    "overlap_address": 0.5953598909956568,
+    "overlap_content": 0.2232131698863882,
+    "overlap_full": 0.615698628784979,
+    "per_fact": [
+      {
+        "answer_after": 0.125,
+        "answer_before": 0.875,
+        "collateral": 0.0625,
+        "dim_A": 7,
+        "silenced": 1.0,
+        "subject": "France"
+      },
+      {
+        "answer_after": 1.0,
+        "answer_before": 1.0,
+        "collateral": 0.4375,
+        "dim_A": 8,
+        "silenced": 0.0,
+        "subject": "Japan"
+      },
+      {
+        "answer_after": 0.0,
+        "answer_before": 1.0,
+        "collateral": 0.375,
+        "dim_A": 4,
+        "silenced": 1.0,
+        "subject": "Italy"
+      },
+      {
+        "answer_after": 0.0,
+        "answer_before": 1.0,
+        "collateral": 0.375,
+        "dim_A": 7,
+        "silenced": 1.0,
+        "subject": "Germany"
+      },
+      {
+        "answer_after": 0.0,
+        "answer_before": 1.0,
+        "collateral": 0.625,
+        "dim_A": 3,
+        "silenced": 1.0,
+        "subject": "Russia"
+      },
+      {
+        "answer_after": 0.0,
+        "answer_before": 1.0,
+        "collateral": 0.1875,
+        "dim_A": 8,
+        "silenced": 1.0,
+        "subject": "China"
+      },
+      {
+        "answer_after": 0.125,
+        "answer_before": 0.875,
+        "collateral": 0.375,
+        "dim_A": 8,
+        "silenced": 1.0,
+        "subject": "Spain"
+      },
+      {
+        "answer_after": 0.0,
+        "answer_before": 0.875,
+        "collateral": 0.4375,
+        "dim_A": 2,
+        "silenced": 1.0,
+        "subject": "Egypt"
+      },
+      {
+        "answer_after": 1.0,
+        "answer_before": 0.875,
+        "collateral": 0.0625,
+        "dim_A": 8,
+        "silenced": 0.0,
+        "subject": "Canada"
+      },
+      {
+        "answer_after": 0.0,
+        "answer_before": 1.0,
+        "collateral": 0.375,
+        "dim_A": 6,
+        "silenced": 1.0,
+        "subject": "Greece"
+      },
+      {
+        "answer_after": 0.0,
+        "answer_before": 1.0,
+        "collateral": 0.125,
+        "dim_A": 6,
+        "silenced": 1.0,
+        "subject": "Cuba"
+      },
+      {
+        "answer_after": 0.0,
+        "answer_before": 1.0,
+        "collateral": 1.0,
+        "dim_A": 2,
+        "silenced": 1.0,
+        "subject": "Iran"
+      },
+      {
+        "answer_after": 0.0,
+        "answer_before": 0.875,
+        "collateral": 0.4375,
+        "dim_A": 3,
+        "silenced": 1.0,
+        "subject": "Poland"
+      },
+      {
+        "answer_after": 0.875,
+        "answer_before": 0.75,
+        "collateral": 0.875,
+        "dim_A": 8,
+        "silenced": 0.0,
+        "subject": "Norway"
+      },
+      {
+        "answer_after": 0.125,
+        "answer_before": 0.75,
+        "collateral": 0.625,
+        "dim_A": 2,
+        "silenced": 1.0,
+        "subject": "Peru"
+      },
+      {
+        "answer_after": 1.0,
+        "answer_before": 1.0,
+        "collateral": 0.0,
+        "dim_A": 8,
+        "silenced": 0.0,
+        "subject": "Chile"
+      },
+      {
+        "answer_after": 1.0,
+        "answer_before": 1.0,
+        "collateral": 0.25,
+        "dim_A": 8,
+        "silenced": 0.0,
+        "subject": "Sweden"
+      }
+    ],
+    "pressure": 0.07552083333333333,
+    "rank_efficiency": 1.0,
+    "seconds": 133.63214683532715,
+    "silenced_rate": 0.7058823529411765,
+    "sum_dims": 58.0,
+    "union_rank": 58.0,
+    "verdict": "12 fact(s), 58 direction(s) in d=768: pressure 0.0755 against a bound of 159 facts, mean pairwise overlap 0.5566 against a matched null of 0.6872 (max 0.8559) -- ALLOCATED: the subspaces are no more overlapping than a matched null and there is budget to spare, so clean deletion is available here"
+  },
+  "title": "clean-deletion capacity, and whether GPT-2 is against the bound or below it",
+  "trains_nothing": true
+}

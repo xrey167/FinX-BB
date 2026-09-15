@@ -1,0 +1,46 @@
+name: E000071 CAVI neural read-hook race
+
+on:
+  push:
+    branches: [research/e000051-clean-bystanders]
+    paths:
+      - 'so/cavi.py'
+      - 'so/experiments/e000071_cavi_read_hook_race.py'
+      - 'so/experiments/e000070_cavi_live_symlink_boundary.py'
+      - 'so/llm_adapter.py'
+      - 'so/mvcc.py'
+      - 'so/data.py'
+      - 'so/experiments/e000015_symlink_cells.py'
+      - 'so/experiments/e000020_symlink_gpt2.py'
+      - '.github/workflows/e000071-cavi-read-hook-race.yml'
+  workflow_dispatch:
+
+jobs:
+  read-hook-race:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+          cache-dependency-path: so/requirements.txt
+      - name: Install CPU dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install torch --index-url https://download.pytorch.org/whl/cpu
+          python -m pip install -r so/requirements.txt
+      - name: CAVI unit semantics
+        run: python -m pytest so/tests/test_cavi.py -q
+      - name: E-000071 actual read-hook race
+        env:
+          SO_THREADS: '2'
+        run: |
+          mkdir -p ci-e71
+          python -m so.experiments.e000071_cavi_read_hook_race --seeds 0 --steps 1200 --groups 16 --template 9 --threads 2 --results-dir ci-e71
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: e000071-cavi-read-hook-race
+          path: ci-e71/

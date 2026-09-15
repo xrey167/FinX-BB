@@ -1,0 +1,65 @@
+name: E000077 BOS dense symlink capability
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [research/e000051-clean-bystanders]
+    paths:
+      - '.github/workflows/e000077-bos-dense-symlink.yml'
+      - 'so/experiments/e000070_cavi_live_symlink_boundary.py'
+      - 'so/experiments/e000020_symlink_gpt2.py'
+      - 'so/experiments/e000008_gpt2_adapter.py'
+      - 'so/cavi.py'
+
+jobs:
+  bos-dense-cavi:
+    strategy:
+      fail-fast: false
+      matrix:
+        seed: [0, 1, 2]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 120
+    env:
+      SO_BOS: '1'
+      SO_THREADS: '2'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+          cache-dependency-path: so/requirements.txt
+      - name: Install CPU dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install torch --index-url https://download.pytorch.org/whl/cpu
+          python -m pip install -r so/requirements.txt
+      - name: CAVI unit semantics
+        run: python -m pytest so/tests/test_cavi.py -q
+      - name: E-000077 BOS+dense real-symlink boundary
+        run: |
+          mkdir -p ci-e77
+          set +e
+          python -m so.experiments.e000070_cavi_live_symlink_boundary \
+            --seeds ${{ matrix.seed }} --steps 3000 --groups 100 --template 9 --threads 2 --results-dir ci-e77
+          rc=$?
+          set -e
+          python - <<'PY'
+          import json, pathlib
+          p=pathlib.Path('ci-e77/e000070_cavi_live_symlink_boundary.json')
+          r=json.loads(p.read_text())['rows'][0]
+          rate=float(r['fresh_alias_read_rate'])
+          print(f'fresh_alias_read_rate={rate:.6f}; required>=0.95')
+          if rate < 0.95:
+              raise SystemExit(3)
+          # Structural CAVI checks must also all pass; the historical E-000070 0.60 screening floor is not sufficient here.
+          bad=[k for k,v in r['checks'].items() if not bool(v)]
+          if bad:
+              print('structural failures:', bad)
+              raise SystemExit(4)
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: e000077-bos-dense-symlink-s${{ matrix.seed }}
+          path: ci-e77/

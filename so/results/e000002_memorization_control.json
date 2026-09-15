@@ -1,0 +1,290 @@
+{
+  "aggregate": {
+    "fixed_no_routing": {
+      "bank_removed_acc": {
+        "max": 1.0,
+        "mean": 1.0,
+        "min": 1.0,
+        "n": 3
+      },
+      "control_after_revoke": {
+        "max": 1.0,
+        "mean": 1.0,
+        "min": 1.0,
+        "n": 3
+      },
+      "direct": {
+        "max": 1.0,
+        "mean": 1.0,
+        "min": 1.0,
+        "n": 3
+      },
+      "target_after_revoke_leak": {
+        "max": 1.0,
+        "mean": 1.0,
+        "min": 1.0,
+        "n": 3
+      },
+      "target_after_revoke_unknown": {
+        "max": 0.0,
+        "mean": 0.0,
+        "min": 0.0,
+        "n": 3
+      },
+      "target_before": {
+        "max": 1.0,
+        "mean": 1.0,
+        "min": 1.0,
+        "n": 3
+      }
+    },
+    "fixed_routing": {
+      "bank_removed_acc": {
+        "max": 0.0,
+        "mean": 0.0,
+        "min": 0.0,
+        "n": 3
+      },
+      "control_after_revoke": {
+        "max": 1.0,
+        "mean": 1.0,
+        "min": 1.0,
+        "n": 3
+      },
+      "direct": {
+        "max": 1.0,
+        "mean": 1.0,
+        "min": 1.0,
+        "n": 3
+      },
+      "target_after_revoke_leak": {
+        "max": 0.0,
+        "mean": 0.0,
+        "min": 0.0,
+        "n": 3
+      },
+      "target_after_revoke_unknown": {
+        "max": 1.0,
+        "mean": 1.0,
+        "min": 1.0,
+        "n": 3
+      },
+      "target_before": {
+        "max": 1.0,
+        "mean": 1.0,
+        "min": 1.0,
+        "n": 3
+      }
+    },
+    "resampled": {
+      "bank_removed_acc": {
+        "max": 0.0,
+        "mean": 0.0,
+        "min": 0.0,
+        "n": 3
+      },
+      "control_after_revoke": {
+        "max": 1.0,
+        "mean": 1.0,
+        "min": 1.0,
+        "n": 3
+      },
+      "direct": {
+        "max": 1.0,
+        "mean": 1.0,
+        "min": 1.0,
+        "n": 3
+      },
+      "target_after_revoke_leak": {
+        "max": 0.0,
+        "mean": 0.0,
+        "min": 0.0,
+        "n": 3
+      },
+      "target_after_revoke_unknown": {
+        "max": 1.0,
+        "mean": 1.0,
+        "min": 1.0,
+        "n": 3
+      },
+      "target_before": {
+        "max": 1.0,
+        "mean": 1.0,
+        "min": 1.0,
+        "n": 3
+      }
+    }
+  },
+  "caveats": "Only 'fixed_routing' is an empirical control: 'resampled' cannot memorise by construction and 'fixed_no_routing' cannot read the layer by construction. The fixed-world regimes see the same random lifecycle states per step as the re-sampled regime (only the world is held fixed), so the no-routing model receives inconsistent labels for revoked/shredded cells and settles on the majority label. Fixed regimes are trained for fewer steps than the re-sampled E-000001-B models.",
+  "claim": "Revocation in the knowledge layer only deletes what the weights have not copied. With re-sampled worlds the weights hold no facts (layer masked -> nothing answered) and revocation leaves no leak. Without a knowledge layer everything is weight-encoded and revocation is impossible (leak 100%). The empirical control \u2014 a fixed training world WITH the layer available \u2014 is reported as measured: within this budget the core did not copy facts into its weights (layer masked -> nothing answered, leak 0%); this is a bound for 2000 steps, not a guarantee for longer training.",
+  "claim_supported": true,
+  "config": {
+    "fixed_steps": 2000,
+    "n_targets": 100,
+    "seeds": [
+      0,
+      1,
+      2
+    ]
+  },
+  "criteria": {
+    "fixed_no_routing/direct": {
+      "observed": 1.0,
+      "op": ">=",
+      "pass": true,
+      "threshold": 0.5
+    },
+    "fixed_no_routing/target_after_revoke_leak": {
+      "observed": 1.0,
+      "op": ">=",
+      "pass": true,
+      "threshold": 0.5
+    },
+    "resampled/bank_removed_acc": {
+      "observed": 0.0,
+      "op": "<=",
+      "pass": true,
+      "threshold": 0.02
+    },
+    "resampled/control_after_revoke": {
+      "observed": 1.0,
+      "op": ">=",
+      "pass": true,
+      "threshold": 0.99
+    },
+    "resampled/target_after_revoke_leak": {
+      "observed": 0.0,
+      "op": "<=",
+      "pass": true,
+      "threshold": 0.02
+    }
+  },
+  "deletion_level": null,
+  "environment": {
+    "device": "cpu",
+    "numpy": "2.2.6",
+    "platform": "Linux-6.18.44-fc-v24-x86_64-with-glibc2.39",
+    "python": "3.11.15",
+    "threads": "2",
+    "torch": "2.14.0+cpu"
+  },
+  "evidence_level": "E4",
+  "evidence_level_meaning": "Controlled neural-network evidence",
+  "experiment": "E-000002",
+  "not_claimed": "No statement about unlearning facts already encoded in weights (that is exactly the regime this mechanism avoids by construction).",
+  "per_condition": {
+    "fixed_no_routing": [
+      {
+        "bank_removed_acc": 1.0,
+        "bank_removed_unknown": 0.0,
+        "control_after_revoke": 1.0,
+        "direct": 1.0,
+        "fresh_world_direct": 0.004,
+        "seed": 0,
+        "target_after_revoke_leak": 1.0,
+        "target_after_revoke_unknown": 0.0,
+        "target_before": 1.0,
+        "train_seconds": 49.771674156188965
+      },
+      {
+        "bank_removed_acc": 1.0,
+        "bank_removed_unknown": 0.0,
+        "control_after_revoke": 1.0,
+        "direct": 1.0,
+        "fresh_world_direct": 0.004,
+        "seed": 1,
+        "target_after_revoke_leak": 1.0,
+        "target_after_revoke_unknown": 0.0,
+        "target_before": 1.0,
+        "train_seconds": 52.26294231414795
+      },
+      {
+        "bank_removed_acc": 1.0,
+        "bank_removed_unknown": 0.0,
+        "control_after_revoke": 1.0,
+        "direct": 1.0,
+        "fresh_world_direct": 0.004,
+        "seed": 2,
+        "target_after_revoke_leak": 1.0,
+        "target_after_revoke_unknown": 0.0,
+        "target_before": 1.0,
+        "train_seconds": 50.721065521240234
+      }
+    ],
+    "fixed_routing": [
+      {
+        "bank_removed_acc": 0.0,
+        "bank_removed_unknown": 1.0,
+        "control_after_revoke": 1.0,
+        "direct": 1.0,
+        "fresh_world_direct": 0.995,
+        "seed": 0,
+        "target_after_revoke_leak": 0.0,
+        "target_after_revoke_unknown": 1.0,
+        "target_before": 1.0,
+        "train_seconds": 96.01888966560364
+      },
+      {
+        "bank_removed_acc": 0.0,
+        "bank_removed_unknown": 1.0,
+        "control_after_revoke": 1.0,
+        "direct": 1.0,
+        "fresh_world_direct": 0.997,
+        "seed": 1,
+        "target_after_revoke_leak": 0.0,
+        "target_after_revoke_unknown": 1.0,
+        "target_before": 1.0,
+        "train_seconds": 102.31113529205322
+      },
+      {
+        "bank_removed_acc": 0.0,
+        "bank_removed_unknown": 1.0,
+        "control_after_revoke": 1.0,
+        "direct": 1.0,
+        "fresh_world_direct": 0.999,
+        "seed": 2,
+        "target_after_revoke_leak": 0.0,
+        "target_after_revoke_unknown": 1.0,
+        "target_before": 1.0,
+        "train_seconds": 98.74408864974976
+      }
+    ],
+    "resampled": [
+      {
+        "bank_removed_acc": 0.0,
+        "bank_removed_unknown": 1.0,
+        "base_checkpoint_sha256": "49197919faff163b562b048a65b31a555ee9841ecb413e10ff4aab4769d92ba8",
+        "control_after_revoke": 1.0,
+        "direct": 1.0,
+        "seed": 0,
+        "target_after_revoke_leak": 0.0,
+        "target_after_revoke_unknown": 1.0,
+        "target_before": 1.0
+      },
+      {
+        "bank_removed_acc": 0.0,
+        "bank_removed_unknown": 1.0,
+        "base_checkpoint_sha256": "75d83f6bc9156d66e886b4d6865332d694accbd7906b44e5909af10d9076446b",
+        "control_after_revoke": 1.0,
+        "direct": 1.0,
+        "seed": 1,
+        "target_after_revoke_leak": 0.0,
+        "target_after_revoke_unknown": 1.0,
+        "target_before": 1.0
+      },
+      {
+        "bank_removed_acc": 0.0,
+        "bank_removed_unknown": 1.0,
+        "base_checkpoint_sha256": "dea4462faa19da797f49dda7c50fb7795c485a88ec752ffebedcd52570ab0571",
+        "control_after_revoke": 1.0,
+        "direct": 1.0,
+        "seed": 2,
+        "target_after_revoke_leak": 0.0,
+        "target_after_revoke_unknown": 1.0,
+        "target_before": 1.0
+      }
+    ]
+  },
+  "recorded_at": "2026-09-02T23:59:48+00:00",
+  "title": "Weight-memorisation control (copy problem)"
+}
