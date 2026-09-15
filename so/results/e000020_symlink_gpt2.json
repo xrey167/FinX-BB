@@ -1,0 +1,549 @@
+{
+  "aggregate": {
+    "active/alias_forced_choice": {
+      "max": 0.915,
+      "mean": 0.895,
+      "min": 0.88,
+      "n": 3
+    },
+    "active/alias_probe_top1": {
+      "max": 0.42,
+      "mean": 0.38833333333333336,
+      "min": 0.36,
+      "n": 3
+    },
+    "alias_direct": {
+      "max": 0.52,
+      "mean": 0.5066666666666667,
+      "min": 0.5,
+      "n": 3
+    },
+    "alias_heldout_min": {
+      "max": 0.4,
+      "mean": 0.36999999999999994,
+      "min": 0.355,
+      "n": 3
+    },
+    "alias_template1_train": {
+      "max": 0.895,
+      "mean": 0.8333333333333334,
+      "min": 0.785,
+      "n": 3
+    },
+    "alias_template8_heldout": {
+      "max": 0.4,
+      "mean": 0.36999999999999994,
+      "min": 0.355,
+      "n": 3
+    },
+    "alias_template9_heldout": {
+      "max": 0.92,
+      "mean": 0.8883333333333333,
+      "min": 0.87,
+      "n": 3
+    },
+    "delete_target/alias_true_object": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 3
+    },
+    "delete_target/alias_unknown": {
+      "max": 1.0,
+      "mean": 0.9916666666666667,
+      "min": 0.98,
+      "n": 3
+    },
+    "direct": {
+      "max": 0.58,
+      "mean": 0.57,
+      "min": 0.5633333333333334,
+      "n": 3
+    },
+    "dup_direct": {
+      "max": 0.59,
+      "mean": 0.5483333333333333,
+      "min": 0.51,
+      "n": 3
+    },
+    "dup_shred/copy_direct_acc": {
+      "max": 0.59,
+      "mean": 0.5583333333333332,
+      "min": 0.54,
+      "n": 3
+    },
+    "dup_shred/copy_forced_choice": {
+      "max": 0.975,
+      "mean": 0.9733333333333333,
+      "min": 0.97,
+      "n": 3
+    },
+    "dup_shred/copy_probe_top1": {
+      "max": 0.585,
+      "mean": 0.49833333333333335,
+      "min": 0.445,
+      "n": 3
+    },
+    "duplicate_update/alias_new_object": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 3
+    },
+    "probe_calibration_top1": {
+      "max": 0.5083333333333333,
+      "mean": 0.48055555555555557,
+      "min": 0.43333333333333335,
+      "n": 3
+    },
+    "resign_target/alias_direct": {
+      "max": 0.52,
+      "mean": 0.5066666666666667,
+      "min": 0.5,
+      "n": 3
+    },
+    "revoke_alias/alias_unknown": {
+      "max": 1.0,
+      "mean": 0.98,
+      "min": 0.95,
+      "n": 3
+    },
+    "revoke_alias/sibling_readable": {
+      "max": 0.6,
+      "mean": 0.5566666666666666,
+      "min": 0.49,
+      "n": 3
+    },
+    "revoke_alias/target_readable": {
+      "max": 0.65,
+      "mean": 0.5766666666666667,
+      "min": 0.52,
+      "n": 3
+    },
+    "rollback/alias_direct": {
+      "max": 0.52,
+      "mean": 0.5066666666666667,
+      "min": 0.5,
+      "n": 3
+    },
+    "shared_update/alias_new_object": {
+      "max": 0.535,
+      "mean": 0.5183333333333334,
+      "min": 0.505,
+      "n": 3
+    },
+    "shred_target/alias_forced_choice": {
+      "max": 0.53,
+      "mean": 0.5100000000000001,
+      "min": 0.475,
+      "n": 3
+    },
+    "shred_target/alias_mean_rank": {
+      "max": 137.555,
+      "mean": 129.61166666666665,
+      "min": 120.335,
+      "n": 3
+    },
+    "shred_target/alias_probe_top1": {
+      "max": 0.01,
+      "mean": 0.0033333333333333335,
+      "min": 0.0,
+      "n": 3
+    },
+    "shred_target/alias_top1_among_entities": {
+      "max": 0.01,
+      "mean": 0.006666666666666667,
+      "min": 0.0,
+      "n": 3
+    },
+    "shred_target/alias_true_object": {
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "n": 3
+    },
+    "shred_target/alias_unknown": {
+      "max": 1.0,
+      "mean": 0.995,
+      "min": 0.985,
+      "n": 3
+    },
+    "train_seconds": {
+      "max": 5387.5919823646545,
+      "mean": 5337.852466424306,
+      "min": 5293.424255371094,
+      "n": 3
+    }
+  },
+  "by_construction": [
+    "the store decides which payload a row carries; the bank never exports the target's payload, status or signature, and the model is never told that a value is a pointer",
+    "that one operation on a shared object reaches every alias is a property of the store; what is measured is whether the frozen model reports it, and whether the SAME model reports the duplication arm, where it does not, correctly"
+  ],
+  "claim": "NOT SUPPORTED BY THE MEASUREMENTS (see criteria): ",
+  "claim_groups_met": {
+    "alias_lifecycle": false,
+    "attack_validity": true,
+    "attacks_through_every_alias": true,
+    "one_shred_deletes_every_path": false,
+    "one_update_reaches_every_path": false,
+    "reading_through_an_alias": false
+  },
+  "claim_parts": [
+    {
+      "claim": "reading_through_an_alias",
+      "criteria": [
+        "direct",
+        "alias_direct",
+        "dup_direct",
+        "alias_heldout_min"
+      ],
+      "supported": false
+    },
+    {
+      "claim": "one_update_reaches_every_path",
+      "criteria": [
+        "shared_update/alias_new_object",
+        "duplicate_update/alias_new_object",
+        "rollback/alias_direct"
+      ],
+      "supported": false
+    },
+    {
+      "claim": "one_shred_deletes_every_path",
+      "criteria": [
+        "shred_target/alias_unknown",
+        "shred_target/alias_true_object",
+        "dup_shred/copy_direct_acc",
+        "resign_target/alias_direct"
+      ],
+      "supported": false
+    },
+    {
+      "claim": "attacks_through_every_alias",
+      "criteria": [
+        "shred_target/alias_probe_top1",
+        "shred_target/alias_forced_choice",
+        "shred_target/alias_top1_among_entities"
+      ],
+      "supported": true
+    },
+    {
+      "claim": "attack_validity",
+      "criteria": [
+        "active/alias_probe_top1",
+        "probe_calibration_top1"
+      ],
+      "supported": true
+    },
+    {
+      "claim": "alias_lifecycle",
+      "criteria": [
+        "revoke_alias/alias_unknown",
+        "revoke_alias/sibling_readable",
+        "revoke_alias/target_readable",
+        "delete_target/alias_unknown",
+        "delete_target/alias_true_object"
+      ],
+      "supported": false
+    }
+  ],
+  "claim_supported": false,
+  "config": {
+    "adapter": {
+      "d_key": 256,
+      "fallback": "unknown",
+      "hard_gate": false,
+      "marker_dim": 16,
+      "match_gate": false,
+      "n_deref": 1,
+      "n_relations": 4,
+      "read_layers": [
+        8,
+        10
+      ],
+      "status_gated": true,
+      "two_channel_null": false,
+      "use_links": true,
+      "use_marker_gate": true
+    },
+    "eval": {
+      "n_alias_per_group": 2,
+      "n_base": 700,
+      "n_direct": 300,
+      "n_groups": 100,
+      "n_targets": 100
+    },
+    "n_deref": 1,
+    "n_train_templates": 8,
+    "seeds": [
+      0,
+      1,
+      2
+    ],
+    "steps": 3000
+  },
+  "criteria": {
+    "active/alias_probe_top1": {
+      "observed": 0.36,
+      "op": ">=",
+      "pass": true,
+      "threshold": 0.25
+    },
+    "alias_direct": {
+      "observed": 0.5,
+      "op": ">=",
+      "pass": false,
+      "threshold": 0.8
+    },
+    "alias_heldout_min": {
+      "observed": 0.355,
+      "op": ">=",
+      "pass": false,
+      "threshold": 0.5
+    },
+    "delete_target/alias_true_object": {
+      "observed": 0.0,
+      "op": "<=",
+      "pass": true,
+      "threshold": 0.05
+    },
+    "delete_target/alias_unknown": {
+      "observed": 0.98,
+      "op": ">=",
+      "pass": true,
+      "threshold": 0.9
+    },
+    "direct": {
+      "observed": 0.5633333333333334,
+      "op": ">=",
+      "pass": false,
+      "threshold": 0.85
+    },
+    "dup_direct": {
+      "observed": 0.51,
+      "op": ">=",
+      "pass": false,
+      "threshold": 0.85
+    },
+    "dup_shred/copy_direct_acc": {
+      "observed": 0.54,
+      "op": ">=",
+      "pass": false,
+      "threshold": 0.85
+    },
+    "duplicate_update/alias_new_object": {
+      "observed": 0.0,
+      "op": "<=",
+      "pass": true,
+      "threshold": 0.05
+    },
+    "probe_calibration_top1": {
+      "observed": 0.43333333333333335,
+      "op": ">=",
+      "pass": true,
+      "threshold": 0.2
+    },
+    "resign_target/alias_direct": {
+      "observed": 0.5,
+      "op": ">=",
+      "pass": false,
+      "threshold": 0.8
+    },
+    "revoke_alias/alias_unknown": {
+      "observed": 0.95,
+      "op": ">=",
+      "pass": true,
+      "threshold": 0.9
+    },
+    "revoke_alias/sibling_readable": {
+      "observed": 0.49,
+      "op": ">=",
+      "pass": false,
+      "threshold": 0.8
+    },
+    "revoke_alias/target_readable": {
+      "observed": 0.52,
+      "op": ">=",
+      "pass": false,
+      "threshold": 0.8
+    },
+    "rollback/alias_direct": {
+      "observed": 0.5,
+      "op": ">=",
+      "pass": false,
+      "threshold": 0.8
+    },
+    "shared_update/alias_new_object": {
+      "observed": 0.505,
+      "op": ">=",
+      "pass": false,
+      "threshold": 0.9
+    },
+    "shred_target/alias_forced_choice": {
+      "observed": 0.53,
+      "op": "<=",
+      "pass": true,
+      "threshold": 0.6
+    },
+    "shred_target/alias_probe_top1": {
+      "observed": 0.01,
+      "op": "<=",
+      "pass": true,
+      "threshold": 0.05
+    },
+    "shred_target/alias_top1_among_entities": {
+      "observed": 0.01,
+      "op": "<=",
+      "pass": true,
+      "threshold": 0.05
+    },
+    "shred_target/alias_true_object": {
+      "observed": 0.0,
+      "op": "<=",
+      "pass": true,
+      "threshold": 0.05
+    },
+    "shred_target/alias_unknown": {
+      "observed": 0.985,
+      "op": ">=",
+      "pass": true,
+      "threshold": 0.9
+    }
+  },
+  "deletion_level": "F1",
+  "deletion_level_meaning": "Routing removal",
+  "deletion_level_targeted": "F4",
+  "design": "The same world is written twice and read by the same trained adapter from natural-language prompts: in the symlink arm the alias keys are LINK cells over shared targets, in the duplication arm they are ordinary fact cells holding a copy. Every sharing claim is the difference between the arms.",
+  "environment": {
+    "device": "cpu",
+    "numpy": "2.2.6",
+    "platform": "Linux-6.18.44-fc-v24-x86_64-with-glibc2.39",
+    "python": "3.11.15",
+    "threads": "1",
+    "torch": "2.14.0+cpu"
+  },
+  "evidence_level": "E5",
+  "evidence_level_meaning": "Transformer evidence",
+  "experiment": "E-000020",
+  "learned": [
+    "following a pointer inside a frozen pretrained transformer: the dereference query comes from the value just read, and the passthrough column keeps a value that was not a pointer",
+    "answering unknown for a dangling pointer after DELETE and for a revoked alias"
+  ],
+  "not_claimed": "chains deeper than one dereference; multi-token entities; anything above 124M parameters.",
+  "per_seed": [
+    {
+      "active/alias_forced_choice": 0.89,
+      "active/alias_probe_top1": 0.36,
+      "alias_direct": 0.52,
+      "alias_heldout_min": 0.4,
+      "alias_template1_train": 0.82,
+      "alias_template8_heldout": 0.4,
+      "alias_template9_heldout": 0.92,
+      "checkpoint_sha256": "53ac475d672a13b9d51ac96bffb6d72df90f5147b12a393e7e6165d90786da49",
+      "delete_target/alias_true_object": 0.0,
+      "delete_target/alias_unknown": 0.98,
+      "direct": 0.5666666666666667,
+      "dup_direct": 0.545,
+      "dup_shred/copy_direct_acc": 0.545,
+      "dup_shred/copy_forced_choice": 0.97,
+      "dup_shred/copy_probe_top1": 0.465,
+      "duplicate_update/alias_new_object": 0.0,
+      "probe_calibration_top1": 0.43333333333333335,
+      "resign_target/alias_direct": 0.52,
+      "revoke_alias/alias_unknown": 0.95,
+      "revoke_alias/sibling_readable": 0.6,
+      "revoke_alias/target_readable": 0.52,
+      "rollback/alias_direct": 0.52,
+      "seed": 2000,
+      "shared_update/alias_new_object": 0.505,
+      "shred_target/alias_forced_choice": 0.53,
+      "shred_target/alias_mean_rank": 120.335,
+      "shred_target/alias_probe_top1": 0.0,
+      "shred_target/alias_top1_among_entities": 0.01,
+      "shred_target/alias_true_object": 0.0,
+      "shred_target/alias_unknown": 0.985,
+      "train_seconds": 5387.5919823646545
+    },
+    {
+      "active/alias_forced_choice": 0.88,
+      "active/alias_probe_top1": 0.385,
+      "alias_direct": 0.5,
+      "alias_heldout_min": 0.355,
+      "alias_template1_train": 0.895,
+      "alias_template8_heldout": 0.355,
+      "alias_template9_heldout": 0.875,
+      "checkpoint_sha256": "d71f78e21af4f40a32e937b6b3817e55a882803c1cb011a59283f7140832bb09",
+      "delete_target/alias_true_object": 0.0,
+      "delete_target/alias_unknown": 1.0,
+      "direct": 0.58,
+      "dup_direct": 0.51,
+      "dup_shred/copy_direct_acc": 0.54,
+      "dup_shred/copy_forced_choice": 0.975,
+      "dup_shred/copy_probe_top1": 0.445,
+      "duplicate_update/alias_new_object": 0.0,
+      "probe_calibration_top1": 0.5,
+      "resign_target/alias_direct": 0.5,
+      "revoke_alias/alias_unknown": 0.99,
+      "revoke_alias/sibling_readable": 0.49,
+      "revoke_alias/target_readable": 0.65,
+      "rollback/alias_direct": 0.5,
+      "seed": 2001,
+      "shared_update/alias_new_object": 0.515,
+      "shred_target/alias_forced_choice": 0.525,
+      "shred_target/alias_mean_rank": 137.555,
+      "shred_target/alias_probe_top1": 0.0,
+      "shred_target/alias_top1_among_entities": 0.01,
+      "shred_target/alias_true_object": 0.0,
+      "shred_target/alias_unknown": 1.0,
+      "train_seconds": 5293.424255371094
+    },
+    {
+      "active/alias_forced_choice": 0.915,
+      "active/alias_probe_top1": 0.42,
+      "alias_direct": 0.5,
+      "alias_heldout_min": 0.355,
+      "alias_template1_train": 0.785,
+      "alias_template8_heldout": 0.355,
+      "alias_template9_heldout": 0.87,
+      "checkpoint_sha256": "1706456c4c014eb571ea2e782167cdbeaae2088e7a380c1876b3dad464e338ce",
+      "delete_target/alias_true_object": 0.0,
+      "delete_target/alias_unknown": 0.995,
+      "direct": 0.5633333333333334,
+      "dup_direct": 0.59,
+      "dup_shred/copy_direct_acc": 0.59,
+      "dup_shred/copy_forced_choice": 0.975,
+      "dup_shred/copy_probe_top1": 0.585,
+      "duplicate_update/alias_new_object": 0.0,
+      "probe_calibration_top1": 0.5083333333333333,
+      "resign_target/alias_direct": 0.5,
+      "revoke_alias/alias_unknown": 1.0,
+      "revoke_alias/sibling_readable": 0.58,
+      "revoke_alias/target_readable": 0.56,
+      "rollback/alias_direct": 0.5,
+      "seed": 2002,
+      "shared_update/alias_new_object": 0.535,
+      "shred_target/alias_forced_choice": 0.475,
+      "shred_target/alias_mean_rank": 130.945,
+      "shred_target/alias_probe_top1": 0.01,
+      "shred_target/alias_top1_among_entities": 0.0,
+      "shred_target/alias_true_object": 0.0,
+      "shred_target/alias_unknown": 1.0,
+      "train_seconds": 5332.54116153717
+    }
+  ],
+  "recorded_at": "2026-09-04T06:24:50+00:00",
+  "sample_sizes": {
+    "alias_direct": 200,
+    "delete_target/alias_unknown": 200,
+    "direct": 300,
+    "dup_direct": 200,
+    "dup_shred/copy_direct_acc": 200,
+    "duplicate_update/alias_new_object": 200,
+    "revoke_alias/alias_unknown": 100,
+    "shared_update/alias_new_object": 200,
+    "shred_target/alias_probe_top1": 200,
+    "shred_target/alias_true_object": 200,
+    "shred_target/alias_unknown": 200
+  },
+  "title": "Shared knowledge objects in a frozen GPT-2: link cells against duplication, natural-language prompts"
+}
