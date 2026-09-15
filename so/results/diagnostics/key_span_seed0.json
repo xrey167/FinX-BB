@@ -1,0 +1,53 @@
+{
+ "rank95": 174,
+ "rank99": 223,
+ "n_train_vectors": 1024,
+ "d_in": 768,
+ "trained": {
+  "off_span_mean": 0.0907215029001236,
+  "off_span_p10": 0.045221731066703796,
+  "off_span_p90": 0.16499388217926025,
+  "key_norm_mean": 21.247711181640625,
+  "n": 256
+ },
+ "interleaved_held": {
+  "off_span_mean": 0.6438722610473633,
+  "off_span_p10": 0.534838080406189,
+  "off_span_p90": 0.7107955813407898,
+  "key_norm_mean": 21.24042320251465,
+  "n": 128
+ },
+ "next256": {
+  "off_span_mean": 0.6464672684669495,
+  "off_span_p10": 0.5371739268302917,
+  "off_span_p90": 0.717311680316925,
+  "key_norm_mean": 21.229402542114258,
+  "n": 256
+ },
+ "t1": {
+  "n_subjects": 253,
+  "spearman_offspan_vs_routing": -0.5422066806866533,
+  "spearman_keynorm_vs_routing": 0.17160478457979314,
+  "routing_trained": 0.9973544973544973,
+  "routing_held": 0.27165354330708663,
+  "offspan_trained": 0.09161388128995895,
+  "offspan_held": 0.6431894302368164,
+  "keynorm_trained": 21.25008201599121,
+  "keynorm_held": 21.240381240844727,
+  "spearman_offspan_within_held": -0.23003960442444693,
+  "spearman_keynorm_within_held": 0.20635897075365578
+ },
+ "t9": {
+  "n_subjects": 253,
+  "spearman_offspan_vs_routing": -0.6733565418947137,
+  "spearman_keynorm_vs_routing": 0.15918538838771637,
+  "routing_trained": 0.9847883597883599,
+  "routing_held": 0.15682414698162728,
+  "offspan_trained": 0.09161388128995895,
+  "offspan_held": 0.6431894302368164,
+  "keynorm_trained": 21.25008201599121,
+  "keynorm_held": 21.240381240844727,
+  "spearman_offspan_within_held": -0.12408605174353206,
+  "spearman_keynorm_within_held": 0.192556008623922
+ }
+}
